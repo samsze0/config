@@ -1,0 +1,25 @@
+{
+	"bootstrapped": true,
+	"installed_packages":
+	[
+		"A File Icon",
+		"C++ Classhelper",
+		"CMakeEditor",
+		"Color Highlight",
+		"Emmet",
+		"FileManager",
+		"fish",
+		"Formatter",
+		"Generic Config",
+		"LSP",
+		"LSP-json",
+		"LSP-pyright",
+		"Meson",
+		"OpenGL Shading Language (GLSL)",
+		"Package Control",
+		"xmake",
+	],
+	"in_process_packages":
+	[
+	],
+}

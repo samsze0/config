@@ -1,0 +1,95 @@
+[
+  { "keys": ["super+shift+o"], "command": "prompt_open" },
+  { "keys": ["super+t"], "command": "new_file" },
+  { "keys": ["f1"], "command": "show_overlay", "args": {"overlay": "command_palette"} },
+  { "keys": ["super+l"], "command": "next_view" },
+  { "keys": ["super+j"], "command": "prev_view" },
+  { "keys": ["shift+space"], "command": "auto_complete" },
+  { "keys": ["f2"], "command": "toggle_side_bar" },
+  { "keys": ["f3"], "command": "show_overlay", "args": {"overlay": "goto", "show_files": true} },
+
+  // Selection expand
+  { "keys": ["ctrl+a"], "command": "expand_selection", "args": {"to": "smart"} },
+  { "keys": ["ctrl+l"], "command": "expand_selection", "args": {"to": "line"} },
+
+  // Delete line
+  { "keys": ["ctrl+y"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Delete Line.sublime-macro"} },
+
+  { "keys": ["super+backspace"], "command": "delete_word", "args": { "forward": false, "sub_words": true } },
+  { "keys": ["super+shift+forward_slash"], "command": "toggle_comment", "args": { "block": true } },
+
+  { "keys": ["super+up"], "command": "swap_line_up" },
+  { "keys": ["super+down"], "command": "swap_line_down" },
+
+  { "keys": ["ctrl+j"], "command": "join_lines" },
+  { "keys": ["ctrl+d"], "command": "duplicate_line" },
+
+  // Multi-cursor
+  { "keys": ["super+shift+up"], "command": "select_lines", "args": {"forward": false} },
+  { "keys": ["super+shift+down"], "command": "select_lines", "args": {"forward": true} },
+
+  // LSP
+  {
+    "command": "lsp_show_diagnostics_panel",
+    "keys": [
+      "f12"
+    ],
+    "context": [
+      {
+       "key": "setting.lsp_active"
+      }
+    ]
+  },
+  {
+    "command": "lsp_symbol_rename",
+    "keys": [
+      "ctrl+r"
+    ],
+    "context": [
+      {
+        "key": "lsp.session_with_capability",
+        "operator": "equal",
+        "operand": "renameProvider"
+      }
+    ]
+  },
+  {
+    "command": "lsp_document_symbols",
+    "keys": [
+      "f11"
+    ],
+    "context": [
+      {
+        "key": "lsp.session_with_capability",
+        "operator": "equal",
+        "operand": "documentSymbolProvider"
+      }
+    ]
+  },
+  {
+    "command": "lsp_hover",
+    "keys": [
+      "super+u"
+    ],
+    "context": [
+      {
+        "key": "lsp.session_with_capability",
+        "operator": "equal",
+        "operand": "hoverProvider"
+      }
+    ]
+  },
+  {
+    "command": "lsp_signature_help_show",
+    "keys": [
+      "ctrl+p"
+    ],
+    "context": [
+      {
+        "key": "lsp.signature_help_available",
+        "operator": "equal",
+        "operand": true
+      }
+    ]
+  },
+]

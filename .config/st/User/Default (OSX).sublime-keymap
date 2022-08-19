@@ -10,7 +10,8 @@
 
   // Selection expand
   { "keys": ["ctrl+a"], "command": "expand_selection", "args": {"to": "smart"} },
-  { "keys": ["ctrl+l"], "command": "expand_selection", "args": {"to": "line"} },
+  { "keys": ["ctrl+l"], "command": "find_under_expand" },
+  { "keys": ["ctrl+shift+l"], "command": "find_under_expand_skip" },
 
   // Delete line
   { "keys": ["ctrl+y"], "command": "run_macro_file", "args": {"file": "res://Packages/Default/Delete Line.sublime-macro"} },
@@ -82,7 +83,7 @@
   {
     "command": "lsp_signature_help_show",
     "keys": [
-      "ctrl+p"
+      "super+p"
     ],
     "context": [
       {
@@ -91,5 +92,24 @@
         "operand": true
       }
     ]
+  },
+
+  // Emmet
+  {
+    "keys": ["ctrl+e", "a"],
+    "command": "emmet_wrap_with_abbreviation",
+    "context": [{"key": "setting.is_widget",  "operand": false }]
+  },
+  {
+    "keys": ["ctrl+e", "e"],
+    "command": "emmet_expand_abbreviation"
+  },
+  {
+    "keys": ["ctrl+e", "d"],
+    "command": "emmet_remove_tag"
+  },
+  {
+    "keys": ["ctrl+e", "r"],
+    "command": "emmet_rename_tag"
   },
 ]

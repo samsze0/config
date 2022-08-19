@@ -62,3 +62,11 @@ ctrl + alt + cmd - f9 : yabai -m window --space 9
 ctrl + alt + cmd - f10 : yabai -m window --space 10
 ctrl + alt + cmd - f11 : yabai -m window --space 11
 ctrl + alt + cmd - f12 : yabai -m window --space 12
+
+# Enable/Disable focus_follow_mouse
+ctrl + alt + cmd - q : yabai -m config focus_follows_mouse autoraise
+ctrl + alt + cmd + shift - q : yabai -m config focus_follows_mouse off
+
+# Enable/Disable window_opacity
+ctrl + alt + cmd - a : yabai -m config window_opacity on
+ctrl + alt + cmd + shift - a : yabai -m config window_opacity off

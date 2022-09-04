@@ -36,7 +36,7 @@ if status is-interactive
     end
   end
 
-  tmux source-file ~/.config/tmux/init.conf
+  # tmux source-file ~/.config/tmux/init.conf
 
   # OS specific
 
@@ -75,3 +75,8 @@ if status is-interactive
     
   end
 end
+
+# pnpm
+set -gx PNPM_HOME "/Users/mingsumsze/Library/pnpm"
+set -gx PATH "$PNPM_HOME" $PATH
+# pnpm end

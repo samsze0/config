@@ -52,18 +52,16 @@ function initial_setup_brew
     brave-browser \
     blender \
     discord \
-    dotnet \
     docker \
     google-cloud-sdk \
     karabiner-elements \
     kitty \
     keycastr \
-    minbrowser \
     obs \
     unity \
     spotify \
-    sublime-text \
-    sublime-merge
+    linearmouse \
+    visual-studio-code
 
   for cask in $casks
     brew install --cask $cask

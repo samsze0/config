@@ -21,6 +21,7 @@ function initial_setup_brew
     lua \
     less \
     llvm \
+    mkcert \
     ninja \
     node \
     python@3.9 \
@@ -49,6 +50,7 @@ function initial_setup_brew
   # Casks
   set -l casks \
     adobe-acrobat-reader \
+    background-music \
     brave-browser \
     blender \
     discord \

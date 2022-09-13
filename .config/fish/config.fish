@@ -29,12 +29,12 @@ if status is-interactive
 
   # TMUX
 
-  if not set -q TMUX
-    tmux attach-session 2> /dev/null
-    if [ $status != 0 ]
-      tmux new-session -n main -c ~ -s main
-    end
-  end
+  # if not set -q TMUX
+  #   tmux attach-session 2> /dev/null
+  #   if [ $status != 0 ]
+  #     tmux new-session -n main -c ~ -s main
+  #   end
+  # end
 
   # tmux source-file ~/.config/tmux/init.conf
 

@@ -63,6 +63,7 @@ function initial_setup_brew
     unity \
     spotify \
     linearmouse \
+    warp \
     visual-studio-code
 
   for cask in $casks

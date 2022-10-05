@@ -1,0 +1,9 @@
+*
+!.gitignore
+!.config/xcode/
+!.config/bat/
+!.config/btm/
+!.config/karabiner/
+!.config/skhd/
+!.config/spacebar/
+!.config/yabai/

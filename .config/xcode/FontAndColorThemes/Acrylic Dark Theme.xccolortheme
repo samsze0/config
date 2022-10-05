@@ -99,7 +99,7 @@
 		<key>xcode.syntax.attribute</key>
 		<string>0.357315 0.590597 0.853188 1</string>
 		<key>xcode.syntax.character</key>
-		<string>0.241082 0.62081 0.538639 1</string>
+		<string>0.288943 0.642174 0.547995 1</string>
 		<key>xcode.syntax.comment</key>
 		<string>0.423943 0.474618 0.525183 1</string>
 		<key>xcode.syntax.comment.doc</key>
@@ -107,9 +107,9 @@
 		<key>xcode.syntax.comment.doc.keyword</key>
 		<string>0.572549 0.631373 0.694118 1</string>
 		<key>xcode.syntax.declaration.other</key>
-		<string>0.357315 0.590597 0.853188 1</string>
+		<string>0.859579 0.859579 0.859579 1</string>
 		<key>xcode.syntax.declaration.type</key>
-		<string>0.357315 0.590597 0.853188 1</string>
+		<string>0.859579 0.859579 0.859579 1</string>
 		<key>xcode.syntax.identifier.class</key>
 		<string>0.834625 0.270207 0.236759 1</string>
 		<key>xcode.syntax.identifier.class.system</key>
@@ -127,13 +127,13 @@
 		<key>xcode.syntax.identifier.macro.system</key>
 		<string>0.357315 0.590597 0.853188 1</string>
 		<key>xcode.syntax.identifier.type</key>
-		<string>0.241082 0.62081 0.538639 1</string>
+		<string>0.288943 0.642174 0.547995 1</string>
 		<key>xcode.syntax.identifier.type.system</key>
-		<string>0.241082 0.62081 0.538639 1</string>
+		<string>0.288943 0.642174 0.547995 1</string>
 		<key>xcode.syntax.identifier.variable</key>
-		<string>0.357315 0.590597 0.853188 1</string>
+		<string>0.859579 0.859579 0.859579 1</string>
 		<key>xcode.syntax.identifier.variable.system</key>
-		<string>0.357315 0.590597 0.853188 1</string>
+		<string>0.859579 0.859579 0.859579 1</string>
 		<key>xcode.syntax.keyword</key>
 		<string>0.357315 0.590597 0.853188 1</string>
 		<key>xcode.syntax.mark</key>
@@ -147,7 +147,7 @@
 		<key>xcode.syntax.preprocessor</key>
 		<string>0.357315 0.590597 0.853188 1</string>
 		<key>xcode.syntax.string</key>
-		<string>0.241082 0.62081 0.538639 1</string>
+		<string>0.280053 0.642602 0.542687 1</string>
 		<key>xcode.syntax.url</key>
 		<string>0.357315 0.590597 0.853188 1</string>
 	</dict>

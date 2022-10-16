@@ -2,19 +2,21 @@
 !.gitignore
 !.config/
 .config/*
-!.config/xcode/
-!.config/xcode/**
-!.config/bat/
-!.config/bat/**
-!.config/btm/
-!.config/btm/**
-!.config/karabiner/
-!.config/karabiner/config.js
-!.config/karabiner/default_config.json
-!.config/karabiner/karabiner.json
-!.config/skhd/
-!.config/skhd/**
-!.config/spacebar/
-!.config/spacebar/**
-!.config/yabai/
-!.config/yabai/**
+# !.config/xcode/
+# !.config/xcode/**
+# !.config/bat/
+# !.config/bat/**
+# !.config/btm/
+# !.config/btm/**
+# !.config/karabiner/
+# !.config/karabiner/config.js
+# !.config/karabiner/default_config.json
+# !.config/karabiner/karabiner.json
+# !.config/skhd/
+# !.config/skhd/**
+# !.config/spacebar/
+# !.config/spacebar/**
+# !.config/yabai/
+# !.config/yabai/**
+!.config/ahk/
+!.config/ahk/**

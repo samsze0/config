@@ -27,7 +27,7 @@ FN1 := false
 ; CapsLock::LWin
 ; LWin::LAlt
 
-$RAlt::
+$*RAlt::
 FN1 := true
 return
 

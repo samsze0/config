@@ -23,11 +23,15 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
 FN1 := false
 
-RControl::
+; $LAlt::Send {LControl}
+; CapsLock::LWin
+; LWin::LAlt
+
+$RAlt::
 FN1 := true
 return
 
-RControl UP::
+$RAlt UP::
 FN1 := false
 return
 
@@ -36,29 +40,29 @@ Send ^{BackSpace}
 return
 
 #If FN1 = true
-  e::Up
-  d::Down
-  s::Left
-  f::Right
+  $e::Up
+  $d::Down
+  $s::Left
+  $f::Right
 
-  j::Home
-  l::End
-  i::PgUp
-  k::PgDn
+  $j::Home
+  $l::End
+  $i::PgUp
+  $k::PgDn
 
-  Esc::`
-  1::F1
-  2::F2
-  3::F3
-  4::F4
-  5::F5
-  6::F6
-  7::F7
-  8::F8
-  9::F9
-  0::F10
-  -::F11
-  =::F12
+  $Esc::`
+  $1::F1
+  $2::F2
+  $3::F3
+  $4::F4
+  $5::F5
+  $6::F6
+  $7::F7
+  $8::F8
+  $9::F9
+  $0::F10
+  $-::F11
+  $=::F12
 #If ; end
 
 ; ^i::

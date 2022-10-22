@@ -50,6 +50,8 @@ return
   $i::PgUp
   $k::PgDn
 
+  $w::Delete
+
   $Esc::`
   $1::F1
   $2::F2

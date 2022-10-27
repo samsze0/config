@@ -1,5 +1,7 @@
 *
 !.gitignore
+!.warp/
+!.warp/**
 !.config/
 .config/*
 !.config/xcode/

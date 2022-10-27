@@ -70,3 +70,6 @@ ctrl + alt + cmd + shift - p : yabai -m config focus_follows_mouse off
 # Enable/Disable window_opacity
 ctrl + alt + cmd - o : yabai -m config window_opacity on
 ctrl + alt + cmd + shift - o : yabai -m config window_opacity off
+
+# Enable/Disable float
+# ctrl + alt + cmd - [ : yabai -m window --toggle float

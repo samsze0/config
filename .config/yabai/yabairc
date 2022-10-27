@@ -35,20 +35,22 @@ yabai -m config normal_window_opacity 0.7
 # Window border
 # yabai -m window --toggle border
 
-# Float window
-# yabai -m rule --add app="^Finder$" manage=off
-# yabai -m rule --add app="^System Preferences$" manage=off
+# By default all float
+# yabai -m rule --add app=".*" manage=off
 
-# Sticky window
-# yabai -m rule --add app="^System Preferences$" sticky=on
-# yabai -m rule --add app="^Finder$" sticky=on
+# Float window
 yabai -m rule --add app="^System Preferences$" manage=off
 yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^WeChat$" manage=off
 yabai -m rule --add app="^WhatsApp$" manage=off
 yabai -m rule --add app="^ColorSlurp$" manage=off
-# yabai -m rule --add app="^Xcode$" manage=off
-# yabai -m rule --add app="^Simulator$" manage=off
+yabai -m rule --add app="^Xcode$" manage=off
+yabai -m rule --add app="^Simulator$" manage=off
+yabai -m rule --add app="^Unity$" manage=off
+
+# Sticky window
+# yabai -m rule --add app="^System Preferences$" sticky=on
+# yabai -m rule --add app="^Finder$" sticky=on
 
 # Übersicht & Spacebar
 # yabai -m signal --add event=space_changed action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"imbar-main-jsx\"'"

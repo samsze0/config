@@ -15,3 +15,7 @@
 - Disable SIP `csrutil disable` (in recovery mode)
 - Enable arm64e (apple silicon) `sudo nvram boot-args=-arm64e_preview_abi` (then reboot)
 - Load scripting addition `sudo yabai --load-sa`
+
+**XCode**
+- `mkdir -p` and `cd` into `~/Library/Developer/Xcode`
+- Create symlink by `ln -s ~/.config/xcode/ UserData`

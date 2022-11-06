@@ -44,9 +44,9 @@ yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^WeChat$" manage=off
 yabai -m rule --add app="^WhatsApp$" manage=off
 yabai -m rule --add app="^ColorSlurp$" manage=off
-yabai -m rule --add app="^Xcode$" manage=off
-yabai -m rule --add app="^Simulator$" manage=off
-yabai -m rule --add app="^Unity$" manage=off
+# yabai -m rule --add app="^Xcode$" manage=off
+# yabai -m rule --add app="^Simulator$" manage=off
+# yabai -m rule --add app="^Unity$" manage=off
 
 # Sticky window
 # yabai -m rule --add app="^System Preferences$" sticky=on

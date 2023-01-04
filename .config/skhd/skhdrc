@@ -16,8 +16,8 @@ ctrl + alt + cmd - right : yabai -m window --swap east
 ctrl + alt + cmd - z : yabai -m window --toggle zoom-fullscreen
 
 # Display goto
-ctrl + alt + cmd - i : yabai -m display --focus prev
-ctrl + alt + cmd - k : yabai -m display --focus next
+ctrl + alt + cmd - k : yabai -m display --focus prev
+ctrl + alt + cmd - i : yabai -m display --focus next
 
 # Space goto (prev/next)
 ctrl + alt + cmd - l : yabai -m space --focus next
@@ -46,8 +46,8 @@ ctrl + alt + cmd - home : yabai -m window --space prev
 ctrl + alt + cmd - end : yabai -m window --space next
 
 # Window move (to display)
-ctrl + alt + cmd - pageup : yabai -m window --display prev ; yabai -m display --focus prev
-ctrl + alt + cmd - pagedown : yabai -m window --display next ; yabai -m display --focus next
+ctrl + alt + cmd - pagedown : yabai -m window --display prev ; yabai -m display --focus prev
+ctrl + alt + cmd - pageup : yabai -m window --display next ; yabai -m display --focus next
 
 # Window move (to space)
 ctrl + alt + cmd - f1 : yabai -m window --space 1

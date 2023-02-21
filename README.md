@@ -20,3 +20,6 @@
 **XCode**
 - `mkdir -p` and `cd` into `~/Library/Developer/Xcode`
 - Create symlink by `ln -s ~/.config/xcode/ UserData`
+
+**Bottom**
+- Setup alias to `btm --config ~/.config/btm/config.toml`

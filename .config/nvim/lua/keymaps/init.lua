@@ -1,6 +1,0 @@
-require('keymaps/_unset')
-require('keymaps/_core')
-require('keymaps/_functionkeys')
-require('keymaps/_windowtab')
-require('keymaps/_lsp')
-require('keymaps/_dap')

@@ -1,8 +1,8 @@
 # Dotfiles
 
 **Homebrew**
-- `brew install cmacrae/formulae/spacebar gnu-sed koekeishiya/formulae/yabai koekeishiya/formulae/skhd less tree wget curl fd fzf bat bottom node miniforge git ripgrep gnu-sed zoxide gh croc asciiema`
-- `brew install visual-studio-code slack postman brave-browser warp homebrew/cask-versions/firefox-developer-edition karabiner-elements docker spotify --cask`
+- `brew install cmacrae/formulae/spacebar koekeishiya/formulae/yabai koekeishiya/formulae/skhd less tree wget curl fd fzf bat bottom node miniforge git ripgrep gnu-sed zoxide gh croc asciiema rustup python`
+- `brew install visual-studio-code slack postman brave-browser warp homebrew/cask-versions/firefox-developer-edition karabiner-elements docker spotify raycast --cask`
 
 **Karabiner**
 - Goto `karabiner/` and run `node config.js`

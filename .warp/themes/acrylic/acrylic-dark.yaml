@@ -1,23 +1,23 @@
-accent: '#4C9BFF' # Accent color for UI elements SwiftUI systemOrange for dark mode
-background: '#000000' # Terminal background color SwiftUI systemGray6 for dark mode
-details: darker # Whether the theme is lighter or darker.
-foreground: '#CBD1DA' # The foreground color.
-terminal_colors: # Ansi escape colors.
+accent: '#4C9BFF'
+background: '#000000'
+details: darker
+foreground: '#CBD1DA'
+terminal_colors:
   bright:
-    black: '#131516' # SwiftUI systemGray6 for dark mode
-    blue: '#4C9BFF' # SwiftUI systemBlue for light mode
-    cyan: '#4C9BFF' # SwiftUI systemCyan for light mode
-    green: '#4C9BFF' # SwiftUI systemGreen for light mode
-    magenta: '#E15362' # SwiftUI systemPink with blue of systemPurple for light mode
-    red: '#E15362' # SwiftUI systemRed for light mode
-    white: '#CBD1DA' # SwiftUI systemGray6 for light mode
-    yellow: '#FE946E' # SwiftUI systemYellow for light mode
+    black: '#131516'
+    blue: '#4C9BFF'
+    cyan: '#4C9BFF'
+    green: '#4C9BFF'
+    magenta: '#E15362'
+    red: '#E15362'
+    white: '#CBD1DA'
+    yellow: '#FE946E'
   normal:
-    black: '#131516' # SwiftUI systemGray6 for dark mode
-    blue: '#4C9BFF' # SwiftUI systemBlue for light mode
-    cyan: '#4C9BFF' # SwiftUI systemCyan for light mode
-    green: '#4C9BFF' # SwiftUI systemGreen for light mode
-    magenta: '#E15362' # SwiftUI systemPink with blue of systemPurple for light mode
-    red: '#E15362' # SwiftUI systemRed for light mode
-    white: '#CBD1DA' # SwiftUI systemGray6 for light mode
-    yellow: '#FE946E' # SwiftUI systemYellow for light mode
+    black: '#131516'
+    blue: '#4C9BFF'
+    cyan: '#4C9BFF'
+    green: '#4C9BFF'
+    magenta: '#E15362'
+    red: '#E15362'
+    white: '#CBD1DA'
+    yellow: '#FE946E'

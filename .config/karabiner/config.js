@@ -26,7 +26,8 @@ const rules = [
     description: "Backquote & Escape",
     manipulators: [
       { conditions: [{ name: "rcommand", type: "variable_if", value: 1 }], from: { key_code: "grave_accent_and_tilde", modifiers: { optional: ["any"] } }, to: [{ key_code: "grave_accent_and_tilde" }], type: "basic" },
-      { from: { key_code: "grave_accent_and_tilde", modifiers: { optional: ["any"] } }, to: [{ key_code: "escape" }], type: "basic" }
+      { from: { key_code: "grave_accent_and_tilde", modifiers: { optional: ["any"] } }, to: [{ key_code: "escape" }], type: "basic" },
+      { from: { key_code: "left_control", modifiers: { optional: ["any"] } }, to: [{ key_code: "grave_accent_and_tilde" }], type: "basic" }
     ]
   },
   {
@@ -59,7 +60,7 @@ const rules = [
       // { conditions: [{ name: "rcommand", type: "variable_if", value: 1 }], from: { key_code: "l", modifiers: { optional: ["any"] } }, to: { key_code: "end" }, type: "basic" }
     ]
   },
-  //
+
   // DIRTY FIXES
   //
   // {
@@ -102,8 +103,11 @@ async function updateConfig() {
 
   config.profiles[0].name = "IM";
   config.profiles[0].selected = true;
+  // Modifications that are applied first. After the transformations the
+  // result are proned to be modified by the complex modifications.
   config.profiles[0].simple_modifications = [
-    { from: { key_code: "right_option" }, to: [{ key_code: "left_control" }] }
+    { from: { key_code: "right_option" }, to: [{ key_code: "left_control" }] },
+    { from: { key_code: "fn" }, "to": [{ "repeat": true, "pointing_button": "button1" }] }
   ];
   config.profiles[0].complex_modifications.rules = rules;
 

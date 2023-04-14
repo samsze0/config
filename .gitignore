@@ -1,7 +1,8 @@
 *
 !.gitignore
 !.warp/
-!.warp/**
+!.warp/themes/**
+!.warp/keybindings.yaml
 !.config/
 .config/*
 !.config/xcode/

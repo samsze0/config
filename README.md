@@ -33,3 +33,5 @@
   - `mkdir homebrew-x86 && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew-x86`
   - `brew install startship pyenv zoxide`
 
+**Blender**
+- Setup symbolic link inside e.g. `~/Library/Application\ Support/Blender/3.5/config/` by `ln -s ~/.config/blender/userpref.blend userpref.blend`. Same for the other config files

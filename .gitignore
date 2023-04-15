@@ -24,3 +24,5 @@
 !.config/yabai/**
 !.config/ahk/
 !.config/ahk/**
+!.config/blender/
+!.config/blender/**

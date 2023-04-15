@@ -3,7 +3,7 @@
 **Homebrew**
 - Install homebrew under custom location (e.g. `~/homebrew`):
   - `mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew`
-- `brew install cmacrae/formulae/spacebar koekeishiya/formulae/yabai koekeishiya/formulae/skhd less tree wget curl fd fzf bat bottom node miniforge git ripgrep gnu-sed zoxide gh croc asciiema rustup python`
+- `brew install cmacrae/formulae/spacebar koekeishiya/formulae/yabai koekeishiya/formulae/skhd less tree wget curl fd fzf bat bottom node miniforge git ripgrep gnu-sed zoxide gh croc asciiema rustup startship python`
 - `brew install visual-studio-code slack postman brave-browser warp homebrew/cask-versions/firefox-developer-edition karabiner-elements docker spotify raycast --cask`
 
 **Karabiner**
@@ -31,3 +31,5 @@
 - Clone the terminal app and check option `Open with Rosetta`
 - (In rosetta) Install homebrew under custom location (e.g. `~/homebrew-x86`):
   - `mkdir homebrew-x86 && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew-x86`
+  - `brew install startship pyenv zoxide`
+

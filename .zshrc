@@ -5,6 +5,8 @@ if [ $(arch) = "i386" ]  # rosetta / x86
 then
     eval "$($HOME/homebrew/bin/brew shellenv)"
 
+    eval "$(starship init zsh)"
+
     eval "$(zoxide init zsh)"
 
     export PYENV_ROOT="$HOME/.pyenv-x86"
@@ -13,6 +15,8 @@ then
     
 else
     eval "$(/opt/homebrew/bin/brew shellenv)"
+
+    eval "$(starship init zsh)"
 
     eval "$(zoxide init zsh)"
     export PATH="$HOMEBREW_PREFIX/opt/curl/bin:$PATH"

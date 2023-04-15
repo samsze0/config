@@ -26,3 +26,5 @@
 !.config/ahk/**
 !.config/blender/
 !.config/blender/**
+.config/blender/config/bookmarks.txt
+.config/blender/config/platform_support.txt

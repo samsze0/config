@@ -34,4 +34,7 @@
   - `brew install startship pyenv zoxide`
 
 **Blender**
-- Setup symbolic link inside e.g. `~/Library/Application\ Support/Blender/3.5/config/` by `ln -s ~/.config/blender/userpref.blend userpref.blend`. Same for the other config files
+- Setup symbolic link inside e.g. `~/Library/Application\ Support/Blender/` by `ln -s ~/.config/blender/ 3.5`
+
+**iCloud**
+- Setup symbolic link in desktop/home by `ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud`

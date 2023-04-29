@@ -29,3 +29,6 @@ else
 fi
 
 export PATH=$HOME/bin:${PATH}
+
+alias ssha='eval $(ssh-agent) && ssh-add'
+alias ll='ls -l'

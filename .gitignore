@@ -7,6 +7,7 @@
 !.warp/keybindings.yaml
 !.config/
 .config/*
+!.config/starship.toml
 !.config/xcode/
 !.config/xcode/**
 !.config/bat/

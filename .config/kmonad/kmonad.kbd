@@ -20,8 +20,9 @@
 
 (defalias
   meta C-M-lalt  ;; Syntatic sugar of (around ctl (around met lalt))
+  ctlalt C-lalt  ;; Syntatic sugar of (around ctl lalt)
   goto_mimic_mac (layer-switch mimic_mac)
-  ;; goto_game (layer-switch game)
+  goto_game (layer-switch game)
 )
 
 (deflayer mimic_mac
@@ -29,13 +30,13 @@
   _  _    _    _    _    _    _    _    _    _    _    _    _    _
   @meta _    _    _    _    _    _    _    _    _    _    _    _
   _ _    _    _    _    _    _    _    _    _    _    _
-  XX lalt lctl           _              XX XX XX
+  XX lalt lctl           _              @ctlalt @goto_game XX
 )
 
-;; (deflayer game
-;;   _  _    _    _    _    _    _    _    _    _    _    _    _    _
-;;   _  _    _    _    _    _    _    _    _    _    _    _    _    _
-;;   _ _    _    _    _    _    _    _    _    _    _    _    _
-;;   _ _    _    _    _    _    _    _    _    _    _    _
-;;   _ _ _           _              XX XX @goto_mimic_mac
-;; )
+(deflayer game
+  _  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _ _    _    _    _    _    _    _    _    _    _    _    _
+  _ _    _    _    _    _    _    _    _    _    _    _
+  _ _ _           _              XX XX @goto_mimic_mac
+)

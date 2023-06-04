@@ -3,23 +3,95 @@ general:
   floating_window_move_amount: "5%"
   # When enabled, switching to the current workspace activates the previously focused workspace
   toggle_workspace_on_refocus: false
-  focus_border_color: "#42c0fb"
+  focus_border_color: "white"
 
 keybindings:
-  # Command to run.
   - command: "focus workspace 1"
+    binding: "Control+LWin+Alt+1"
+  - command: "focus workspace 2"
+    binding: "Control+LWin+Alt+2"
+  - command: "focus workspace 3"
+    binding: "Control+LWin+Alt+3"
+  - command: "focus workspace 4"
+    binding: "Control+LWin+Alt+4"
+  - command: "focus workspace 5"
+    binding: "Control+LWin+Alt+5"
+  - command: "focus workspace 6"
+    binding: "Control+LWin+Alt+6"
+  - command: "focus workspace 7"
+    binding: "Control+LWin+Alt+7"
+  - command: "focus workspace 8"
+    binding: "Control+LWin+Alt+8"
+  - command: "focus workspace 9"
+    binding: "Control+LWin+Alt+9"
+  - command: "focus workspace 10"
+    binding: "Control+LWin+Alt+0"
+  # - command: "focus workspace 11"
+  #   binding: "Control+LWin+Alt+11"
+  # - command: "focus workspace 12"
+  #   binding: "Control+LWin+Alt+12"
 
-    # Key combination to trigger the keybinding.
-    binding: "Alt+1"
+  - command: "move to workspace 1"
+    binding: "Control+LWin+Alt+F1"
+  - command: "move to workspace 2"
+    binding: "Control+LWin+Alt+F2"
+  - command: "move to workspace 3"
+    binding: "Control+LWin+Alt+F3"
+  - command: "move to workspace 4"
+    binding: "Control+LWin+Alt+F4"
+  - command: "move to workspace 5"
+    binding: "Control+LWin+Alt+F5"
+  - command: "move to workspace 6"
+    binding: "Control+LWin+Alt+F6"
+  - command: "move to workspace 7"
+    binding: "Control+LWin+Alt+F7"
+  - command: "move to workspace 8"
+    binding: "Control+LWin+Alt+F8"
+  - command: "move to workspace 9"
+    binding: "Control+LWin+Alt+F9"
+  - command: "move to workspace 10"
+    binding: "Control+LWin+Alt+F10"
+  - command: "move to workspace 11"
+    binding: "Control+LWin+Alt+F11"
+  - command: "move to workspace 12"
+    binding: "Control+LWin+Alt+F12"
 
-  # To run multiple commands in a sequence, use the `commands` property (eg. to move a window to a
-  # workspace + focus workspace).
-  - commands: ["move to workspace 1", "focus workspace 1"]
-    binding: "Alt+Shift+1"
+  - command: "focus workspace prev"
+    binding: "Control+LWin+Alt+J"
+  - command: "focus workspace next"
+    binding: "Control+LWin+Alt+L"
+
+  - command: "toggle maximized"
+    binding: "Control+LWin+Alt+Z"
 
   - command: "focus left"
-    # To have multiple key combinations that can trigger a command, use the `bindings` property.
-    bindings: ["Alt+H", "Alt+Left"]
+    binding: "Control+LWin+Alt+S"
+  - command: "focus right"
+    binding: "Control+LWin+Alt+F"
+  - command: "focus up"
+    binding: "Control+LWin+Alt+E"
+  - command: "focus down"
+    binding: "Control+LWin+Alt+D"
+
+  - command: "move left"
+    binding: "Control+LWin+Alt+Left"
+  - command: "move right"
+    binding: "Control+LWin+Alt+Right"
+  - command: "move up"
+    binding: "Control+LWin+Alt+Up"
+  - command: "move down"
+    binding: "Control+LWin+Alt+Down"
+
+  - command: "exit wm"
+    binding: "Control+LWin+Alt+Q"
+  - command: "reload config"
+    binding: "Control+LWin+Alt+R"
+
+  # - commands: ["move to workspace 2", "focus workspace 2"]
+  #   binding: "Control+LWin+Alt+2"
+  # - command: "focus left"
+  #   # To have multiple key combinations that can trigger a command, use the `bindings` property.
+  #   bindings: ["Alt+H", "Alt+Left"]
 
 # Available commands
 # layout <vertical | horizontal>
@@ -43,73 +115,61 @@ keybindings:
 
 gaps:
   # Gap between adjacent windows.
-  inner_gap: 20
-
+  inner_gap: 0
   # Gap between windows and the screen edge.
-  outer_gap: 20
+  outer_gap: 0
 
 workspaces:
-  # Uniquely identifies the workspace and is used as the label for the workspace in the bar if
-  # `display_name` is not provided.
   - name: "1"
+  - name: "2"
+  - name: "3"
+  - name: "4"
+  - name: "5"
+  - name: "6"
+  - name: "7"
+  - name: "8"
+  - name: "9"
+  - name: "10"
+  - name: "11"
+  - name: "12"
 
-    # Optional override for the workspace label in the bar. Does not need to be unique.
-    display_name: "Work"
-
-    # Optionally force the workspace on a specific monitor if it exists. Use the monitor's number
-    # as shown in the Windows display settings (eg. 1, 2, 3...).
-    bind_to_monitor: 1
 
 bar:
   # The option to enable/disable the bar.
   enabled: true
-  
   # Height of the bar in pixels.
-  height: "30px"
-
+  height: "1px"
   # The position of the bar on the screen. Can be either "top" or "bottom".
   position: "top"
-
   # Opacity value between 0.0 and 1.0.
   opacity: 1.0
-
   # Background color of the bar.
   background: "#101010"
-
   # Default font color. Can be overriden by setting `foreground` in a component's config.
   foreground: "white"
-
   # Default font family. Can be overriden by setting `font_family` in a component's config.
   font_family: "Segoe UI"
-
   # Default font size. Can be overriden by setting `font_size` in a component's config.
   font_size: "13px"
-
   # Default font weight. Typically ranges from 100 to 950, where a higher value is thicker. Can
   # be overriden by setting `font_weight` in a component's config.
   font_weight: "400"
-
   # Horizontal and vertical borders in pixels. Borders are inside the dimensions of the bar and do
   # not affect bar height. See "Shorthand properties" for more info.
   border_width: "0"
-
   # Color of the border.
-  border_color: "blue"
-
+  border_color: "white"
   # Horizontal and vertical spacing between components within the bar and the edges of the bar. See
   # "Shorthand properties" for more info.
   padding: "4px 6px 4px 6px"
-
   # Separator between components within the bar. `label` is used for each section
   # of the bar unless `label_{left,center,right}` is explictly set, in which case
   # they are preferred over default.
   component_separator:
     label: " | "
-
   # Components to display on the left side of the bar.
   components_left:
     - type: "workspaces"
-
   # Components to display on the right side of the bar.
-  components_right:
-    - type: "clock"
+  # components_right:
+  #   - type: "clock"

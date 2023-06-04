@@ -45,6 +45,12 @@
 !.config/kmonad/**
 !.config/obinskit/
 !.config/obinskit/** 
+!.config/powertoys/
+!.config/powertoys/**
+!.config/powertoys/keyboard-manager/
+!.config/powertoys/keyboard-manager/**
+!.config/powertoys/keyboard-manager/powertoys-run/
+!.config/powertoys/keyboard-manager/powertoys-run/**
 
 # Games
 !.config/apex/

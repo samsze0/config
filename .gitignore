@@ -43,6 +43,8 @@
 !.config/ohmyposh/**
 !.config/kmonad/
 !.config/kmonad/**
+!.config/obinskit/
+!.config/obinskit/** 
 
 # Games
 !.config/apex/

@@ -1,0 +1,115 @@
+general:
+  show_floating_on_top: false
+  floating_window_move_amount: "5%"
+  # When enabled, switching to the current workspace activates the previously focused workspace
+  toggle_workspace_on_refocus: false
+  focus_border_color: "#42c0fb"
+
+keybindings:
+  # Command to run.
+  - command: "focus workspace 1"
+
+    # Key combination to trigger the keybinding.
+    binding: "Alt+1"
+
+  # To run multiple commands in a sequence, use the `commands` property (eg. to move a window to a
+  # workspace + focus workspace).
+  - commands: ["move to workspace 1", "focus workspace 1"]
+    binding: "Alt+Shift+1"
+
+  - command: "focus left"
+    # To have multiple key combinations that can trigger a command, use the `bindings` property.
+    bindings: ["Alt+H", "Alt+Left"]
+
+# Available commands
+# layout <vertical | horizontal>
+# focus <left | right | up | down>
+# focus workspace <prev | next | recent>
+# focus workspace <workspace name>
+# move <left | right | up | down>
+# move to workspace <workspace name>
+# resize <height | width> <amount in px | amount in %> (eg. resize height 3% or resize width 20px)
+# resize borders <shorthand property> (eg. resize borders 0px -7px -7px -7px)
+# set <floating | tiling | minimized | maximized>
+# set <width | height> <amount in px | amount in %> (eg. set height 30% or set width 200px)
+# toggle <floating | maximized>
+# toggle focus mode
+# tiling direction toggle
+# exit wm
+# reload config
+# close
+# exec <process name | path to executable> (eg. exec chrome or exec 'C:/Program Files/Google/Chrome/Application/chrome')
+# ignore
+
+gaps:
+  # Gap between adjacent windows.
+  inner_gap: 20
+
+  # Gap between windows and the screen edge.
+  outer_gap: 20
+
+workspaces:
+  # Uniquely identifies the workspace and is used as the label for the workspace in the bar if
+  # `display_name` is not provided.
+  - name: "1"
+
+    # Optional override for the workspace label in the bar. Does not need to be unique.
+    display_name: "Work"
+
+    # Optionally force the workspace on a specific monitor if it exists. Use the monitor's number
+    # as shown in the Windows display settings (eg. 1, 2, 3...).
+    bind_to_monitor: 1
+
+bar:
+  # The option to enable/disable the bar.
+  enabled: true
+  
+  # Height of the bar in pixels.
+  height: "30px"
+
+  # The position of the bar on the screen. Can be either "top" or "bottom".
+  position: "top"
+
+  # Opacity value between 0.0 and 1.0.
+  opacity: 1.0
+
+  # Background color of the bar.
+  background: "#101010"
+
+  # Default font color. Can be overriden by setting `foreground` in a component's config.
+  foreground: "white"
+
+  # Default font family. Can be overriden by setting `font_family` in a component's config.
+  font_family: "Segoe UI"
+
+  # Default font size. Can be overriden by setting `font_size` in a component's config.
+  font_size: "13px"
+
+  # Default font weight. Typically ranges from 100 to 950, where a higher value is thicker. Can
+  # be overriden by setting `font_weight` in a component's config.
+  font_weight: "400"
+
+  # Horizontal and vertical borders in pixels. Borders are inside the dimensions of the bar and do
+  # not affect bar height. See "Shorthand properties" for more info.
+  border_width: "0"
+
+  # Color of the border.
+  border_color: "blue"
+
+  # Horizontal and vertical spacing between components within the bar and the edges of the bar. See
+  # "Shorthand properties" for more info.
+  padding: "4px 6px 4px 6px"
+
+  # Separator between components within the bar. `label` is used for each section
+  # of the bar unless `label_{left,center,right}` is explictly set, in which case
+  # they are preferred over default.
+  component_separator:
+    label: " | "
+
+  # Components to display on the left side of the bar.
+  components_left:
+    - type: "workspaces"
+
+  # Components to display on the right side of the bar.
+  components_right:
+    - type: "clock"

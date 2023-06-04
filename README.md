@@ -1,5 +1,7 @@
 # Dotfiles
 
+## MacOS
+
 **Homebrew**
 - Install homebrew under custom location (e.g. `~/homebrew`):
   - `mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew`
@@ -38,3 +40,16 @@
 
 **iCloud**
 - Setup symbolic link in desktop/home by `ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud`
+
+## Windows
+
+**winget**
+- `winget install Mozilla.Firefox.DeveloperEdition`
+- `winget install Microsoft.PowerToys`
+- `winget install Microsoft.WindowsTerminal`
+
+**Link Shell Extension**
+- `winget install HermannSchinagl.LinkShellExtension`
+
+**GlazeWM**
+- `winget install lars-berger.GlazeWM`

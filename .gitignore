@@ -1,19 +1,27 @@
 *
 !.gitignore
+!.config/
+.config/*
+
+# zshell
 !.zshrc
 !.zprofile
+!.config/starship.toml
+
+# Warp
 !.warp/
 !.warp/themes/**
 !.warp/keybindings.yaml
-!.config/
-.config/*
-!.config/starship.toml
-!.config/xcode/
-!.config/xcode/**
+
+# *nix
 !.config/bat/
 !.config/bat/**
 !.config/btm/
 !.config/btm/**
+
+# MacOS
+!.config/xcode/
+!.config/xcode/**
 !.config/karabiner/
 !.config/karabiner/config.js
 !.config/karabiner/default_config.json
@@ -23,8 +31,28 @@
 !.config/spacebar/**
 !.config/yabai/
 !.config/yabai/**
-!.config/ahk/
-!.config/ahk/**
+
+# Windows
+!.config/glazewm/
+!.config/glazewm/**
+!.config/windows-terminal/
+!.config/windows-terminal/**
+!.config/powershell/
+!.config/powershell/**
+!.config/ohmyposh/
+!.config/ohmyposh/**
+!.config/kmonad/
+!.config/kmonad/**
+
+# Games
+!.config/apex/
+!.config/apex/**
+!.config/rainbow6/
+!.config/rainbow6/**
+!.config/rawaccel/
+!.config/rawaccel/**
+
+# Blender
 !.config/blender/
 !.config/blender/**
 .config/blender/config/bookmarks.txt

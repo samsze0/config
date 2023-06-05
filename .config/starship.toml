@@ -6,3 +6,81 @@ disabled = true
 
 [dotnet]
 disabled = true
+
+[ruby]
+disabled = true
+
+[cmake]
+disabled = true
+
+[c]
+disabled = true
+
+[package]
+disabled = true
+
+[git_status]
+format = '([\[$ahead_behind\]]($style) )'
+style = 'red bold'
+ahead = '⇡'
+behind = '⇣'
+disabled = false
+
+[git_branch]
+format = '⋅ [$symbol$branch(:$remote_branch)]($style) '
+symbol = ' '
+style = 'bold blue'
+disabled = false
+
+[python]
+pyenv_version_name = true
+pyenv_prefix = ''
+format = '⋅ [${symbol}${pyenv_prefix}(${version} )($virtualenv )]($style)'
+version_format = 'v${raw}'
+style = 'blue bold'
+symbol = 'Python '
+disabled = false
+
+[rust]
+format = '⋅ [$symbol($version )]($style)'
+version_format = 'v${raw}'
+symbol = 'Rust '
+style = 'bold blue'
+detect_extensions = ['rs']
+detect_files = ['Cargo.toml']
+detect_folders = []
+disabled = false
+
+[nodejs]
+format = '⋅ [$symbol($version )]($style)'
+version_format = 'v${raw}'
+symbol = 'Node '
+style = 'bold blue'
+detect_extensions = [
+    'js',
+    'mjs',
+    'cjs',
+    'ts',
+    'mts',
+    'cts',
+]
+detect_files = [
+    'package.json',
+    '.node-version',
+    '.nvmrc',
+]
+detect_folders = ['node_modules']
+disabled = false
+
+[directory]
+style = 'yellow bold'
+disabled = false
+
+[custom.arch]
+# https://starship.rs/config/#custom-commands
+# https://github.com/starship/starship/discussions/1252
+command = 'echo $(arch)'
+symbol = ' '
+format = '⋅ [$symbol($output )]($style)'
+style = 'bold blue'
+when = true

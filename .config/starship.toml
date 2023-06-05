@@ -38,7 +38,7 @@ disabled = false
 [python]
 pyenv_version_name = true
 pyenv_prefix = ''
-format = '⋅ [${symbol}${pyenv_prefix}(${version} )($virtualenv )]($style)'
+format = '⋅ [${symbol}${pyenv_prefix}(${version} )]($style)[($virtualenv )](bold yellow)'
 version_format = 'v${raw}'
 style = 'blue bold'
 symbol = 'Python '
@@ -85,5 +85,5 @@ disabled = false
 command = 'echo $(arch)'
 symbol = ' '
 format = '⋅ [$symbol($output )]($style)'
-style = 'bold blue'
+style = 'bold yellow'
 when = true

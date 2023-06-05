@@ -20,8 +20,8 @@ disabled = true
 disabled = true
 
 [git_status]
-format = '([\[$ahead_behind\]]($style) )'
-style = 'red bold'
+format = '([$ahead_behind]($style) )'
+style = 'bold blue'
 ahead = '⇡'
 behind = '⇣'
 disabled = false

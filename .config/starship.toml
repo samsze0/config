@@ -19,9 +19,12 @@ disabled = true
 [package]
 disabled = true
 
+[cmd_duration]
+disabled = true
+
 [git_status]
 format = '([$ahead_behind]($style) )'
-style = 'bold blue'
+style = 'bold yellow'
 ahead = '⇡'
 behind = '⇣'
 disabled = false

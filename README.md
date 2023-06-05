@@ -43,14 +43,22 @@
 
 ## Windows
 
+- Download Nvidia Graphics Driver
+
 **Scoop**
 - Scoop is installed in `~/scoop/` by default. Doesn't interfere with other users' programs
 - Scoop doesn't pollute PATH (similar to Homebrew)
 - Each installed program is isolated and independent (no dependencies? Scoop isn't a package manager)
 - Install scoop: `iwr -useb get.scoop.sh | iex`
+- Install git: `scoop install main/git`
 - Add "buckets":
   - `scoop bucket add extras`
   - `scoop bucket add versions`
-  - `scoop bucket add main`
-- Development stuff: `scoop install versions/firefox-developer extras/powertoys extras/windows-terminal extras/glazewm main/nvm main/pyenv extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd extras/komorebi extras/vcredist2022 main/git`
-- Other stuff: `extras/msiafterburner`
+- Development stuff: `scoop install versions/firefox-developer extras/powertoys  extras/glazewm main/nvm main/pyenv extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd extras/komorebi extras/vcredist2022 sudo`
+- For Windows 10: `scoop install extras/windows-terminal`
+
+**Powershell >=7** (Optinal)
+- `winget install Microsoft.PowerShell`
+
+**Symlinks**
+- E.g. `sudo ln -s C:\Users\{user}\.config\windows-terminal\settings.json settings.json`. Note that absolute path must be used

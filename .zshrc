@@ -28,4 +28,4 @@ fi
 export PATH=$HOME/bin:${PATH}
 
 alias ssha='eval $(ssh-agent) && ssh-add'
-alias ll='ls -l'
+alias btmm='btm --config ~/.config/btm/config.toml'

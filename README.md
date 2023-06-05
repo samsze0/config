@@ -1,5 +1,8 @@
 # Dotfiles
 
+- `git clone` this repo (SSH) into a temporary folder
+- Move all content from the temp folder into `~`
+
 ## MacOS
 
 **Homebrew**
@@ -54,8 +57,9 @@
 - Add "buckets":
   - `scoop bucket add extras`
   - `scoop bucket add versions`
+  - `scoop bucket add nerd-fonts`
 - Development stuff: `scoop install versions/firefox-developer extras/powertoys  extras/glazewm main/nvm main/pyenv extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd extras/komorebi extras/vcredist2022 sudo`
-- For Windows 10: `scoop install extras/windows-terminal`
+- For Windows 10: `scoop install extras/windows-terminal nerd-fonts/Hack-NF`
 
 **Powershell >=7** (Optinal)
 - `winget install Microsoft.PowerShell`

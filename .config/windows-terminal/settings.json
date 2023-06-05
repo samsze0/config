@@ -198,7 +198,14 @@
     "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
     "profiles": 
     {
-        "defaults": {},
+        "defaults": 
+        {
+            "colorScheme": "Artizon",
+            "font": 
+            {
+                "face": "Hack Nerd Font"
+            }
+        },
         "list": 
         [
             {
@@ -216,27 +223,27 @@
     "schemes": 
     [
         {
-            "background": "#282C34",
-            "black": "#282C34",
-            "blue": "#61AFEF",
+            "background": "#000000",
+            "black": "#131516",
+            "blue": "#4C9BFF",
             "brightBlack": "#5A6374",
-            "brightBlue": "#61AFEF",
-            "brightCyan": "#56B6C2",
-            "brightGreen": "#98C379",
-            "brightPurple": "#C678DD",
-            "brightRed": "#E06C75",
-            "brightWhite": "#DCDFE4",
-            "brightYellow": "#E5C07B",
+            "brightBlue": "#4C9BFF",
+            "brightCyan": "#4C9BFF",
+            "brightGreen": "#4C9BFF",
+            "brightPurple": "#4C9BFF",
+            "brightRed": "#E15362",
+            "brightWhite": "#CBD1DA",
+            "brightYellow": "#FE946E",
             "cursorColor": "#FFFFFF",
-            "cyan": "#56B6C2",
-            "foreground": "#DCDFE4",
-            "green": "#98C379",
-            "name": "One Half Dark",
-            "purple": "#C678DD",
-            "red": "#E06C75",
+            "cyan": "#4C9BFF",
+            "foreground": "#CBD1DA",
+            "green": "#4C9BFF",
+            "name": "Artizon",
+            "purple": "#4C9BFF",
+            "red": "#E15362",
             "selectionBackground": "#FFFFFF",
-            "white": "#DCDFE4",
-            "yellow": "#E5C07B"
+            "white": "#CBD1DA",
+            "yellow": "#FE946E"
         }
     ]
 }

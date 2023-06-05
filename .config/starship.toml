@@ -86,4 +86,5 @@ command = 'echo $(arch)'
 symbol = ' '
 format = '⋅ [$symbol($output )]($style)'
 style = 'bold yellow'
-when = true
+ignore_timeout = true
+when = ''' test $os == "macos" '''

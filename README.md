@@ -5,8 +5,8 @@
 **Homebrew**
 - Install homebrew under custom location (e.g. `~/homebrew`):
   - `mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew`
-- `brew install cmacrae/formulae/spacebar koekeishiya/formulae/yabai koekeishiya/formulae/skhd less tree wget curl fd fzf ansible bat bottom node miniforge git ripgrep gnu-sed zoxide gh croc asciiema rustup starship python`
-- `brew install visual-studio-code slack postman brave-browser warp homebrew/cask-versions/firefox-developer-edition karabiner-elements docker spotify raycast --cask`
+- Formulae: `brew install cmacrae/formulae/spacebar koekeishiya/formulae/yabai koekeishiya/formulae/skhd less tree wget curl fd fzf bat bottom nvm git ripgrep gnu-sed zoxide gh croc rustup starship pyenv`
+- Cask: `brew install visual-studio-code brave-browser warp homebrew/cask-versions/firefox-developer-edition karabiner-elements docker raycast --cask`
 
 **Karabiner**
 - Goto `karabiner/` and run `node config.js`
@@ -43,13 +43,14 @@
 
 ## Windows
 
-**winget**
-- `winget install Mozilla.Firefox.DeveloperEdition`
-- `winget install Microsoft.PowerToys`
-- `winget install Microsoft.WindowsTerminal`
-
-**Link Shell Extension**
-- `winget install HermannSchinagl.LinkShellExtension`
-
-**GlazeWM**
-- `winget install lars-berger.GlazeWM`
+**Scoop**
+- Scoop is installed in `~/scoop/` by default. Doesn't interfere with other users' programs
+- Scoop doesn't pollute PATH (similar to Homebrew)
+- Each installed program is isolated and independent (no dependencies? Scoop isn't a package manager)
+- Install scoop: `iwr -useb get.scoop.sh | iex`
+- Add "buckets":
+  - `scoop bucket add extras`
+  - `scoop bucket add versions`
+  - `scoop bucket add main`
+- Development stuff: `scoop install versions/firefox-developer extras/powertoys extras/windows-terminal extras/glazewm main/nvm main/pyenv extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd extras/komorebi extras/vcredist2022 main/git`
+- Other stuff: `extras/msiafterburner`

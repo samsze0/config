@@ -138,7 +138,7 @@ bar:
   # The option to enable/disable the bar.
   enabled: true
   # Height of the bar in pixels.
-  height: "1px"
+  height: "30px"
   # The position of the bar on the screen. Can be either "top" or "bottom".
   position: "top"
   # Opacity value between 0.0 and 1.0.

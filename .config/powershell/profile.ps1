@@ -5,6 +5,8 @@ Set-PSReadlineKeyHandler -Key Tab -Function MenuComplete
 Set-PSReadlineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
 
+Set-Alias open ii
+
 Invoke-Expression (& 'starship' init powershell --print-full-init | Out-String)
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
 
@@ -20,7 +22,8 @@ function setup {
   param (
     $PowerShell,
     $WindowsTerminalPath,
-    $PowerToys
+    $PowerToys,
+    $RawAccel
   )
   if ($PowerShell) {
     sudo ln -s "$([Environment]::GetEnvironmentVariable('userprofile'))\.config\powershell\profile.ps1" "$([Environment]::GetEnvironmentVariable('userprofile'))\Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
@@ -32,5 +35,8 @@ function setup {
   if ($PowerToys) {
     sudo ln -s "$([Environment]::GetEnvironmentVariable('userprofile'))\.config\powertoys\keyboard-manager\settings.json" "$([Environment]::GetEnvironmentVariable('userprofile'))\AppData\Local\Microsoft\PowerToys\Keyboard Manager\settings.json"
     sudo ln -s "$([Environment]::GetEnvironmentVariable('userprofile'))\.config\powertoys\keyboard-manager\default.json" "$([Environment]::GetEnvironmentVariable('userprofile'))\AppData\Local\Microsoft\PowerToys\Keyboard Manager\default.json"
+  }
+  if ($RawAccel) {
+    sudo ln -s "$([Environment]::GetEnvironmentVariable('userprofile'))\.config\rawaccel\settings.json" "$([Environment]::GetEnvironmentVariable('userprofile'))\.config\rawaccel\RawAccel\settings.json"
   }
 }

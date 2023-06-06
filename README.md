@@ -45,8 +45,11 @@
 - Setup symbolic link in desktop/home by `ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud`
 
 ## Windows
-
-- Download Nvidia Graphics Driver
+- For how to bypass TPM (Windows 11 installation), see [here](https://www.tomshardware.com/how-to/bypass-windows-11-tpm-requirement)
+- Avoid linking with Microsoft. Create a new user that doesn't link to Microsoft and give him admin privileges
+- Install Nvidia Graphics Driver
+- Install the [media feature pack](https://support.microsoft.com/en-us/windows/media-feature-pack-for-windows-n-8622b390-4ce6-43c9-9b42-549e5328e407) if you are on the windows "N" version. Also install the OpenSSH server feature
+- Install drivers from [your motherboard support page](https://www.msi.com/Motherboard/{}/support)
 
 **Scoop**
 - Scoop is installed in `~/scoop/` by default. Doesn't interfere with other users' programs
@@ -58,11 +61,16 @@
   - `scoop bucket add extras`
   - `scoop bucket add versions`
   - `scoop bucket add nerd-fonts`
-- Development stuff: `scoop install versions/firefox-developer extras/powertoys  extras/glazewm main/nvm main/pyenv extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd extras/komorebi extras/vcredist2022 sudo`
-- For Windows 10: `scoop install extras/windows-terminal nerd-fonts/Hack-NF`
+- Development stuff: `scoop install versions/firefox-developer extras/powertoys  extras/glazewm main/nvm extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd extras/komorebi extras/vcredist2022 sudo which nerd-fonts/Hack-NF`
+- For Windows 10: `scoop install extras/windows-terminal`
 
 **Powershell >=7** (Optinal)
 - `winget install Microsoft.PowerShell`
 
 **Symlinks**
 - E.g. `sudo ln -s C:\Users\{user}\.config\windows-terminal\settings.json settings.json`. Note that absolute path must be used
+
+**pyenv-win**
+- There is an [ongoing issue](https://github.com/pyenv-win/pyenv-win/issues/449) with scoop's install of `pyenv-win`. It will fail to install the python runtime and will get the `error installing "core" component MSI.` error message. For now ~~run custom command for installing (or just use the `pyenv-install-python` function defined inside `profile.ps1`)~~ just don't install `pyenv-win` via scoop
+- Install `pyenv-win` via `Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"; &"./install-pyenv-win.ps1"`. This will install `pyenv-win` inside `~/.pyenv/`
+- Install e.g. `pyenv install 3.10.11` and set it as the global/default via `pyenv global 3.10.11`

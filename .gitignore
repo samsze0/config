@@ -35,12 +35,12 @@
 
 # Windows
 !.config/whkdrc
+!.config/fancywm/
+!.config/fancywm/**
 !.config/windows-terminal/
 !.config/windows-terminal/**
 !.config/powershell/
 !.config/powershell/**
-!.config/kmonad/
-!.config/kmonad/**
 !.config/obinskit/
 !.config/obinskit/** 
 !.config/powertoys/

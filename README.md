@@ -64,11 +64,14 @@
 - Development stuff: `scoop install versions/firefox-developer extras/powertoys main/nvm extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd  extras/vcredist2022 sudo which nerd-fonts/Hack-NF`
 - For Windows 10: `scoop install extras/windows-terminal`
 
-**Powershell >=7** (Optinal)
-- `winget install Microsoft.PowerShell`
+**winget**
+- Require microsoft store login if the source is from tore``
+- `winget install Microsoft.PowerShell` (for Powershell >=7; optional)
+- `winget install fancywm`
 
 **Symlinks**
 - E.g. `sudo ln -s C:\Users\{user}\.config\windows-terminal\settings.json settings.json`. Note that absolute path must be used
+- Alternatively, run the `setup` powershell script, which setup all the necessary symlinks
 
 **pyenv-win**
 - There is an [ongoing issue](https://github.com/pyenv-win/pyenv-win/issues/449) with scoop's install of `pyenv-win`. It will fail to install the python runtime and will get the `error installing "core" component MSI.` error message. For now ~~run custom command for installing (or just use the `pyenv-install-python` function defined inside `profile.ps1`)~~ just don't install `pyenv-win` via scoop

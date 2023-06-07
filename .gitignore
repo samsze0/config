@@ -34,14 +34,11 @@
 !.config/yabai/**
 
 # Windows
-!.config/glazewm/
-!.config/glazewm/**
+!.config/whkdrc
 !.config/windows-terminal/
 !.config/windows-terminal/**
 !.config/powershell/
 !.config/powershell/**
-!.config/ohmyposh/
-!.config/ohmyposh/**
 !.config/kmonad/
 !.config/kmonad/**
 !.config/obinskit/

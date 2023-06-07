@@ -7,15 +7,16 @@ Set-PSReadlineKeyHandler -Key DownArrow -Function HistorySearchForward
 
 Set-Alias open ii
 
-Invoke-Expression (& 'starship' init powershell --print-full-init | Out-String)
+Invoke-Expression (& starship init powershell --print-full-init | Out-String)
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
-
-function wm {
-  glazewm --config="$([Environment]::GetEnvironmentVariable('userprofile'))\.config\glazewm\config.yaml"
-}
 
 function kbd {
   ~/.config/kmonad/kmonad.exe "$([Environment]::GetEnvironmentVariable('userprofile'))/.config/kmonad/kmonad.kbd"
+}
+
+function whkd_reload {
+  taskkill /f /im whkd.exe
+  Start-Process whkd -WindowStyle hidden
 }
 
 function setup {

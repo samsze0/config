@@ -61,7 +61,7 @@
   - `scoop bucket add extras`
   - `scoop bucket add versions`
   - `scoop bucket add nerd-fonts`
-- Development stuff: `scoop install versions/firefox-developer extras/powertoys  extras/glazewm main/nvm extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd extras/komorebi extras/vcredist2022 sudo which nerd-fonts/Hack-NF`
+- Development stuff: `scoop install versions/firefox-developer extras/powertoys main/nvm extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd  extras/vcredist2022 sudo which nerd-fonts/Hack-NF`
 - For Windows 10: `scoop install extras/windows-terminal`
 
 **Powershell >=7** (Optinal)

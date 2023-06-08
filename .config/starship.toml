@@ -55,6 +55,9 @@ symbol = ' '
 style = 'bold blue'
 disabled = false
 
+[battery]
+disabled = true
+
 [python]
 pyenv_version_name = true
 pyenv_prefix = ''

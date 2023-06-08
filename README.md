@@ -51,6 +51,9 @@
 - Install the [media feature pack](https://support.microsoft.com/en-us/windows/media-feature-pack-for-windows-n-8622b390-4ce6-43c9-9b42-549e5328e407) if you are on the windows "N" version. Also install the OpenSSH server feature
 - Install drivers from [your motherboard support page](https://www.msi.com/Motherboard/{}/support)
 
+**MSVC**
+- Visual Studio comes with the microsoft C/C++ compiler/build tools. Currently this is the only method of obtaining those build tools
+
 **Scoop**
 - Scoop is installed in `~/scoop/` by default. Doesn't interfere with other users' programs
 - Scoop doesn't pollute PATH (similar to Homebrew)
@@ -61,7 +64,7 @@
   - `scoop bucket add extras`
   - `scoop bucket add versions`
   - `scoop bucket add nerd-fonts`
-- Development stuff: `scoop install versions/firefox-developer extras/powertoys main/nvm extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd  extras/vcredist2022 sudo which nerd-fonts/Hack-NF`
+- Development stuff: `scoop install versions/firefox-developer extras/powertoys main/nvm extras/vscode main/rustup main/starship main/croc main/gh main/ripgrep main/curl main/wget main/less main/fd main/fzf main/bat main/zoxide main/gotop main/ln extras/whkd  extras/vcredist2022 sudo which nerd-fonts/Hack-NF cmake`
 - For Windows 10: `scoop install extras/windows-terminal`
 
 **winget**

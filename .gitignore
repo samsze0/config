@@ -57,6 +57,7 @@
 !.config/rainbow6/**
 !.config/rawaccel/
 !.config/rawaccel/**
+.config/rawaccel/RawAccel/.config
 
 # Blender
 !.config/blender/

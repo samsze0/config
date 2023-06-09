@@ -4,23 +4,18 @@ disabled = true
 [azure]
 disabled = true
 
-[dotnet]
-disabled = true
-
-[ruby]
-disabled = true
-
-[cmake]
-disabled = true
-
-[c]
+[cmd_duration]
 disabled = true
 
 [package]
 disabled = true
 
-[cmd_duration]
+[battery]
 disabled = true
+
+[directory]
+style = 'yellow bold'
+disabled = false
 
 [git_status]
 format = '([$all_status$ahead_behind]($style) )'
@@ -55,9 +50,6 @@ symbol = ' '
 style = 'bold blue'
 disabled = false
 
-[battery]
-disabled = true
-
 [python]
 pyenv_version_name = true
 pyenv_prefix = ''
@@ -69,12 +61,69 @@ disabled = false
 
 [rust]
 format = '⋅ [$symbol($version )]($style)'
-version_format = 'v${raw}'
+version_format = '${raw}'
 symbol = 'Rust '
 style = 'bold blue'
 detect_extensions = ['rs']
 detect_files = ['Cargo.toml']
 detect_folders = []
+disabled = false
+
+[c]
+format = '⋅ [($name )($version )]($style)'
+version_format = '${raw}'
+style = 'blue bold'
+symbol = 'C '
+detect_extensions = [
+    'c',
+    'h',
+]
+detect_files = []
+detect_folders = []
+commands = [
+    [
+        'cc',
+        '--version',
+    ],
+    [
+        'gcc',
+        '--version',
+    ],
+    [
+        'clang',
+        '--version',
+    ],
+]
+disabled = false
+
+[cmake]
+format = '⋅ [$symbol($version )]($style)'
+version_format = '${raw}'
+symbol = 'CMake '
+style = 'bold blue'
+detect_extensions = []
+detect_files = [
+    'CMakeLists.txt',
+    'CMakeCache.txt',
+]
+disabled = false
+
+[golang]
+format = '⋅ [$symbol($version )]($style)'
+version_format = '${raw}'
+symbol = 'Go '
+style = 'bold blue'
+detect_extensions = ['go']
+detect_files = [
+    'go.mod',
+    'go.sum',
+    'go.work',
+    'glide.yaml',
+    'Gopkg.yml',
+    'Gopkg.lock',
+    '.go-version',
+]
+detect_folders = ['Godeps']
 disabled = false
 
 [nodejs]
@@ -98,8 +147,24 @@ detect_files = [
 detect_folders = ['node_modules']
 disabled = false
 
-[directory]
-style = 'yellow bold'
+[swift]
+format = '⋅ [$symbol($version )]($style)'
+version_format = '${raw}'
+symbol = 'Swift '
+style = 'bold blue'
+detect_extensions = ['swift']
+detect_files = ['Package.swift']
+detect_folders = []
+disabled = false
+
+[zig]
+format = '⋅ [$symbol($version )]($style)'
+version_format = '${raw}'
+symbol = 'Zig '
+style = 'bold blue'
+detect_extensions = ['zig']
+detect_files = []
+detect_folders = []
 disabled = false
 
 [custom.arch]

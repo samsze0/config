@@ -12,6 +12,7 @@ then
     export PYENV_ROOT="$HOME/.pyenv-x86"
     export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init -)"
+    eval "$(pip completion --zsh)"
     
 else
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -23,6 +24,7 @@ else
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init -)"
+    eval "$(pip completion --zsh)"
 fi
 
 export PATH=$HOME/bin:${PATH}

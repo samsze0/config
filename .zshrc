@@ -1,6 +1,9 @@
 # https://apple.stackexchange.com/questions/388622/zsh-zprofile-zshrc-zlogin-what-goes-where
 # https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout
 
+# Note: Warp still hasn't supported zsh completions yet (i.e. compdef, compctl, compsys, etc.)
+# https://github.com/warpdotdev/Warp/issues/2179
+
 if [ $(arch) = "i386" ]  # rosetta / x86
 then
     eval "$($HOME/homebrew-x86/bin/brew shellenv)"

@@ -64,3 +64,7 @@
 !.config/blender/**
 .config/blender/config/bookmarks.txt
 .config/blender/config/platform_support.txt
+
+# Kitty
+!.config/kitty/
+!.config/kitty/**

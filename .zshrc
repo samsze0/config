@@ -27,6 +27,8 @@ then
     export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init -)"
     eval "$(pip completion --zsh)"
+
+    export PATH="/usr/local/cuda/bin:$PATH"
     
 else  # OSX m1
     eval "$(/opt/homebrew/bin/brew shellenv)"

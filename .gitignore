@@ -72,3 +72,6 @@
 # GNOME
 !.config/gnome/
 !.config/gnome/**
+
+# Cinnamon
+!.config/cinnamon.ini

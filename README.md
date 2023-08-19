@@ -83,9 +83,16 @@
 
 ## NixOS
 
+- Load the [flake (TODO)]() and run `sudo nixos-rebuild switch`
+
 **GNOME**
 - Use `dconf` to load the keybindings config i.e. `dconf load /org/gnome/<schema> < config_file`. Possible schemas include:
   - `desktop/wm/keybindings/`
   - `settings-daemon/plugins/media-keys/`
   - `shell/keybindings/`
 - Use `dconf dump` to dump existing settings to this repo
+
+**Cinnamon**
+- Use `dconf` to load and dump the desktop environment config
+- `dconf load /org/cinnamon/ < ~/.config/cinnamon.ini`
+- `dconf dump /org/cinnamon/ > ~/.config/cinnamon.ini`

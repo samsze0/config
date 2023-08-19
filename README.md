@@ -96,3 +96,7 @@
 - Use `dconf` to load and dump the desktop environment config
 - `dconf load /org/cinnamon/ < ~/.config/cinnamon.ini`
 - `dconf dump /org/cinnamon/ > ~/.config/cinnamon.ini`
+
+**OpenRGB**
+- Run `sudo modprobe i2c-dev`
+- Run `sudo openrgb`

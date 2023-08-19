@@ -29,7 +29,12 @@ then
     eval "$(pip completion --zsh)"
 
     export PATH="/usr/local/cuda/bin:$PATH"
-    
+
+    # ZLE bindings
+    bindkey "^[[H" beginning-of-line
+    bindkey "^[[F" end-of-line
+    # bindkey "^H" backward-kill-word
+   
 else  # OSX m1
     eval "$(/opt/homebrew/bin/brew shellenv)"
 

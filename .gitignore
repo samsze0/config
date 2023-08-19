@@ -68,3 +68,7 @@
 # Kitty
 !.config/kitty/
 !.config/kitty/**
+
+# GNOME
+!.config/gnome/
+!.config/gnome/**

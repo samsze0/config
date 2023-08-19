@@ -4,7 +4,7 @@
 # Note: Warp still hasn't supported zsh completions yet (i.e. compdef, compctl, compsys, etc.)
 # https://github.com/warpdotdev/Warp/issues/2179
 
-if [ $(arch) = "i386" ]  # OSX rosetta / x86
+if [ $(arch) = "i386" ]  # OSX rosetta
 then
     eval "$($HOME/homebrew-x86/bin/brew shellenv)"
 

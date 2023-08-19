@@ -80,3 +80,12 @@
 - There is an [ongoing issue](https://github.com/pyenv-win/pyenv-win/issues/449) with scoop's install of `pyenv-win`. It will fail to install the python runtime and will get the `error installing "core" component MSI.` error message. For now ~~run custom command for installing (or just use the `pyenv-install-python` function defined inside `profile.ps1`)~~ just don't install `pyenv-win` via scoop
 - Install `pyenv-win` via `Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/pyenv-win/pyenv-win/master/pyenv-win/install-pyenv-win.ps1" -OutFile "./install-pyenv-win.ps1"; &"./install-pyenv-win.ps1"`. This will install `pyenv-win` inside `~/.pyenv/`
 - Install e.g. `pyenv install 3.10.11` and set it as the global/default via `pyenv global 3.10.11`
+
+## NixOS
+
+**GNOME**
+- Use `dconf` to load the keybindings config i.e. `dconf load /org/gnome/<schema> < config_file`. Possible schemas include:
+  - `desktop/wm/keybindings/`
+  - `settings-daemon/plugins/media-keys/`
+  - `shell/keybindings/`
+- Use `dconf dump` to dump existing settings to this repo

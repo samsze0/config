@@ -85,6 +85,11 @@
 
 - Load the [flake (TODO)]() and run `sudo nixos-rebuild switch`
 
+**Adding unstable channel**
+- The unstable channels contain some extra packages e.g. `pyenv`
+- `sudo nix-channel --add https://nixos.org/channels/nixpkgs/unstable unstable`
+- `sudo nix-channel --update`
+
 **GNOME**
 - Use `dconf` to load the keybindings config i.e. `dconf load /org/gnome/<schema> < config_file`. Possible schemas include:
   - `desktop/wm/keybindings/`
@@ -94,8 +99,9 @@
 
 **Cinnamon**
 - Use `dconf` to load and dump the desktop environment config
-- `dconf load /org/cinnamon/ < ~/.config/cinnamon.ini`
-- `dconf dump /org/cinnamon/ > ~/.config/cinnamon.ini`
+  - `dconf load /org/cinnamon/ < ~/.config/cinnamon.ini`
+  - `dconf dump /org/cinnamon/ > ~/.config/cinnamon.ini`
+- Sometimes cinnamon can become quite slow. Hit `Alt` + `F2` and enter `r` to restart cinnamon
 
 **OpenRGB**
 - Run `sudo modprobe i2c-dev`

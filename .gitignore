@@ -75,3 +75,7 @@
 
 # Cinnamon
 !.config/cinnamon.ini
+
+# NixOS
+!.config/nixos/
+!.config/nixos/**

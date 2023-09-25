@@ -33,26 +33,6 @@
   # I18n
   i18n.defaultLocale = "en_HK.UTF-8";
 
-  # GNOME
-  environment.gnome.excludePackages = (with pkgs; [
-    # gnome-photos
-    gnome-tour
-  ]) ++ (with pkgs.gnome; [
-    cheese  # Webcam tool
-    gnome-music
-    gnome-terminal
-    gedit  # Text editor
-    epiphany  # Web browser
-    geary  # Email reader
-    # evince  # Document viewer
-    # gnome-characters
-    # totem  # Video player
-    tali  # Poker game
-    iagno  # Go game
-    hitori  # Sudoku game
-    atomix  # Puzzle game
-  ]);
-
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
@@ -129,8 +109,6 @@
     pciutils
     file
     cudatoolkit
-
-    cmake
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -186,9 +164,6 @@
     xkbVariant = "";
     autoRepeatDelay = 120;  # Overriden by GNOME
     autoRepeatInterval = 30;  # Overriden by GNOME
-    # GNOME
-    displayManager.gdm.enable = false;
-    desktopManager.gnome.enable = false;
     # Cinnamon
     displayManager.lightdm.enable = true;
     desktopManager.cinnamon.enable = true;

@@ -1,0 +1,31 @@
+* {
+  border: none;
+  border-radius: 0;
+  font-size: 12px;
+  min-height: 0;
+}
+
+window#waybar {
+  background: transparent;
+  color: white;
+}
+
+#workspaces {
+  background-color: #13141f;
+  opacity: 0.8;
+
+  padding: 2px 1px;
+
+  border-radius: 8px;
+
+  margin: 2px;
+}
+
+#workspaces button {
+  font-weight: bolder;
+  color: #454749;
+}
+
+#workspaces button.active, #workspaces button.focus {
+  color: #c7c7c7;
+}

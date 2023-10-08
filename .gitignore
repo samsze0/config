@@ -80,3 +80,15 @@
 # lf
 !.config/lf/
 !.config/lf/**
+
+# Hyprland
+!.config/hypr/
+!.config/hypr/**
+
+# Rofi
+!.config/rofi/
+!.config/rofi/**
+
+# Waybar
+!.config/waybar/
+!.config/waybar/**

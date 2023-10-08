@@ -6,6 +6,8 @@
 # zshell
 !.zshrc
 !.zprofile
+
+# Starship
 !.config/starship.toml
 !.config/starship_default.toml
 
@@ -14,9 +16,11 @@
 !.warp/themes/**
 !.warp/keybindings.yaml
 
-# *nix
+# Bat
 !.config/bat/
 !.config/bat/**
+
+# Bottom
 !.config/btm/
 !.config/btm/**
 
@@ -69,13 +73,10 @@
 !.config/kitty/
 !.config/kitty/**
 
-# GNOME
-!.config/gnome/
-!.config/gnome/**
-
-# Cinnamon
-!.config/cinnamon.ini
-
 # NixOS
 !.config/nixos/
 !.config/nixos/**
+
+# lf
+!.config/lf/
+!.config/lf/**

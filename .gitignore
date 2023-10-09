@@ -3,6 +3,7 @@
 !README.md
 !.config/
 .config/*
+!INSTRUCTIONS.md
 
 # zshell
 !.zshrc

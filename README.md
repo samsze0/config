@@ -4,7 +4,7 @@
 
 **NixOS**
 
-`sudo nixos-rebuild switch --flake <github-repo>`
+See [nixos-config](https://github.com/artizon-io/nixos-config)
 
 **OSX**
 

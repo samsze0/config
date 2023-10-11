@@ -56,10 +56,6 @@
 !.config/kitty/
 !.config/kitty/**
 
-# NixOS
-!.config/nixos/
-!.config/nixos/**
-
 # lf
 !.config/lf/
 !.config/lf/**

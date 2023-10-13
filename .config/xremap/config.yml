@@ -1,0 +1,16 @@
+# Run hyprctl clients to view list of application names
+
+# modmap:
+#   - name: main
+#     remap:
+
+# keymap:
+#   - name: main
+#     application:
+#       # not: /^code.*/  # VSCode
+#       only: [
+#         kitty
+#       ]
+#     remap:
+#       home: ctrl-e
+#       end: ctrl-a

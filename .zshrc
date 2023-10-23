@@ -4,6 +4,14 @@
 # Note: Warp still hasn't supported zsh completions yet (i.e. compdef, compctl, compsys, etc.)
 # https://github.com/warpdotdev/Warp/issues/2179
 
+check_command_exists() {
+    if command -v $1 > /dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 if [ $(arch) = "i386" ]  # OSX rosetta
 then
     eval "$($HOME/homebrew-x86/bin/brew shellenv)"
@@ -17,16 +25,18 @@ then
     eval "$(pyenv init -)"
     eval "$(pip completion --zsh)"
 
-elif [ $(arch) = "x86_64" ]  # Linux
+elif [ $(arch) = "x86_64" ]  # Linux / NixOS
 then
     eval "$(starship init zsh)"
 
     eval "$(zoxide init zsh)"
 
-    export PYENV_ROOT="$HOME/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pip completion --zsh)"
+    if check_command_exists pyenv; then
+        export PYENV_ROOT="$HOME/.pyenv"
+        export PATH="$PYENV_ROOT/bin:$PATH"
+        eval "$(pyenv init -)"
+    fi
+    check_command_exists pip && eval "$(pip completion --zsh)"
 
     export PATH="/usr/local/cuda/bin:$PATH"
 

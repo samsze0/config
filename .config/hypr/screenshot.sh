@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-NOTIFICATION_DURATION=$1
+IMAGE_FORMAT=${1:-png}  # Fallback to png
+NOTIFICATION_DURATION=${2:-2000}  # Fallback to 2000ms
 
-geometry=$(slurp)
+geometry=$(slurp) || exit 0
 
-if [ $? -eq 1 ]; then
-    exit 0
-fi
-
-grim -g "$geometry" - | wl-copy
+grim -t $IMAGE_FORMAT -g "$geometry" - |
+    # convert - -shave 1x1 $IMAGE_FORMAT:- | # Shave 1px border (with ImageMagick)
+    wl-copy
 
 dunstify "Screenshot copied to clipboard" -t $NOTIFICATION_DURATION

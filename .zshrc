@@ -43,7 +43,11 @@ then
     # ZLE bindings
     bindkey "^[[H" beginning-of-line
     bindkey "^[[F" end-of-line
-    # bindkey "^H" backward-kill-word
+
+    if [[ $(uname -a) =~ "nixos" ]]; then  # NixOS
+        alias screen-record="bash ~/.config/hypr/screen-record.sh"
+        alias nixos-reload="bash ~/.config/hypr/nixos-reload.sh"
+    fi
    
 else  # OSX m1
     eval "$(/opt/homebrew/bin/brew shellenv)"

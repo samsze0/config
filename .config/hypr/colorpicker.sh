@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
 
-NOTIFICATION_DURATION=$1
+NOTIFICATION_DURATION=${1:-2000}  # Fallback to 2000ms
 
-color=$(hyprpicker)
-
-if [ ${#color} -eq 0 ]; then
-    exit 0
-fi
+color=$(hyprpicker) || exit 0
 
 wl-copy $color
 

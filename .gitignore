@@ -30,8 +30,12 @@
 !.config/xcode/
 !.config/xcode/**
 !.config/karabiner/
-!.config/karabiner/config.js
+!.config/karabiner/config.ts
 !.config/karabiner/default_config.json
+!.config/karabiner/tsconfig.json
+!.config/karabiner/flake.nix
+!.config/karabiner/flake.lock
+!.config/karabiner/README.md
 !.config/skhd/
 !.config/skhd/**
 !.config/spacebar/
@@ -75,3 +79,7 @@
 # Xremap
 !.config/xremap/
 !.config/xremap/**
+
+# GTK
+!.config/gtk*/
+!.config/gtk*/**

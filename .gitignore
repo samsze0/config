@@ -1,13 +1,17 @@
 *
 !.gitignore
+!.gitmodules
+!.gitattributes
 !README.md
 !.config/
 .config/*
 !INSTRUCTIONS.md
 
-# zshell
+# Zsh
 !.zshrc
 !.zprofile
+!.config/zsh/
+!.config/zsh/**
 
 # Starship
 !.config/starship.toml
@@ -26,9 +30,7 @@
 !.config/btm/
 !.config/btm/**
 
-# MacOS
-!.config/xcode/
-!.config/xcode/**
+# Karabiner
 !.config/karabiner/
 !.config/karabiner/config.ts
 !.config/karabiner/default_config.json
@@ -36,10 +38,16 @@
 !.config/karabiner/flake.nix
 !.config/karabiner/flake.lock
 !.config/karabiner/README.md
+
+# Skhd
 !.config/skhd/
 !.config/skhd/**
+
+# Spacebar
 !.config/spacebar/
 !.config/spacebar/**
+
+# Yabai
 !.config/yabai/
 !.config/yabai/**
 

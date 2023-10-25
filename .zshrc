@@ -98,12 +98,12 @@ alias gg='git-forgit'
 
 # FZF
 # https://github.com/junegunn/fzf/blob/master/ADVANCED.md
-export FZF_DEFAULT_OPTS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
+FZF_COLORS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
     --color=
-    bg+:#222222,
-    preview-bg:#000000,
+    bg+:#333333,
+    preview-bg:#111111,
     bg:#000000,
-    border:#777777,
+    border:#555555,
     spinner:#4C9BFF,
     hl:#777777,
     fg:#777777,
@@ -116,3 +116,5 @@ export FZF_DEFAULT_OPTS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
     hl+:#FE946E
 EOT
 )
+
+export FZF_DEFAULT_OPTS="$FZF_COLORS --height=60% --layout=reverse --info=inline --border --margin=1 --padding=1"

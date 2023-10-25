@@ -7,6 +7,10 @@
 .config/*
 !INSTRUCTIONS.md
 
+# VSCode
+!.vscode/
+!.vscode/settings.json
+
 # Zsh
 !.zshrc
 !.zprofile
@@ -27,8 +31,8 @@
 !.config/bat/**
 
 # Bottom
-!.config/btm/
-!.config/btm/**
+!.config/bottom/
+!.config/bottom/**
 
 # Karabiner
 !.config/karabiner/

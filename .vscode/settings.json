@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "**/lf/lfrc": "properties",
+        "**/lf/colors": "properties",
+        "**/lf/icons": "properties",
+    },
+    "explorer.excludeGitIgnore": false,
+    "search.exclude": {
+        "**/zsh/plugins/**": true,
+    }
+}

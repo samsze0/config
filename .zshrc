@@ -17,9 +17,9 @@ zstyle ':fzf-tab:complete:ls:*' fzf-preview 'exa -1 --color=always $realpath'
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions
-source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888,bold"
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+# source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888,bold"
+# ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
 # zsh-syntax-highlighting
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
@@ -94,5 +94,25 @@ fi
 export PATH=$HOME/bin:${PATH}
 
 alias ssha='eval $(ssh-agent) && ssh-add'
-alias btmm='btm --config ~/.config/btm/config.toml'
 alias gg='git-forgit'
+
+# FZF
+# https://github.com/junegunn/fzf/blob/master/ADVANCED.md
+export FZF_DEFAULT_OPTS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
+    --color=
+    bg+:#222222,
+    preview-bg:#000000,
+    bg:#000000,
+    border:#777777,
+    spinner:#4C9BFF,
+    hl:#777777,
+    fg:#777777,
+    header:#7E8E91,
+    info:#4C9BFF,
+    pointer:#4C9BFF,
+    marker:#FE946E,
+    fg+:#CBD1DA,
+    prompt:#FE946E,
+    hl+:#FE946E
+EOT
+)

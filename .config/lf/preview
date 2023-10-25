@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eu
+
+get_mimetype() {
+    if [ -f "$1" ]; then
+        file -Lb --mime-type "$1"  # Follom symlink + brief output only
+    else
+        echo "Error: File '$1' not found"
+        return 1
+    fi
+}
+
+MIME_TYPE=$(file -Lb --mime-type "$1")
+
+if [[ $MIME_TYPE =~ ^image ]]; then
+    kitty +kitten icat --transfer-mode file --stdin no --place "${2}x${3}@${4}x${5}" "${1}" < /dev/null > /dev/tty
+    exit 1
+elif [[ $MIME_TYPE =~ ^text ]]; then
+    bat --color always $1
+else
+    echo "$MIME_TYPE preview not supported"
+fi

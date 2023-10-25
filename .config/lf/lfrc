@@ -1,2 +1,217 @@
-set cleaner ~/.config/lf/lf_kitty_clean
-set previewer ~/.config/lf/lf_kitty_preview
+# https://pkg.go.dev/github.com/gokcehan/lf#hdr-Configuration
+
+# Command prefixes
+
+# :  read (default)  builtin/custom command
+# $  shell           shell command
+# %  shell-pipe      shell command running with the ui
+# !  shell-wait      shell command waiting for key press
+# &  shell-async     shell command running asynchronously
+
+# Settings
+
+# anchorfind       bool      (default true)
+# autoquit         bool      (default false)
+# borderfmt        string    (default "\033[0m")
+# cleaner          string    (default '')
+# cursoractivefmt  string    (default "\033[7m")
+# cursorparentfmt  string    (default "\033[7m")
+# cursorpreviewfmt string    (default "\033[4m")
+# dircache         bool      (default true)
+# dircounts        bool      (default false)
+# dirfirst         bool      (default true)
+# dironly          bool      (default false)
+# dirpreviews      bool      (default false)
+# drawbox          bool      (default false)
+# dupfilefmt       string    (default '%f.~%n~')
+# errorfmt         string    (default "\033[7;31;47m")
+# filesep          string    (default "\n")
+# findlen          int       (default 1)
+# globsearch       bool      (default false)
+# hidden           bool      (default false)
+# hiddenfiles      []string  (default '.*')
+# history          bool      (default true)
+# icons            bool      (default false)
+# ifs              string    (default '')
+# ignorecase       bool      (default true)
+# ignoredia        bool      (default true)
+# incfilter        bool      (default false)
+# incsearch        bool      (default false)
+# info             []string  (default '')
+# infotimefmtnew   string    (default 'Jan _2 15:04')
+# infotimefmtold   string    (default 'Jan _2  2006')
+# mouse            bool      (default false)
+# number           bool      (default false)
+# numberfmt        string    (default "\033[33m")
+# period           int       (default 0)
+# preserve         []string  (default "mode")
+# preview          bool      (default true)
+# previewer        string    (default '')
+# promptfmt        string    (default "\033[32;1m%u@%h\033[0m:\033[34;1m%d\033[0m\033[1m%f\033[0m")
+# ratios           []int     (default '1:2:3')
+# relativenumber   bool      (default false)
+# reverse          bool      (default false)
+# ruler            []string  (default 'acc:progress:selection:filter:ind')
+# rulerfmt         string    (default "  %a|  %p|  \033[7;31m %m \033[0m|  \033[7;33m %c \033[0m|  \033[7;35m %s \033[0m|  \033[7;34m %f \033[0m|  %i/%t")
+# scrolloff        int       (default 0)
+# selmode          string    (default 'all')
+# shell            string    (default 'sh' for Unix and 'cmd' for Windows)
+# shellflag        string    (default '-c' for Unix and '/c' for Windows)
+# shellopts        []string  (default '')
+# sixel            bool      (default false)
+# smartcase        bool      (default true)
+# smartdia         bool      (default false)
+# sortby           string    (default 'natural')
+# statfmt          string    (default "\033[36m%p\033[0m| %c| %u| %g| %S| %t| -> %l")
+# tabstop          int       (default 8)
+# tagfmt           string    (default "\033[31m")
+# tempmarks        string    (default '')
+# timefmt          string    (default 'Mon Jan _2 15:04:05 2006')
+# truncatechar     string    (default '~')
+# truncatepct      int       (default 100)
+# waitmsg          string    (default 'Press any key to continue')
+# wrapscan         bool      (default true)
+# wrapscroll       bool      (default false)
+# user_{option}    string    (default none)
+
+set icons true
+set ignorecase true
+set hidden true
+set cleaner ~/.config/lf/clean
+set previewer ~/.config/lf/preview
+
+# Commands
+
+# quit                     (default 'q')
+# up                       (default 'k' and '<up>')
+# half-up                  (default '<c-u>')
+# page-up                  (default '<c-b>' and '<pgup>')
+# scroll-up                (default '<c-y>')
+# down                     (default 'j' and '<down>')
+# half-down                (default '<c-d>')
+# page-down                (default '<c-f>' and '<pgdn>')
+# scroll-down              (default '<c-e>')
+# updir                    (default 'h' and '<left>')
+# open                     (default 'l' and '<right>')
+# jump-next                (default ']')
+# jump-prev                (default '[')
+# top                      (default 'gg' and '<home>')
+# bottom                   (default 'G' and '<end>')
+# high                     (default 'H')
+# middle                   (default 'M')
+# low                      (default 'L')
+# toggle
+# invert                   (default 'v')
+# invert-below
+# unselect                 (default 'u')
+# glob-select
+# glob-unselect
+# calcdirsize
+# clearmaps
+# copy                     (default 'y')
+# cut                      (default 'd')
+# paste                    (default 'p')
+# clear                    (default 'c')
+# sync
+# draw
+# redraw                   (default '<c-l>')
+# load
+# reload                   (default '<c-r>')
+# echo
+# echomsg
+# echoerr
+# cd
+# select
+# delete         (modal)
+# rename         (modal)   (default 'r')
+# source
+# push
+# read           (modal)   (default ':')
+# shell          (modal)   (default '$')
+# shell-pipe     (modal)   (default '%')
+# shell-wait     (modal)   (default '!')
+# shell-async    (modal)   (default '&')
+# find           (modal)   (default 'f')
+# find-back      (modal)   (default 'F')
+# find-next                (default ';')
+# find-prev                (default ',')
+# search         (modal)   (default '/')
+# search-back    (modal)   (default '?')
+# search-next              (default 'n')
+# search-prev              (default 'N')
+# filter         (modal)
+# setfilter
+# mark-save      (modal)   (default 'm')
+# mark-load      (modal)   (default "'")
+# mark-remove    (modal)   (default '"')
+# tag
+# tag-toggle               (default 't')
+
+# Command line commands
+
+# cmd-escape               (default '<esc>')
+# cmd-complete             (default '<tab>')
+# cmd-menu-complete
+# cmd-menu-complete-back
+# cmd-menu-accept
+# cmd-enter                (default '<c-j>' and '<enter>')
+# cmd-interrupt            (default '<c-c>')
+# cmd-history-next         (default '<c-n>' and '<down>')
+# cmd-history-prev         (default '<c-p>' and '<up>')
+# cmd-left                 (default '<c-b>' and '<left>')
+# cmd-right                (default '<c-f>' and '<right>')
+# cmd-home                 (default '<c-a>' and '<home>')
+# cmd-end                  (default '<c-e>' and '<end>')
+# cmd-delete               (default '<c-d>' and '<delete>')
+# cmd-delete-back          (default '<backspace>' and '<backspace2>')
+# cmd-delete-home          (default '<c-u>')
+# cmd-delete-end           (default '<c-k>')
+# cmd-delete-unix-word     (default '<c-w>')
+# cmd-yank                 (default '<c-y>')
+# cmd-transpose            (default '<c-t>')
+# cmd-transpose-word       (default '<a-t>')
+# cmd-word                 (default '<a-f>')
+# cmd-word-back            (default '<a-b>')
+# cmd-delete-word          (default '<a-d>')
+# cmd-delete-word-back     (default '<a-backspace>' and '<a-backspace2>')
+# cmd-capitalize-word      (default '<a-c>')
+# cmd-uppercase-word       (default '<a-u>')
+# cmd-lowercase-word       (default '<a-l>')
+
+# Keybinds
+
+# cmd open &$OPENER "$f"
+# map e $$EDITOR "$f"
+# map i $$PAGER "$f"
+# map w $$SHELL
+# cmd doc $$lf -doc | $PAGER
+# map <f-1> doc
+# cmd maps $lf -remote "query $id maps" | $PAGER
+# cmd cmaps $lf -remote "query $id cmaps" | $PAGER
+# cmd cmds $lf -remote "query $id cmds" | $PAGER
+
+# map zh set hidden!
+# map zr set reverse!
+# map zn set info
+# map zs set info size
+# map zt set info time
+# map za set info size:time
+# map sn :set sortby natural; set info
+# map ss :set sortby size; set info size
+# map st :set sortby time; set info time
+# map sa :set sortby atime; set info atime
+# map sc :set sortby ctime; set info ctime
+# map se :set sortby ext; set info
+# map gh cd ~
+# map <space> :toggle; down
+
+# Hooks / special commands
+
+# open
+# paste
+# rename
+# delete
+# pre-cd
+# on-cd
+# on-select
+# on-quit

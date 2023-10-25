@@ -30,7 +30,9 @@ source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source ~/.config/zsh/plugins/forgit/forgit.plugin.zsh
 export PATH="$PATH:$HOME/.config/zsh/plugins/forgit/bin"
 
-autoload -U compinit; compinit  # enable completion
+# Enable zsh completion
+autoload -U compinit; compinit
+compaudit || (compaudit | xargs chmod go-w)  # Remove group & other write permission for all insecure directories if there are any
 
 check_command_exists() {
     if command -v $1 > /dev/null 2>&1; then
@@ -117,4 +119,4 @@ FZF_COLORS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
 EOT
 )
 
-export FZF_DEFAULT_OPTS="$FZF_COLORS --height=60% --layout=reverse --info=inline --border --margin=1 --padding=1"
+export FZF_DEFAULT_OPTS="$FZF_COLORS --layout=reverse --info=inline --border --margin=1 --padding=1"

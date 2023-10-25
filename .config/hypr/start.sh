@@ -8,7 +8,7 @@ swww img ~/Desktop/Desktop-background/sand-wave.jpg &
 nm-applet --indicator &
 
 # Waybar
-waybar &
+# waybar &
 
 # Notifications
 dunst &

@@ -35,7 +35,7 @@ TogglePreedit=
 # Active By Default
 ActiveByDefault=True
 # Share Input State
-ShareInputState=No
+ShareInputState=Program
 # Show preedit in application
 PreeditEnabledByDefault=True
 # Show Input Method Information when switch input method
@@ -51,7 +51,7 @@ DefaultPageSize=10
 # Override Xkb Option
 OverrideXkbOption=False
 # Custom Xkb Option
-CustomXkbOption=""
+CustomXkbOption=
 # Force Enabled Addons
 EnabledAddons=
 # Force Disabled Addons

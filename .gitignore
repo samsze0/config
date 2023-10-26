@@ -109,4 +109,8 @@
 !.local/share/fcitx5/themes/mine/
 !.local/share/fcitx5/themes/mine/**
 !.config/fcitx5/
-!.config/fcitx5/**
+!.config/fcitx5/conf/
+!.config/fcitx5/conf/pinyin.conf
+!.config/fcitx5/conf/classicui.conf
+!.config/fcitx5/config
+!.config/fcitx5/profile

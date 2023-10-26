@@ -14,6 +14,7 @@ source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
 # preview directory's content with exa when completing cd or ls
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:ls:*' fzf-preview 'exa -1 --color=always $realpath'
+zstyle ':fzf-tab:*' fzf-min-height 1000
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions

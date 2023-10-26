@@ -23,3 +23,6 @@ wlsunset -S "06:30" -s "18:30" -T 6500 -t 4600 &
 
 # Key remap
 # sudo xremap ~/.config/xremap/config.yml &
+
+# Input methods
+fcitx5 &

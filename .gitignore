@@ -5,6 +5,9 @@
 !README.md
 !.config/
 .config/*
+!.local/
+!.local/share
+.local/share/**
 !INSTRUCTIONS.md
 
 # VSCode
@@ -99,3 +102,9 @@
 # GTK
 !.config/gtk*/
 !.config/gtk*/**
+
+# Fcitx5
+!.local/share/fcitx5/
+!.local/share/fcitx5/themes/
+!.local/share/fcitx5/themes/mine/
+!.local/share/fcitx5/themes/mine/**

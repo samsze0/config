@@ -51,7 +51,7 @@ DefaultPageSize=10
 # Override Xkb Option
 OverrideXkbOption=False
 # Custom Xkb Option
-CustomXkbOption=
+CustomXkbOption="a s d fa s f"
 # Force Enabled Addons
 EnabledAddons=
 # Force Disabled Addons

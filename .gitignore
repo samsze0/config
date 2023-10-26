@@ -114,3 +114,7 @@
 !.config/fcitx5/conf/classicui.conf
 !.config/fcitx5/config
 !.config/fcitx5/profile
+
+# Wallpapers
+!.config/wallpapers/
+!.config/wallpapers/**

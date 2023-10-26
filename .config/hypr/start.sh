@@ -2,7 +2,7 @@
 
 # Wallpaper
 swww init &
-swww img ~/Desktop/Desktop-background/sand-wave.jpg &
+swww img ~/.config/wallpapers/blue-sky-and-house.webp &
 
 # Network manager applet
 nm-applet --indicator &

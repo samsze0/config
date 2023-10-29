@@ -2,7 +2,7 @@
 
 # Wallpaper
 swww init &
-swww img ~/.config/wallpapers/blue-sky-and-house.webp &
+swww img ~/.config/wallpapers/black.jpg &
 
 # Network manager applet
 nm-applet --indicator &

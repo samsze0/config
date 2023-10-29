@@ -74,6 +74,7 @@ then
     # ZLE bindings
     bindkey "^[[H" beginning-of-line
     bindkey "^[[F" end-of-line
+    bindkey "^H" backward-kill-word
 
     if [[ $(uname -a) =~ "nixos" ]]  # NixOS
     then

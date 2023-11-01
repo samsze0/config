@@ -95,10 +95,6 @@
 !.config/waybar/
 !.config/waybar/**
 
-# Xremap
-!.config/xremap/
-!.config/xremap/**
-
 # GTK
 !.config/gtk*/
 !.config/gtk*/**

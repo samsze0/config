@@ -116,5 +116,9 @@
 !.config/wallpapers/**
 
 # GNOME
-!.config/gnome
+!.config/gnome/
 !.config/gnome/**
+
+# Poetry
+!.config/pypoetry/
+!.config/pypoetry/**

@@ -114,3 +114,7 @@
 # Wallpapers
 !.config/wallpapers/
 !.config/wallpapers/**
+
+# GNOME
+!.config/gnome
+!.config/gnome/**

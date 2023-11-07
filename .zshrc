@@ -18,9 +18,8 @@ zstyle ':fzf-tab:*' fzf-min-height 1000
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions
-# source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
-# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888,bold"
-# ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
 # zsh-syntax-highlighting
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
@@ -80,6 +79,8 @@ then
     then
         alias screen-record="bash ~/.config/hypr/screen-record.sh"
         alias nixos-reload="bash ~/.config/hypr/nixos-reload.sh"
+
+        alias code='code --disable-gpu'
     fi
    
 else  # OSX m1

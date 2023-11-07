@@ -77,8 +77,9 @@ then
 
     if [[ $(uname -a) =~ "nixos" ]]  # NixOS
     then
-        alias screen-record="bash ~/.config/hypr/screen-record.sh"
-        alias nixos-reload="bash ~/.config/hypr/nixos-reload.sh"
+	# Hyprland
+        # alias screen-record="bash ~/.config/hypr/screen-record.sh"
+        # alias nixos-reload="bash ~/.config/hypr/nixos-reload.sh"
 
         alias code='code --disable-gpu'
     fi
@@ -100,6 +101,13 @@ export PATH=$HOME/bin:${PATH}
 
 alias ssha='eval $(ssh-agent) && ssh-add'
 alias gg='git-forgit'
+alias manfzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
+alias kitty-save='kitty @ ls | nix run nixpkgs#python39 ~/.config/kitty/kitty-convert-dump.py > ~/.kitty-session.kitty'
+alias kitty-load='kitty --session ~/.kitty-session.kitty'
+alias nixos-reload='sudo nixos-rebuild switch --flake ~/nixos-config --install-bootloader'
+alias nix-gc='nix-collect-garbage -d'
+alias df='df -h'
+alias ll='exa -l'
 
 # FZF
 # https://github.com/junegunn/fzf/blob/master/ADVANCED.md
@@ -121,5 +129,10 @@ FZF_COLORS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
     hl+:#FE946E
 EOT
 )
-
 export FZF_DEFAULT_OPTS="$FZF_COLORS --layout=reverse --info=inline --border --margin=1 --padding=1"
+
+# ZSH history
+setopt share_history
+export HISTFILE=~/.zhistory
+export SAVEHIST=100 # Capacity of no. lines
+export HISTSIZE=50 # Capacity of no. lines for a session

@@ -215,3 +215,12 @@ set previewer ~/.config/lf/preview
 # on-cd
 # on-select
 # on-quit
+
+cmd delete ${{
+  set -f
+  printf "$fx\n\n"
+  printf "delete?[y/n]"
+  read ans
+  [ $ans = "y" ] && rm -rf $fx
+}}
+map <delete> delete

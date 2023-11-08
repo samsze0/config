@@ -2,6 +2,8 @@
 
 set -eu
 
+IMAGE_COORDINATES="${2}x${3}@${4}x${5}"
+
 get_mimetype() {
     if [ -f "$1" ]; then
         file -Lb --mime-type "$1"  # Follom symlink + brief output only
@@ -11,13 +13,24 @@ get_mimetype() {
     fi
 }
 
-MIME_TYPE=$(file -Lb --mime-type "$1")
+image_preview() {
+    kitty +kitten icat --transfer-mode file --stdin no --place $IMAGE_COORDINATES "$1" < /dev/null > /dev/tty
+}
+
+MIME_TYPE=$(get_mimetype $1)
 
 if [[ $MIME_TYPE =~ ^image ]]; then
-    kitty +kitten icat --transfer-mode file --stdin no --place "${2}x${3}@${4}x${5}" "${1}" < /dev/null > /dev/tty
+    image_preview $1
     exit 1
-elif [[ $MIME_TYPE =~ ^text ]]; then
+elif [[ $MIME_TYPE =~ ^text || $MIME_TYPE = application/json ]]; then
     bat --color always $1
+    exit 1
+elif [[ $MIME_TYPE =~ ^video ]]; then
+    CACHE_FILE=~/.cache/lf-preview-tmp.png
+    ffmpeg -i "$1" -ss 00:00:05 -vframes 1 -y $CACHE_FILE
+    image_preview $CACHE_FILE
+    exit 1
 else
     echo "$MIME_TYPE preview not supported"
+    exit 1
 fi

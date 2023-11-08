@@ -224,3 +224,7 @@ cmd delete ${{
   [ $ans = "y" ] && rm -rf $fx
 }}
 map <delete> delete
+
+cmd open ${{
+  ~/.config/lf/open
+}}

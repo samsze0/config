@@ -122,3 +122,7 @@
 # Poetry
 !.config/pypoetry/
 !.config/pypoetry/**
+
+# Neovim
+!.config/nvim/
+!.config/nvim/**

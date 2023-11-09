@@ -77,11 +77,19 @@ then
 
     if [[ $(uname -a) =~ "nixos" ]]  # NixOS
     then
-	# Hyprland
-        # alias screen-record="bash ~/.config/hypr/screen-record.sh"
-        # alias nixos-reload="bash ~/.config/hypr/nixos-reload.sh"
+        alias nix-gc='nix-collect-garbage -d'
+        alias nix-dev='nix develop -c zsh'
+        alias kitty-save='kitty @ ls | nix run nixpkgs#python39 ~/.config/kitty/kitty-convert-dump.py > ~/.kitty-session.kitty'
+        alias kitty-load='kitty --session ~/.kitty-session.kitty'
 
-        alias code='code --disable-gpu'
+        if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]  # Hyprland
+        then
+            alias nixos-reload='sudo nixos-rebuild switch --flake ~/nixos-config#hyprland --install-bootloader'
+            alias screen-record="bash ~/.config/hypr/screen-record.sh"
+        else  # GNOME
+            alias nixos-reload='sudo nixos-rebuild switch --flake ~/nixos-config#gnome --install-bootloader'
+            alias code='code --disable-gpu'
+        fi
     fi
    
 else  # OSX m1
@@ -102,10 +110,6 @@ export PATH=$HOME/bin:${PATH}
 alias ssha='eval $(ssh-agent) && ssh-add'
 alias gg='git-forgit'
 alias manfzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
-alias kitty-save='kitty @ ls | nix run nixpkgs#python39 ~/.config/kitty/kitty-convert-dump.py > ~/.kitty-session.kitty'
-alias kitty-load='kitty --session ~/.kitty-session.kitty'
-alias nixos-reload='sudo nixos-rebuild switch --flake ~/nixos-config --install-bootloader'
-alias nix-gc='nix-collect-garbage -d'
 alias df='df -h'
 alias ll='exa -l'
 

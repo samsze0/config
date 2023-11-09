@@ -2,7 +2,7 @@
 
 # Wallpaper
 swww init &
-swww img ~/.config/wallpapers/black.jpg &
+swww img ~/.config/wallpapers/nixos.png &
 
 # Network manager applet
 nm-applet --indicator &
@@ -21,6 +21,8 @@ wl-paste --watch cliphist store &
 # https://www.mankier.com/1/wlsunset
 wlsunset -S "06:30" -s "18:30" -T 6500 -t 4600 &
 
-
 # Input methods
 fcitx5 &
+
+# XRemap (for some reason needs to be restarted)
+systemctl --user restart xremap

@@ -1,3 +1,11 @@
+-- Pageup/down
+vim.api.nvim_set_keymap("n", "<PageUp>", "<C-u><C-u>", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("n", "<PageDown>", "<C-d><C-d>", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("v", "<PageUp>", "<C-u><C-u>", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("v", "<PageDown>", "<C-d><C-d>", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", {silent = true, noremap = true})  -- Execute <C-u> twice in normal mode
+vim.api.nvim_set_keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", {silent = true, noremap = true})
+
 -- Matching pair
 vim.api.nvim_set_keymap("n", "m", "%", {silent = true, noremap = true})
 vim.api.nvim_set_keymap("v", "m", "%", {silent = true, noremap = true})
@@ -5,6 +13,9 @@ vim.api.nvim_set_keymap("v", "m", "%", {silent = true, noremap = true})
 -- Macro
 vim.api.nvim_set_keymap("n", ".", "@", {silent = true, noremap = true})  -- replay macro x
 vim.api.nvim_set_keymap("n", ">", "Q", {silent = true, noremap = true})  -- replay last macro
+
+-- Clear search highlights
+vim.api.nvim_set_keymap("n", "<Space>/", "<cmd>noh<CR>", {silent = true, noremap = true})
 
 -- Replay edit
 vim.api.nvim_set_keymap("n", ",", ".", {silent = true, noremap = true})
@@ -25,7 +36,7 @@ vim.api.nvim_set_keymap("v", "A", "I", {silent = true, noremap = true})
 -- Home
 vim.api.nvim_set_keymap("n", "<Home>", "^", {silent = true, noremap = true})
 vim.api.nvim_set_keymap("v", "<Home>", "^", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("i", "<Home>", "<C-o>^", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("i", "<Home>", "<C-o>^", {silent = true, noremap = true})  -- Execute ^ in normal mode
 
 -- Indent
 vim.api.nvim_set_keymap("n", "<Tab>", ">>", {silent = true, noremap = true})
@@ -37,10 +48,10 @@ vim.api.nvim_set_keymap("v", "<S-Tab>", "<gv", {silent = true, noremap = true})
 vim.api.nvim_set_keymap("v", "y", "ygv<Esc>", {silent = true, noremap = true})
 
 -- Fold
--- vim.api.nvim_set_keymap("n", "z.", "zo", {silent = true, noremap = true})
--- vim.api.nvim_set_keymap("n", "z,", "zc", {silent = true, noremap = true})
--- vim.api.nvim_set_keymap("n", "z>", "zr", {silent = true, noremap = true})
--- vim.api.nvim_set_keymap("n", "z<", "zm", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("n", "z.", "zo", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("n", "z,", "zc", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("n", "z>", "zr", {silent = true, noremap = true})
+vim.api.nvim_set_keymap("n", "z<", "zm", {silent = true, noremap = true})
 
 -- Screen movement
 vim.api.nvim_set_keymap("n", "<S-Up>", "<C-Y>", {silent = true, noremap = true})

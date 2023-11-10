@@ -1,23 +1,27 @@
+-- :help <option> to get info (or :h)
+
 vim.cmd[[set clipboard+=unnamedplus]]  -- Use system clipboard
 
 vim.opt.number = true
--- vim.opt.cursorline = true
--- vim.opt.signcolumn = "auto"
+vim.opt.cursorline = false  -- Highlight current line
+vim.opt.signcolumn = "auto"
 vim.opt.wrap = false
-vim.cmd[[set formatoptions-=o]]
-vim.cmd[[set formatoptions-=r]]
-vim.cmd[[set formatoptions-=c]]
+
+-- :help fo-table
+-- vim.cmd[[set formatoptions-=o]]  -- Disable auto comment in normal mode
+-- vim.cmd[[set formatoptions-=r]]  -- Disable auto comment in insert mode
+-- vim.cmd[[set formatoptions-=c]]  -- Disable auto wrap comment
+
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 2
-vim.opt.autoindent = true
 vim.opt.smarttab = true
 vim.opt.showtabline=0
 
 vim.opt.smartcase = true
 vim.opt.ignorecase = true
-vim.opt.hlsearch = false
+vim.opt.hlsearch = true  -- Highlight all matches. Pair with keymap :noh to clear highlights
 
 vim.cmd[[set backupdir=~/.cache/nvim/backup]]
 vim.cmd[[set directory=~/.cache/nvim/swap]]
@@ -25,11 +29,12 @@ vim.cmd[[set undodir=~/.cache/nvim/undo]]
 
 vim.cmd[[filetype on]]
 vim.cmd[[filetype plugin off]]
+-- vim.cmd[[filetype indent on]]
 
 require('keymaps')
 
 vim.opt.background = "dark"
-vim.opt.termguicolors = true
+vim.opt.termguicolors = true  -- Support all color (instead of 16)
 
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'

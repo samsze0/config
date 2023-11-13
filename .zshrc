@@ -4,10 +4,6 @@
 # Warp still hasn't supported zsh completions yet (i.e. compdef, compctl, compsys, etc.)
 # https://github.com/warpdotdev/Warp/issues/2179
 
-# zsh-autocomplete
-# https://github.com/marlonrichert/zsh-autocomplete
-# source ~/.config/zsh/plugins/zsh-autocomplete/zsh-autocomplete.plugin.zsh
-
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
 source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
@@ -24,11 +20,6 @@ ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 # zsh-syntax-highlighting
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
 source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# forgit
-# https://github.com/wfxr/forgit
-source ~/.config/zsh/plugins/forgit/forgit.plugin.zsh
-export PATH="$PATH:$HOME/.config/zsh/plugins/forgit/bin"
 
 # Enable zsh completion
 autoload -U compinit; compinit
@@ -108,10 +99,10 @@ fi
 export PATH=$HOME/bin:${PATH}
 
 alias ssha='eval $(ssh-agent) && ssh-add'
-alias gg='git-forgit'
 alias manfzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
-alias df='df -h'
+alias duf='duf -theme ansi'
 alias ll='exa -l'
+alias deff='delta --raw'
 
 # FZF
 # https://github.com/junegunn/fzf/blob/master/ADVANCED.md
@@ -140,3 +131,8 @@ setopt share_history
 export HISTFILE=~/.zhistory
 export SAVEHIST=100 # Capacity of no. lines
 export HISTSIZE=50 # Capacity of no. lines for a session
+
+
+export SHELL="$(which zsh)"
+export PAGER="bat"
+export EDITOR="nvim"

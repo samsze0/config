@@ -11,14 +11,14 @@ vim.api.nvim_set_keymap("n", "m", "%", {silent = true, noremap = true})
 vim.api.nvim_set_keymap("v", "m", "%", {silent = true, noremap = true})
 
 -- Macro
-vim.api.nvim_set_keymap("n", ".", "@", {silent = true, noremap = true})  -- replay macro x
-vim.api.nvim_set_keymap("n", ">", "Q", {silent = true, noremap = true})  -- replay last macro
+vim.api.nvim_set_keymap("n", ",", "@", {silent = true, noremap = true})  -- replay macro x
+vim.api.nvim_set_keymap("n", "<", "Q", {silent = true, noremap = true})  -- replay last macro
 
 -- Clear search highlights
 vim.api.nvim_set_keymap("n", "<Space>/", "<cmd>noh<CR>", {silent = true, noremap = true})
 
 -- Replay edit
-vim.api.nvim_set_keymap("n", ",", ".", {silent = true, noremap = true})
+-- vim.api.nvim_set_keymap("n", ".", ".", {silent = true, noremap = true})
 
 -- Redo
 vim.api.nvim_set_keymap("n", "U", "<C-R>", {silent = true, noremap = true})

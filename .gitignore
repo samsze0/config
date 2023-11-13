@@ -127,3 +127,7 @@
 !.config/nvim/
 !.config/nvim/**
 .config/nvim/plugin
+
+# Tmux
+!.config/tmux/
+!.config/tmux/**

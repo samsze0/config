@@ -2,14 +2,7 @@
 
 set -eu
 
-get_mimetype() {
-    if [ -f "$1" ]; then
-        file -Lb --mime-type "$1"  # Follom symlink + brief output only
-    else
-        echo "Error: File '$1' not found"
-        return 1
-    fi
-}
+source ~/.config/lf/utils.sh
 
 MIME_TYPE=$(get_mimetype $fx)
 
@@ -23,6 +16,6 @@ elif [[ $MIME_TYPE =~ ^video ]]; then
     celluloid $fx
     exit 0
 else
-    xdg-open $fx
-    exit 0
+    # xdg-open $fx
+    exit 1
 fi

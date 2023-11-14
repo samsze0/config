@@ -2,6 +2,8 @@
 
 set -eu
 
+source ~/.config/lf/utils.sh
+
 get_filename() {
     # Split the input into an array
     local input=($@)
@@ -29,11 +31,6 @@ get_image_coord() {
 
 FILE=$(get_filename $@)
 IMAGE_COORDINATES=$(get_image_coord $@)
-
-get_mimetype() {
-    # Caution: input filename should wrap in "" to avoid word splitting
-    file -Lb --mime-type "$1"  # Follom symlink + brief output only
-}
 
 image_preview() {
     # Caution: input filename should wrap in "" to avoid word splitting

@@ -4,23 +4,23 @@
 set icons true
 set ignorecase true
 set hidden true
-set cleaner ~/.config/lf/clean
-set previewer ~/.config/lf/preview
+set cleaner ~/.config/lf/clean.sh
+set previewer ~/.config/lf/preview.sh
 
 cmd delete ${{
   set -f
-  printf "$fx\n"
-  printf "delete?[y/n]"
+  printf "$fx\n\n"
+  printf "delete? [y/n] "
   read ans
   [ $ans = "y" ] && rm -rf $fx
 }}
 map <delete> delete
 
 cmd open ${{
-  ~/.config/lf/open
+  ~/.config/lf/open.sh
 }}
 
-cmd new_file_or_dir ${{
+cmd create_new ${{
   # read ans
   ans=$1
   if [ -n $ans ]; then
@@ -32,4 +32,4 @@ cmd new_file_or_dir ${{
     fi
   fi
 }}
-map a :push :new_file_or_dir<space>
+map a :push :create_new<space>

@@ -77,6 +77,20 @@ require('packer').startup(function(use)
   -- }
 
   use {
+    'voldikss/vim-floaterm'
+  }
+
+  use {
+    'ptzz/lf.vim',
+    config = function()
+      require('_lfvim')
+    end,
+    requires = {
+      'voldikss/vim-floaterm'
+    },
+  }
+
+  use {
     'neovim/nvim-lspconfig',
     config = function()
       require('_lspconfig')

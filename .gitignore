@@ -87,10 +87,6 @@
 !.config/hypr/
 !.config/hypr/**
 
-# Rofi
-!.config/rofi/
-!.config/rofi/**
-
 # Waybar
 !.config/waybar/
 !.config/waybar/**

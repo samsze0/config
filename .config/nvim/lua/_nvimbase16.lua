@@ -19,3 +19,25 @@ require('base16-colorscheme').setup({
   base0E = colors.blue,
   base0F = colors.blue,
 })
+
+local theme_colors = require('base16-colorscheme').colors
+
+-- Override
+
+vim.api.nvim_set_hl(0, "Search", {
+  fg = nil;
+  bg = theme_colors.base01;
+})
+vim.api.nvim_set_hl(0, "IncSearch", {
+  fg = nil;
+  bg = theme_colors.base06;
+})
+vim.api.nvim_set_hl(0, "Substitute", {
+  fg = nil;
+  bg = theme_colors.base02;
+})
+
+vim.api.nvim_set_hl(0, "MatchParen", {
+  fg = nil;
+  bg = theme_colors.base02;
+})

@@ -1,87 +1,108 @@
+local keymap = vim.api.nvim_set_keymap
+local opts = {silent = true, noremap = true}
+
 -- Pageup/down
-vim.api.nvim_set_keymap("n", "<PageUp>", "<C-u><C-u>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "<PageDown>", "<C-d><C-d>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "<PageUp>", "<C-u><C-u>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "<PageDown>", "<C-d><C-d>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", {silent = true, noremap = true})  -- Execute <C-u> twice in normal mode
-vim.api.nvim_set_keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", {silent = true, noremap = true})
+keymap("n", "<PageUp>", "<C-u><C-u>", opts)
+keymap("n", "<PageDown>", "<C-d><C-d>", opts)
+keymap("v", "<PageUp>", "<C-u><C-u>", opts)
+keymap("v", "<PageDown>", "<C-d><C-d>", opts)
+keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", opts)  -- Execute <C-u> twice in normal mode
+keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
 
 -- Matching pair
-vim.api.nvim_set_keymap("n", "m", "%", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "m", "%", {silent = true, noremap = true})
+keymap("n", "m", "%", opts)
+keymap("v", "m", "%", opts)
 
 -- Macro
-vim.api.nvim_set_keymap("n", ",", "@", {silent = true, noremap = true})  -- replay macro x
-vim.api.nvim_set_keymap("n", "<", "Q", {silent = true, noremap = true})  -- replay last macro
+keymap("n", ".", "@", opts)  -- replay macro x
+keymap("n", ">", "Q", opts)  -- replay last macro
 
 -- Clear search highlights
-vim.api.nvim_set_keymap("n", "<Space>/", "<cmd>noh<CR>", {silent = true, noremap = true})
+keymap("n", "<Space>/", "<cmd>noh<CR>", opts)
 
 -- Replay edit
--- vim.api.nvim_set_keymap("n", ".", ".", {silent = true, noremap = true})
+keymap("n", ".", ".", opts)
 
 -- Redo
-vim.api.nvim_set_keymap("n", "U", "<C-R>", {silent = true, noremap = true})
+keymap("n", "U", "<C-R>", opts)
 
 -- New line
-vim.api.nvim_set_keymap("n", "o", "o<Esc>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "O", "O<Esc>", {silent = true, noremap = true})
+keymap("n", "o", "o<Esc>", opts)
+keymap("n", "O", "O<Esc>", opts)
 
 -- Insert/append swap
-vim.api.nvim_set_keymap("n", "i", "a", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "a", "i", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "I", "A", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "A", "I", {silent = true, noremap = true})
+keymap("n", "i", "a", opts)
+keymap("n", "a", "i", opts)
+keymap("v", "I", "A", opts)
+keymap("v", "A", "I", opts)
 
 -- Home
-vim.api.nvim_set_keymap("n", "<Home>", "^", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "<Home>", "^", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("i", "<Home>", "<C-o>^", {silent = true, noremap = true})  -- Execute ^ in normal mode
+keymap("n", "<Home>", "^", opts)
+keymap("v", "<Home>", "^", opts)
+keymap("i", "<Home>", "<C-o>^", opts)  -- Execute ^ in normal mode
 
 -- Indent
-vim.api.nvim_set_keymap("n", "<Tab>", ">>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "<S-Tab>", "<<", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "<Tab>", ">gv", {silent = true, noremap = true})  -- keep selection after
-vim.api.nvim_set_keymap("v", "<S-Tab>", "<gv", {silent = true, noremap = true})
+keymap("n", "<Tab>", ">>", opts)
+keymap("n", "<S-Tab>", "<<", opts)
+keymap("v", "<Tab>", ">gv", opts)  -- keep selection after
+keymap("v", "<S-Tab>", "<gv", opts)
 
 -- Yank - stay at cursor after
-vim.api.nvim_set_keymap("v", "y", "ygv<Esc>", {silent = true, noremap = true})
+keymap("v", "y", "ygv<Esc>", opts)
 
 -- Fold
-vim.api.nvim_set_keymap("n", "z.", "zo", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "z,", "zc", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "z>", "zr", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "z<", "zm", {silent = true, noremap = true})
+keymap("n", "z.", "zo", opts)
+keymap("n", "z,", "zc", opts)
+keymap("n", "z>", "zr", opts)
+keymap("n", "z<", "zm", opts)
 
 -- Screen movement
-vim.api.nvim_set_keymap("n", "<S-Up>", "<C-Y>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "<S-Up>", "<C-Y>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("i", "<S-Up>", "<C-o><C-Y>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "<S-Down>", "<C-E>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "<S-Down>", "<C-E>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("i", "<S-Down>", "<C-o><C-E>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "<S-Left>", "<ScrollWheelLeft>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "<S-Left>", "<ScrollWheelLeft>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("i", "<S-Left>", "<ScrollWheelLeft>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "<S-Right>", "<ScrollWheelRight>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("v", "<S-Right>", "<ScrollWheelRight>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("i", "<S-Right>", "<ScrollWheelRight>", {silent = true, noremap = true})
+keymap("n", "<S-Up>", "<C-Y>", opts)
+keymap("v", "<S-Up>", "<C-Y>", opts)
+keymap("i", "<S-Up>", "<C-o><C-Y>", opts)
+keymap("n", "<S-Down>", "<C-E>", opts)
+keymap("v", "<S-Down>", "<C-E>", opts)
+keymap("i", "<S-Down>", "<C-o><C-E>", opts)
+keymap("n", "<S-Left>", "<ScrollWheelLeft>", opts)
+keymap("v", "<S-Left>", "<ScrollWheelLeft>", opts)
+keymap("i", "<S-Left>", "<ScrollWheelLeft>", opts)
+keymap("n", "<S-Right>", "<ScrollWheelRight>", opts)
+keymap("v", "<S-Right>", "<ScrollWheelRight>", opts)
+keymap("i", "<S-Right>", "<ScrollWheelRight>", opts)
 
 -- Window (pane)
-vim.api.nvim_set_keymap("n", "we", "<cmd>wincmd k<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "wd", "<cmd>wincmd j<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "ww", "<cmd>wincmd h<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "wf", "<cmd>wincmd l<CR>", {silent = true, noremap = true})
+keymap("n", "wi", "<cmd>wincmd k<CR>", opts)
+keymap("n", "wk", "<cmd>wincmd j<CR>", opts)
+keymap("n", "wj", "<cmd>wincmd h<CR>", opts)
+keymap("n", "wl", "<cmd>wincmd l<CR>", opts)
 
-vim.api.nvim_set_keymap("n", "wx", "<cmd>clo<CR>", {silent = true, noremap = true})
+keymap("n", "wx", "<cmd>clo<CR>", opts)
 
-vim.api.nvim_set_keymap("n", "wk", "<cmd>split<CR><cmd>wincmd j<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "wl", "<cmd>vsplit<CR><cmd>wincmd l<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "wi", "<cmd>split<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "wj", "<cmd>vsplit<CR>", {silent = true, noremap = true})
+keymap("n", "wd", "<cmd>split<CR><cmd>wincmd j<CR>", opts)  -- Switch to bottom window after creating it
+keymap("n", "wf", "<cmd>vsplit<CR><cmd>wincmd l<CR>", opts)
+keymap("n", "we", "<cmd>split<CR>", opts)
+keymap("n", "ws", "<cmd>vsplit<CR>", opts)
 
 -- Tab
-vim.api.nvim_set_keymap("n", "tj", "<cmd>tabp<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "tl", "<cmd>tabn<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "tt", "<cmd>tabnew<CR>", {silent = true, noremap = true})
-vim.api.nvim_set_keymap("n", "tw", "<cmd>tabclose<CR>", {silent = true, noremap = true})
+keymap("n", "tj", "<cmd>tabp<CR>", opts)
+keymap("n", "tl", "<cmd>tabn<CR>", opts)
+keymap("n", "tt", "<cmd>tabnew<CR>", opts)
+keymap("n", "tw", "<cmd>tabclose<CR>", opts)
+
+-- Auto closing pair
+-- Ref: https://github.com/m4xshen/autoclose.nvim/blob/main/lua/autoclose.lua
+-- keymap("i", "\"", "\"\"<left>", opts)
+-- keymap("i", "'", "''<left>", opts)
+-- keymap("i", "(", "()<left>", opts)
+-- keymap("i", "[", "[]<left>", opts)
+-- keymap("i", "{", "{}<left>", opts)
+-- keymap("i", "<", "<><left>", opts)
+
+-- Delete & cut
+-- Ref: https://github.com/gbprod/cutlass.nvim/blob/main/lua/cutlass.lua
+keymap("n", "d", "\"_d", opts)
+keymap("v", "d", "\"_d", opts)
+keymap("n", "x", "d", opts)
+keymap("v", "x", "d", opts)
+keymap("n", "xx", "dd", opts)
+keymap("n", "X", "D", opts)

@@ -91,7 +91,17 @@ require('packer').startup(function(use)
   use {
   	'windwp/nvim-autopairs',
     config = function()
-      require("nvim-autopairs").setup({})
+      require('nvim-autopairs').setup({})
     end
+  }
+
+  use {
+    'ggandor/leap.nvim',
+    config = function()
+      require('_leap')
+    end,
+    requires = {
+      'tpope/vim-repeat'
+    }
   }
 end)

@@ -5,9 +5,9 @@ local M = {}
 
 local white = "#CBD1DA"
 local black = "#000000"
-local red = "#FF5C89"
-local blue = "#4C9BFF"
-local yellow = "#FE946E"
+local red = "#eb5858"
+local blue = "#549eff"
+local yellow = "#f59953"
 
 M.colors = {
   base00 = black,
@@ -78,15 +78,15 @@ function M.setup()
   hi.Exception                          = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
   hi.FoldColumn                         = { guifg = c.base0C, guibg = c.base00, gui = nil, guisp = nil }
   hi.Folded                             = { guifg = c.base03, guibg = c.base01, gui = nil, guisp = nil }
-  hi.IncSearch                          = { guifg = c.base01, guibg = c.base06, gui = 'none', guisp = nil }
+  hi.IncSearch                          = { guifg = c.black, guibg = c.white, gui = 'none', guisp = nil }
   hi.Italic                             = { guifg = nil, guibg = nil, gui = 'none', guisp = nil }
   hi.Macro                              = { guifg = c.base08, guibg = nil, gui = nil, guisp = nil }
   hi.MatchParen                         = { guifg = nil, guibg = c.base02, gui = nil, guisp = nil }
   hi.ModeMsg                            = { guifg = c.base0B, guibg = nil, gui = nil, guisp = nil }
   hi.MoreMsg                            = { guifg = c.base0B, guibg = nil, gui = nil, guisp = nil }
   hi.Question                           = { guifg = c.base0D, guibg = nil, gui = nil, guisp = nil }
-  hi.Search                             = { guifg = c.base01, guibg = c.base01, gui = nil, guisp = nil }
-  hi.Substitute                         = { guifg = c.base01, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.Search                             = { guifg = nil, guibg = c.base01, gui = nil, guisp = nil }
+  hi.Substitute                         = { guifg = nil, guibg = c.base02, gui = 'none', guisp = nil }
   hi.SpecialKey                         = { guifg = c.base03, guibg = nil, gui = nil, guisp = nil }
   hi.TooLong                            = { guifg = c.base08, guibg = nil, gui = nil, guisp = nil }
   hi.Underlined                         = { guifg = c.base08, guibg = nil, gui = nil, guisp = nil }
@@ -369,7 +369,7 @@ function M.setup()
   vim.g.terminal_color_5  = c.blue
   vim.g.terminal_color_6  = c.blue
   vim.g.terminal_color_7  = c.white
-  vim.g.terminal_color_8  = c.black
+  vim.g.terminal_color_8  = c.base03
   vim.g.terminal_color_9  = c.red
   vim.g.terminal_color_10 = c.blue
   vim.g.terminal_color_11 = c.blue
@@ -386,7 +386,7 @@ function M.setup()
   vim.g.base16_gui05      = c.blue
   vim.g.base16_gui06      = c.blue
   vim.g.base16_gui07      = c.white
-  vim.g.base16_gui08      = c.black
+  vim.g.base16_gui08      = c.base03
   vim.g.base16_gui09      = c.red
   vim.g.base16_gui0A      = c.blue
   vim.g.base16_gui0B      = c.blue
@@ -405,6 +405,10 @@ function M.setup()
   hi.FzfLuaHeaderBind = { guifg = c.base0A, guibg = nil }
   hi.FzfLuaTabMarker = { guifg = c.base0A, guibg = nil }
   hi.FzfLuaBufFlagAlt = { guifg = c.base0A, guibg = nil }
+
+  -- :h leap-highlight
+  hi.LeapLabelPrimary = { guifg = c.black, guibg = c.yellow }
+  hi.LeapLabelSecondary = { guifg = c.black, guibg = c.base03 }
 end
 
 return M

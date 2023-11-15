@@ -14,14 +14,14 @@ keymap("n", "m", "%", opts)
 keymap("v", "m", "%", opts)
 
 -- Macro
-keymap("n", ".", "@", opts)  -- replay macro x
-keymap("n", ">", "Q", opts)  -- replay last macro
+keymap("n", ",", "@", opts)  -- replay macro x
+keymap("n", "<", "Q", opts)  -- replay last macro
 
 -- Clear search highlights
 keymap("n", "<Space>/", "<cmd>noh<CR>", opts)
 
 -- Replay edit
-keymap("n", ".", ".", opts)
+-- keymap("n", ".", ".", opts)
 
 -- Redo
 keymap("n", "U", "<C-R>", opts)
@@ -142,3 +142,9 @@ keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
 keymap("n", "la", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
 keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
 keymap("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+
+-- Leap
+vim.keymap.set({"n", "v"}, "s", function ()
+  local current_window = vim.fn.win_getid()
+  require('leap').leap { target_windows = { current_window } }
+end)

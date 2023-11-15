@@ -361,39 +361,39 @@ function M.setup()
 
   hi.TreesitterContext = { guifg = nil, guibg = c.base01, gui = 'italic', guisp = nil }
 
-  vim.g.terminal_color_0  = c.base00
-  vim.g.terminal_color_1  = c.base08
-  vim.g.terminal_color_2  = c.base0B
-  vim.g.terminal_color_3  = c.base0A
-  vim.g.terminal_color_4  = c.base0D
-  vim.g.terminal_color_5  = c.base0E
-  vim.g.terminal_color_6  = c.base0C
-  vim.g.terminal_color_7  = c.base05
-  vim.g.terminal_color_8  = c.base03
-  vim.g.terminal_color_9  = c.base08
-  vim.g.terminal_color_10 = c.base0B
-  vim.g.terminal_color_11 = c.base0A
-  vim.g.terminal_color_12 = c.base0D
-  vim.g.terminal_color_13 = c.base0E
-  vim.g.terminal_color_14 = c.base0C
-  vim.g.terminal_color_15 = c.base07
+  vim.g.terminal_color_0  = c.black
+  vim.g.terminal_color_1  = c.red
+  vim.g.terminal_color_2  = c.blue
+  vim.g.terminal_color_3  = c.blue
+  vim.g.terminal_color_4  = c.blue
+  vim.g.terminal_color_5  = c.blue
+  vim.g.terminal_color_6  = c.blue
+  vim.g.terminal_color_7  = c.white
+  vim.g.terminal_color_8  = c.black
+  vim.g.terminal_color_9  = c.red
+  vim.g.terminal_color_10 = c.blue
+  vim.g.terminal_color_11 = c.blue
+  vim.g.terminal_color_12 = c.blue
+  vim.g.terminal_color_13 = c.blue
+  vim.g.terminal_color_14 = c.blue
+  vim.g.terminal_color_15 = c.white
 
-  vim.g.base16_gui00      = c.base00
-  vim.g.base16_gui01      = c.base01
-  vim.g.base16_gui02      = c.base02
-  vim.g.base16_gui03      = c.base03
-  vim.g.base16_gui04      = c.base04
-  vim.g.base16_gui05      = c.base05
-  vim.g.base16_gui06      = c.base06
-  vim.g.base16_gui07      = c.base07
-  vim.g.base16_gui08      = c.base08
-  vim.g.base16_gui09      = c.base09
-  vim.g.base16_gui0A      = c.base0A
-  vim.g.base16_gui0B      = c.base0B
-  vim.g.base16_gui0C      = c.base0C
-  vim.g.base16_gui0D      = c.base0D
-  vim.g.base16_gui0E      = c.base0E
-  vim.g.base16_gui0F      = c.base0F
+  vim.g.base16_gui00      = c.black
+  vim.g.base16_gui01      = c.red
+  vim.g.base16_gui02      = c.blue
+  vim.g.base16_gui03      = c.blue
+  vim.g.base16_gui04      = c.blue
+  vim.g.base16_gui05      = c.blue
+  vim.g.base16_gui06      = c.blue
+  vim.g.base16_gui07      = c.white
+  vim.g.base16_gui08      = c.black
+  vim.g.base16_gui09      = c.red
+  vim.g.base16_gui0A      = c.blue
+  vim.g.base16_gui0B      = c.blue
+  vim.g.base16_gui0C      = c.blue
+  vim.g.base16_gui0D      = c.blue
+  vim.g.base16_gui0E      = c.blue
+  vim.g.base16_gui0F      = c.white
 
   hi.CopilotSuggestion = { guifg = c.base03, guibg = nil }
 

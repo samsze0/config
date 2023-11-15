@@ -106,3 +106,31 @@ keymap("n", "x", "d", opts)
 keymap("v", "x", "d", opts)
 keymap("n", "xx", "dd", opts)
 keymap("n", "X", "D", opts)
+
+-- FzfLua
+-- https://github.com/ibhagwan/fzf-lua#commands
+keymap("n", "<f1>", "<cmd>FzfLua<cr>", opts)
+keymap("n", "<f3>", "<cmd>FzfLua files<cr>", opts)
+keymap("n", "<f5>", "<cmd>FzfLua live_grep<cr>", opts)  -- Ripgrep whole project
+keymap("n", "<f8>", "<cmd>FzfLua git_stash<cr>", opts)
+keymap("n", "<f9>", "<cmd>FzfLua git_commits<cr>", opts)  -- Project commit history
+keymap("n", "<f10>", "<cmd>FzfLua git_bcommits<cr>", opts)  -- File (i.e. buffer) commit history
+keymap("n", "<f11>", "<cmd>FzfLua git_status<cr>", opts)
+
+-- FzfLua + LSP
+keymap("n", "li", "<cmd>FzfLua lsp_definitions<CR>", opts)
+keymap("n", "lr", "<cmd>FzfLua lsp_references<CR>", opts)
+keymap("n", "<f4>", "<cmd>FzfLua lsp_document_symbols<CR>", opts)
+keymap("n", "ld", "<cmd>FzfLua lsp_document_diagnostics<CR>", opts)  -- Show list of problems
+keymap("n", "lD", "<cmd>FzfLua lsp_workspace_diagnostics<CR>", opts)
+
+-- lf.vim
+keymap("n", "<f2>", "<cmd>Lf<cr>", opts)
+
+-- LSP
+keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
+keymap("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
+keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
+keymap("n", "la", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
+keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
+keymap("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)

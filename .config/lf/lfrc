@@ -8,11 +8,7 @@ set cleaner ~/.config/lf/clean.sh
 set previewer ~/.config/lf/preview.sh
 
 cmd delete ${{
-  set -f
-  printf "$fx\n\n"
-  printf "delete? [y/n] "
-  read ans
-  [ $ans = "y" ] && rm -rf $fx
+  ~/.config/lf/delete.sh $fx
 }}
 map <delete> delete
 
@@ -21,15 +17,6 @@ cmd open ${{
 }}
 
 cmd create_new ${{
-  # read ans
-  ans=$1
-  if [ -n $ans ]; then
-    echo $ans
-    if [[ $ans =~ .*/$ ]]; then  # If ends in "/". regex requires [[]]
-      mkdir -p $ans
-    else
-      touch $ans  # Doesn't create the parent dir for the file
-    fi
-  fi
+  ~/.config/lf/create_new.sh $@
 }}
 map a :push :create_new<space>

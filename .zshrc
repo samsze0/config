@@ -70,7 +70,7 @@ then
     then
         alias nix-gc='nix-collect-garbage -d'
         alias nix-dev='nix develop -c zsh'
-        alias kitty-save='kitty @ ls | nix run nixpkgs#python39 ~/.config/kitty/kitty-convert-dump.py > ~/.kitty-session.kitty'
+        alias kitty-save='kitty @ ls | python ~/.config/kitty/kitty-convert-dump.py > ~/.kitty-session.kitty'
         alias kitty-load='kitty --session ~/.kitty-session.kitty'
 
         if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]  # Hyprland

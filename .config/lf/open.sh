@@ -17,5 +17,5 @@ elif [[ $MIME_TYPE =~ ^video ]]; then
     exit 0
 else
     # xdg-open $fx
-    exit 1
+    exit 0
 fi

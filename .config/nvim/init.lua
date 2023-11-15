@@ -17,7 +17,7 @@ vim.opt.softtabstop = 2
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 2
 vim.opt.smarttab = true
-vim.opt.showtabline=0
+vim.opt.showtabline = 0
 
 vim.opt.smartcase = true
 vim.opt.ignorecase = true
@@ -68,22 +68,17 @@ require('packer').startup(function(use)
     end
   }
 
-  -- use {
-  --   'nvim-treesitter/nvim-treesitter',
-  --   run = ':TSUpdate',
-  --   config = function()
-  --     require('_treesitter')
-  --   end
-  -- }
-
   use {
-    'voldikss/vim-floaterm'
+    'voldikss/vim-floaterm',
+    config = function()
+      vim.g.floaterm_width = 0.9
+      vim.g.floaterm_height = 0.9
+    end
   }
 
   use {
     'ptzz/lf.vim',
     config = function()
-      require('_lfvim')
     end,
     requires = {
       'voldikss/vim-floaterm'
@@ -94,13 +89,6 @@ require('packer').startup(function(use)
     'neovim/nvim-lspconfig',
     config = function()
       require('_lspconfig')
-    end
-  }
-
-  use {
-    'windwp/nvim-autopairs',
-    config = function()
-      require("nvim-autopairs").setup({})
     end
   }
 end)

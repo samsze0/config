@@ -10,11 +10,11 @@ require('base16-colorscheme').setup({
   base06 = '#9a9bb3',
   base07 = colors.white,
 
-  base08 = colors.red,
+  base08 = colors.blue,
   base09 = colors.yellow,
-  base0A = colors.yellow,
-  base0B = colors.blue,
-  base0C = colors.blue,
+  base0A = colors.blue,
+  base0B = colors.yellow,  -- string
+  base0C = colors.yellow,
   base0D = colors.blue,
   base0E = colors.blue,
   base0F = colors.blue,
@@ -41,3 +41,16 @@ vim.api.nvim_set_hl(0, "MatchParen", {
   fg = nil;
   bg = theme_colors.base02;
 })
+
+vim.api.nvim_set_hl(0, "CopilotSuggestion", {
+  fg = theme_colors.base03;
+  bg = nil;
+})
+
+vim.api.nvim_set_hl(0, "NormalFloat", {
+  fg = theme_colors.base05,
+  bg = '#171A1C'
+})
+-- vim.api.nvim_set_hl(0, "FloatBorder", {
+--   bg = theme_colors.yellow
+-- })

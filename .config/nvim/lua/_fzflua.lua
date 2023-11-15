@@ -75,12 +75,3 @@ require('fzf-lua').setup({
     severity = "warn",
   },
 })
-
--- https://github.com/ibhagwan/fzf-lua#commands
-vim.api.nvim_set_keymap("n", "<f1>", "<cmd>FzfLua<cr>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap("n", "<f3>", "<cmd>FzfLua files<cr>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap("n", "<f4>", "<cmd>FzfLua live_grep<cr>", {noremap = true, silent = true})  -- Ripgrep whole project
-vim.api.nvim_set_keymap("n", "<f8>", "<cmd>FzfLua git_stash<cr>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap("n", "<f9>", "<cmd>FzfLua git_commits<cr>", {noremap = true, silent = true})  -- Project commit history
-vim.api.nvim_set_keymap("n", "<f10>", "<cmd>FzfLua git_bcommits<cr>", {noremap = true, silent = true})  -- File (i.e. buffer) commit history
-vim.api.nvim_set_keymap("n", "<f11>", "<cmd>FzfLua git_status<cr>", {noremap = true, silent = true})

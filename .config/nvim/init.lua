@@ -32,18 +32,21 @@ vim.cmd[[filetype plugin off]]
 -- vim.cmd[[filetype indent on]]
 
 require('keymaps')
-
-vim.opt.background = "dark"
-vim.opt.termguicolors = true  -- Support all color (instead of 16)
+require('theme').setup()
 
 require('packer').startup(function(use)
   use 'wbthomason/packer.nvim'
 
   use {
-    'RRethy/nvim-base16',
+    'ibhagwan/fzf-lua',
+    branch = "main",
     config = function()
-      require("_nvimbase16")
+      require('_fzflua')
     end
+  }
+
+  use {
+    'github/copilot.vim'
   }
 
   use {
@@ -53,13 +56,6 @@ require('packer').startup(function(use)
     end
   }
 
-  use {
-    'ibhagwan/fzf-lua',
-    branch = "main",
-    config = function()
-      require('_fzflua')
-    end
-  }
 
   use {  -- Show colors for color values e.g. hex
     'norcalli/nvim-colorizer.lua',
@@ -89,6 +85,13 @@ require('packer').startup(function(use)
     'neovim/nvim-lspconfig',
     config = function()
       require('_lspconfig')
+    end
+  }
+
+  use {
+  	'windwp/nvim-autopairs',
+    config = function()
+      require("nvim-autopairs").setup({})
     end
   }
 end)

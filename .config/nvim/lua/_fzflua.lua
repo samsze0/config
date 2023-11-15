@@ -4,13 +4,13 @@ require('fzf-lua').setup({
   winopts = {
     fullscreen       = true,           -- start fullscreen?
     preview = {
-      border         = 'border',        -- border|noborder, applies only to
+      border         = 'noborder',        -- border|noborder, applies only to
                                         -- native fzf previewers (bat/cat/git/etc)
       wrap           = 'nowrap',        -- wrap|nowrap
       hidden         = 'nohidden',      -- hidden|nohidden
-      vertical       = 'down:50%',      -- up|down:size
-      horizontal     = 'right:50%',     -- right|left:size
-      layout         = 'vertical',          -- horizontal|vertical|flex
+      vertical       = 'down:70%',      -- up|down:size
+      horizontal     = 'right:70%',     -- right|left:size
+      layout         = 'horizontal',          -- horizontal|vertical|flex
       flip_columns   = 120,             -- #cols to switch to horizontal on flex
       -- Only valid with the builtin previewer:
       title          = true,            -- preview border title (file/buf)?

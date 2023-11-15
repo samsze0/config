@@ -143,8 +143,14 @@ keymap("n", "la", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
 keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
 keymap("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
 
--- Leap
-vim.keymap.set({"n", "v"}, "s", function ()
-  local current_window = vim.fn.win_getid()
-  require('leap').leap { target_windows = { current_window } }
+-- Flash
+vim.keymap.set({"n", "v"}, "s", function()
+  require("flash").jump()
 end)
+vim.keymap.set({"n", "v"}, "s", function()
+  require("flash").jump()
+end)
+-- { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end,
+-- { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+-- { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+-- { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },

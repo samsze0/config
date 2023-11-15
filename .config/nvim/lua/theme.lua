@@ -405,10 +405,6 @@ function M.setup()
   hi.FzfLuaHeaderBind = { guifg = c.base0A, guibg = nil }
   hi.FzfLuaTabMarker = { guifg = c.base0A, guibg = nil }
   hi.FzfLuaBufFlagAlt = { guifg = c.base0A, guibg = nil }
-
-  -- :h leap-highlight
-  hi.LeapLabelPrimary = { guifg = c.black, guibg = c.yellow }
-  hi.LeapLabelSecondary = { guifg = c.black, guibg = c.base03 }
 end
 
 return M

@@ -95,13 +95,7 @@ require('packer').startup(function(use)
     end
   }
 
-  use {
-    'ggandor/leap.nvim',
-    config = function()
-      require('_leap')
-    end,
-    requires = {
-      'tpope/vim-repeat'
-    }
+  use {  -- Hop
+    'folke/flash.nvim'
   }
 end)

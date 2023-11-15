@@ -2,15 +2,16 @@ local theme = require('lualine.themes.ayu_dark')
 
 local colors = require('theme').colors
 
-theme.normal.a.bg = colors.base0F
-theme.insert.a.bg = colors.base08
-theme.visual.a.bg = colors.base0A
+theme.normal.a.bg = colors.blue
+theme.insert.a.bg = colors.red
+theme.visual.a.bg = colors.yellow
 
-theme.visual.c = {}
-theme.visual.c.fg = theme.visual.b.fg
-theme.insert.c = {}
-theme.insert.c.fg = theme.insert.b.fg
-theme.normal.c.fg = theme.normal.b.fg
+local mode_session = {
+  'mode',
+  fmt = function(str)
+    return " "
+  end
+}
 
 local tab_session = {
   'tabs',
@@ -88,7 +89,9 @@ require('lualine').setup {
     }
   },
   sections = {
-    lualine_a = {'mode'},
+    lualine_a = {
+      mode_session
+    },
     lualine_b = {
       tab_session
     },

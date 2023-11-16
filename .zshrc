@@ -136,3 +136,4 @@ export HISTSIZE=50 # Capacity of no. lines for a session
 export SHELL="$(which zsh)"
 export PAGER="bat"
 export EDITOR="nvim"
+export BROWSER="firefox"

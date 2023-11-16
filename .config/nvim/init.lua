@@ -34,87 +34,86 @@ vim.cmd[[filetype plugin off]]
 require('keymaps')
 require('theme').setup()
 
-require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim'
+-- Lazy.nvim bootstrap
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
 
-  use {
+require("lazy").setup({
+  'wbthomason/packer.nvim',
+  {
     'ibhagwan/fzf-lua',
     branch = "main",
     config = function()
       require('_fzflua')
     end
-  }
-
-  use {
-    'github/copilot.vim'
-  }
-
-  use {
+  },
+  'github/copilot.vim',
+  {
     'nvim-lualine/lualine.nvim',
     config = function()
       require("_lualine")
     end
-  }
-
-
-  use {  -- Show colors for color values e.g. hex
+  },
+  {  -- Show colors for color values e.g. hex
     'norcalli/nvim-colorizer.lua',
     config = function()
       require('_colorizer')
     end
-  }
-
-  use {
+  },
+  {
     'voldikss/vim-floaterm',
     config = function()
       vim.g.floaterm_width = 0.9
       vim.g.floaterm_height = 0.9
     end
-  }
-
-  use {
+  },
+  {
     'ptzz/lf.vim',
     requires = {
       'voldikss/vim-floaterm'
     },
-  }
-
-  use {
+  },
+  {
     'neovim/nvim-lspconfig',
     config = function()
       require('_lspconfig')
     end
-  }
-
-  use {
+  },
+  {
   	'windwp/nvim-autopairs',
     config = function()
       require('_autopairs')
     end
-  }
-
-  use {  -- Hop
+  },
+  {  -- Hop
     'folke/flash.nvim',
     config = function()
       require('_flash')
     end
-  }
-
-  use {  -- Configure lua-language-server for neovim config
+  },
+  {  -- Configure lua-language-server for neovim config
     'folke/neodev.nvim',
-  }
-
-  use {  -- Git status in sign column and git hunk preview/navigation and line blame
+  },
+  {  -- Git status in sign column and git hunk preview/navigation and line blame
     'lewis6991/gitsigns.nvim',
     config = function()
       require('_gitsigns')
     end
-  }
-
-  use {
+  },
+  {
     'nvim-tree/nvim-tree.lua',
     config = function()
       require('_nvimtree')
     end
   }
-end)
+})

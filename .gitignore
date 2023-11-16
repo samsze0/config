@@ -128,3 +128,7 @@
 # Tmux
 !.config/tmux/
 !.config/tmux/**
+
+# Pandoc
+!.config/pandoc/
+!.config/pandoc/**

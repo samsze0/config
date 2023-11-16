@@ -74,8 +74,6 @@ require('packer').startup(function(use)
 
   use {
     'ptzz/lf.vim',
-    config = function()
-    end,
     requires = {
       'voldikss/vim-floaterm'
     },
@@ -91,11 +89,25 @@ require('packer').startup(function(use)
   use {
   	'windwp/nvim-autopairs',
     config = function()
-      require('nvim-autopairs').setup({})
+      require('_autopairs')
     end
   }
 
   use {  -- Hop
-    'folke/flash.nvim'
+    'folke/flash.nvim',
+    config = function()
+      require('_flash')
+    end
+  }
+
+  use {  -- Configure lua-language-server for neovim config
+    'folke/neodev.nvim',
+  }
+
+  use {  -- Git status in sign column and git hunk preview/navigation and line blame
+    'lewis6991/gitsigns.nvim',
+    config = function()
+      require('_gitsigns')
+    end
   }
 end)

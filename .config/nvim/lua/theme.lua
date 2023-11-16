@@ -9,6 +9,9 @@ local red = "#eb5858"
 local blue = "#549eff"
 local yellow = "#f59953"
 
+local float = "#17191f"
+local word_highlight = "#1a1c24"
+
 M.colors = {
   base00 = black,
   base01 = '#2c313c',
@@ -25,10 +28,13 @@ M.colors = {
   blue = blue,
   yellow = yellow,
 
+  float = float,
+  word_highlight = word_highlight,
+
   base08 = blue,
   base09 = yellow,
   base0A = blue,
-  base0B = yellow,  -- string
+  base0B = yellow, -- string
   base0C = yellow,
   base0D = blue,
   base0E = blue,
@@ -64,7 +70,7 @@ function M.setup()
   end
   vim.cmd('set termguicolors')
 
-  local c = M.colors
+  local c                               = M.colors
 
   local hi                              = M.highlight
 
@@ -110,8 +116,10 @@ function M.setup()
   hi.CursorLine                         = { guifg = nil, guibg = c.base01, gui = 'none', guisp = nil }
   hi.CursorLineNr                       = { guifg = c.base04, guibg = c.base01, gui = nil, guisp = nil }
   hi.QuickFixLine                       = { guifg = nil, guibg = c.base01, gui = 'none', guisp = nil }
-  hi.PMenu                              = { guifg = c.base05, guibg = c.base01, gui = 'none', guisp = nil }
-  hi.PMenuSel                           = { guifg = c.base01, guibg = c.base05, gui = nil, guisp = nil }
+  hi.PMenu                              = { guifg = c.base03, guibg = c.float, gui = 'none', guisp = nil }
+  hi.PMenuSel                           = { guifg = c.base03, guibg = c.base02, gui = nil, guisp = nil }
+  hi.PMenuSbar                          = { guifg = nil, guibg = c.base01, gui = 'none', guisp = nil }
+  hi.PMenuThumb                         = { guifg = nil, guibg = c.base04, gui = nil, guisp = nil }
   hi.TabLine                            = { guifg = c.base03, guibg = c.base01, gui = 'none', guisp = nil }
   hi.TabLineFill                        = { guifg = c.base03, guibg = c.base01, gui = 'none', guisp = nil }
   hi.TabLineSel                         = { guifg = c.base0B, guibg = c.base01, gui = 'none', guisp = nil }
@@ -341,72 +349,108 @@ function M.setup()
     hi['@tag.delimiter'] = 'TSTagDelimiter'
   end
 
-  hi.NvimInternalError = { guifg = c.base00, guibg = c.base08, gui = 'none', guisp = nil }
+  hi.NvimInternalError        = { guifg = c.base00, guibg = c.base08, gui = 'none', guisp = nil }
 
-  hi.NormalFloat       = { guifg = c.base05, guibg = '#171A1C', gui = nil, guisp = nil }
-  hi.FloatBorder       = { guifg = c.base05, guibg = c.base00, gui = nil, guisp = nil }
-  hi.NormalNC          = { guifg = c.base05, guibg = c.base00, gui = nil, guisp = nil }
-  hi.TermCursor        = { guifg = c.base00, guibg = c.base05, gui = 'none', guisp = nil }
-  hi.TermCursorNC      = { guifg = c.base00, guibg = c.base05, gui = nil, guisp = nil }
+  hi.NormalFloat              = { guifg = c.base05, guibg = c.float, gui = nil, guisp = nil }
+  hi.FloatBorder              = { guifg = c.base05, guibg = c.base00, gui = nil, guisp = nil }
+  hi.NormalNC                 = { guifg = c.base05, guibg = c.base00, gui = nil, guisp = nil }
+  hi.TermCursor               = { guifg = c.base00, guibg = c.base05, gui = 'none', guisp = nil }
+  hi.TermCursorNC             = { guifg = c.base00, guibg = c.base05, gui = nil, guisp = nil }
 
-  hi.User1             = { guifg = c.base08, guibg = c.base02, gui = 'none', guisp = nil }
-  hi.User2             = { guifg = c.base0E, guibg = c.base02, gui = 'none', guisp = nil }
-  hi.User3             = { guifg = c.base05, guibg = c.base02, gui = 'none', guisp = nil }
-  hi.User4             = { guifg = c.base0C, guibg = c.base02, gui = 'none', guisp = nil }
-  hi.User5             = { guifg = c.base05, guibg = c.base02, gui = 'none', guisp = nil }
-  hi.User6             = { guifg = c.base05, guibg = c.base01, gui = 'none', guisp = nil }
-  hi.User7             = { guifg = c.base05, guibg = c.base02, gui = 'none', guisp = nil }
-  hi.User8             = { guifg = c.base00, guibg = c.base02, gui = 'none', guisp = nil }
-  hi.User9             = { guifg = c.base00, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.User1                    = { guifg = c.base08, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.User2                    = { guifg = c.base0E, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.User3                    = { guifg = c.base05, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.User4                    = { guifg = c.base0C, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.User5                    = { guifg = c.base05, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.User6                    = { guifg = c.base05, guibg = c.base01, gui = 'none', guisp = nil }
+  hi.User7                    = { guifg = c.base05, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.User8                    = { guifg = c.base00, guibg = c.base02, gui = 'none', guisp = nil }
+  hi.User9                    = { guifg = c.base00, guibg = c.base02, gui = 'none', guisp = nil }
 
-  hi.TreesitterContext = { guifg = nil, guibg = c.base01, gui = 'italic', guisp = nil }
+  hi.TreesitterContext        = { guifg = nil, guibg = c.base01, gui = 'italic', guisp = nil }
 
-  vim.g.terminal_color_0  = c.black
-  vim.g.terminal_color_1  = c.red
-  vim.g.terminal_color_2  = c.blue
-  vim.g.terminal_color_3  = c.blue
-  vim.g.terminal_color_4  = c.blue
-  vim.g.terminal_color_5  = c.blue
-  vim.g.terminal_color_6  = c.blue
-  vim.g.terminal_color_7  = c.white
-  vim.g.terminal_color_8  = c.base03
-  vim.g.terminal_color_9  = c.red
-  vim.g.terminal_color_10 = c.blue
-  vim.g.terminal_color_11 = c.blue
-  vim.g.terminal_color_12 = c.blue
-  vim.g.terminal_color_13 = c.blue
-  vim.g.terminal_color_14 = c.blue
-  vim.g.terminal_color_15 = c.white
+  vim.g.terminal_color_0      = c.black
+  vim.g.terminal_color_1      = c.red
+  vim.g.terminal_color_2      = c.blue
+  vim.g.terminal_color_3      = c.blue
+  vim.g.terminal_color_4      = c.blue
+  vim.g.terminal_color_5      = c.blue
+  vim.g.terminal_color_6      = c.blue
+  vim.g.terminal_color_7      = c.white
+  vim.g.terminal_color_8      = c.base03
+  vim.g.terminal_color_9      = c.red
+  vim.g.terminal_color_10     = c.blue
+  vim.g.terminal_color_11     = c.blue
+  vim.g.terminal_color_12     = c.blue
+  vim.g.terminal_color_13     = c.blue
+  vim.g.terminal_color_14     = c.blue
+  vim.g.terminal_color_15     = c.white
 
-  vim.g.base16_gui00      = c.black
-  vim.g.base16_gui01      = c.red
-  vim.g.base16_gui02      = c.blue
-  vim.g.base16_gui03      = c.blue
-  vim.g.base16_gui04      = c.blue
-  vim.g.base16_gui05      = c.blue
-  vim.g.base16_gui06      = c.blue
-  vim.g.base16_gui07      = c.white
-  vim.g.base16_gui08      = c.base03
-  vim.g.base16_gui09      = c.red
-  vim.g.base16_gui0A      = c.blue
-  vim.g.base16_gui0B      = c.blue
-  vim.g.base16_gui0C      = c.blue
-  vim.g.base16_gui0D      = c.blue
-  vim.g.base16_gui0E      = c.blue
-  vim.g.base16_gui0F      = c.white
+  vim.g.base16_gui00          = c.black
+  vim.g.base16_gui01          = c.red
+  vim.g.base16_gui02          = c.blue
+  vim.g.base16_gui03          = c.blue
+  vim.g.base16_gui04          = c.blue
+  vim.g.base16_gui05          = c.blue
+  vim.g.base16_gui06          = c.blue
+  vim.g.base16_gui07          = c.white
+  vim.g.base16_gui08          = c.base03
+  vim.g.base16_gui09          = c.red
+  vim.g.base16_gui0A          = c.blue
+  vim.g.base16_gui0B          = c.blue
+  vim.g.base16_gui0C          = c.blue
+  vim.g.base16_gui0D          = c.blue
+  vim.g.base16_gui0E          = c.blue
+  vim.g.base16_gui0F          = c.white
 
-  hi.CopilotSuggestion = { guifg = c.base03, guibg = nil }
+  hi.CopilotSuggestion        = { guifg = c.base02, guibg = nil }
 
-  hi.FzfLuaBufFlagCur = { guifg = c.base03, guibg = nil }
-  hi.FzfLuaHeaderText = { guifg = c.base03, guibg = nil }
-  hi.FzfLuaBufLineNr = { guifg = c.base0A, guibg = nil }
-  hi.FzfLuaBufNr = { guifg = c.base0A, guibg = nil }
-  hi.FzfLuaBufName = { guifg = c.base0A, guibg = nil }
-  hi.FzfLuaHeaderBind = { guifg = c.base0A, guibg = nil }
-  hi.FzfLuaTabMarker = { guifg = c.base0A, guibg = nil }
-  hi.FzfLuaBufFlagAlt = { guifg = c.base0A, guibg = nil }
+  hi.FzfLuaBufFlagCur         = { guifg = c.base03, guibg = nil }
+  hi.FzfLuaHeaderText         = { guifg = c.base03, guibg = nil }
+  hi.FzfLuaBufLineNr          = { guifg = c.base0A, guibg = nil }
+  hi.FzfLuaBufNr              = { guifg = c.base0A, guibg = nil }
+  hi.FzfLuaBufName            = { guifg = c.base0A, guibg = nil }
+  hi.FzfLuaHeaderBind         = { guifg = c.base0A, guibg = nil }
+  hi.FzfLuaTabMarker          = { guifg = c.base0A, guibg = nil }
+  hi.FzfLuaBufFlagAlt         = { guifg = c.base0A, guibg = nil }
 
-  hi.NvimTreeIndentMarker = { guifg = c.base01, guibg = nil }
+  hi.NvimTreeIndentMarker     = { guifg = c.base01, guibg = nil }
+
+  hi.IblIndent                = { guifg = c.float }
+  hi.IblWhitespace            = { guifg = c.float }
+  hi.IblScope                 = { guifg = c.float }
+
+  hi.IlluminatedWordText      = { guibg = c.word_highlight, gui = nil }
+  hi.IlluminatedWordRead      = { guibg = c.word_highlight, gui = nil }
+  hi.IlluminatedWordWrite     = { guibg = c.word_highlight, gui = nil }
+
+  hi.CmpItemAbbr              = { guifg = c.base03, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemAbbrDeprecated    = { guifg = c.base01, guibg = nil, gui = 'strikethrough', guisp = nil }
+  hi.CmpItemAbbrMatch         = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemAbbrMatchFuzzy    = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindDefault       = { guifg = c.base05, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemMenu              = { guifg = nil, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindKeyword       = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindVariable      = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindConstant      = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindReference     = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindValue         = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindFunction      = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindMethod        = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindConstructor   = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindClass         = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindInterface     = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindStruct        = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindEvent         = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindEnum          = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindUnit          = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindModule        = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindProperty      = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindField         = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindTypeParameter = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindEnumMember    = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindOperator      = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindSnippet       = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
 end
 
 return M

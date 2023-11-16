@@ -122,6 +122,9 @@ keymap("n", "<f11>", "<cmd>FzfLua git_status<cr>", opts)
 keymap("n", "<f12>", "<cmd>FloatermToggle<cr>", opts)
 keymap("t", "<f12>", "<cmd>FloatermToggle<cr>", opts)
 
+-- NvimTree
+keymap("n", "<f2><f1>", "<cmd>NvimTreeFindFile<cr>", opts)
+
 -- FzfLua + LSP
 -- keymap("n", "li", "<cmd>FzfLua lsp_definitions<CR>", opts)
 keymap("n", "lr", "<cmd>FzfLua lsp_references<CR>", opts)

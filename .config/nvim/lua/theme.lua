@@ -104,7 +104,7 @@ function M.setup()
   hi.StatusLineNC                       = { guifg = c.base04, guibg = c.base01, gui = 'none', guisp = nil }
   hi.WinBar                             = { guifg = c.base05, guibg = nil, gui = 'none', guisp = nil }
   hi.WinBarNC                           = { guifg = c.base04, guibg = nil, gui = 'none', guisp = nil }
-  hi.VertSplit                          = { guifg = c.base05, guibg = c.base00, gui = 'none', guisp = nil }
+  hi.VertSplit                          = { guifg = c.base01, guibg = c.base00, gui = 'none', guisp = nil }
   hi.ColorColumn                        = { guifg = nil, guibg = c.base01, gui = 'none', guisp = nil }
   hi.CursorColumn                       = { guifg = nil, guibg = c.base01, gui = 'none', guisp = nil }
   hi.CursorLine                         = { guifg = nil, guibg = c.base01, gui = 'none', guisp = nil }
@@ -405,6 +405,8 @@ function M.setup()
   hi.FzfLuaHeaderBind = { guifg = c.base0A, guibg = nil }
   hi.FzfLuaTabMarker = { guifg = c.base0A, guibg = nil }
   hi.FzfLuaBufFlagAlt = { guifg = c.base0A, guibg = nil }
+
+  hi.NvimTreeIndentMarker = { guifg = c.base01, guibg = nil }
 end
 
 return M

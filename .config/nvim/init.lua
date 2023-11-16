@@ -110,4 +110,11 @@ require('packer').startup(function(use)
       require('_gitsigns')
     end
   }
+
+  use {
+    'nvim-tree/nvim-tree.lua',
+    config = function()
+      require('_nvimtree')
+    end
+  }
 end)

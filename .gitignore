@@ -124,6 +124,7 @@
 !.config/nvim/
 !.config/nvim/**
 .config/nvim/plugin
+.config/nvim/lua/.luarc.json
 
 # Tmux
 !.config/tmux/

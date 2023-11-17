@@ -2,7 +2,8 @@
 
 set -eu
 
-source ~/.config/lf/utils.sh
+# shellcheck source=../zsh/utils.sh
+source ~/.config/zsh/utils.sh
 
 get_filename() {
     # Split the input into an array
@@ -29,8 +30,8 @@ get_image_coord() {
     echo "${input[-4]}x${input[-3]}@${input[-2]}x${input[-1]}"
 }
 
-FILE=$(get_filename $@)
-IMAGE_COORDINATES=$(get_image_coord $@)
+FILE=$(get_filename "$@")
+IMAGE_COORDINATES=$(get_image_coord "$@")
 
 image_preview() {
     # Caution: input filename should wrap in "" to avoid word splitting

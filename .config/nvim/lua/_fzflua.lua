@@ -8,8 +8,8 @@ require('fzf-lua').setup({
       -- native fzf previewers (bat/cat/git/etc)
       wrap         = 'nowrap',     -- wrap|nowrap
       hidden       = 'nohidden',   -- hidden|nohidden
-      vertical     = 'down:60%',   -- up|down:size
-      horizontal   = 'right:60%',  -- right|left:size
+      vertical     = 'down:50%',   -- up|down:size
+      horizontal   = 'right:50%',  -- right|left:size
       layout       = 'horizontal', -- horizontal|vertical|flex
       flip_columns = 120,          -- #cols to switch to horizontal on flex
       -- Only valid with the builtin previewer:
@@ -73,4 +73,3 @@ require('fzf-lua').setup({
     severity = "warn",
   },
 })
-

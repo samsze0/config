@@ -1,12 +1,5 @@
 #!/usr/bin/env bash
 
-set -eu
-
-get_mimetype() {
-    # Caution: input filename should wrap in "" to avoid word splitting
-    file -Lb --mime-type "$1"  # Follom symlink + brief output only
-}
-
 CACHE_PANDOC_PDF=~/.cache/lf-open-tmp-pandoc.pdf
 
 # open_md_as_pdf() {
@@ -28,7 +21,7 @@ open_md_as_html() {
       --css ~/.config/pandoc/light.css \
       --katex \
       --highlight-style pygments \
-      $1 -o $CACHE_PANDOC_HTML
+      "$1" -o $CACHE_PANDOC_HTML
 
     firefox $CACHE_PANDOC_HTML
 }

@@ -4,6 +4,11 @@
 # Warp still hasn't supported zsh completions yet (i.e. compdef, compctl, compsys, etc.)
 # https://github.com/warpdotdev/Warp/issues/2179
 
+# Custom lib
+source ~/.config/zsh/tailscale.sh
+source ~/.config/zsh/utils.sh
+source ~/.config/zsh/pandoc.sh
+
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
 source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
@@ -103,6 +108,9 @@ alias manfzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
 alias duf='duf -theme ansi'
 alias ll='exa -l'
 alias deff='delta --raw'
+alias ts-get='sudo tailscale file get'  # Move files out of tailscale inbox
+alias ts-send='tailscale_send'  # Move files out of tailscale inbox
+alias jq='gojq'
 
 # FZF
 # https://github.com/junegunn/fzf/blob/master/ADVANCED.md

@@ -14,8 +14,9 @@ local word_highlight = "#1a1c24"
 local diffview_red_bg = "#1e0b0b"
 local diffview_blue_bg = "#0b111a"
 local diffview_yellow_bg = "#1e1307"
-local diffview_blue_bg_bright = "#111c2e"
-local diffview_yellow_bg_bright = "#2e1c0a"
+local diffview_red_bg_bright = "#2f0f0f"
+local diffview_blue_bg_bright = "#111e36"
+local diffview_yellow_bg_bright = "#34200c"
 local diffview_padding_fg = "#17191f"
 
 M.colors = {
@@ -40,6 +41,7 @@ M.colors = {
   diffview_red_bg = diffview_red_bg,
   diffview_blue_bg = diffview_blue_bg,
   diffview_yellow_bg = diffview_yellow_bg,
+  diffview_red_bg_bright = diffview_red_bg_bright,
   diffview_blue_bg_bright = diffview_blue_bg_bright,
   diffview_yellow_bg_bright = diffview_yellow_bg_bright,
   diffview_padding_fg = diffview_padding_fg,
@@ -419,6 +421,7 @@ function M.setup()
   hi.CopilotSuggestion           = { guifg = c.base02, guibg = nil }
 
   hi.FzfLuaBufFlagCur            = { guifg = c.base03, guibg = nil }
+  hi.FzfLuaTabTitle              = { guifg = c.blue, guibg = nil }
   hi.FzfLuaHeaderText            = { guifg = c.base03, guibg = nil }
   hi.FzfLuaBufLineNr             = { guifg = c.base0A, guibg = nil }
   hi.FzfLuaBufNr                 = { guifg = c.base0A, guibg = nil }
@@ -474,14 +477,24 @@ function M.setup()
   -- Color of sign in sign column in tree view
   hi.DiffviewSignColumn          = { guifg = c.base05, guibg = nil }
   hi.DiffviewStatusAdded         = { guifg = c.blue, guibg = nil }
-  hi.DiffviewStatusUntracked     = { guifg = c.yellow, guibg = nil }
+  hi.DiffviewStatusUntracked     = { guifg = c.blue, guibg = nil }
+  hi.DiffviewStatusRenamed       = { guifg = c.yellow, guibg = nil }
+  hi.DiffviewStatusUnmerged      = { guifg = c.yellow, guibg = nil }
+  hi.DiffviewStatusIgnored       = { guifg = c.base03, guibg = nil }
+  hi.DiffviewStatusModified      = { guifg = c.yellow, guibg = nil }
   hi.DiffviewStatusBroken        = { guifg = c.red, guibg = nil }
   hi.DiffviewStatusDeleted       = { guifg = c.red, guibg = nil }
-  hi.DiffviewStatusUnknown       = { guifg = c.yellow, guibg = nil }
+  hi.DiffviewStatusUnknown       = { guifg = c.base05, guibg = nil }
 
   -- Color of the number of added/deleted lines in tree view
-  hi.DiffviewFilePanelDeletions  = { guifg = c.red, guibg = nil }
-  hi.DiffviewFilePanelInsertions = { guifg = c.blue, guibg = nil }
+  hi.DiffviewFilePanelDeletions  = { guifg = c.base03, guibg = nil }
+  hi.DiffviewFilePanelInsertions = { guifg = c.base03, guibg = nil }
+
+  -- hi.GitSignsAddInline           = { guifg = nil, guibg = c.diffview_blue_bg_bright }
+  hi.GitSignsChangeInline        = { guifg = nil, guibg = c.diffview_blue_bg_bright } -- Current state of the hunk for preview_hunk
+  -- hi.GitSignsDeleteInline        = { guifg = nil, guibg = c.diffview_red_bg }
+
+  hi.GitSignsDeleteVirtLn        = { guifg = nil, guibg = c.diffview_red_bg } -- Previous state of the hunk for preview_hunk
 end
 
 return M

@@ -51,11 +51,12 @@ require("diffview").setup({
     listing_style = "tree", -- One of 'list' or 'tree'
     tree_options = {
       -- Only applies when listing_style is 'tree'
-      flatten_dirs = true,             -- Flatten dirs that only contain one single dir
-      folder_statuses = "only_folded", -- One of 'never', 'only_folded' or 'always'.
+      flatten_dirs = true,       -- Flatten dirs that only contain one single dir
+      folder_statuses = "never", -- One of 'never', 'only_folded' or 'always'.
     },
     win_config = {
       -- See ':h diffview-config-win_config'
+      type = "split",
       position = "left",
       width = 35,
       win_opts = {}
@@ -100,34 +101,34 @@ require("diffview").setup({
     view = {
       -- The `view` bindings are active in the diff buffers, only when the current
       -- tabpage is a Diffview.
-      { "n", "gl",       actions.select_next_entry, { desc = "Open the diff for the next file" } },
-      { "n", "gj",       actions.select_prev_entry, { desc = "Open the diff for the previous file" } },
-      { "n", "ge",       actions.goto_file_edit,    { desc = "Open the file in the previous tabpage" } },
+      -- { "n", "sl",       actions.select_next_entry, { desc = "Open the diff for the next file" } },
+      -- { "n", "sj",       actions.select_prev_entry, { desc = "Open the diff for the previous file" } },
+      { "n", "ge",       actions.goto_file_edit, { desc = "Open the file in the previous tabpage" } },
       -- { "n", "<C-w><C-f>", actions.goto_file_split,   { desc = "Open the file in a new split" } },
       -- { "n", "<C-w>gf",    actions.goto_file_tab,     { desc = "Open the file in a new tabpage" } },
-      { "n", "<f2><f1>", actions.focus_files,       { desc = "Bring focus to the file panel" } },
+      { "n", "<f2><f1>", actions.focus_files,    { desc = "Bring focus to the file panel" } },
       -- { "n", "<leader>b",  actions.toggle_files,      { desc = "Toggle the file panel." } },
       -- { "n", "g<C-x>",     actions.cycle_layout,      { desc = "Cycle through available layouts." } },
-      { "n", "gi", actions.prev_conflict, {
-        desc =
-        "In the merge-tool: jump to the previous conflict"
-      } },
-      { "n", "gk", actions.next_conflict,             { desc = "In the merge-tool: jump to the next conflict" } },
-      { "n", "gu", actions.conflict_choose("ours"),   { desc = "Choose the OURS version of a conflict" } },
-      { "n", "go", actions.conflict_choose("theirs"), { desc = "Choose the THEIRS version of a conflict" } },
+      -- { "n", "si", actions.prev_conflict, {
+      --   desc =
+      --   "In the merge-tool: jump to the previous conflict"
+      -- } },
+      -- { "n", "sk", actions.next_conflict,             { desc = "In the merge-tool: jump to the next conflict" } },
+      -- { "n", "sl", actions.conflict_choose("ours"),   { desc = "Choose the OURS version of a conflict" } },
+      -- { "n", "sj", actions.conflict_choose("theirs"), { desc = "Choose the THEIRS version of a conflict" } },
       -- { "n", "<leader>cb", actions.conflict_choose("base"),   { desc = "Choose the BASE version of a conflict" } },
       -- { "n", "<leader>ca", actions.conflict_choose("all"),    { desc = "Choose all the versions of a conflict" } },
       -- { "n", "dx",         actions.conflict_choose("none"),   { desc = "Delete the conflict region" } },
-      { "n", "gU", actions.conflict_choose_all("ours"),
-        {
-          desc =
-          "Choose the OURS version of a conflict for the whole file"
-        } },
-      { "n", "gO", actions.conflict_choose_all("theirs"),
-        {
-          desc =
-          "Choose the THEIRS version of a conflict for the whole file"
-        } },
+      -- { "n", "sL", actions.conflict_choose_all("ours"),
+      --   {
+      --     desc =
+      --     "Choose the OURS version of a conflict for the whole file"
+      --   } },
+      -- { "n", "sJ", actions.conflict_choose_all("theirs"),
+      --   {
+      --     desc =
+      --     "Choose the THEIRS version of a conflict for the whole file"
+      --   } },
       -- { "n", "<leader>cB", actions.conflict_choose_all("base"),
       --   {
       --     desc =
@@ -190,16 +191,16 @@ require("diffview").setup({
       } },
       { "n", "<2-LeftMouse>", actions.select_entry,       { desc = "Open the diff for the selected entry" } },
       { "n", "<right>",       actions.select_entry,       { desc = "Open the diff for the selected entry" } },
-      { "n", "s",             actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
-      { "n", "S",             actions.stage_all,          { desc = "Stage all entries" } },
-      { "n", "U",             actions.unstage_all,        { desc = "Unstage all entries" } },
-      { "n", "X", actions.restore_entry, {
-        desc =
-        "Restore entry to the state on the left side"
-      } },
-      { "n", "L",      actions.open_commit_log,    { desc = "Open the commit log panel" } },
+      -- { "n", "s",             actions.toggle_stage_entry, { desc = "Stage / unstage the selected entry" } },
+      -- { "n", "S",             actions.stage_all,          { desc = "Stage all entries" } },
+      -- { "n", "U",             actions.unstage_all,        { desc = "Unstage all entries" } },
+      -- { "n", "X", actions.restore_entry, {
+      --   desc =
+      --   "Restore entry to the state on the left side"
+      -- } },
+      -- { "n", "L",      actions.open_commit_log,    { desc = "Open the commit log panel" } },
       -- { "n", "zo",     actions.open_fold,       { desc = "Expand fold" } },
-      { "n", "<left>", actions.close_fold,         { desc = "Collapse fold" } },
+      { "n", "<left>",        actions.close_fold,         { desc = "Collapse fold" } },
       -- { "n", "zc",     actions.close_fold,      { desc = "Collapse fold" } },
       -- { "n", "za",     actions.toggle_fold,     { desc = "Toggle fold" } },
       -- { "n", "zR",     actions.open_all_folds,  { desc = "Expand all folds" } },
@@ -211,19 +212,19 @@ require("diffview").setup({
       -- { "n", "gf",         actions.goto_file_edit,  { desc = "Open the file in the previous tabpage" } },
       -- { "n", "<C-w><C-f>", actions.goto_file_split, { desc = "Open the file in a new split" } },
       -- { "n", "<C-w>gf",    actions.goto_file_tab,   { desc = "Open the file in a new tabpage" } },
-      { "n", "i",      actions.listing_style,      { desc = "Toggle between 'list' and 'tree' views" } },
+      { "n", "i",             actions.listing_style,      { desc = "Toggle between 'list' and 'tree' views" } },
       -- { "n", "f", actions.toggle_flatten_dirs,
       --   {
       --     desc =
       --     "Flatten empty subdirectories in tree listing style"
       --   } },
-      { "n", "R",      actions.refresh_files,      { desc = "Update stats and entries in the file list" } },
+      { "n", "R",             actions.refresh_files,      { desc = "Update stats and entries in the file list" } },
       -- { "n", "<leader>e", actions.focus_files,        { desc = "Bring focus to the file panel" } },
       -- { "n", "<leader>b", actions.toggle_files,       { desc = "Toggle the file panel" } },
       -- { "n", "g<C-x>",    actions.cycle_layout,       { desc = "Cycle available layouts" } },
       -- { "n", "gi",        actions.prev_conflict,      { desc = "Go to the previous conflict" } },
       -- { "n", "gk",        actions.next_conflict,      { desc = "Go to the next conflict" } },
-      { "n", "g?",     actions.help("file_panel"), { desc = "Open the help panel" } },
+      { "n", "g?",            actions.help("file_panel"), { desc = "Open the help panel" } },
       -- { "n", "gU", actions.conflict_choose_all("ours"),
       --   {
       --     desc =
@@ -251,7 +252,7 @@ require("diffview").setup({
       --   } },
     },
     file_history_panel = {
-      { "n", "g!",            actions.options,                    { desc = "Open the option panel" } },
+      { "n", "g!", actions.options,                    { desc = "Open the option panel" } },
       -- { "n", "<C-A-d>", actions.open_in_diffview, {
       --   desc =
       --   "Open the entry under the cursor in a diffview"
@@ -260,25 +261,25 @@ require("diffview").setup({
         desc =
         "Copy the commit hash of the entry under the cursor"
       } },
-      { "n", "L",             actions.open_commit_log,            { desc = "Show commit details" } },
+      -- { "n", "L",             actions.open_commit_log,            { desc = "Show commit details" } },
       -- { "n", "zR",            actions.open_all_folds,             { desc = "Expand all folds" } },
       -- { "n", "zM",            actions.close_all_folds,            { desc = "Collapse all folds" } },
-      { "n", "<down>",        actions.next_entry,                 { desc = "Bring the cursor to the next file entry" } },
-      { "n", "<up>",          actions.prev_entry,                 { desc = "Bring the cursor to the previous file entry." } },
+      -- { "n", "<down>",        actions.next_entry,                 { desc = "Bring the cursor to the next file entry" } },
+      -- { "n", "<up>",          actions.prev_entry,                 { desc = "Bring the cursor to the previous file entry." } },
       -- { "n", "<cr>",          actions.select_entry,               { desc = "Open the diff for the selected entry." } },
-      { "n", "<right>",       actions.select_entry,               { desc = "Open the diff for the selected entry." } },
-      { "n", "<2-LeftMouse>", actions.select_entry,               { desc = "Open the diff for the selected entry." } },
+      -- { "n", "<right>",       actions.select_entry,               { desc = "Open the diff for the selected entry." } },
+      -- { "n", "<2-LeftMouse>", actions.select_entry,               { desc = "Open the diff for the selected entry." } },
       -- { "n", "<c-b>",         actions.scroll_view(-0.25),         { desc = "Scroll the view up" } },
       -- { "n", "<c-f>",         actions.scroll_view(0.25),          { desc = "Scroll the view down" } },
       -- { "n", "<tab>",         actions.select_next_entry,          { desc = "Open the diff for the next file" } },
       -- { "n", "<s-tab>",       actions.select_prev_entry,          { desc = "Open the diff for the previous file" } },
-      { "n", "ge",            actions.goto_file_edit,             { desc = "Open the file in the previous tabpage" } },
+      -- { "n", "ge",            actions.goto_file_edit,             { desc = "Open the file in the previous tabpage" } },
       -- { "n", "<C-w><C-f>",    actions.goto_file_split,            { desc = "Open the file in a new split" } },
       -- { "n", "<C-w>gf",       actions.goto_file_tab,              { desc = "Open the file in a new tabpage" } },
-      { "n", "<f2><f1>",      actions.focus_files,                { desc = "Bring focus to the file panel" } },
+      -- { "n", "<f2><f1>",      actions.focus_files,                { desc = "Bring focus to the file panel" } },
       -- { "n", "<leader>b",     actions.toggle_files,               { desc = "Toggle the file panel" } },
       -- { "n", "g<C-x>",        actions.cycle_layout,               { desc = "Cycle available layouts" } },
-      { "n", "g?",            actions.help("file_history_panel"), { desc = "Open the help panel" } },
+      { "n", "g?", actions.help("file_history_panel"), { desc = "Open the help panel" } },
     },
     option_panel = {
       { "n", "<tab>", actions.select_entry,         { desc = "Change the current option" } },

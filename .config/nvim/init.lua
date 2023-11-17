@@ -3,8 +3,9 @@
 vim.cmd [[set clipboard+=unnamedplus]] -- Use system clipboard
 
 vim.opt.number = true
-vim.opt.cursorline = false -- Highlight current line
+vim.opt.cursorline = false    -- Highlight current line
 vim.opt.signcolumn = "auto"
+vim.opt.signcolumn = 'auto:4' -- Maximum 4 signs
 vim.opt.wrap = false
 
 -- :help fo-table
@@ -204,6 +205,15 @@ require("lazy").setup({
     'sindrets/diffview.nvim',
     config = function()
       require('_diffview')
+    end
+  },
+  {
+    'nvim-pack/nvim-spectre',
+    dependencies = {
+      'nvim-lua/plenary.nvim'
+    },
+    config = function()
+      require('_spectre')
     end
   }
 })

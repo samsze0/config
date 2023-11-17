@@ -2,8 +2,6 @@
 
 set -eu
 
-source ~/.config/lf/utils.sh
-
 MIME_TYPE=$(get_mimetype $fx)
 
 if [[ $MIME_TYPE =~ ^image ]]; then

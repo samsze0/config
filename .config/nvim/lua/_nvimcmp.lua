@@ -1,5 +1,59 @@
 local cmp = require('cmp')
 
+local mapping = {
+  ['<Up>'] = cmp.mapping(
+    cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 1 }),
+    { 'i', 'c', 's' }
+  ),
+  ['<Down>'] = cmp.mapping(
+    cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 }),
+    { 'i', 'c', 's' }
+  ),
+  ['<PageUp>'] = cmp.mapping(
+    cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 10 }),
+    { 'i', 'c', 's' }
+  ),
+  ['<PageDown>'] = cmp.mapping(
+    cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 10 }),
+    { 'i', 'c', 's' }
+  ),
+  ['<S-Up>'] = cmp.mapping(
+    cmp.mapping.scroll_docs(-5),
+    { 'i', 'c', 's' }
+  ),
+  ['<S-Down>'] = cmp.mapping(
+    cmp.mapping.scroll_docs(5),
+    { 'i', 'c', 's' }
+  ),
+  ['<S-PageUp>'] = cmp.mapping(
+    cmp.mapping.scroll_docs(-10),
+    { 'i', 'c', 's' }
+  ),
+  ['<S-PageDown>'] = cmp.mapping(
+    cmp.mapping.scroll_docs(10),
+    { 'i', 'c', 's' }
+  ),
+  ['<C-Space>'] = cmp.mapping(
+    cmp.mapping.complete(),
+    { 'i', 'c', 's' }
+  ),
+  ['<Tab>'] = cmp.mapping(
+    cmp.mapping.confirm({ select = true }),
+    { 'i', 'c', 's' }
+  ),
+  ['<CR>'] = cmp.mapping({
+    i = cmp.mapping.confirm({ select = true }),
+    s = cmp.mapping.confirm({ select = true }),
+    -- c = function(fallback) -- First confirm the entry if there is any, then execute fallback
+    --   if not cmp.get_active_entry() == nil then
+    --     cmp.complete_common_string()
+    --   end
+
+    --   return fallback()
+    -- end
+  })
+}
+
 cmp.setup({
   -- preselect = cmp.PreselectMode.Item,
   snippet = {
@@ -11,23 +65,11 @@ cmp.setup({
     -- completion = cmp.config.window.bordered(),
     -- documentation = cmp.config.window.bordered(),
   },
-  mapping = cmp.mapping.preset.insert({
-    ['<Up>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 1 }),
-    ['<Down>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 }),
-    ['<PageUp>'] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 10 }),
-    ['<PageDown>'] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 10 }),
-    ['<S-Up>'] = cmp.mapping.scroll_docs(-5),
-    ['<S-Down>'] = cmp.mapping.scroll_docs(5),
-    ['<S-PageUp>'] = cmp.mapping.scroll_docs(-10),
-    ['<S-PageDown>'] = cmp.mapping.scroll_docs(10),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<Tab>'] = cmp.mapping.confirm({ select = true }),
-    ['<CR>'] = cmp.mapping.confirm({ select = true }),
-  }),
+  mapping = mapping,
   sources = cmp.config.sources({
     { name = 'nvim_lsp' },
   }, {
-    { name = 'buffer' },
+    -- { name = 'buffer' },
   }),
   formatting = {
     format = require('lspkind').cmp_format({
@@ -56,15 +98,16 @@ cmp.setup.filetype('gitcommit', {
 
 -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline({ '/', '?' }, {
-  mapping = cmp.mapping.preset.cmdline(),
+  completion = {
+    autocomplete = false,
+  },
   sources = {
-    { name = 'buffer' }
+    { name = 'buffer' } -- Can coverup the editor
   }
 })
 
 -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline(':', {
-  mapping = cmp.mapping.preset.cmdline(),
   sources = cmp.config.sources({
     { name = 'path' }
   }, {

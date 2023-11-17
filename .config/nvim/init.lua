@@ -31,6 +31,8 @@ vim.cmd [[filetype on]]
 vim.cmd [[filetype plugin off]]
 -- vim.cmd[[filetype indent on]]
 
+vim.opt.fillchars:append { diff = "╱" }
+
 require('keymaps')
 require('theme').setup()
 
@@ -196,6 +198,12 @@ require("lazy").setup({
     'dstein64/nvim-scrollview',
     config = function()
       require('scrollview').setup({})
+    end
+  },
+  {
+    'sindrets/diffview.nvim',
+    config = function()
+      require('_diffview')
     end
   }
 })

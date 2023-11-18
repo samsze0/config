@@ -10,3 +10,8 @@ tailscale_send() {
   P=$(echo "$PEERS" | fzf)
   sudo tailscale file cp "$@" "$P:"
 }
+
+# Get file from tailscale inbox to destination dir
+tailscale_get() {
+  sudo tailscale file get $@
+}

@@ -60,8 +60,11 @@ def convert(session):
 
             for w in tab["windows"]:
                 print(f"title {w['title']}")
+                # print(
+                #     f"launch {env_to_str(w['env'])} {fg_proc_to_str(w['foreground_processes'])}"
+                # )
                 print(
-                    f"launch {env_to_str(w['env'])} {fg_proc_to_str(w['foreground_processes'])}"
+                    f"launch {env_to_str(w['env'])} zsh"
                 )
                 if w["is_focused"]:
                     print("focus")

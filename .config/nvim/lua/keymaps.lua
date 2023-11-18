@@ -13,11 +13,12 @@ keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
 -- Delete word
 keymap("n", "ke", "<cmd>m .-2<CR>", opts)
 
--- Move/swap line/selection up/down
 -- Caution: marks in visual mode are only set after leaving visual mode
 -- `<cmd>` will execute a command without leaving visual mode while
 -- `:` leaves visual mode and enters command mode before processing the command.
 -- https://www.reddit.com/r/neovim/comments/y2h8ps/i_have_a_mapping_for_normal_how_to_make_an/
+
+-- Move/swap line/selection up/down
 -- keymap("n", "ke", "<cmd>m .-2<CR>==", opts) -- Auto indent line afterwards
 keymap("n", "ke", "<cmd>m .-2<CR>", opts)
 -- keymap("n", "ke", "dd2<Up>\"dp==", noremap_opts)
@@ -51,6 +52,10 @@ keymap("n", "<Space>/", "<cmd>noh<CR>", opts)
 
 -- Redo
 keymap("n", "U", "<C-R>", opts)
+
+-- New line
+keymap("n", "o", "o<Esc>", opts)
+keymap("n", "O", "O<Esc>", opts)
 
 -- Insert/append swap
 keymap("n", "i", "a", opts)
@@ -141,6 +146,8 @@ keymap("t", "<f12>", "<cmd>FloatermToggle<cr>", opts)
 
 -- Diffview
 keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
+keymap("n", "<f11><f2>", "<cmd>DiffviewFileHistory %<cr>", opts) -- See current file git history
+keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts)     -- See current selection git history
 
 -- NvimTree
 keymap("n", "<f2><f1>", "<cmd>NvimTreeFindFile<cr>", opts)
@@ -179,4 +186,12 @@ keymap("n", "sj", "<cmd>Gitsigns stage_hunk<CR>", opts)
 keymap("n", "sl", "<cmd>Gitsigns undo_stage_hunk<CR>", opts)
 keymap("n", "s;", "<cmd>Gitsigns reset_hunk<CR>", opts)
 
--- Diffview
+-- :qa, :q!, :wq
+keymap("n", "<space>q", ":q<cr>", opts)
+keymap("n", "<space>w", ":wq<cr>", opts)
+keymap("n", "<space>Q", ":q!<cr>", opts)
+keymap("n", "<space>s", ":w<cr>", opts)
+
+-- persistence.nvim
+-- restore the session for the current directory
+keymap("n", "<Space>R", [[<cmd>lua require("persistence").load()<cr>]], opts)

@@ -9,9 +9,9 @@ vim.opt.signcolumn = 'auto:4' -- Maximum 4 signs
 vim.opt.wrap = false
 
 -- :help fo-table
--- vim.cmd[[set formatoptions-=o]]  -- Disable auto comment in normal mode
--- vim.cmd[[set formatoptions-=r]]  -- Disable auto comment in insert mode
--- vim.cmd[[set formatoptions-=c]]  -- Disable auto wrap comment
+vim.cmd [[set formatoptions-=o]] -- Disable auto comment in normal mode
+vim.cmd [[set formatoptions-=r]] -- Disable auto comment in insert mode
+vim.cmd [[set formatoptions-=c]] -- Disable auto wrap comment
 
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
@@ -30,7 +30,6 @@ vim.cmd [[set undodir=~/.cache/nvim/undo]]
 
 vim.cmd [[filetype on]]
 vim.cmd [[filetype plugin off]]
--- vim.cmd[[filetype indent on]]
 
 vim.opt.fillchars:append { diff = "╱" }
 
@@ -53,11 +52,11 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
   {
+    -- TODO: open file when swap file exists throw cryptic error
     'ibhagwan/fzf-lua',
-    branch = "main",
     config = function()
       require('_fzflua')
-    end
+    end,
   },
   {
     'github/copilot.vim',
@@ -153,6 +152,7 @@ require("lazy").setup({
   {
     -- Project specific settings incl. LSP (w/ vscode interop)
     'folke/neoconf.nvim',
+    enabled = false,
     config = function()
       require('_neoconf')
     end
@@ -214,6 +214,24 @@ require("lazy").setup({
     },
     config = function()
       require('_spectre')
+    end
+  },
+  {
+    -- Make and resurrect sessions with vim's built-in mksession
+    'folke/persistence.nvim',
+    config = function()
+      require('persistence').setup({
+        options = { "buffers", "curdir", "tabpages", "winsize" },
+        pre_save = function()
+        end,
+        save_empty = true, -- whether to save if there are no open file buffers
+      })
+    end
+  },
+  {
+    'nvim-treesitter/nvim-treesitter',
+    config = function()
+      require('_treesitter')
     end
   }
 })

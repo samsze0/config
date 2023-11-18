@@ -58,7 +58,8 @@ M.colors = {
 
 M.highlight = setmetatable({}, {
   __newindex = function(_, hlgroup, args)
-    if ('string' == type(args)) then
+    -- If type is string, set a link
+    if (type(args) == 'string') then
       vim.api.nvim_set_hl(0, hlgroup, { link = args })
       return
     end

@@ -10,6 +10,8 @@ source ~/.config/zsh/utils.sh
 source ~/.config/zsh/pandoc.sh
 source ~/.config/zsh/image.sh
 source ~/.config/zsh/browser.sh
+source ~/.config/zsh/kitty.sh
+source ~/.config/zsh/nix.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
@@ -32,13 +34,6 @@ source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 autoload -U compinit; compinit
 compaudit || (compaudit | xargs chmod go-w)  # Remove group & other write permission for all insecure directories if there are any
 
-check_command_exists() {
-    if command -v $1 > /dev/null 2>&1; then
-        return 0
-    else
-        return 1
-    fi
-}
 
 if [ $(arch) = "i386" ]  # OSX rosetta
 then
@@ -77,8 +72,6 @@ then
     then
         alias nix-gc='nix-collect-garbage -d'
         alias nix-dev='nix develop -c zsh'
-        alias kitty-save='kitty @ ls | python ~/.config/kitty/kitty-convert-dump.py > ~/.kitty-session.kitty'
-        alias kitty-load='kitty --session ~/.kitty-session.kitty'
 
         if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]  # Hyprland
         then
@@ -110,9 +103,10 @@ alias manfzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
 alias duf='duf -theme ansi'
 alias ll='exa -l'
 alias deff='delta --raw'
-alias ts-get='sudo tailscale file get'  # Move files out of tailscale inbox
-alias ts-send='tailscale_send'  # Move files out of tailscale inbox
+alias ts-get='tailscale_get'
+alias ts-send='tailscale_send'
 alias jq='gojq'
+alias v='nvim'
 
 # FZF
 # https://github.com/junegunn/fzf/blob/master/ADVANCED.md

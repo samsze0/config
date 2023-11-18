@@ -5,6 +5,9 @@ set -eu
 # shellcheck source=../zsh/utils.sh
 source ~/.config/zsh/utils.sh
 
+# shellcheck source=../zsh/image.sh
+source ~/.config/zsh/image.sh
+
 get_filename() {
     # Split the input into an array
     local input=($@)
@@ -47,9 +50,10 @@ elif [[ $MIME_TYPE =~ ^text || $MIME_TYPE = application/json ]]; then
     bat --color always $FILE
     exit 1
 elif [[ $MIME_TYPE =~ ^video ]]; then
-    CACHE_FILE=~/.cache/lf-preview-tmp.png
-    ffmpeg -i "$FILE" -ss 00:00:05 -vframes 1 -y $CACHE_FILE
-    image_preview "$CACHE_FILE"
+    image_preview $(get_video_thumbnail_as_image "$FILE")
+    exit 1
+elif [[ $MIME_TYPE = application/pdf ]]; then
+    image_preview $(get_pdf_thumbnail_as_image "$FILE")
     exit 1
 else
     echo "$MIME_TYPE preview not supported"

@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-CACHE_PANDOC_PDF=~/.cache/lf-open-tmp-pandoc.pdf
+# shellcheck source=./browser.sh
+source ~/.config/zsh/browser.sh
 
-# open_md_as_pdf() {
+CACHE_PANDOC_PDF=~/.cache/pandoc-cache.pdf
+
+# Open markdown in browser as pdf with predefined theme stoerd in `~/.config/pandoc/`
+# open_md_in_browser_as_pdf() {
 #     # TODO: fix text colors
 #     pandoc --pdf-engine=xelatex \
 #       -f markdown \
@@ -10,12 +14,13 @@ CACHE_PANDOC_PDF=~/.cache/lf-open-tmp-pandoc.pdf
 #       --template ~/.config/pandoc/notion-dark.tex \
 #       $1 > $CACHE_PANDOC_PDF
 #
-#     firefox $CACHE_PANDOC_PDF
+#     open_in_browser_new_window $CACHE_PANDOC_PDF
 # }
 
-CACHE_PANDOC_HTML=~/.cache/lf-open-tmp-pandoc.html
+CACHE_PANDOC_HTML=~/.cache/pandoc-cache.html
 
-open_md_as_html() {
+# Open markdown in browser as html with predefined theme stoerd in `~/.config/pandoc/`
+open_md_in_browser_as_html() {
     # https://pandoc.org/demos.html
     pandoc --standalone \
       --css ~/.config/pandoc/light.css \
@@ -23,5 +28,5 @@ open_md_as_html() {
       --highlight-style pygments \
       "$1" -o $CACHE_PANDOC_HTML
 
-    firefox $CACHE_PANDOC_HTML
+    open_in_browser_new_window $CACHE_PANDOC_HTML
 }

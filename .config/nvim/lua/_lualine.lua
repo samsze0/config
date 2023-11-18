@@ -104,7 +104,7 @@ require('lualine').setup {
       filename_session
     },
     lualine_c = {},
-    lualine_x = { 'filetype', 'encoding' },
+    lualine_x = { 'selectioncount', 'searchcount', 'filetype', 'encoding' },
     lualine_y = {},
     lualine_z = {}
   },

@@ -1,5 +1,6 @@
 local keymap = vim.api.nvim_set_keymap
 local opts = { silent = true, noremap = true }
+local noremap_opts = { silent = true, noremap = false }
 
 -- Pageup/down
 keymap("n", "<PageUp>", "<C-u><C-u>", opts)
@@ -9,9 +10,34 @@ keymap("v", "<PageDown>", "<C-d><C-d>", opts)
 keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", opts) -- Execute <C-u> twice in normal mode
 keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
 
+-- Delete word
+keymap("n", "ke", "<cmd>m .-2<CR>", opts)
+
+-- Move/swap line/selection up/down
+-- Caution: marks in visual mode are only set after leaving visual mode
+-- `<cmd>` will execute a command without leaving visual mode while
+-- `:` leaves visual mode and enters command mode before processing the command.
+-- https://www.reddit.com/r/neovim/comments/y2h8ps/i_have_a_mapping_for_normal_how_to_make_an/
+-- keymap("n", "ke", "<cmd>m .-2<CR>==", opts) -- Auto indent line afterwards
+keymap("n", "ke", "<cmd>m .-2<CR>", opts)
+-- keymap("n", "ke", "dd2<Up>\"dp==", noremap_opts)
+keymap("n", "kd", "<cmd>m .+1<CR>", opts)
+keymap("v", "ke", ":m .-2<CR>gv", opts)
+-- keymap("v", "ke", ":m .-2<CR>gv=gv", opts)     -- Auto indent selection then re-select selection
+keymap("v", "kd", ":m '>+1<CR>gv", opts)
+
+-- Delete line
+keymap("n", "my", "dd", noremap_opts)
+keymap("i", "<C-y>", "<C-o>dd", noremap_opts)
+keymap("v", "my", ":d<CR>", opts)
+
+-- Duplicate line/selection
+keymap("n", "md", "<cmd>t .<CR>", opts)
+keymap("v", "md", ":t '><CR>", opts)
+
 -- Matching pair
-keymap("n", "m", "%", opts)
-keymap("v", "m", "%", opts)
+keymap("n", "mm", "%", opts)
+keymap("v", "mm", "%", opts)
 
 -- Macro
 keymap("n", ",", "@", opts) -- replay macro x
@@ -25,10 +51,6 @@ keymap("n", "<Space>/", "<cmd>noh<CR>", opts)
 
 -- Redo
 keymap("n", "U", "<C-R>", opts)
-
--- New line
-keymap("n", "o", "o<Esc>", opts)
-keymap("n", "O", "O<Esc>", opts)
 
 -- Insert/append swap
 keymap("n", "i", "a", opts)
@@ -83,20 +105,13 @@ keymap("n", "wf", "<cmd>vsplit<CR><cmd>wincmd l<CR>", opts)
 keymap("n", "we", "<cmd>split<CR>", opts)
 keymap("n", "ws", "<cmd>vsplit<CR>", opts)
 
+keymap("n", "wt", "<cmd>wincmd T<CR>", opts) -- Move to new tab
+
 -- Tab
 keymap("n", "tj", "<cmd>tabp<CR>", opts)
 keymap("n", "tl", "<cmd>tabn<CR>", opts)
 keymap("n", "tt", "<cmd>tabnew<CR>", opts)
 keymap("n", "tw", "<cmd>tabclose<CR>", opts)
-
--- Auto closing pair
--- Ref: https://github.com/m4xshen/autoclose.nvim/blob/main/lua/autoclose.lua
--- keymap("i", "\"", "\"\"<left>", opts)
--- keymap("i", "'", "''<left>", opts)
--- keymap("i", "(", "()<left>", opts)
--- keymap("i", "[", "[]<left>", opts)
--- keymap("i", "{", "{}<left>", opts)
--- keymap("i", "<", "<><left>", opts)
 
 -- Delete & cut
 -- Ref: https://github.com/gbprod/cutlass.nvim/blob/main/lua/cutlass.lua
@@ -107,7 +122,7 @@ keymap("v", "x", "d", opts)
 keymap("n", "xx", "dd", opts)
 keymap("n", "X", "D", opts)
 
--- Jump
+-- Jump (jumplist)
 keymap("n", "<C-u>", "<C-o>", opts)
 keymap("n", "<C-o>", "<C-i>", opts)
 
@@ -131,7 +146,7 @@ keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
 keymap("n", "<f2><f1>", "<cmd>NvimTreeFindFile<cr>", opts)
 
 -- FzfLua + LSP
--- keymap("n", "li", "<cmd>FzfLua lsp_definitions<CR>", opts)
+keymap("n", "li", "<cmd>FzfLua lsp_definitions<CR>", opts)
 keymap("n", "lr", "<cmd>FzfLua lsp_references<CR>", opts)
 keymap("n", "<f4><f4>", "<cmd>FzfLua lsp_document_symbols<CR>", opts)
 keymap("n", "<f4><f5>", "<cmd>FzfLua lsp_live_workspace_symbols<CR>", opts)
@@ -144,20 +159,12 @@ keymap("n", "<f2><f3>", "<cmd>LfCurrentFile<cr>", opts)
 
 -- LSP
 keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-keymap("n", "li", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
+keymap("n", "lU", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+keymap("n", "lI", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
 keymap("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
 keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
 keymap("n", "la", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
 keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
-keymap("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
-
--- Flash
-vim.keymap.set({ "n", "v" }, "s", function()
-  require("flash").jump()
-end)
-vim.keymap.set({ "n", "v" }, "s", function()
-  require("flash").jump()
-end)
 
 -- Comment.nvim
 keymap("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)", opts)
@@ -171,3 +178,5 @@ keymap("n", "sb", "<cmd>Gitsigns blame_line<CR>", opts)
 keymap("n", "sj", "<cmd>Gitsigns stage_hunk<CR>", opts)
 keymap("n", "sl", "<cmd>Gitsigns undo_stage_hunk<CR>", opts)
 keymap("n", "s;", "<cmd>Gitsigns reset_hunk<CR>", opts)
+
+-- Diffview

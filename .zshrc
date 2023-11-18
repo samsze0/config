@@ -8,6 +8,8 @@
 source ~/.config/zsh/tailscale.sh
 source ~/.config/zsh/utils.sh
 source ~/.config/zsh/pandoc.sh
+source ~/.config/zsh/image.sh
+source ~/.config/zsh/browser.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration

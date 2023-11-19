@@ -266,6 +266,16 @@ require("lazy").setup({
     end
   },
   {
+    'nvim-treesitter/nvim-treesitter-textobjects',
+    enabled = false,
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter'
+    },
+    config = function()
+      require('_treesitter_textobjects')
+    end
+  },
+  {
     -- Act as tab bar
     'akinsho/bufferline.nvim',
     config = function()

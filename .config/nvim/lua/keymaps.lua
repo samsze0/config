@@ -159,6 +159,7 @@ keymap("n", "<f4><f4>", "<cmd>FzfLua lsp_document_symbols<CR>", opts)
 keymap("n", "<f4><f5>", "<cmd>FzfLua lsp_live_workspace_symbols<CR>", opts)
 keymap("n", "ld", "<cmd>FzfLua lsp_document_diagnostics<CR>", opts) -- Show list of problems
 keymap("n", "lD", "<cmd>FzfLua lsp_workspace_diagnostics<CR>", opts)
+keymap("n", "la", "<cmd>FzfLua lsp_code_actions<CR>", opts)
 
 -- lf.vim
 keymap("n", "<f2><f2>", "<cmd>LfWorkingDirectory<cr>", opts)
@@ -170,7 +171,6 @@ keymap("n", "lU", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
 keymap("n", "lI", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
 keymap("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
 keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-keymap("n", "la", "<cmd>lua vim.lsp.buf.code_action()<CR>", opts)
 keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
 
 -- Comment.nvim

@@ -27,6 +27,7 @@
   "nvim-scrollview": { "branch": "main", "commit": "74ab63b598cca206888e83090ed6312aac324b4c" },
   "nvim-spectre": { "branch": "master", "commit": "a18a58015b46f02b4fe537ebfffd82e46110ff24" },
   "nvim-treesitter": { "branch": "master", "commit": "f2de95e30aac507bf7fa785e13a8edcbdc604605" },
+  "nvim-treesitter-textobjects": { "branch": "master", "commit": "dbcd9388e3b119a87c785e10a00d62876077d23d" },
   "persistence.nvim": { "branch": "main", "commit": "ad538bfd5336f1335cdb6fd4e0b0eebfa6e12f32" },
   "plenary.nvim": { "branch": "master", "commit": "50012918b2fc8357b87cff2a7f7f0446e47da174" },
   "vim-floaterm": { "branch": "master", "commit": "b1d93789faf8bfe1f3e17eec03b8312c2939fcf2" },

@@ -1,3 +1,5 @@
+-- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+
 -- nvim-cmp supports more types of completion candidates than the default (omnifunc)
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
@@ -26,5 +28,9 @@ require('lspconfig').gopls.setup({
 })
 
 require('lspconfig').clangd.setup({
+  capabilities = capabilities,
+})
+
+require('lspconfig').neocmake.setup({
   capabilities = capabilities,
 })

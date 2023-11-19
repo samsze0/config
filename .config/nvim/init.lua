@@ -233,5 +233,11 @@ require("lazy").setup({
     config = function()
       require('_treesitter')
     end
+  },
+  {
+    'akinsho/bufferline.nvim',
+    config = function()
+      require('_bufferline')
+    end
   }
 })

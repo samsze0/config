@@ -131,8 +131,8 @@ require("diffview").setup({
       { "n", "x<Delete>",     actions.restore_entry, },
       { "n", "xB",            actions.open_commit_log, },
       { "n", "<left>",        actions.close_fold, },
-      { "n", "x[",            actions.scroll_view(-0.25), }, -- Scroll the buffer(s)
-      { "n", "x]",            actions.scroll_view(0.25), },
+      { "n", "<s-pageup>",    actions.scroll_view(-0.25), }, -- Scroll the buffer(s)
+      { "n", "<s-pagedown>",  actions.scroll_view(0.25), },
       { "n", "xl",            actions.select_next_entry, },
       { "n", "xj",            actions.select_prev_entry, },
       { "n", "xoo",           actions.goto_file_edit, },
@@ -157,8 +157,8 @@ require("diffview").setup({
       { "n", "<cr>",          actions.select_entry, },
       { "n", "<tab>",         actions.select_entry, },
       { "n", "<2-LeftMouse>", actions.select_entry, },
-      { "n", "x[",            actions.scroll_view(-0.25), }, -- Scroll the buffer(s)
-      { "n", "x]",            actions.scroll_view(0.25), },
+      { "n", "<s-pageup>",    actions.scroll_view(-0.25), },         -- Scroll the buffer(s)
+      { "n", "<s-pagedown>",  actions.scroll_view(0.25), },
       { "n", "xl",            actions.select_next_entry, },
       { "n", "xj",            actions.select_prev_entry, },
       { "n", "xoo",           actions.goto_file_edit, },

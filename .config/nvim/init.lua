@@ -3,9 +3,9 @@
 vim.cmd [[set clipboard+=unnamedplus]] -- Use system clipboard
 
 vim.opt.number = true
-vim.opt.cursorline = false    -- Highlight current line
+vim.opt.cursorline = false   -- Highlight current line
 vim.opt.signcolumn = "auto"
-vim.opt.signcolumn = 'auto:4' -- Maximum 4 signs
+vim.opt.signcolumn = 'yes:1' -- Maximum 1 signs, fixed
 vim.opt.wrap = false
 
 -- :help fo-table
@@ -34,6 +34,7 @@ vim.cmd [[filetype plugin off]]
 vim.opt.fillchars:append { diff = "╱" }
 
 require('keymaps')
+require('winbar').setup() -- i.e. breadcrumbs
 require('theme').setup()
 
 -- Lazy.nvim bootstrap
@@ -77,17 +78,49 @@ require("lazy").setup({
   {
     -- Term within neovim
     'voldikss/vim-floaterm',
+    enabled = true,
     config = function()
       vim.g.floaterm_width = 0.9
       vim.g.floaterm_height = 0.9
-    end
+    end,
   },
   {
     -- Lf integration
     'ptzz/lf.vim',
+    enabled = true,
     requires = {
       'voldikss/vim-floaterm'
     },
+  },
+  {
+    'akinsho/toggleterm.nvim',
+    enabled = false
+  },
+  {
+    'lmburns/lf.nvim',
+    enabled = false,
+    requires = {
+      'akinsho/toggleterm.nvim',
+      config = function()
+        require("toggleterm").setup()
+      end
+    },
+    config = function()
+      -- This feature will not work if the plugin is lazy-loaded
+      vim.g.lf_netrw = 1
+
+      require('lf').setup({
+        escape_quit = false,
+        border = "rounded",
+      })
+
+      vim.api.nvim_create_autocmd({ 'User' }, {
+        pattern = "LfTermEnter",
+        callback = function(a)
+          vim.api.nvim_buf_set_keymap(a.buf, "t", "q", "q", { nowait = true })
+        end,
+      })
+    end
   },
   {
     'neovim/nvim-lspconfig',
@@ -235,9 +268,10 @@ require("lazy").setup({
     end
   },
   {
+    -- Act as tab bar
     'akinsho/bufferline.nvim',
     config = function()
       require('_bufferline')
     end
-  }
+  },
 })

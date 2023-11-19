@@ -132,9 +132,3 @@ require('spectre').setup({
   },
   open_template  = {}
 })
-
-local theme = require('theme')
-
-theme.highlight.SpectreBody = { guifg = theme.colors.blue, guibg = nil } -- "Search", "Replace" and "Path" (headers)
-theme.highlight.SpectreSearch = { guifg = nil, guibg = theme.colors.diffview_blue_bg_bright }
-theme.highlight.SpectreReplace = { guifg = nil, guibg = theme.colors.diffview_red_bg_bright }

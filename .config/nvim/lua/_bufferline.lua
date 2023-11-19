@@ -2,10 +2,12 @@
 
 local bufferline = require('bufferline')
 
+local colors = require('theme').colors
+
 bufferline.setup({
   options = {
     mode = "tabs",
-    style_preset = bufferline.style_preset.minimal,
+    style_preset = bufferline.style_preset.default,
     themable = true,
     numbers = 'none',
     indicator = {

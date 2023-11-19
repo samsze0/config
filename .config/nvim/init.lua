@@ -33,10 +33,6 @@ vim.cmd [[filetype plugin off]]
 
 vim.opt.fillchars:append { diff = "╱" }
 
-require('keymaps')
-require('winbar').setup() -- i.e. breadcrumbs
-require('theme').setup()
-
 -- Lazy.nvim bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -50,6 +46,8 @@ if not vim.loop.fs_stat(lazypath) then
   })
 end
 vim.opt.rtp:prepend(lazypath)
+
+require('theme').setup({}) -- Setup once because some plugins might read existing highlight groups values
 
 require("lazy").setup({
   {
@@ -274,4 +272,15 @@ require("lazy").setup({
       require('_bufferline')
     end
   },
+})
+
+require('keymaps')
+require('winbar').setup() -- i.e. breadcrumbs
+require('theme').setup({
+  debug = {
+    sources = {
+      vim_fn_getcompletion = false,
+      colon_highlights = false
+    }
+  }
 })

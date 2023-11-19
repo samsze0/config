@@ -24,7 +24,7 @@ local tab_session = {
       fg = colors.white
     },
     inactive = {
-      fg = colors.base04
+      fg = colors.gray_300
     }
   },
   show_modified_status = false,

@@ -1,5 +1,5 @@
 local options = {
-  RGB      = true,         -- #RGB hex codes
+  RGB      = false,        -- #RGB hex codes
   RRGGBB   = true,         -- #RRGGBB hex codes
   names    = false,        -- "Name" codes like Blue
   RRGGBBAA = true,         -- #RRGGBBAA hex codes
@@ -14,4 +14,3 @@ require('colorizer').setup({
   '*', -- Highlight all files, but customize some others.
   css = { rgb_fn = true, hsl_fn = true, css = true, css_fn = true, names = true },
 }, options)
-

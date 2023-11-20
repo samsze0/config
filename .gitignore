@@ -20,10 +20,6 @@
 !.config/zsh/
 !.config/zsh/**
 
-# Delta
-!.config/delta/
-!.config/delta/**
-
 # Starship
 !.config/starship.toml
 !.config/starship_default.toml

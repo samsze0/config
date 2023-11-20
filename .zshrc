@@ -12,6 +12,7 @@ source ~/.config/zsh/image.sh
 source ~/.config/zsh/browser.sh
 source ~/.config/zsh/kitty.sh
 source ~/.config/zsh/nix.sh
+source ~/.config/zsh/gitconfig.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
@@ -138,6 +139,6 @@ export HISTSIZE=50 # Capacity of no. lines for a session
 
 
 export SHELL="$(which zsh)"
-export PAGER="bat"
+export PAGER="less"
 export EDITOR="nvim"
 export BROWSER="firefox"

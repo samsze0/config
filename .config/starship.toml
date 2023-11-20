@@ -134,6 +134,17 @@ impure_msg = 'impure'
 pure_msg = 'pure'
 disabled = false
 
+[lua]
+format = '⋅ [$symbol($version )]($style)'
+version_format = 'v${raw}'
+symbol = 'Lua '
+style = 'bold blue'
+lua_binary = 'lua'
+disabled = false
+detect_extensions = ['lua']
+detect_files = ['.lua-version']
+detect_folders = ['lua']
+
 [nodejs]
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'

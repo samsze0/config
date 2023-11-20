@@ -44,13 +44,26 @@ local mapping = {
     { 'i', 'c', 's' }
   ),
   ['<C-Space>'] = cmp.mapping(
-    cmp.mapping.complete(),
+    function(fallback)
+      if not cmp.visible() then
+        cmp.complete()
+        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 })
+      end
+    end,
     { 'i', 'c', 's' }
   ),
-  ['<Tab>'] = cmp.mapping(
-    cmp.mapping.confirm({ select = true }),
-    { 'i', 'c', 's' }
-  ),
+  ['<Tab>'] = cmp.mapping({
+    i = cmp.mapping.confirm({ select = true }),
+    s = cmp.mapping.confirm({ select = true }),
+    c = function(fallback)
+      if not cmp.visible() then
+        cmp.complete()
+        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 })
+      else
+        cmp.confirm({ select = true })
+      end
+    end
+  }),
   ['<CR>'] = cmp.mapping({
     i = fallback_if_cmp_has_active(function()
       cmp.confirm()
@@ -71,8 +84,8 @@ cmp.setup({
     end
   },
   completion = {
-    keyword_length = 2, -- Number of char to trigger auto-completion
-    -- autocompletion = ,  -- cmp.TriggerEvent | false
+    autocomplete = false, -- cmp.TriggerEvent | false
+    -- keyword_length = 0,     -- Number of char to trigger auto-completion
     -- completeopt = ,  -- See vim's completeopt
   },
   matching = {
@@ -137,7 +150,7 @@ cmp.setup.filetype('gitcommit', {
 -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline({ '/', '?' }, {
   completion = {
-    autocomplete = false,
+    autocomplete = false, -- Cause error if true. TODO: find out what `cmp.TriggerEvent[]` are
   },
   sources = {
     { name = 'buffer' } -- Can coverup the editor
@@ -147,7 +160,6 @@ cmp.setup.cmdline({ '/', '?' }, {
 -- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline(':', {
   completion = {
-    keyword_length = 1
   },
   sources = cmp.config.sources({
     { name = 'path' }

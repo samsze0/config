@@ -11,7 +11,7 @@ keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", opts) -- Execute <C-u> twice in 
 keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
 
 -- Delete word
-keymap("n", "ke", "<cmd>m .-2<CR>", opts)
+keymap("i", "<C-BS>", "<C-W>", opts)
 
 -- Caution: marks in visual mode are only set after leaving visual mode
 -- `<cmd>` will execute a command without leaving visual mode while
@@ -56,6 +56,11 @@ keymap("n", "U", "<C-R>", opts)
 -- New line
 keymap("n", "o", "o<Esc>", opts)
 keymap("n", "O", "O<Esc>", opts)
+
+-- Fold
+keymap("n", "zl", "zo", opts)
+keymap("n", "zj", "zc", opts)
+keymap("n", "zp", "za", opts)
 
 -- Insert/append swap
 keymap("n", "i", "a", opts)
@@ -188,10 +193,14 @@ keymap("n", "s;", "<cmd>Gitsigns reset_hunk<CR>", opts)
 
 -- :qa, :q!, :wq
 keymap("n", "<space>q", ":q<cr>", opts)
-keymap("n", "<space>w", ":wq<cr>", opts)
+keymap("n", "<space>w", ":w<cr>", opts)
 keymap("n", "<space>Q", ":q!<cr>", opts)
-keymap("n", "<space>s", ":w<cr>", opts)
+keymap("n", "<space>W", ":w!<cr>", opts)
+keymap("n", "<space>a", ":qa<cr>", opts)
 
 -- persistence.nvim
 -- restore the session for the current directory
 keymap("n", "<Space>R", [[<cmd>lua require("persistence").load()<cr>]], opts)
+
+-- Custom commands
+vim.api.nvim_create_user_command("CopyRelPath", "call setreg('+', expand('%'))", {})

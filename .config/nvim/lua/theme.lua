@@ -10,9 +10,9 @@ M.colors = {
   gray_200 = "#1a1c24",
   gray_300 = '#2c313c',
   gray_400 = '#3e4451',
-  gray_500 = '#565c64',
-  gray_600 = '#6c7891',
-  gray_700 = '#9a9bb3',
+  gray_500 = '#535d6c',
+  gray_600 = '#687184',
+  gray_700 = '#8a95a7',
   gray_800 = '#abb2bf',
   white = "#cbd1da",
 
@@ -21,14 +21,17 @@ M.colors = {
   yellow = "#f59953",
 
   red_100 = "#1e0b0b",
-  blue_100 = "#0b111a",
+  blue_100 = "#0b131c",
   yellow_100 = "#1e1307",
   red_300 = "#2f0f0f",
-  blue_300 = "#112039",
+  blue_300 = "#122241",
   yellow_300 = "#34200c",
   red_500 = "#571919",
-  blue_500 = "#172f5c",
+  blue_500 = "#18305e",
   yellow_500 = "#693e13",
+  red_700 = "#913333",
+  blue_700 = "#244c96",
+  yellow_700 = "#ba6b2f",
 }
 
 local indent_marker = M.colors.gray_100
@@ -86,8 +89,8 @@ function M.setup(opts)
   hi.Error                              = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
   hi.ErrorMsg                           = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
   hi.Exception                          = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
-  hi.FoldColumn                         = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.Folded                             = { guifg = c.gray_600, guibg = c.gray_300, gui = nil, guisp = nil }
+  hi.FoldColumn                         = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
+  hi.Folded                             = { guifg = c.gray_600, guibg = c.gray_200, gui = nil, guisp = nil }
   hi.IncSearch                          = { guifg = c.black, guibg = c.white, gui = 'none', guisp = nil }
   hi.Italic                             = { guifg = nil, guibg = nil, gui = 'none', guisp = nil }
   hi.Macro                              = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
@@ -158,15 +161,15 @@ function M.setup(opts)
   hi.Typedef                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
 
   -- Diff highlighting
-  hi.DiffAdd                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.DiffAdd                            = { guifg = nil, guibg = c.blue_100, gui = nil, guisp = nil }
   hi.DiffChange                         = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.DiffDelete                         = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
-  hi.DiffText                           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.DiffAdded                          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.DiffDelete                         = { guifg = c.gray_200, guibg = c.gray_50, gui = nil, guisp = nil }
+  hi.DiffText                           = { guifg = nil, guibg = c.blue_300, gui = nil, guisp = nil }
+  hi.DiffAdded                          = { guifg = nil, guibg = c.blue_100, gui = nil, guisp = nil }
   hi.DiffFile                           = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
   hi.DiffNewFile                        = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.DiffLine                           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.DiffRemoved                        = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
+  hi.DiffLine                           = { guifg = nil, guibg = c.yellow_100, gui = nil, guisp = nil }
+  hi.DiffRemoved                        = { guifg = nil, guibg = c.red_100, gui = nil, guisp = nil }
 
   -- Git highlighting
   hi.gitcommitOverflow                  = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
@@ -488,11 +491,8 @@ function M.setup(opts)
   hi.DiffviewFilePanelCounter      = { guifg = c.blue, gui = "bold" }
   hi.DiffviewDiffAddAsDelete       = { gui = "bold", guifg = c.blue, guibg = c.gray_500 }
 
-  -- hi.GitSignsAddInline           = { guifg = nil, guibg = c.blue_300 }
   hi.GitSignsChangeInline          = { guifg = nil, guibg = c.blue_300 } -- Current state of the hunk for preview_hunk
-  -- hi.GitSignsDeleteInline        = { guifg = nil, guibg = c.red_300 }
-
-  hi.GitSignsDeleteVirtLn          = { guifg = nil, guibg = c.red_300 } -- Previous state of the hunk for preview_hunk
+  hi.GitSignsDeleteVirtLn          = { guifg = nil, guibg = c.red_300 }  -- Previous state of the hunk for preview_hunk
 
   hi.SpectreHeader                 = { guifg = c.blue }
   hi.SpectreBody                   = { guifg = c.blue }
@@ -500,17 +500,17 @@ function M.setup(opts)
   hi.SpectreDir                    = { guifg = c.blue }
   hi.SpectreSearch                 = { guibg = c.blue_300 }
   hi.SpectreBorder                 = { guifg = c.blue }
-  hi.SpectreReplace                = 'SpectreSearch'
+  hi.SpectreReplace                = { guibg = c.red_300 }
 
   hi.BufferLineBackground          = { guifg = c.gray_500, guibg = c.gray_50 }  -- Inactive tab
   hi.BufferLineBufferSelected      = { guifg = c.gray_700, guibg = c.gray_200 } -- Active tab
   hi.BufferLineSeparator           = { guifg = c.black, guibg = c.black }
 
-  hi.BufferLineError               = { guifg = c.red_500, guibg = c.gray_50 }
-  hi.BufferLineErrorSelected       = { guifg = c.red_500, guibg = c.gray_100 }
-  hi.BufferLineModified            = { guifg = c.yellow_500, guibg = c.gray_50 }
-  hi.BufferLineModifiedSelected    = { guifg = c.yellow_500, guibg = c.gray_100 }
-  hi.BufferLineDiagnosticSelected  = { guifg = c.gray_500, guibg = c.gray_100 }
+  hi.BufferLineError               = { guifg = c.red_700, guibg = c.gray_50 }
+  hi.BufferLineErrorSelected       = { guifg = c.red_700, guibg = c.gray_100 }
+  hi.BufferLineModified            = { guifg = c.gray_700, guibg = c.gray_50 }
+  hi.BufferLineModifiedSelected    = { guifg = c.gray_700, guibg = c.gray_100 }
+  hi.BufferLineDiagnosticSelected  = { guifg = c.gray_700, guibg = c.gray_100 }
   hi.BufferLinePickSelected        = 'BufferLineDiagnosticSelected'
   hi.BufferLineIndicatorSelected   = 'BufferLineDiagnosticSelected'
   hi.BufferLineNumbersSelected     = 'BufferLineDiagnosticSelected'

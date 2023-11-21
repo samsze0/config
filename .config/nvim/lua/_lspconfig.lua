@@ -43,6 +43,9 @@ require('lspconfig').lua_ls.setup({
 require('lspconfig').gopls.setup({
   capabilities = capabilities,
 })
+require('lspconfig').golangci_lint_ls.setup({
+  capabilities = capabilities,
+})
 
 -- C/C++
 require('lspconfig').clangd.setup({
@@ -76,5 +79,15 @@ require('lspconfig').terraformls.setup({ -- TODO
   capabilities = capabilities,
 })
 require('lspconfig').tflint.setup({ -- TODO
+  capabilities = capabilities,
+})
+
+-- Databases
+require('lspconfig').postgres_lsp.setup({
+  capabilities = capabilities,
+})
+
+-- Shading langauges
+require('lspconfig').glsl_analyzer.setup({
   capabilities = capabilities,
 })

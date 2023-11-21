@@ -1,0 +1,76 @@
+
+
+new_tab config
+layout stack
+cd /home/sam
+title ~
+launch --env KITTY_WINDOW_ID=10 --env PWD=/home/sam zsh
+title v
+launch --env KITTY_WINDOW_ID=76 --env PWD=/home/sam zsh
+focus
+
+
+new_tab nixos-config
+layout fat
+cd /home/sam/nixos-config
+title ~/nixos-config
+launch --env KITTY_WINDOW_ID=3 --env PWD=/home/sam/nixos-config zsh
+focus
+
+
+new_tab rl-experiment
+layout fat
+cd /home/sam/dev/rl-experiment
+title kitty-save-session
+launch --env KITTY_WINDOW_ID=4 --env PWD=/home/sam/dev/rl-experiment zsh
+focus
+
+
+new_tab pytorch-dqn
+layout stack
+cd /home/sam/dev/more/pytorch-dqn
+title nix-dev
+launch --env KITTY_WINDOW_ID=70 --env PWD=/home/sam/dev/more/pytorch-dqn zsh
+title v
+launch --env KITTY_WINDOW_ID=73 --env PWD=/home/sam/dev/more/pytorch-dqn zsh
+focus
+
+
+new_tab lf
+layout fat
+cd /home/sam/dev/lf
+title ~/dev/lf
+launch --env KITTY_WINDOW_ID=67 --env PWD=/home/sam/dev/lf zsh
+focus
+
+
+new_tab pico-lf
+layout fat
+cd /home/sam/dev/pico-lf
+title ~/dev/pico-lf
+launch --env KITTY_WINDOW_ID=6 --env PWD=/home/sam/dev/pico-lf zsh
+focus
+
+
+new_tab ~/dev/motion-canvas-test
+layout fat
+cd /home/sam/dev/motion-canvas-test
+title ~/dev/motion-canvas-test
+launch --env KITTY_WINDOW_ID=16 --env PWD=/home/sam zsh
+focus
+
+
+new_tab motion-canvas
+layout fat
+cd /home/sam/dev
+title ~/dev
+launch --env KITTY_WINDOW_ID=18 --env PWD=/home/sam/dev zsh
+focus
+
+
+new_tab gymnasium
+layout fat
+cd /home/sam/dev/more/Gymnasium
+title kitty-save-session
+launch --env KITTY_WINDOW_ID=71 --env PWD=/home/sam/dev/more/pytorch-dqn zsh
+focus

@@ -1,6 +1,12 @@
 # Config
 
+Shared config for NixOS and OSX
+
 ## Usage
+
+```shell
+git clone https://github.com/samsze0/config --recursive
+```
 
 **NixOS**
 
@@ -8,4 +14,4 @@ See [nixos-config](https://github.com/artizon-io/nixos-config)
 
 **OSX**
 
-See [instructions](./INSTRUCTIONS.md)
+See [instructions for OSX](./INSTRUCTIONS-OSX.md)

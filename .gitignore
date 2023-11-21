@@ -8,7 +8,7 @@
 !.local/
 !.local/share
 .local/share/**
-!INSTRUCTIONS.md
+!INSTRUCTIONS-OSX.md
 
 # VSCode
 !.vscode/

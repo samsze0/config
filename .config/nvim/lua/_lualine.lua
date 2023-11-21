@@ -1,17 +1,32 @@
-local theme = require('lualine.themes.ayu_dark')
-
 local colors = require('theme').colors
 
-theme.normal.a.bg = colors.blue
-theme.insert.a.bg = colors.red
-theme.visual.a.bg = colors.yellow
+local theme = {}
+for _, mode in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do
+  theme[mode] = {
+    a = { fg = colors.white, gui = "bold" },
+    b = { bg = colors.gray_50, fg = colors.gray_700 },
+    c = { bg = colors.gray_50, fg = colors.gray_600 }
+  }
+end
+
+theme.normal.a.bg = colors.blue_700
+theme.insert.a.bg = colors.gray_500
+theme.visual.a.bg = colors.yellow_700
+theme.replace.a.bg = colors.gray_500
+theme.command.a.bg = colors.gray_500
+theme.inactive.b.fg = colors.gray_500
+theme.inactive.c.fg = colors.gray_500
 
 local mode_session = {
   'mode',
-  fmt = function(str)
-    return " "
+  fmt = function(mode)
+    return mode:sub(1, 1)
   end
 }
+
+local function maximize_status_session()
+  return vim.t.maximized and 'Z' or ''
+end
 
 local tab_session = {
   'tabs',
@@ -70,7 +85,7 @@ require('lualine').setup {
     lualine_c = {},
     lualine_x = { 'selectioncount', 'searchcount', 'filetype', 'encoding' },
     lualine_y = {},
-    lualine_z = {}
+    lualine_z = { maximize_status_session }
   },
   inactive_sections = {
     lualine_a = {},

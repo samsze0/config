@@ -13,13 +13,14 @@ source ~/.config/zsh/browser.sh
 source ~/.config/zsh/kitty.sh
 source ~/.config/zsh/nix.sh
 source ~/.config/zsh/gitconfig.sh
+source ~/.config/zsh/fzf.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
 source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
 # preview directory's content with exa when completing cd or ls
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'exa -1 --color=always $realpath'
-zstyle ':fzf-tab:complete:ls:*' fzf-preview 'exa -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:*' fzf-min-height 1000
 
 # zsh-autosuggestions
@@ -102,34 +103,14 @@ export PATH=$HOME/bin:${PATH}
 alias ssha='eval $(ssh-agent) && ssh-add'
 alias manfzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
 alias duf='duf -theme ansi'
-alias ll='exa -l'
+alias ll='eza -l'
 alias deff='delta --raw'
 alias ts-get='tailscale_get'
 alias ts-send='tailscale_send'
 alias jq='gojq'
 alias v='nvim'
 
-# FZF
-# https://github.com/junegunn/fzf/blob/master/ADVANCED.md
-FZF_COLORS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
-    --color=
-    bg+:#333333,
-    preview-bg:#111111,
-    bg:#000000,
-    border:#555555,
-    spinner:#4C9BFF,
-    hl:#777777,
-    fg:#777777,
-    header:#7E8E91,
-    info:#4C9BFF,
-    pointer:#4C9BFF,
-    marker:#FE946E,
-    fg+:#CBD1DA,
-    prompt:#FE946E,
-    hl+:#FE946E
-EOT
-)
-export FZF_DEFAULT_OPTS="$FZF_COLORS --layout=reverse --info=inline --border --margin=1 --padding=1"
+export FZF_DEFAULT_OPTS=$(fzf_init)
 
 # ZSH history
 setopt share_history
@@ -137,8 +118,9 @@ export HISTFILE=~/.zhistory
 export SAVEHIST=100 # Capacity of no. lines
 export HISTSIZE=50 # Capacity of no. lines for a session
 
-
+# Default apps
 export SHELL="$(which zsh)"
 export PAGER="less"
 export EDITOR="nvim"
 export BROWSER="firefox"
+export MANPAGER="nvim +Man\!"  # https://neovim.io/doc/user/filetype.html#ft-man-plugin

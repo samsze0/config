@@ -41,6 +41,7 @@ Ranges in command line mode
     - `:view` to open file as read-only
     - `:sort` to sort lines
     - `:recover` to recover a file from swap
+    - `:messages` to see all messages (useful because old messages are overwritten by new ones)
 - Diff
     - `:diffthis` to add current window to diff (must be in same tab) (shorthand for `:windo diffthis`)
     - `:diffsplit <file>` to diff another file in split. E.g. `:vert diffsplit <file>`
@@ -85,3 +86,18 @@ Ranges in command line mode
     - (TODO)
 - Command line window
     - (TODO)
+
+# Plugin Development
+
+- `:so <file>` to source the lua file (just like zsh)
+- Launch neovim as `v --cmd "set rtp+=<path-to-lua-lib>"` to add plugin locally
+- Packages/plugins are cached when neovim first loads them. With the snippet below, we can have a quick feedback loop `:Test` -> `:so %` -> `:Test` -> ...
+- Borrow AST information from Treesitter playground! (vscode doesn't support this). https://github.com/nvim-treesitter/playground . Debug using `:InspectTree` and `:EditQuery` (requires nightly 0.10+).
+- `vim.pretty_print` for pretty print
+
+```lua
+vim.api.create_user_command("Test", function()
+  package.loaded.PackageName = nil  -- clear cache
+  require("PackageName").my_func()
+end, {})
+```

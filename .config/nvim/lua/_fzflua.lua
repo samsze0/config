@@ -44,6 +44,8 @@ require('fzf-lua').setup({
   actions = {
     files = {
       ["default"] = actions.file_edit,
+      ["alt-q"]   = actions.file_sel_to_qf, -- send to quickfix
+      ["alt-l"]   = actions.file_sel_to_ll, -- send to loclist
     },
     buffers = {
       ["default"] = actions.buf_edit,
@@ -78,9 +80,9 @@ require('fzf-lua').setup({
         preview_pager = "delta --width=$FZF_PREVIEW_COLUMNS",
         actions = {
           -- actions inherit from 'actions.files' and merge
-          ["right"]  = { fn = actions.git_unstage, reload = true },
-          ["left"]   = { fn = actions.git_stage, reload = true },
-          ["ctrl-x"] = { fn = actions.git_reset, reload = true },
+          ["right"] = { fn = actions.git_unstage, reload = true },
+          ["left"]  = { fn = actions.git_stage, reload = true },
+          ["alt-x"] = { fn = actions.git_reset, reload = true },
         },
       },
       commits = {
@@ -89,7 +91,7 @@ require('fzf-lua').setup({
         preview_pager = "delta --width=$FZF_PREVIEW_COLUMNS",
         actions = {
           ["default"] = actions.git_checkout,
-          ["ctrl-y"]  = { fn = actions.git_yank_commit, exec_silent = true },
+          ["alt-y"]   = { fn = actions.git_yank_commit, exec_silent = true },
         },
       },
       bcommits = {
@@ -98,10 +100,9 @@ require('fzf-lua').setup({
         preview_pager = "delta --width=$FZF_PREVIEW_COLUMNS",
         actions = {
           ["default"] = actions.git_buf_edit,
-          ["ctrl-s"]  = actions.git_buf_split,
-          ["ctrl-v"]  = actions.git_buf_vsplit,
-          ["ctrl-t"]  = actions.git_buf_tabedit,
-          ["ctrl-y"]  = { fn = actions.git_yank_commit, exec_silent = true },
+          ["alt-w"]   = actions.git_buf_vsplit,
+          ["alt-t"]   = actions.git_buf_tabedit,
+          ["alt-y"]   = { fn = actions.git_yank_commit, exec_silent = true },
         },
       },
       branches = {
@@ -126,7 +127,7 @@ require('fzf-lua').setup({
         preview  = "git --no-pager stash show --patch --color {1}",
         actions  = {
           ["default"] = actions.git_stash_apply,
-          ["ctrl-x"]  = { fn = actions.git_stash_drop, reload = true },
+          ["alt-x"]   = { fn = actions.git_stash_drop, reload = true },
         },
         fzf_opts = {
           ["--no-multi"]  = '',
@@ -141,7 +142,7 @@ require('fzf-lua').setup({
       glob_separator = "%s%-%-",  -- query separator pattern (lua): ' --'
       actions        = {
         -- actions inherit from 'actions.files' and merge
-        ["ctrl-g"] = { actions.grep_lgrep } -- Toggle live grep
+        ["alt-g"] = { actions.grep_lgrep } -- Toggle live grep
       },
     },
     lsp = {
@@ -152,7 +153,7 @@ require('fzf-lua').setup({
     buffers = {
       actions = {
         -- actions inherit from 'actions.buffers' and merge
-        ["ctrl-x"] = { fn = actions.buf_del, reload = true },
+        ["alt-x"] = { fn = actions.buf_del, reload = true },
       }
     },
     tabs = {
@@ -160,7 +161,7 @@ require('fzf-lua').setup({
       actions    = {
         -- actions inherit from 'actions.buffers' and merge
         ["default"] = actions.buf_switch,
-        ["ctrl-x"]  = { fn = actions.buf_del, reload = true },
+        ["alt-x"]   = { fn = actions.buf_del, reload = true },
       },
     },
     diagnostics = {
@@ -168,3 +169,6 @@ require('fzf-lua').setup({
     }
   },
 })
+
+-- vim.ui.select
+require('fzf-lua').register_ui_select()

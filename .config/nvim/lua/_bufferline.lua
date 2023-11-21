@@ -24,7 +24,7 @@ bufferline.setup({
     max_name_length = 18,
     max_prefix_length = 15, -- prefix used when a buffer is de-duplicated
     truncate_names = true,  -- whether or not tab names should be truncated
-    tab_size = 18,
+    tab_size = 15,
     diagnostics = false,
     -- NOTE: this will be called a lot so don't do any heavy processing here
     custom_filter = function(buf_number, buf_numbers)

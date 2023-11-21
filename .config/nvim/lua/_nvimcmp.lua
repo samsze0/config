@@ -1,6 +1,6 @@
 local cmp = require('cmp')
 
-local fallback_if_cmp_has_active = function(f)
+local fallback_if_cmp_has_no_active_entry = function(f)
   return function(fallback)
     if cmp.visible() and cmp.get_active_entry() ~= nil then
       f()
@@ -12,49 +12,60 @@ end
 
 local mapping = {
   ['<Up>'] = cmp.mapping(
-    cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 1 }),
+    fallback_if_cmp_has_no_active_entry(function() cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 1 }) end),
     { 'i', 'c', 's' }
   ),
   ['<Down>'] = cmp.mapping(
-    cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 }),
+    fallback_if_cmp_has_no_active_entry(function() cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 }) end),
     { 'i', 'c', 's' }
   ),
   ['<PageUp>'] = cmp.mapping(
-    cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 10 }),
+    fallback_if_cmp_has_no_active_entry(function()
+      cmp.select_prev_item({
+        behavior = cmp.SelectBehavior.Select,
+        count = 10
+      })
+    end),
     { 'i', 'c', 's' }
   ),
   ['<PageDown>'] = cmp.mapping(
-    cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 10 }),
+    fallback_if_cmp_has_no_active_entry(function()
+      cmp.select_next_item({
+        behavior = cmp.SelectBehavior.Select,
+        count = 10
+      })
+    end),
     { 'i', 'c', 's' }
   ),
   ['<S-Up>'] = cmp.mapping(
-    cmp.mapping.scroll_docs(-5),
+    fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(-5) end),
     { 'i', 'c', 's' }
   ),
   ['<S-Down>'] = cmp.mapping(
-    cmp.mapping.scroll_docs(5),
+    fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(5) end),
     { 'i', 'c', 's' }
   ),
   ['<S-PageUp>'] = cmp.mapping(
-    cmp.mapping.scroll_docs(-10),
+    fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(-10) end),
     { 'i', 'c', 's' }
   ),
   ['<S-PageDown>'] = cmp.mapping(
-    cmp.mapping.scroll_docs(10),
+    fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(10) end),
     { 'i', 'c', 's' }
   ),
   ['<C-Space>'] = cmp.mapping(
     function(fallback)
       if not cmp.visible() then
         cmp.complete()
-        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 })
       end
+
+      cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 })
     end,
     { 'i', 'c', 's' }
   ),
   ['<Tab>'] = cmp.mapping({
-    i = cmp.mapping.confirm({ select = true }),
-    s = cmp.mapping.confirm({ select = true }),
+    i = fallback_if_cmp_has_no_active_entry(function() cmp.confirm() end),
+    s = fallback_if_cmp_has_no_active_entry(function() cmp.confirm() end),
     c = function(fallback)
       if not cmp.visible() then
         cmp.complete()
@@ -65,13 +76,13 @@ local mapping = {
     end
   }),
   ['<CR>'] = cmp.mapping({
-    i = fallback_if_cmp_has_active(function()
+    i = fallback_if_cmp_has_no_active_entry(function()
       cmp.confirm()
     end),
-    s = fallback_if_cmp_has_active(function()
+    s = fallback_if_cmp_has_no_active_entry(function()
       cmp.confirm()
     end),
-    c = fallback_if_cmp_has_active(function()
+    c = fallback_if_cmp_has_no_active_entry(function()
       cmp.confirm()
     end),
   })
@@ -84,8 +95,8 @@ cmp.setup({
     end
   },
   completion = {
-    autocomplete = false, -- cmp.TriggerEvent | false
-    -- keyword_length = 0,     -- Number of char to trigger auto-completion
+    -- autocomplete = false, -- cmp.TriggerEvent | false
+    keyword_length = 1, -- Number of char to trigger auto-completion
     -- completeopt = ,  -- See vim's completeopt
   },
   matching = {
@@ -150,7 +161,8 @@ cmp.setup.filetype('gitcommit', {
 -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline({ '/', '?' }, {
   completion = {
-    autocomplete = false, -- Cause error if true. TODO: find out what `cmp.TriggerEvent[]` are
+    autocomplete = false, -- TODO: find out what `cmp.TriggerEvent[]` are
+    -- keyword_length = 1, -- Number of char to trigger auto-completion
   },
   sources = {
     { name = 'buffer' } -- Can coverup the editor

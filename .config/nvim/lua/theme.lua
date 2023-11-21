@@ -5,6 +5,7 @@ local M = {}
 
 M.colors = {
   black = "#000000",
+  gray_35 = "#090909",
   gray_50 = "#111111",
   gray_100 = "#17191f",
   gray_200 = "#1a1c24",
@@ -26,18 +27,30 @@ M.colors = {
   red_300 = "#2f0f0f",
   blue_300 = "#122241",
   yellow_300 = "#34200c",
-  red_500 = "#571919",
-  blue_500 = "#18305e",
-  yellow_500 = "#693e13",
-  red_700 = "#913333",
-  blue_700 = "#244c96",
-  yellow_700 = "#ba6b2f",
+  red_400 = "#571919",
+  blue_400 = "#1b3567",
+  yellow_400 = "#693e13",
+  red_500 = "#7b2525",
+  blue_500 = "#26498b",
+  yellow_500 = "#905020",
+  red_600 = "#913333",
+  blue_600 = "#2955a7",
+  yellow_600 = "#9d5925",
+  red_700 = "#af4343",
+  blue_700 = "#2f66cd",
+  yellow_700 = "#b86b31",
 }
 
 local indent_marker = M.colors.gray_100
 
+-- Maintaining another list instead of doing `rawset` of `M.highlight` because
+-- populating entries in `M.highlight` will cause `__index` to be invoked instead of `__newindex`
+M.defined_highlight_groups = {}
+
 M.highlight = setmetatable({}, {
-  __newindex = function(_, hlgroup, args)
+  __newindex = function(tbl, hlgroup, args)
+    table.insert(M.defined_highlight_groups, hlgroup)
+
     -- If type is string, set a link
     if (type(args) == 'string') then
       vim.api.nvim_set_hl(0, hlgroup, { link = args })
@@ -61,16 +74,15 @@ M.highlight = setmetatable({}, {
 })
 
 function M.setup(opts)
-  if not opts then
-    opts = {
-      debug = {
-        sources = {
-          colon_highlights = false,
-          vim_fn_getcompletion = false
-        }
-      }
+  local default_opts = {
+    debug = {
+      enabled = false,
+      source = ":highlights", -- @Types "vim_fn_getcompletion" | ":highlights"
+      hide_defined_entries = true,
+      toggle_colorizer = false
     }
-  end
+  }
+  opts = vim.tbl_deep_extend("keep", opts, default_opts)
 
   if vim.fn.exists('syntax_on') then
     vim.cmd('syntax reset')
@@ -156,7 +168,7 @@ function M.setup(opts)
   hi.String                             = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
   hi.Structure                          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.Tag                                = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Todo                               = { guifg = c.blue, guibg = c.gray_300, gui = nil, guisp = nil }
+  hi.Todo                               = { guifg = nil, guibg = c.blue_300, gui = nil, guisp = nil }
   hi.Type                               = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
   hi.Typedef                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
 
@@ -209,6 +221,11 @@ function M.setup(opts)
   hi.DiagnosticUnderlineWarn            = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.yellow }
   hi.DiagnosticUnderlineInformation     = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.blue }
   hi.DiagnosticUnderlineHint            = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.blue }
+
+  hi.DiagnosticVirtualTextError         = { guifg = c.red_700, guibg = c.red_100 }
+  hi.DiagnosticVirtualTextWarn          = { guifg = c.yellow_700, guibg = c.yellow_100 }
+  hi.DiagnosticVirtualTextInfo          = { guifg = c.blue_700, guibg = c.blue_100 }
+  hi.DiagnosticVirtualTextHint          = { guifg = c.blue_700, guibg = c.blue_100 }
 
   hi.LspReferenceText                   = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
   hi.LspReferenceRead                   = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
@@ -506,8 +523,8 @@ function M.setup(opts)
   hi.BufferLineBufferSelected      = { guifg = c.gray_700, guibg = c.gray_200 } -- Active tab
   hi.BufferLineSeparator           = { guifg = c.black, guibg = c.black }
 
-  hi.BufferLineError               = { guifg = c.red_700, guibg = c.gray_50 }
-  hi.BufferLineErrorSelected       = { guifg = c.red_700, guibg = c.gray_100 }
+  hi.BufferLineError               = { guifg = c.red_600, guibg = c.gray_50 }
+  hi.BufferLineErrorSelected       = { guifg = c.red_600, guibg = c.gray_100 }
   hi.BufferLineModified            = { guifg = c.gray_700, guibg = c.gray_50 }
   hi.BufferLineModifiedSelected    = { guifg = c.gray_700, guibg = c.gray_100 }
   hi.BufferLineDiagnosticSelected  = { guifg = c.gray_700, guibg = c.gray_100 }
@@ -516,7 +533,9 @@ function M.setup(opts)
   hi.BufferLineNumbersSelected     = 'BufferLineDiagnosticSelected'
   hi.BufferLineCloseButtonSelected = 'BufferLineDiagnosticSelected'
 
-  if opts.debug then
+  if opts.debug.enabled then
+    vim.print(vim.inspect(opts))
+
     local function get_color_name_if_exists(target)
       for color, value in pairs(M.colors) do
         if value == target then
@@ -526,7 +545,12 @@ function M.setup(opts)
       return target
     end
 
-    if opts.debug.sources.vim_fn_getcompletion then
+    local map = require("utils").map
+    local split_string = require("utils").split_string
+
+    local buf_lines = nil
+
+    if opts.debug.source == "vim_fn_getcompletion" then
       local fn = vim.fn
       local highlights = fn.getcompletion("", "highlight")
 
@@ -534,40 +558,25 @@ function M.setup(opts)
         return fn.synIDattr(fn.synIDtrans(fn.hlID(group)), attr)
       end
 
-      for _, e in ipairs(highlights) do
-        local bg = get_color(e, "bg#")
+      buf_lines = map(highlights, function(i, hl)
+        local bg = get_color(hl, "bg#")
         bg = get_color_name_if_exists(bg)
-        local fg = get_color(e, "fg#")
+        local fg = get_color(hl, "fg#")
         fg = get_color_name_if_exists(fg)
-        print(vim.inspect(e .. " fg " .. fg .. " bg " .. bg))
-      end
-    end
-
-    if opts.debug.sources.colon_highlights then
-      local function split_string(inputstr, sep)
-        if sep == nil then
-          sep = "%s"
-        end
-        local t = {}
-        for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
-          table.insert(t, str)
-        end
-        return t
-      end
-
-      local function map(tbl, func)
-        local new_tbl = {}
-        for i, v in ipairs(tbl) do
-          new_tbl[i] = func(v)
-        end
-        return new_tbl
-      end
-
+        return hl .. " fg " .. fg .. " bg " .. bg
+      end)
+    elseif opts.debug.source == ":highlights" then
       local hl_raw = vim.api.nvim_exec('highlight', true)
       local hl_groups = split_string(hl_raw, "\n")
 
-      local buf_lines = map(hl_groups, function(g)
-        return table.concat(map(split_string(g, " "), function(part)
+      buf_lines = map(hl_groups, function(i, g)
+        local parts = split_string(g, " ")
+
+        if opts.debug.hide_defined_entries and parts[1] ~= "link" and require("utils").contains(M.defined_highlight_groups, parts[1]) then
+          return nil
+        end
+
+        return table.concat(map(parts, function(i, part)
           -- a = letter; x = hexidecimal digit
           local k, v = string.match(part, "(gui%a+)=(#%x+)")
           if k and v then
@@ -577,10 +586,13 @@ function M.setup(opts)
           end
         end), " ")
       end)
+    end
 
-      local buf = vim.api.nvim_create_buf(false, true) -- Empty buffer
-      vim.api.nvim_buf_set_lines(buf, 0, -1, false, buf_lines)
-      vim.api.nvim_set_current_buf(buf)
+    if not buf_lines then return end
+
+    require("utils").show_content_as_buf(buf_lines)
+    if opts.debug.toggle_colorizer then
+      vim.cmd("ColorizerToggle")
     end
   end
 end

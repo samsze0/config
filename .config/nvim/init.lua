@@ -33,6 +33,8 @@ vim.cmd [[filetype plugin off]]
 
 vim.opt.fillchars:append { diff = "╱" }
 
+vim.opt.pumblend = 0 -- Transparency for popup-menu; 0 = opaque; 100 = transparent
+
 -- Lazy.nvim bootstrap
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -47,18 +49,32 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+local config = require('config')
+
 require('theme').setup({}) -- Setup once because some plugins might read existing highlight groups values
 
 require("lazy").setup({
   {
     -- TODO: open file when swap file exists throw cryptic error
     'ibhagwan/fzf-lua',
+    enabled = not config.telescope_over_fzflua,
     config = function()
       require('_fzflua')
     end,
   },
   {
     'github/copilot.vim',
+    config = function()
+      local run_setup_on_startup = false
+
+      if run_setup_on_startup then
+        vim.api.nvim_create_autocmd("VimEnter", {
+          callback = function()
+            vim.cmd("Copilot setup")
+          end,
+        })
+      end
+    end
   },
   {
     'nvim-lualine/lualine.nvim',
@@ -123,7 +139,6 @@ require("lazy").setup({
   {
     'neovim/nvim-lspconfig',
     dependencies = {
-      'folke/neoconf.nvim',
       'hrsh7th/cmp-nvim-lsp'
     },
     config = function()
@@ -146,7 +161,9 @@ require("lazy").setup({
   },
   {
     -- Configure lua-language-server for neovim config
+    -- TODO: not working
     'folke/neodev.nvim',
+    enabled = true,
     config = function()
       require("neodev").setup({})
     end
@@ -159,8 +176,8 @@ require("lazy").setup({
     end
   },
   {
-    enabled = false,
     'nvim-tree/nvim-tree.lua',
+    enabled = false,
     config = function()
       require('_nvimtree')
     end
@@ -183,7 +200,8 @@ require("lazy").setup({
   {
     -- Project specific settings incl. LSP (w/ vscode interop)
     'folke/neoconf.nvim',
-    enabled = false,
+    enabled = true,
+    priority = 100, -- Default priority is 50. Must load befor
     config = function()
       require('_neoconf')
     end
@@ -256,7 +274,7 @@ require("lazy").setup({
         options = { "buffers", "curdir", "tabpages", "winsize" },
         pre_save = function()
         end,
-        save_empty = true, -- whether to save if there are no open file buffers
+        save_empty = false, -- whether to save if there are no open file buffers
       })
     end
   },
@@ -283,15 +301,37 @@ require("lazy").setup({
       require('_bufferline')
     end
   },
+  {
+    'nvim-telescope/telescope.nvim',
+    enabled = config.telescope_over_fzflua,
+    dependencies = {
+      'nvim-lua/plenary.nvim'
+    },
+    config = function()
+      require('_telescope')
+    end
+  },
+  {
+    -- TODO: doesn't work if window is not buffer? (e.g. help or command line window)
+    -- Probably relies on closing the instance and reopening it again
+    'declancm/maximize.nvim',
+    enabled = require('config').maximize_with_plugin,
+    config = function()
+      require('maximize').setup({
+        default_keymaps = false,
+      })
+    end
+  }
 })
 
-require('keymaps')
+require('keymaps').setup()
 require('winbar').setup() -- i.e. breadcrumbs
+require('commands')
 require('theme').setup({
   debug = {
-    sources = {
-      vim_fn_getcompletion = false,
-      colon_highlights = false
-    }
+    enabled = false,
+    source = ":highlights",
+    toggle_colorizer = true,
+    hide_defined_entries = true
   }
 })

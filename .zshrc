@@ -14,6 +14,8 @@ source ~/.config/zsh/kitty.sh
 source ~/.config/zsh/nix.sh
 source ~/.config/zsh/gitconfig.sh
 source ~/.config/zsh/fzf.sh
+source ~/.config/zsh/socket.sh
+source ~/.config/zsh/unix.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
@@ -120,7 +122,7 @@ export HISTSIZE=50 # Capacity of no. lines for a session
 
 # Default apps
 export SHELL="$(which zsh)"
-export PAGER="less"
+export PAGER="nvim -RM"
 export EDITOR="nvim"
 export BROWSER="firefox"
 export MANPAGER="nvim +Man\!"  # https://neovim.io/doc/user/filetype.html#ft-man-plugin

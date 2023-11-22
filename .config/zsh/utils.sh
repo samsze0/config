@@ -14,3 +14,11 @@ check_command_exists() {
         return 1
     fi
 }
+
+# Log out all programs instead of the first match only
+which_all() {
+  for dir in $(echo "$PATH" | tr ":" " "); do
+    find "$dir" -maxdepth 1 -name 'nc' -executable -type f,l 2>/dev/null
+    # Type is file or symlink (becaues of NixOS). Redirect any error to /dev/null in case dir doesn't exist
+  done
+}

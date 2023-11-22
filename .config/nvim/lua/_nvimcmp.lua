@@ -55,6 +55,11 @@ local mapping = {
   ),
   ['<C-Space>'] = cmp.mapping(
     function(fallback)
+      if cmp.visible() and cmp.get_active_entry() ~= nil then
+        cmp.close()
+        return
+      end
+
       if not cmp.visible() then
         cmp.complete()
       end
@@ -89,6 +94,7 @@ local mapping = {
 }
 
 cmp.setup({
+  preselect = cmp.PreselectMode.None,
   snippet = {
     expand = function(args)
       require('luasnip').lsp_expand(args.body)

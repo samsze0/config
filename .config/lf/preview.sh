@@ -46,7 +46,7 @@ MIME_TYPE=$(get_mimetype "$FILE")
 if [[ $MIME_TYPE =~ ^image ]]; then
     image_preview "$FILE"
     exit 1
-elif [[ $MIME_TYPE =~ ^text || $MIME_TYPE = application/json ]]; then
+elif [[ $MIME_TYPE =~ ^text || $MIME_TYPE = application/json || $MIME_TYPE = application/javascript ]]; then
     bat --color always $FILE
     exit 1
 elif [[ $MIME_TYPE =~ ^video ]]; then

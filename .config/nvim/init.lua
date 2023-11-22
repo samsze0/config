@@ -55,6 +55,16 @@ require('theme').setup({}) -- Setup once because some plugins might read existin
 
 require("lazy").setup({
   {
+    'nvim-telescope/telescope.nvim',
+    enabled = config.telescope_over_fzflua,
+    dependencies = {
+      'nvim-lua/plenary.nvim'
+    },
+    config = function()
+      require('_telescope')
+    end
+  },
+  {
     -- TODO: open file when swap file exists throw cryptic error
     'ibhagwan/fzf-lua',
     enabled = not config.telescope_over_fzflua,
@@ -64,6 +74,7 @@ require("lazy").setup({
   },
   {
     'github/copilot.vim',
+    enabled = config.copilot_plugin == "vim",
     config = function()
       local run_setup_on_startup = false
 
@@ -74,6 +85,13 @@ require("lazy").setup({
           end,
         })
       end
+    end
+  },
+  {
+    'zbirenbaum/copilot.lua',
+    enabled = config.copilot_plugin == "lua",
+    config = function()
+      require('_copilotlua')
     end
   },
   {
@@ -92,7 +110,7 @@ require("lazy").setup({
   {
     -- Term within neovim
     'voldikss/vim-floaterm',
-    enabled = true,
+    enabled = config.terminal_plugin == "floaterm" or config.lf_plugin == "vim",
     config = function()
       vim.g.floaterm_width = 0.9
       vim.g.floaterm_height = 0.9
@@ -101,18 +119,18 @@ require("lazy").setup({
   {
     -- Lf integration
     'ptzz/lf.vim',
-    enabled = true,
+    enabled = config.lf_plugin == "vim",
     requires = {
       'voldikss/vim-floaterm'
     },
   },
   {
     'akinsho/toggleterm.nvim',
-    enabled = false
+    enabled = config.terminal_plugin == "toggleterm"
   },
   {
     'lmburns/lf.nvim',
-    enabled = false,
+    enabled = config.lf_plugin == "nvim",
     requires = {
       'akinsho/toggleterm.nvim',
       config = function()
@@ -177,7 +195,7 @@ require("lazy").setup({
   },
   {
     'nvim-tree/nvim-tree.lua',
-    enabled = false,
+    enabled = config.filetree_plugin == "nvimtree",
     config = function()
       require('_nvimtree')
     end
@@ -302,16 +320,6 @@ require("lazy").setup({
     end
   },
   {
-    'nvim-telescope/telescope.nvim',
-    enabled = config.telescope_over_fzflua,
-    dependencies = {
-      'nvim-lua/plenary.nvim'
-    },
-    config = function()
-      require('_telescope')
-    end
-  },
-  {
     -- TODO: doesn't work if window is not buffer? (e.g. help or command line window)
     -- Probably relies on closing the instance and reopening it again
     'declancm/maximize.nvim',
@@ -320,6 +328,13 @@ require("lazy").setup({
       require('maximize').setup({
         default_keymaps = false,
       })
+    end
+  },
+  {
+    'cshuaimin/ssr.nvim',
+    enabled = config.ssr_plugin,
+    config = function()
+      require('_ssr')
     end
   }
 })

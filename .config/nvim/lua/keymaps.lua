@@ -18,19 +18,12 @@ M.setup = function()
   -- Delete word
   keymap("i", "<C-BS>", "<C-W>", opts)
 
-  -- Caution: marks in visual mode are only set after leaving visual mode
-  -- `<cmd>` will execute a command without leaving visual mode while
-  -- `:` leaves visual mode and enters command mode before processing the command.
-  -- https://www.reddit.com/r/neovim/comments/y2h8ps/i_have_a_mapping_for_normal_how_to_make_an/
-
   -- Move/swap line/selection up/down
-  -- keymap("n", "ke", "<cmd>m .-2<CR>==", opts) -- Auto indent line afterwards
-  keymap("n", "ke", "<cmd>m .-2<CR>", opts)
-  -- keymap("n", "ke", "dd2<Up>\"dp==", noremap_opts)
-  keymap("n", "kd", "<cmd>m .+1<CR>", opts)
-  keymap("v", "ke", ":m .-2<CR>gv", opts)
-  -- keymap("v", "ke", ":m .-2<CR>gv=gv", opts)     -- Auto indent selection then re-select selection
-  keymap("v", "kd", ":m '>+1<CR>gv", opts)
+  local auto_indent = false
+  keymap("n", "ke", "<cmd>m .-2<CR>" .. (auto_indent and "==" or ""), opts)
+  keymap("n", "kd", "<cmd>m .+1<CR>" .. (auto_indent and "==" or ""), opts)
+  keymap("v", "ke", ":m .-2<CR>gv" .. (auto_indent and "=gv" or ""), opts)
+  keymap("v", "kd", ":m '>+1<CR>gv" .. (auto_indent and "=gv" or ""), opts)
 
   -- Delete line
   keymap("n", "my", "dd", noremap_opts)
@@ -51,9 +44,6 @@ M.setup = function()
 
   -- Clear search highlights
   keymap("n", "<Space>/", "<cmd>noh<CR>", opts)
-
-  -- Replay edit
-  -- keymap("n", ".", ".", opts)
 
   -- Redo
   keymap("n", "U", "<C-R>", opts)
@@ -128,7 +118,7 @@ M.setup = function()
     keymap("n", 'wz', "<Cmd>lua require('maximize').toggle()<CR>", opts)
   else
     keymap("n", 'wz', "<C-W>_<C-W>|", opts) -- Maximise both horizontally and vertically
-    keymap("n", 'wZ', "<C-W>=", opts)
+    keymap("n", 'wx', "<C-W>=", opts)
   end
 
   -- Tab
@@ -225,18 +215,6 @@ M.setup = function()
     (config.telescope_over_fzflua and 'lua require("telescope.builtin").' or "FzfLua lsp_code_actions") .. "<cr>",
     opts)
 
-  -- Diffview
-  keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
-  keymap("n", "<f11><f2>", "<cmd>DiffviewFileHistory %<cr>", opts) -- See current file git history
-  keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts)     -- See current selection git history
-
-  -- NvimTree
-  keymap("n", "<f2><f1>", "<cmd>NvimTreeFindFile<cr>", opts)
-
-  -- lf.vim
-  keymap("n", "<f2><f2>", "<cmd>LfWorkingDirectory<cr>", opts)
-  keymap("n", "<f2><f3>", "<cmd>LfCurrentFile<cr>", opts)
-
   -- LSP
   keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
   keymap("n", "lU", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
@@ -244,7 +222,12 @@ M.setup = function()
   keymap("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
   keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
-  keymap("n", "ll", "<cmd>lua vim.lsp.buf.format()<CR>", opts)
+
+  local function lsp_format_and_notify()
+    vim.lsp.buf.format()
+    print("Formatted")
+  end
+  vim.keymap.set("n", "ll", lsp_format_and_notify, {})
 
   local overwrite_formatter_on_lsp_attach = false
 
@@ -252,7 +235,7 @@ M.setup = function()
     vim.api.nvim_create_autocmd('LspAttach', {
       callback = function(args)
         local client = vim.lsp.get_client_by_id(args.data.client_id)
-        if client.server_capabilities.hoverProvider then
+        if client.server_capabilities.documentFormattingProvider then
           vim.keymap.set("n", "ll", vim.lsp.buf.format, { buffer = args.buf })
         end
       end,
@@ -261,11 +244,13 @@ M.setup = function()
 
   keymap("n", "lL", [[<cmd>lua require("keymaps").lsp_pick_formatter()<CR>]], opts)
 
-  -- Floaterm
-  keymap("n", "<f12>", "<cmd>FloatermToggle<CR>", opts)
-  keymap("t", "<f12>", "<cmd>FloatermToggle<CR>", opts)
+  -- Terminal
+  if config.terminal_plugin == "floaterm" then
+    keymap("n", "<f12>", "<cmd>FloatermToggle<CR>", opts)
+    keymap("t", "<f12>", "<cmd>FloatermToggle<CR>", opts)
+  end
 
-  -- Comment.nvim
+  -- Comment
   keymap("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)", opts)
   keymap("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)gv", opts) -- Re-select the last block
 
@@ -285,15 +270,49 @@ M.setup = function()
   keymap("n", "<space>W", ":w!<cr>", opts)
   keymap("n", "<space>a", ":qa<cr>", opts)
 
-  -- persistence.nvim
-  -- restore the session for the current directory
+  -- Command line window
+  keymap("n", "<space>;", "q:", opts)
+
+  -- Session restore
   keymap("n", "<Space>R", [[<cmd>lua require("persistence").load()<cr>]], opts)
 
   -- Colorizer
-  keymap("n", "<leader>r", "<cmd>ColorizerToggle<CR>", opts)
-  keymap("n", "<leader>R", "<cmd>ColorizerReloadAllBuffers<CR>", opts)
+  local function colorizer_toggle_and_notify()
+    vim.cmd [[ColorizerToggle]]
+    print("Colorizer toggled")
+  end
+  vim.keymap.set("n", "<leader>r", colorizer_toggle_and_notify, {})
+  local function colorizer_reload_and_notify()
+    vim.cmd [[ColorizerReloadAllBuffers]]
+    print("Colorizer reloaded")
+  end
+  vim.keymap.set("n", "<leader>R", colorizer_reload_and_notify, {})
 
-  keymap("n", "<space>;", "q:", opts) -- command line window
+  -- Copilot
+  if config.copilot_plugin == "vim" then
+    keymap("n", "<leader>p", "<cmd>Copilot setup<CR>", opts)
+  elseif config.copilot_plugin == "lua" then
+  end
+
+  if config.ssr_plugin then
+    vim.keymap.set({ "n", "v" }, "<leader>f", function() require("ssr").open() end)
+  end
+
+  -- Diffview
+  keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
+  keymap("n", "<f11><f2>", "<cmd>DiffviewFileHistory %<cr>", opts) -- See current file git history
+  keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts)     -- See current selection git history
+
+  -- File tree
+  if config.filetree_plugin == "nvimtree" then
+    keymap("n", "<f2><f1>", "<cmd>NvimTreeFindFile<cr>", opts)
+  end
+
+  -- File managers
+  if config.lf_plugin == "vim" then
+    keymap("n", "<f2><f2>", "<cmd>LfWorkingDirectory<cr>", opts)
+    keymap("n", "<f2><f3>", "<cmd>LfCurrentFile<cr>", opts)
+  end
 end
 
 M.lsp_pick_formatter = function()

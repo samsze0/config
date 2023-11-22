@@ -7,6 +7,7 @@ Visual mode
     - `o` in visual mode let you "change end"
     - `=` in visual mode let you re-indent the selected text
     - While in insert mode, use `C-o` to do a normal mode command
+    - Caution: marks in visual mode are only set after leaving visual mode. `<cmd>` will execute a command without leaving visual mode while `:` leaves visual mode and enters command mode before processing the command.
 Normal mode
     - `*` to select all occurrences of word under cursor
     - (TODO)

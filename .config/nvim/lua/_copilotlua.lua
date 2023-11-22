@@ -1,14 +1,10 @@
+-- TODO: https://github.com/zbirenbaum/copilot.lua/issues/172
+
 require('copilot').setup({
   panel = {
-    enabled = true,
+    enabled = false,
     auto_refresh = false,
-    keymap = {
-      jump_prev = "[[",
-      jump_next = "]]",
-      accept = "<CR>",
-      refresh = "gr",
-      open = "<M-CR>"
-    },
+    keymap = {},
     layout = {
       position = "bottom", -- | top | left | right
       ratio = 0.4
@@ -18,14 +14,7 @@ require('copilot').setup({
     enabled = true,
     auto_trigger = true,
     debounce = 75,
-    keymap = {
-      accept = "<M-l>",
-      accept_word = false,
-      accept_line = false,
-      next = "<M-]>",
-      prev = "<M-[>",
-      dismiss = "<C-]>",
-    },
+    keymap = {},
   },
   filetypes = {
     yaml = false,

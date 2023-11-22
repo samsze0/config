@@ -48,6 +48,63 @@ local tab_session = {
   },
 }
 
+local indicator_colors = {
+  red = {
+    fg = colors.red_700,
+    bg = colors.gray_50,
+  },
+  yellow = {
+    fg = colors.yellow_700,
+    bg = colors.gray_50,
+  },
+  blue = {
+    fg = colors.blue_700,
+    bg = colors.gray_50,
+  },
+  gray = {
+    fg = colors.gray_700,
+    bg = colors.gray_50,
+  },
+}
+
+local gitsigns_status = vim.b.gitsigns_status_dict or {
+  added = 0,
+  changed = 0,
+  removed = 0,
+}
+
+local diff_session = {
+  'diff',
+  colored = true,
+  diff_color = {
+    added    = indicator_colors.gray,
+    modified = indicator_colors.gray,
+    removed  = indicator_colors.gray,
+  },
+  symbols = { added = '+', modified = '~', removed = '-' },
+  source = {
+    added = gitsigns_status.added,
+    modified = gitsigns_status.changed,
+    removed = gitsigns_status.removed,
+  },
+}
+
+local diagnostic_session = {
+  'diagnostics',
+  sources = { 'nvim_lsp' },
+  sections = { 'error', 'warn', 'info', 'hint' },
+  diagnostics_color = {
+    error = indicator_colors.red,
+    warn = indicator_colors.yellow,
+    info = indicator_colors.blue,
+    hint = indicator_colors.blue,
+  },
+  symbols = { error = 'E', warn = 'W', info = 'I', hint = 'H' },
+  colored = true,
+  update_in_insert = false,
+  always_visible = false,
+}
+
 local filename_session = {
   'filename',
   file_status = true,    -- Displays file status (readonly status, modified status)
@@ -82,7 +139,7 @@ require('lualine').setup {
     lualine_b = {
       filename_session
     },
-    lualine_c = {},
+    lualine_c = { diagnostic_session, diff_session },
     lualine_x = { 'selectioncount', 'searchcount', 'filetype', 'encoding' },
     lualine_y = {},
     lualine_z = { maximize_status_session }

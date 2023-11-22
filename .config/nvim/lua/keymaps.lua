@@ -3,7 +3,7 @@ local M = {}
 M.setup = function()
   local keymap = vim.api.nvim_set_keymap
   local opts = { silent = true, noremap = true }
-  local noremap_opts = { silent = true, noremap = false }
+  local opts_can_remap = { silent = true, noremap = false }
 
   local config = require('config')
 
@@ -20,23 +20,24 @@ M.setup = function()
 
   -- Move/swap line/selection up/down
   local auto_indent = false
-  keymap("n", "ke", "<cmd>m .-2<CR>" .. (auto_indent and "==" or ""), opts)
-  keymap("n", "kd", "<cmd>m .+1<CR>" .. (auto_indent and "==" or ""), opts)
-  keymap("v", "ke", ":m .-2<CR>gv" .. (auto_indent and "=gv" or ""), opts)
-  keymap("v", "kd", ":m '>+1<CR>gv" .. (auto_indent and "=gv" or ""), opts)
+  keymap("n", "<C-up>", "<cmd>m .-2<CR>" .. (auto_indent and "==" or ""), opts)
+  keymap("n", "<C-down>", "<cmd>m .+1<CR>" .. (auto_indent and "==" or ""), opts)
+  keymap("v", "<C-up>", ":m .-2<CR>gv" .. (auto_indent and "=gv" or ""), opts)
+  keymap("v", "<C-down>", ":m '>+1<CR>gv" .. (auto_indent and "=gv" or ""), opts)
 
   -- Delete line
-  keymap("n", "my", "dd", noremap_opts)
-  keymap("i", "<C-y>", "<C-o>dd", noremap_opts)
-  keymap("v", "my", ":d<CR>", opts)
+  keymap("n", "<M-y>", "dd", opts_can_remap)
+  keymap("i", "<M-y>", "<C-o><M-y>", opts_can_remap)
+  keymap("v", "<M-y>", ":d<CR>", opts)
 
   -- Duplicate line/selection
-  keymap("n", "md", "<cmd>t .<CR>", opts)
-  keymap("v", "md", ":t '><CR>", opts)
+  keymap("n", "<M-g>", "<cmd>t .<CR>", opts)
+  keymap("i", "<M-g>", "<C-o><M-g>", opts_can_remap)
+  keymap("v", "<M-g>", ":t '><CR>", opts)
 
   -- Matching pair
-  keymap("n", "mm", "%", opts)
-  keymap("v", "mm", "%", opts)
+  keymap("n", "m", "%", opts)
+  keymap("v", "m", "%", opts)
 
   -- Macro
   keymap("n", ",", "@", opts) -- replay macro x
@@ -102,6 +103,10 @@ M.setup = function()
   keymap("n", "wk", "<cmd>wincmd j<CR>", opts)
   keymap("n", "wj", "<cmd>wincmd h<CR>", opts)
   keymap("n", "wl", "<cmd>wincmd l<CR>", opts)
+  keymap("n", "<C-e>", "<cmd>wincmd k<CR>", opts)
+  keymap("n", "<C-d>", "<cmd>wincmd j<CR>", opts)
+  keymap("n", "<C-s>", "<cmd>wincmd h<CR>", opts)
+  keymap("n", "<C-f>", "<cmd>wincmd l<CR>", opts)
 
   keymap("n", "ww", "<cmd>clo<CR>", opts)
 
@@ -112,9 +117,9 @@ M.setup = function()
 
   keymap("n", "wt", "<cmd>wincmd T<CR>", opts) -- Move to new tab
 
-  local maximize_with_plugin = require('config').maximize_with_plugin
+  local maximize_plugin = require('config').maximize_plugin
 
-  if maximize_with_plugin then
+  if maximize_plugin then
     keymap("n", 'wz', "<Cmd>lua require('maximize').toggle()<CR>", opts)
   else
     keymap("n", 'wz', "<C-W>_<C-W>|", opts) -- Maximise both horizontally and vertically
@@ -126,9 +131,13 @@ M.setup = function()
   keymap("n", "tl", "<cmd>tabn<CR>", opts)
   keymap("n", "tt", "<cmd>tabnew<CR>", opts)
   keymap("n", "tw", "<cmd>tabclose<CR>", opts)
+  keymap("n", "<C-j>", "<cmd>tabp<CR>", opts)
+  keymap("n", "<C-l>", "<cmd>tabn<CR>", opts)
 
   keymap("n", "tu", "<cmd>tabm -1<CR>", opts)
   keymap("n", "to", "<cmd>tabm +1<CR>", opts)
+  keymap("n", "<C-S-j>", "<cmd>tabm -1<CR>", opts)
+  keymap("n", "<C-S-l>", "<cmd>tabm +1<CR>", opts)
 
   -- Delete & cut
   -- Ref: https://github.com/gbprod/cutlass.nvim/blob/main/lua/cutlass.lua
@@ -217,7 +226,7 @@ M.setup = function()
 
   -- LSP
   keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-  keymap("n", "lU", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
+  keymap("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
   keymap("n", "lI", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
   keymap("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
@@ -225,7 +234,7 @@ M.setup = function()
 
   local function lsp_format_and_notify()
     vim.lsp.buf.format()
-    print("Formatted")
+    vim.notify("Formatted")
   end
   vim.keymap.set("n", "ll", lsp_format_and_notify, {})
 
@@ -266,32 +275,45 @@ M.setup = function()
   -- :qa, :q!, :wq
   keymap("n", "<space>q", ":q<cr>", opts)
   keymap("n", "<space>w", ":w<cr>", opts)
-  keymap("n", "<space>Q", ":q!<cr>", opts)
-  keymap("n", "<space>W", ":w!<cr>", opts)
+  keymap("n", "<space><BS>", ":q!<cr>", opts)
+  keymap("n", "<space>s", ":w!<cr>", opts)
   keymap("n", "<space>a", ":qa<cr>", opts)
+  keymap("n", "<space><delete>", ":qa!<cr>", opts)
 
   -- Command line window
   keymap("n", "<space>;", "q:", opts)
 
   -- Session restore
-  keymap("n", "<Space>R", [[<cmd>lua require("persistence").load()<cr>]], opts)
+  keymap("n", "<Space>r", [[<cmd>lua require("persistence").load()<cr>]], opts)
 
   -- Colorizer
   local function colorizer_toggle_and_notify()
     vim.cmd [[ColorizerToggle]]
-    print("Colorizer toggled")
+    vim.notify("Colorizer toggled")
   end
   vim.keymap.set("n", "<leader>r", colorizer_toggle_and_notify, {})
   local function colorizer_reload_and_notify()
     vim.cmd [[ColorizerReloadAllBuffers]]
-    print("Colorizer reloaded")
+    vim.notify("Colorizer reloaded")
   end
   vim.keymap.set("n", "<leader>R", colorizer_reload_and_notify, {})
+
+  -- Nvim Cmp
+  vim.keymap.set("i", "<M-w>", function()
+    local cmp = require("cmp")
+
+    if cmp.visible() then
+      cmp.confirm({ select = true })
+    end
+  end, {})
 
   -- Copilot
   if config.copilot_plugin == "vim" then
     keymap("n", "<leader>p", "<cmd>Copilot setup<CR>", opts)
   elseif config.copilot_plugin == "lua" then
+    vim.keymap.set("i", "<M-a>", require("copilot.suggestion").accept, {})
+    vim.keymap.set("i", "<M-d>", require("copilot.suggestion").next, {})
+    vim.keymap.set("i", "<M-e>", require("copilot.suggestion").prev, {})
   end
 
   if config.ssr_plugin then

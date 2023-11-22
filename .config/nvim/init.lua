@@ -276,7 +276,7 @@ require("lazy").setup({
   },
   {
     'nvim-pack/nvim-spectre',
-    enabled = false,
+    enabled = config.spectre_plugin,
     dependencies = {
       'nvim-lua/plenary.nvim'
     },
@@ -323,7 +323,7 @@ require("lazy").setup({
     -- TODO: doesn't work if window is not buffer? (e.g. help or command line window)
     -- Probably relies on closing the instance and reopening it again
     'declancm/maximize.nvim',
-    enabled = require('config').maximize_with_plugin,
+    enabled = require('config').maximize_plugin,
     config = function()
       require('maximize').setup({
         default_keymaps = false,
@@ -336,6 +336,53 @@ require("lazy").setup({
     config = function()
       require('_ssr')
     end
+  },
+  {
+    'tanvirtin/vgit.nvim',
+    enabled = config.vgit_plugin,
+    dependencies = {
+      'nvim-lua/plenary.nvim'
+    },
+    config = function()
+      require('_vgit')
+    end
+  },
+  {
+    'mfussenegger/nvim-dap',
+    enabled = config.dap_plugins,
+    config = function()
+      -- TODO
+    end
+  },
+  {
+    'folke/trouble.nvim',
+    enabled = config.trouble_plugin,
+    config = function()
+      require('_trouble')
+    end
+  },
+  {
+    -- TODO: replace by forking fzflua
+    'folke/todo-comments.nvim',
+    enabled = false,
+  },
+  {
+    -- UI Component Library
+    'MunifTanjim/nui.nvim',
+  },
+  {
+    -- vim.notify() backend + LSP $/progress handler
+    'j-hui/fidget.nvim',
+    enabled = config.notify_backend == "fidget",
+    config = function()
+      require('_fidget')
+    end
+  },
+  {
+    -- Change code by utilizing treesitter
+    'Wansmer/treesj',
+    enabled = false,
+    -- TODO
   }
 })
 
@@ -350,3 +397,7 @@ require('theme').setup({
     hide_defined_entries = true
   }
 })
+
+if vim.g.neovide then
+  require("neovide")
+end

@@ -1,6 +1,8 @@
 -- Tweak from RRethy/nvim-base16
 -- https://github.com/RRethy/nvim-base16/blob/master/lua/base16-colorscheme.lua
 
+local config = require("config")
+
 local M = {}
 
 M.colors = {
@@ -373,156 +375,158 @@ function M.setup(opts)
     hi['@tag.delimiter'] = 'TSTagDelimiter'
   end
 
-  hi.NvimInternalError             = { guifg = c.black, guibg = c.blue, gui = 'none', guisp = nil }
+  hi.NvimInternalError          = { guifg = c.black, guibg = c.blue, gui = 'none', guisp = nil }
 
-  hi.NormalFloat                   = { guifg = c.gray_800, guibg = c.gray_100, gui = nil, guisp = nil }
-  hi.FloatBorder                   = { guifg = c.gray_800, guibg = c.black, gui = nil, guisp = nil }
-  hi.NormalNC                      = { guifg = c.gray_800, guibg = nil, gui = nil, guisp = nil }
-  hi.TermCursor                    = { guifg = c.black, guibg = c.gray_800, gui = 'none', guisp = nil }
-  hi.TermCursorNC                  = { guifg = c.black, guibg = c.gray_800, gui = nil, guisp = nil }
+  hi.NormalFloat                = { guifg = c.gray_800, guibg = c.gray_100, gui = nil, guisp = nil }
+  hi.FloatBorder                = { guifg = c.gray_800, guibg = c.black, gui = nil, guisp = nil }
+  hi.NormalNC                   = { guifg = c.gray_800, guibg = nil, gui = nil, guisp = nil }
+  hi.TermCursor                 = { guifg = c.black, guibg = c.gray_800, gui = 'none', guisp = nil }
+  hi.TermCursorNC               = { guifg = c.black, guibg = c.gray_800, gui = nil, guisp = nil }
 
-  hi.User1                         = { guifg = c.blue, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.User2                         = { guifg = c.blue, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.User3                         = { guifg = c.gray_800, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.User4                         = { guifg = c.yellow, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.User5                         = { guifg = c.gray_800, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.User6                         = { guifg = c.gray_800, guibg = c.gray_300, gui = 'none', guisp = nil }
-  hi.User7                         = { guifg = c.gray_800, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.User8                         = { guifg = c.black, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.User9                         = { guifg = c.black, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.User1                      = { guifg = c.blue, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.User2                      = { guifg = c.blue, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.User3                      = { guifg = c.gray_800, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.User4                      = { guifg = c.yellow, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.User5                      = { guifg = c.gray_800, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.User6                      = { guifg = c.gray_800, guibg = c.gray_300, gui = 'none', guisp = nil }
+  hi.User7                      = { guifg = c.gray_800, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.User8                      = { guifg = c.black, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.User9                      = { guifg = c.black, guibg = c.gray_400, gui = 'none', guisp = nil }
 
-  hi.TreesitterContext             = { guifg = nil, guibg = c.gray_300, gui = 'italic', guisp = nil }
+  hi.TreesitterContext          = { guifg = nil, guibg = c.gray_300, gui = 'italic', guisp = nil }
 
-  vim.g.terminal_color_0           = c.black
-  vim.g.terminal_color_1           = c.red
-  vim.g.terminal_color_2           = c.blue
-  vim.g.terminal_color_3           = c.blue
-  vim.g.terminal_color_4           = c.blue
-  vim.g.terminal_color_5           = c.blue
-  vim.g.terminal_color_6           = c.blue
-  vim.g.terminal_color_7           = c.white
-  vim.g.terminal_color_8           = c.gray_600
-  vim.g.terminal_color_9           = c.red
-  vim.g.terminal_color_10          = c.blue
-  vim.g.terminal_color_11          = c.blue
-  vim.g.terminal_color_12          = c.blue
-  vim.g.terminal_color_13          = c.blue
-  vim.g.terminal_color_14          = c.blue
-  vim.g.terminal_color_15          = c.white
+  local override_terminal_color = true
 
-  vim.g.base16_gui00               = c.black
-  vim.g.base16_gui01               = c.red
-  vim.g.base16_gui02               = c.blue
-  vim.g.base16_gui03               = c.blue
-  vim.g.base16_gui04               = c.blue
-  vim.g.base16_gui05               = c.blue
-  vim.g.base16_gui06               = c.blue
-  vim.g.base16_gui07               = c.white
-  vim.g.base16_gui08               = c.gray_600
-  vim.g.base16_gui09               = c.red
-  vim.g.base16_gui0A               = c.blue
-  vim.g.base16_gui0B               = c.blue
-  vim.g.base16_gui0C               = c.blue
-  vim.g.base16_gui0D               = c.blue
-  vim.g.base16_gui0E               = c.blue
-  vim.g.base16_gui0F               = c.white
+  if override_terminal_color then
+    vim.g.terminal_color_0  = c.black
+    vim.g.terminal_color_1  = c.red
+    vim.g.terminal_color_2  = c.blue
+    vim.g.terminal_color_3  = c.blue
+    vim.g.terminal_color_4  = c.blue
+    vim.g.terminal_color_5  = c.blue
+    vim.g.terminal_color_6  = c.blue
+    vim.g.terminal_color_7  = c.white
+    vim.g.terminal_color_8  = c.gray_600
+    vim.g.terminal_color_9  = c.red
+    vim.g.terminal_color_10 = c.blue
+    vim.g.terminal_color_11 = c.blue
+    vim.g.terminal_color_12 = c.blue
+    vim.g.terminal_color_13 = c.blue
+    vim.g.terminal_color_14 = c.blue
+    vim.g.terminal_color_15 = c.white
+  end
 
-  hi.CopilotSuggestion             = { guifg = c.gray_400, guibg = nil }
+  -- Copilot
+  if config.copilot_plugin == "vim" then
+    hi.CopilotSuggestion = { guifg = c.gray_400, guibg = nil }
+  end
 
-  hi.FzfLuaBufFlagCur              = { guifg = c.gray_600, guibg = nil }
-  hi.FzfLuaTabTitle                = { guifg = c.blue, guibg = nil }
-  hi.FzfLuaHeaderText              = { guifg = c.gray_600, guibg = nil }
-  hi.FzfLuaBufLineNr               = { guifg = c.blue, guibg = nil }
-  hi.FzfLuaBufNr                   = { guifg = c.blue, guibg = nil }
-  hi.FzfLuaBufName                 = { guifg = c.blue, guibg = nil }
-  hi.FzfLuaHeaderBind              = { guifg = c.blue, guibg = nil }
-  hi.FzfLuaTabMarker               = { guifg = c.blue, guibg = nil }
-  hi.FzfLuaBufFlagAlt              = { guifg = c.blue, guibg = nil }
+  -- Fuzzy finder
+  if not config.telescope_over_fzflua then
+    hi.FzfLuaBufFlagCur = { guifg = c.gray_600, guibg = nil }
+    hi.FzfLuaTabTitle   = { guifg = c.blue, guibg = nil }
+    hi.FzfLuaHeaderText = { guifg = c.gray_600, guibg = nil }
+    hi.FzfLuaBufLineNr  = { guifg = c.blue, guibg = nil }
+    hi.FzfLuaBufNr      = { guifg = c.blue, guibg = nil }
+    hi.FzfLuaBufName    = { guifg = c.blue, guibg = nil }
+    hi.FzfLuaHeaderBind = { guifg = c.blue, guibg = nil }
+    hi.FzfLuaTabMarker  = { guifg = c.blue, guibg = nil }
+    hi.FzfLuaBufFlagAlt = { guifg = c.blue, guibg = nil }
+  end
 
-  hi.NvimTreeIndentMarker          = { guifg = indent_marker, guibg = nil }
+  -- File tree
+  if config.filetree_plugin == "nvimtree" then
+    hi.NvimTreeIndentMarker = { guifg = indent_marker, guibg = nil }
+  end
 
-  hi.IblIndent                     = { guifg = indent_marker }
-  hi.IblWhitespace                 = { guifg = indent_marker }
-  hi.IblScope                      = { guifg = indent_marker }
+  -- indent-blankline
+  hi.IblIndent                    = { guifg = indent_marker }
+  hi.IblWhitespace                = { guifg = indent_marker }
+  hi.IblScope                     = { guifg = indent_marker }
 
-  hi.IlluminatedWordText           = { guibg = c.gray_200, gui = nil }
-  hi.IlluminatedWordRead           = { guibg = c.gray_200, gui = nil }
-  hi.IlluminatedWordWrite          = { guibg = c.gray_200, gui = nil }
+  -- vim-illuminate
+  hi.IlluminatedWordText          = { guibg = c.gray_200, gui = nil }
+  hi.IlluminatedWordRead          = { guibg = c.gray_200, gui = nil }
+  hi.IlluminatedWordWrite         = { guibg = c.gray_200, gui = nil }
 
-  hi.CmpItemAbbr                   = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil } -- Completion items default
-  hi.CmpItemAbbrDeprecated         = { guifg = c.gray_400, guibg = nil, gui = 'strikethrough', guisp = nil }
-  hi.CmpItemAbbrDeprecatedDefault  = 'CmpItemAbbrDeprecated'
-  hi.CmpItemAbbrMatch              = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil } -- Matched portion of completion items
-  hi.CmpItemAbbrMatchFuzzy         = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemMenu                   = { guifg = nil, guibg = nil, gui = nil, guisp = nil }
+  -- nvim-cmp
+  hi.CmpItemAbbr                  = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil } -- Completion items default
+  hi.CmpItemAbbrDeprecated        = { guifg = c.gray_400, guibg = nil, gui = 'strikethrough', guisp = nil }
+  hi.CmpItemAbbrDeprecatedDefault = 'CmpItemAbbrDeprecated'
+  hi.CmpItemAbbrMatch             = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil } -- Matched portion of completion items
+  hi.CmpItemAbbrMatchFuzzy        = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemMenu                  = { guifg = nil, guibg = nil, gui = nil, guisp = nil }
+  -- Color of "<icon> symbol" on the right
+  hi.CmpItemKindDefault           = { guifg = c.gray_800, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindKeyword           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindVariable          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindConstant          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindReference         = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindValue             = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindFunction          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindMethod            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindConstructor       = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindClass             = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindInterface         = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindStruct            = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindEvent             = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindEnum              = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindUnit              = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindModule            = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindProperty          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindField             = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindTypeParameter     = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindEnumMember        = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindOperator          = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindSnippet           = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
 
-  hi.CmpItemKindDefault            = { guifg = c.gray_800, guibg = nil, gui = nil, guisp = nil } -- Color of "<icon> symbol" on the right
-  hi.CmpItemKindKeyword            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindVariable           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindConstant           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindReference          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindValue              = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindFunction           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindMethod             = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindConstructor        = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindClass              = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindInterface          = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindStruct             = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindEvent              = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindEnum               = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindUnit               = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindModule             = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindProperty           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindField              = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindTypeParameter      = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindEnumMember         = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindOperator           = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
-  hi.CmpItemKindSnippet            = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
-
-  hi.DiffviewDiffDelete            = { guifg = c.gray_50, guibg = nil }  -- Region of padding to make editors align. fg = color of diff char symbol
-  hi.DiffviewDiffAdd               = { guifg = nil, guibg = c.blue_100 } -- Added/changed lines
-  hi.DiffviewDiffChange            = { guifg = nil, guibg = c.blue_100 } -- Changed lines (on both editors)
-  hi.DiffviewDiffText              = { guifg = nil, guibg = c.blue_300 } -- Actual changed region (within added/changed lines)
-
+  -- diffview
+  hi.DiffviewDiffDelete           = { guifg = c.gray_50, guibg = nil }  -- Region of padding to make editors align. fg = color of diff char symbol
+  hi.DiffviewDiffAdd              = { guifg = nil, guibg = c.blue_100 } -- Added/changed lines
+  hi.DiffviewDiffChange           = { guifg = nil, guibg = c.blue_100 } -- Changed lines (on both editors)
+  hi.DiffviewDiffText             = { guifg = nil, guibg = c.blue_300 } -- Actual changed region (within added/changed lines)
   -- Color of sign in sign column in tree view
-  hi.DiffviewSignColumn            = { guifg = c.gray_800, guibg = nil }
-  hi.DiffviewStatusAdded           = { guifg = c.blue, guibg = nil }
-  hi.DiffviewStatusUntracked       = { guifg = c.blue, guibg = nil }
-  hi.DiffviewStatusRenamed         = { guifg = c.yellow, guibg = nil }
-  hi.DiffviewStatusUnmerged        = { guifg = c.yellow, guibg = nil }
-  hi.DiffviewStatusIgnored         = { guifg = c.gray_600, guibg = nil }
-  hi.DiffviewStatusModified        = { guifg = c.yellow, guibg = nil }
-  hi.DiffviewStatusBroken          = { guifg = c.red, guibg = nil }
-  hi.DiffviewStatusDeleted         = { guifg = c.red, guibg = nil }
-  hi.DiffviewStatusUnknown         = { guifg = c.gray_800, guibg = nil }
-
+  hi.DiffviewSignColumn           = { guifg = c.gray_800, guibg = nil }
+  hi.DiffviewStatusAdded          = { guifg = c.blue, guibg = nil }
+  hi.DiffviewStatusUntracked      = { guifg = c.blue, guibg = nil }
+  hi.DiffviewStatusRenamed        = { guifg = c.yellow, guibg = nil }
+  hi.DiffviewStatusUnmerged       = { guifg = c.yellow, guibg = nil }
+  hi.DiffviewStatusIgnored        = { guifg = c.gray_600, guibg = nil }
+  hi.DiffviewStatusModified       = { guifg = c.yellow, guibg = nil }
+  hi.DiffviewStatusBroken         = { guifg = c.red, guibg = nil }
+  hi.DiffviewStatusDeleted        = { guifg = c.red, guibg = nil }
+  hi.DiffviewStatusUnknown        = { guifg = c.gray_800, guibg = nil }
   -- Color of the number of added/deleted lines in tree view
-  hi.DiffviewFilePanelDeletions    = { guifg = c.gray_600, guibg = nil }
-  hi.DiffviewFilePanelInsertions   = { guifg = c.gray_600, guibg = nil }
+  hi.DiffviewFilePanelDeletions   = { guifg = c.gray_600, guibg = nil }
+  hi.DiffviewFilePanelInsertions  = { guifg = c.gray_600, guibg = nil }
+  -- Misc
+  hi.DiffviewFilePanelTitle       = { gui = "bold", guifg = c.yellow }
+  hi.DiffviewSecondary            = { guifg = c.red }
+  hi.DiffviewPrimary              = { guifg = c.blue }
+  hi.DiffviewDim1                 = { guifg = c.blue }
+  hi.DiffviewFilePanelFileName    = { guifg = c.white }
+  hi.DiffviewFilePanelCounter     = { guifg = c.blue, gui = "bold" }
+  hi.DiffviewDiffAddAsDelete      = { gui = "bold", guifg = c.blue, guibg = c.gray_500 }
 
-  hi.DiffviewFilePanelTitle        = { gui = "bold", guifg = c.yellow }
-  hi.DiffviewSecondary             = { guifg = c.red }
-  hi.DiffviewPrimary               = { guifg = c.blue }
-  hi.DiffviewDim1                  = { guifg = c.blue }
-  hi.DiffviewFilePanelFileName     = { guifg = c.white }
-  hi.DiffviewFilePanelCounter      = { guifg = c.blue, gui = "bold" }
-  hi.DiffviewDiffAddAsDelete       = { gui = "bold", guifg = c.blue, guibg = c.gray_500 }
+  -- Git signs
+  hi.GitSignsChangeInline         = { guifg = nil, guibg = c.blue_300 } -- Current state of the hunk for preview_hunk
+  hi.GitSignsDeleteVirtLn         = { guifg = nil, guibg = c.red_300 }  -- Previous state of the hunk for preview_hunk
 
-  hi.GitSignsChangeInline          = { guifg = nil, guibg = c.blue_300 } -- Current state of the hunk for preview_hunk
-  hi.GitSignsDeleteVirtLn          = { guifg = nil, guibg = c.red_300 }  -- Previous state of the hunk for preview_hunk
+  if config.spectre then
+    hi.SpectreHeader  = { guifg = c.blue }
+    hi.SpectreBody    = { guifg = c.blue }
+    hi.SpectreFile    = { guifg = c.yellow }
+    hi.SpectreDir     = { guifg = c.blue }
+    hi.SpectreSearch  = { guibg = c.blue_300 }
+    hi.SpectreBorder  = { guifg = c.blue }
+    hi.SpectreReplace = { guibg = c.red_300 }
+  end
 
-  hi.SpectreHeader                 = { guifg = c.blue }
-  hi.SpectreBody                   = { guifg = c.blue }
-  hi.SpectreFile                   = { guifg = c.yellow }
-  hi.SpectreDir                    = { guifg = c.blue }
-  hi.SpectreSearch                 = { guibg = c.blue_300 }
-  hi.SpectreBorder                 = { guifg = c.blue }
-  hi.SpectreReplace                = { guibg = c.red_300 }
-
+  -- bufferline
   hi.BufferLineBackground          = { guifg = c.gray_500, guibg = c.gray_50 }  -- Inactive tab
   hi.BufferLineBufferSelected      = { guifg = c.gray_700, guibg = c.gray_200 } -- Active tab
   hi.BufferLineSeparator           = { guifg = c.black, guibg = c.black }
-
+  -- Indicators
   hi.BufferLineError               = { guifg = c.red_600, guibg = c.gray_50 }
   hi.BufferLineErrorSelected       = { guifg = c.red_600, guibg = c.gray_100 }
   hi.BufferLineModified            = { guifg = c.gray_700, guibg = c.gray_50 }

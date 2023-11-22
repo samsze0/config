@@ -1,3 +1,17 @@
+# Keymap
+
+```
+Fn->fuzzy/git/panels
+Q-. W->window E-> R-> T->tab Y-. U-. I-. O-. P-. [-> ]-> \->leader
+A-. S->hunk D-. F-> G-. H-> J-> K-> L->lsp ;-> '->
+Z-. X->git C-. V-. B-> N-> M-> ,->macro .-. /-.
+<Alt>->kitty <Ctrl>-> <Space>->editor <Alt+Ctrl>->edit/completion
+```
+
+# Good resources
+
+- https://neovimcraft.com/plugin/nanotee/nvim-lua-guide
+
 # Less common vim keymaps/tips
 
 Help

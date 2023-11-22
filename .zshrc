@@ -111,6 +111,8 @@ alias ts-get='tailscale_get'
 alias ts-send='tailscale_send'
 alias jq='gojq'
 alias v='nvim'
+alias vv='neovide'
+alias lf='PAGER="nvim -RM" lf'
 
 export FZF_DEFAULT_OPTS=$(fzf_init)
 
@@ -122,7 +124,7 @@ export HISTSIZE=50 # Capacity of no. lines for a session
 
 # Default apps
 export SHELL="$(which zsh)"
-export PAGER="nvim -RM"
+export PAGER="less"
 export EDITOR="nvim"
 export BROWSER="firefox"
 export MANPAGER="nvim +Man\!"  # https://neovim.io/doc/user/filetype.html#ft-man-plugin

@@ -43,6 +43,135 @@ M.colors = {
   yellow_700 = "#b86b31",
 }
 
+local c = M.colors
+
+local reset_non_treesitter_hl = false
+
+local use_existing_colors_for_syntax_hl = true
+
+local github_syntax_hl = {
+}
+
+local default_syntax_hl = {
+  Comment = c.gray_600,
+  Boolean = c.yellow,
+  Character = c.blue,
+  Conditional = c.blue,
+  Constant = c.yellow,
+  Define = c.blue,
+  Delimiter = c.blue,
+  Float = c.yellow,
+  Function = c.blue,
+  Identifier = c.gray_800,
+  Include = c.blue,
+  Keyword = c.blue,
+  Label = c.blue,
+  Number = c.yellow,
+  Operator = c.blue,
+  Preproc = c.blue,
+  Repeat = c.blue,
+  Special = c.yellow,
+  Specialchar = c.blue,
+  Statement = c.blue,
+  Storageclass = c.blue,
+  String = c.yellow,
+  Structure = c.blue,
+  Tag = c.blue,
+  Type = c.blue,
+  Typedef = c.blue,
+
+  TSAnnotation = c.blue,
+  TSAttribute = c.blue,
+  TSBoolean = c.yellow,
+  TSCharacter = c.yellow,
+  TSComment = c.gray_600,
+  TSConstructor = c.blue,
+  TSConditional = c.blue,
+  TSConstant = c.yellow,
+  TSConstBuiltin = c.yellow,
+  TSConstMacro = c.blue,
+  TSError = c.red,
+  TSException = c.red,
+  TSField = c.gray_800,
+  TSFloat = c.yellow,
+  TSFunction = c.blue,
+  TSFuncBuiltin = c.blue,
+  TSFuncMacro = c.blue,
+  TSInclude = c.blue,
+  TSKeyword = c.blue,
+  TSKeywordFunction = c.blue,
+  TSKeywordOperator = c.blue,
+  TSLabel = c.gray_800,
+  TSMethod = c.blue,
+  TSNamespace = c.blue,
+  TSNone = c.gray_800,
+  TSNumber = c.yellow,
+  TSOperator = c.gray_800,
+  TSParameter = c.gray_800,
+  TSParameterReference = c.gray_800,
+  TSProperty = c.gray_800,
+  TSPunctDelimiter = c.blue,
+  TSPunctBracket = c.gray_800,
+  TSPunctSpecial = c.gray_800,
+  TSRepeat = c.blue,
+  TSString = c.yellow,
+  TSStringRegex = c.yellow,
+  TSStringEscape = c.yellow,
+  TSSymbol = c.yellow,
+  TSTag = c.blue,
+  TSTagDelimiter = c.blue,
+  TSText = c.gray_800,
+  TSEmphasis = c.yellow,
+  TSUnderline = c.gray_100,
+  TSStrike = c.gray_100,
+  TSTitle = c.blue,
+  TSLiteral = c.yellow,
+  TSURI = c.yellow,
+  TSType = c.blue,
+  TSTypeBuiltin = c.blue,
+  TSVariable = c.gray_800,
+  TSVariableBuiltin = c.blue,
+}
+
+local reset_non_ts_syntax_hl_tbl = {
+  Comment = c.white,
+  Boolean = c.white,
+  Character = c.white,
+  Conditional = c.white,
+  Constant = c.white,
+  Define = c.white,
+  Delimiter = c.white,
+  Float = c.white,
+  Function = c.white,
+  Identifier = c.white,
+  Include = c.white,
+  Keyword = c.white,
+  Label = c.white,
+  Number = c.white,
+  Operator = c.white,
+  Preproc = c.white,
+  Repeat = c.white,
+  Special = c.white,
+  Specialchar = c.white,
+  Statement = c.white,
+  Storageclass = c.white,
+  String = c.white,
+  Structure = c.white,
+  Tag = c.white,
+  Type = c.white,
+  Typedef = c.white,
+}
+
+if use_existing_colors_for_syntax_hl then
+  c = vim.tbl_extend("error", M.colors, default_syntax_hl)
+else
+  c = vim.tbl_extend("error", M.colors, github_syntax_hl)
+end
+
+if reset_non_treesitter_hl then
+  c = vim.tbl_extend("force", M.colors, reset_non_ts_syntax_hl_tbl)
+end
+
 local indent_marker = M.colors.gray_100
 
 -- Maintaining another list instead of doing `rawset` of `M.highlight` because
@@ -81,7 +210,8 @@ function M.setup(opts)
       enabled = false,
       source = ":highlights", -- @Types "vim_fn_getcompletion" | ":highlights"
       hide_defined_entries = true,
-      toggle_colorizer = false
+      toggle_colorizer = false,
+      show_non_ts_syntax_hl_only = false
     }
   }
   opts = vim.tbl_deep_extend("keep", opts, default_opts)
@@ -90,8 +220,6 @@ function M.setup(opts)
     vim.cmd('syntax reset')
   end
   vim.cmd('set termguicolors')
-
-  local c                               = M.colors
 
   local hi                              = M.highlight
 
@@ -146,33 +274,33 @@ function M.setup(opts)
   hi.TabLineSel                         = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
 
   -- Standard syntax highlighting
-  hi.Boolean                            = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.Character                          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Comment                            = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hi.Conditional                        = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Constant                           = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.Define                             = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.Delimiter                          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Float                              = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.Function                           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Identifier                         = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.Include                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Keyword                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Label                              = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Number                             = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.Operator                           = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.PreProc                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Repeat                             = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Special                            = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.SpecialChar                        = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Statement                          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.StorageClass                       = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.String                             = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.Structure                          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Tag                                = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
+  hi.Comment                            = { guifg = c.Comment, guibg = nil, gui = nil, guisp = nil }
+  hi.Boolean                            = { guifg = c.Boolean, guibg = nil, gui = nil, guisp = nil }
+  hi.Character                          = { guifg = c.Character, guibg = nil, gui = nil, guisp = nil }
+  hi.Conditional                        = { guifg = c.Conditional, guibg = nil, gui = nil, guisp = nil }
+  hi.Constant                           = { guifg = c.Constant, guibg = nil, gui = nil, guisp = nil }
+  hi.Define                             = { guifg = c.Define, guibg = nil, gui = 'none', guisp = nil }
+  hi.Delimiter                          = { guifg = c.Delimiter, guibg = nil, gui = nil, guisp = nil }
+  hi.Float                              = { guifg = c.Float, guibg = nil, gui = nil, guisp = nil }
+  hi.Function                           = { guifg = c.Function, guibg = nil, gui = nil, guisp = nil }
+  hi.Identifier                         = { guifg = c.Identifier, guibg = nil, gui = 'none', guisp = nil }
+  hi.Include                            = { guifg = c.Include, guibg = nil, gui = nil, guisp = nil }
+  hi.Keyword                            = { guifg = c.Keyword, guibg = nil, gui = nil, guisp = nil }
+  hi.Label                              = { guifg = c.Label, guibg = nil, gui = nil, guisp = nil }
+  hi.Number                             = { guifg = c.Number, guibg = nil, gui = nil, guisp = nil }
+  hi.Operator                           = { guifg = c.Operator, guibg = nil, gui = 'none', guisp = nil }
+  hi.PreProc                            = { guifg = c.PreProc, guibg = nil, gui = nil, guisp = nil }
+  hi.Repeat                             = { guifg = c.Repeat, guibg = nil, gui = nil, guisp = nil }
+  hi.Special                            = { guifg = c.Special, guibg = nil, gui = nil, guisp = nil }
+  hi.SpecialChar                        = { guifg = c.SpecialChar, guibg = nil, gui = nil, guisp = nil }
+  hi.Statement                          = { guifg = c.Statement, guibg = nil, gui = nil, guisp = nil }
+  hi.StorageClass                       = { guifg = c.StorageClass, guibg = nil, gui = nil, guisp = nil }
+  hi.String                             = { guifg = c.String, guibg = nil, gui = nil, guisp = nil }
+  hi.Structure                          = { guifg = c.Structure, guibg = nil, gui = nil, guisp = nil }
+  hi.Tag                                = { guifg = c.Tag, guibg = nil, gui = nil, guisp = nil }
+  hi.Type                               = { guifg = c.Type, guibg = nil, gui = 'none', guisp = nil }
+  hi.Typedef                            = { guifg = c.Typedef, guibg = nil, gui = nil, guisp = nil }
   hi.Todo                               = { guifg = nil, guibg = c.blue_300, gui = nil, guisp = nil }
-  hi.Type                               = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.Typedef                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
 
   -- Diff highlighting
   hi.DiffAdd                            = { guifg = nil, guibg = c.blue_100, gui = nil, guisp = nil }
@@ -240,65 +368,64 @@ function M.setup(opts)
   hi.LspDiagnosticsUnderlineWarning     = 'DiagnosticUnderlineWarning'
   hi.LspDiagnosticsUnderlineInformation = 'DiagnosticUnderlineInformation'
   hi.LspDiagnosticsUnderlineHint        = 'DiagnosticUnderlineHint'
+  hi.LspInlayHint                       = { guifg = c.gray_600, guibg = nil, gui = 'italic', guisp = nil }
 
-  hi.TSAnnotation                       = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSAttribute                        = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSBoolean                          = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSCharacter                        = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSComment                          = { guifg = c.gray_600, guibg = nil, gui = 'italic', guisp = nil }
-  hi.TSConstructor                      = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSConditional                      = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSConstant                         = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSConstBuiltin                     = { guifg = c.yellow, guibg = nil, gui = 'italic', guisp = nil }
-  hi.TSConstMacro                       = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSError                            = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSException                        = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSField                            = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSFloat                            = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSFunction                         = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSFuncBuiltin                      = { guifg = c.blue, guibg = nil, gui = 'italic', guisp = nil }
-  hi.TSFuncMacro                        = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSInclude                          = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSKeyword                          = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSKeywordFunction                  = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSKeywordOperator                  = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSLabel                            = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSMethod                           = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSNamespace                        = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSNone                             = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSNumber                           = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSOperator                         = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSParameter                        = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSParameterReference               = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSProperty                         = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSPunctDelimiter                   = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSPunctBracket                     = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSPunctSpecial                     = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSRepeat                           = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSString                           = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSStringRegex                      = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSStringEscape                     = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSSymbol                           = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSTag                              = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSTagDelimiter                     = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSText                             = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSAnnotation                       = { guifg = c.TSAnnotation, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSAttribute                        = { guifg = c.TSAttribute, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSBoolean                          = { guifg = c.TSBoolean, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSCharacter                        = { guifg = c.TSCharacter, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSComment                          = { guifg = c.TSComment, guibg = nil, gui = 'italic', guisp = nil }
+  hi.TSConstructor                      = { guifg = c.TSConstructor, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSConditional                      = { guifg = c.TSConditional, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSConstant                         = { guifg = c.TSConstant, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSConstBuiltin                     = { guifg = c.TSConstBuiltin, guibg = nil, gui = 'italic', guisp = nil }
+  hi.TSConstMacro                       = { guifg = c.TSConstMacro, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSError                            = { guifg = c.TSError, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSException                        = { guifg = c.TSException, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSField                            = { guifg = c.TSField, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSFloat                            = { guifg = c.TSFloat, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSFunction                         = { guifg = c.TSFunction, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSFuncBuiltin                      = { guifg = c.TSFuncBuiltin, guibg = nil, gui = 'italic', guisp = nil }
+  hi.TSFuncMacro                        = { guifg = c.TSFuncMacro, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSInclude                          = { guifg = c.TSInclude, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSKeyword                          = { guifg = c.TSKeyword, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSKeywordFunction                  = { guifg = c.TSKeywordFunction, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSKeywordOperator                  = { guifg = c.TSKeywordOperator, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSLabel                            = { guifg = c.TSLabel, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSMethod                           = { guifg = c.TSMethod, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSNamespace                        = { guifg = c.TSNamespace, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSNone                             = { guifg = c.TSNone, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSNumber                           = { guifg = c.TSNumber, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSOperator                         = { guifg = c.TSOperator, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSParameter                        = { guifg = c.TSParameter, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSParameterReference               = { guifg = c.TSParameterReference, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSProperty                         = { guifg = c.TSProperty, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSPunctDelimiter                   = { guifg = c.TSPunctDelimiter, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSPunctBracket                     = { guifg = c.TSPunctBracket, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSPunctSpecial                     = { guifg = c.TSPunctSpecial, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSRepeat                           = { guifg = c.TSRepeat, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSString                           = { guifg = c.TSString, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSStringRegex                      = { guifg = c.TSStringRegex, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSStringEscape                     = { guifg = c.TSStringEscape, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSSymbol                           = { guifg = c.TSSymbol, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSTag                              = { guifg = c.TSTag, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSTagDelimiter                     = { guifg = c.TSTagDelimiter, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSText                             = { guifg = c.TSText, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSEmphasis                         = { guifg = c.TSEmphasis, guibg = nil, gui = 'italic', guisp = nil }
+  hi.TSUnderline                        = { guifg = c.TSUnderline, guibg = nil, gui = 'underline', guisp = nil }
+  hi.TSStrike                           = { guifg = c.TSStrike, guibg = nil, gui = 'strikethrough', guisp = nil }
+  hi.TSTitle                            = { guifg = c.TSTitle, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSLiteral                          = { guifg = c.TSLiteral, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSURI                              = { guifg = c.TSURI, guibg = nil, gui = 'underline', guisp = nil }
+  hi.TSType                             = { guifg = c.TSType, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSTypeBuiltin                      = { guifg = c.TSTypeBuiltin, guibg = nil, gui = 'italic', guisp = nil }
+  hi.TSVariable                         = { guifg = c.TSVariable, guibg = nil, gui = 'none', guisp = nil }
+  hi.TSVariableBuiltin                  = { guifg = c.TSVariableBuiltin, guibg = nil, gui = 'italic', guisp = nil }
+
   hi.TSStrong                           = { guifg = nil, guibg = nil, gui = 'bold', guisp = nil }
-  hi.TSEmphasis                         = { guifg = c.yellow, guibg = nil, gui = 'italic', guisp = nil }
-  hi.TSUnderline                        = { guifg = c.black, guibg = nil, gui = 'underline', guisp = nil }
-  hi.TSStrike                           = { guifg = c.black, guibg = nil, gui = 'strikethrough', guisp = nil }
-  hi.TSTitle                            = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSLiteral                          = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSURI                              = { guifg = c.yellow, guibg = nil, gui = 'underline', guisp = nil }
-  hi.TSType                             = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSTypeBuiltin                      = { guifg = c.blue, guibg = nil, gui = 'italic', guisp = nil }
-  hi.TSVariable                         = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.TSVariableBuiltin                  = { guifg = c.blue, guibg = nil, gui = 'italic', guisp = nil }
-
   hi.TSDefinition                       = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
   hi.TSDefinitionUsage                  = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
   hi.TSCurrentScope                     = { guifg = nil, guibg = nil, gui = 'bold', guisp = nil }
-
-  hi.LspInlayHint                       = { guifg = c.gray_600, guibg = nil, gui = 'italic', guisp = nil }
 
   if vim.fn.has('nvim-0.8.0') then
     hi['@comment'] = 'TSComment'
@@ -538,7 +665,10 @@ function M.setup(opts)
   hi.BufferLineCloseButtonSelected = 'BufferLineDiagnosticSelected'
 
   if opts.debug.enabled then
-    vim.print(vim.inspect(opts))
+    local log_opts = false
+    if log_opts then
+      vim.print(vim.inspect(opts))
+    end
 
     local function get_color_name_if_exists(target)
       for color, value in pairs(M.colors) do
@@ -553,6 +683,20 @@ function M.setup(opts)
     local split_string = require("utils").split_string
 
     local buf_lines = nil
+
+    function join_lines_if_begins_with_links(lines)
+      local i = 1
+      while i < #lines do
+        -- Trim the leading and trailing whitespace and check if first 5 char is "links"
+        if string.sub(lines[i + 1]:gsub("^%s*(.-)%s*$", "%1"), 1, 5) == "links" then
+          lines[i] = lines[i] .. " " .. lines[i + 1]
+          table.remove(lines, i + 1)
+        else
+          i = i + 1
+        end
+      end
+      return lines
+    end
 
     if opts.debug.source == "vim_fn_getcompletion" then
       local fn = vim.fn
@@ -573,10 +717,16 @@ function M.setup(opts)
       local hl_raw = vim.api.nvim_exec('highlight', true)
       local hl_groups = split_string(hl_raw, "\n")
 
+      hl_groups = join_lines_if_begins_with_links(hl_groups)
+
       buf_lines = map(hl_groups, function(i, g)
         local parts = split_string(g, " ")
+        local links_to = string.match(g, "links to (%w+)")
 
-        if opts.debug.hide_defined_entries and parts[1] ~= "link" and require("utils").contains(M.defined_highlight_groups, parts[1]) then
+        if opts.debug.hide_defined_entries and require("utils").contains(M.defined_highlight_groups, parts[1]) then
+          return nil
+        elseif opts.debug.show_non_ts_syntax_hl_only and (reset_non_ts_syntax_hl_tbl[parts[1]] == nil and not (links_to ~= nil and reset_non_ts_syntax_hl_tbl[links_to] ~= nil)) then
+          -- Skip entry if it's not a non-TS syntax hl group and it doesn't link to one
           return nil
         end
 

@@ -126,7 +126,10 @@ require("lazy").setup({
   },
   {
     'akinsho/toggleterm.nvim',
-    enabled = config.terminal_plugin == "toggleterm"
+    enabled = config.terminal_plugin == "toggleterm",
+    config = function()
+      require('_toggleterm')
+    end
   },
   {
     'lmburns/lf.nvim',
@@ -383,6 +386,12 @@ require("lazy").setup({
     'Wansmer/treesj',
     enabled = false,
     -- TODO
+  },
+  {
+    -- Peek lines when doing `:<line>` on cmdline
+    'nacro90/numb.nvim',
+    enabled = false,
+    -- TODO
   }
 })
 
@@ -393,8 +402,9 @@ require('theme').setup({
   debug = {
     enabled = false,
     source = ":highlights",
-    toggle_colorizer = true,
-    hide_defined_entries = true
+    toggle_colorizer = false,
+    hide_defined_entries = false,
+    show_non_ts_syntax_hl_only = true
   }
 })
 

@@ -87,16 +87,16 @@ M.setup = function()
   -- Screen movement
   keymap("n", "<S-Up>", "5<C-Y>", opts)
   keymap("v", "<S-Up>", "5<C-Y>", opts)
-  keymap("i", "<S-Up>", "5<C-o><C-Y>", opts)
+  keymap("i", "<S-Up>", "<C-o>5<C-Y>", opts)
   keymap("n", "<S-Down>", "5<C-E>", opts)
   keymap("v", "<S-Down>", "5<C-E>", opts)
-  keymap("i", "<S-Down>", "5<C-o><C-E>", opts)
+  keymap("i", "<S-Down>", "<C-o>5<C-E>", opts)
   keymap("n", "<S-Left>", "2<ScrollWheelLeft>", opts)
   keymap("v", "<S-Left>", "2<ScrollWheelLeft>", opts)
-  keymap("i", "<S-Left>", "2<ScrollWheelLeft>", opts)
+  keymap("i", "<S-Left>", "<C-o>2<ScrollWheelLeft>", opts)
   keymap("n", "<S-Right>", "2<ScrollWheelRight>", opts)
   keymap("v", "<S-Right>", "2<ScrollWheelRight>", opts)
-  keymap("i", "<S-Right>", "2<ScrollWheelRight>", opts)
+  keymap("i", "<S-Right>", "<C-o>2<ScrollWheelRight>", opts)
 
   -- Window (pane)
   keymap("n", "wi", "<cmd>wincmd k<CR>", opts)
@@ -299,7 +299,7 @@ M.setup = function()
   vim.keymap.set("n", "<leader>R", colorizer_reload_and_notify, {})
 
   -- Nvim Cmp
-  vim.keymap.set("i", "<M-w>", function()
+  vim.keymap.set("i", "<M-r>", function()
     local cmp = require("cmp")
 
     if cmp.visible() then
@@ -312,6 +312,7 @@ M.setup = function()
     keymap("n", "<leader>p", "<cmd>Copilot setup<CR>", opts)
   elseif config.copilot_plugin == "lua" then
     vim.keymap.set("i", "<M-a>", require("copilot.suggestion").accept, {})
+    vim.keymap.set("i", "<M-w>", require("copilot.suggestion").accept_line, {})
     vim.keymap.set("i", "<M-d>", require("copilot.suggestion").next, {})
     vim.keymap.set("i", "<M-e>", require("copilot.suggestion").prev, {})
   end

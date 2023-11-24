@@ -129,8 +129,8 @@ require("diffview").setup({
       { "n", "<Delete>",      actions.restore_entry, },
       { "n", "B",             actions.open_commit_log, },
       { "n", "<left>",        actions.close_fold, },
-      { "n", "<S-pageup>",    actions.scroll_view(-0.25), }, -- Scroll the buffer(s)
-      { "n", "<S-pagedown>",  actions.scroll_view(0.25), },
+      { "n", "<C-S-up>",      actions.scroll_view(-5), }, -- Scroll the buffer(s)
+      { "n", "<C-S-down>",    actions.scroll_view(5), },
       { "n", "<C-down>",      actions.select_next_entry, },
       { "n", "<C-up>",        actions.select_prev_entry, },
       { "n", "xe",            actions.goto_file_edit, },
@@ -155,13 +155,13 @@ require("diffview").setup({
       { "n", "<tab>",         actions.select_entry, },
       { "n", "<cr>",          actions.select_entry, },
       { "n", "<2-LeftMouse>", actions.select_entry, },
-      { "n", "<s-pageup>",    actions.scroll_view(-0.25), }, -- Scroll the buffer(s)
-      { "n", "<s-pagedown>",  actions.scroll_view(0.25), },
+      { "n", "<C-S-up>",      actions.scroll_view(-5), }, -- Scroll the buffer(s)
+      { "n", "<C-S-down>",    actions.scroll_view(5), },
       { "n", "<C-down>",      actions.select_next_entry, },
       { "n", "<C-up>",        actions.select_prev_entry, },
-      { "n", "e",             actions.goto_file_edit, },
-      { "n", "w",             actions.goto_file_split, },
-      { "n", "t",             actions.goto_file_tab, },
+      { "n", "xe",            actions.goto_file_edit, },
+      { "n", "xw",            actions.goto_file_split, },
+      { "n", "xt",            actions.goto_file_tab, },
       { "n", "?",             actions.help("file_history_panel"), },
     },
     option_panel = {

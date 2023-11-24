@@ -55,9 +55,13 @@ local mapping = {
   ),
   ['<C-Space>'] = cmp.mapping(
     function(fallback)
-      if cmp.visible() and cmp.get_active_entry() ~= nil then
-        cmp.close()
-        return
+      local close_if_open = false
+
+      if close_if_open then
+        if cmp.visible() and cmp.get_active_entry() ~= nil then
+          cmp.close()
+          return
+        end
       end
 
       if not cmp.visible() then

@@ -3,7 +3,7 @@ return {
   ssr_plugin = true,
   spectre_plugin = false,
   copilot_plugin = "lua",       -- @type "vim" | "lua" | false
-  terminal_plugin = "floaterm", -- @type "floaterm" | false
+  terminal_plugin = "floaterm", -- @type "floaterm" | "toggleterm" | false
   filetree_plugin = nil,        -- @type "nvimtree" | false
   lf_plugin = "vim",            -- @type "vim" | "nvim" | false
 

@@ -81,7 +81,7 @@ local default_syntax_hl = {
   String = c.yellow,
   Structure = c.blue,
   Tag = c.gray_blue,
-  Type = c.red,
+  Type = c.blue,
   Typedef = c.blue,
 
   TSAnnotation = c.gray_blue,
@@ -131,7 +131,7 @@ local default_syntax_hl = {
   TSTitle = c.gray_blue,
   TSLiteral = c.yellow_900,
   TSURI = c.gray_blue,
-  TSType = c.red,
+  TSType = c.blue,
   TSTypeBuiltin = c.gray_blue,
   TSVariable = c.gray_800,
   TSVariableBuiltin = c.gray_blue,
@@ -237,15 +237,15 @@ function M.setup(opts)
   hi.Exception                          = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
   hi.FoldColumn                         = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
   hi.Folded                             = { guifg = c.gray_600, guibg = c.gray_200, gui = nil, guisp = nil }
-  hi.IncSearch                          = { guifg = c.black, guibg = c.white, gui = 'none', guisp = nil }
+  hi.IncSearch                          = { guifg = c.black, guibg = c.yellow, gui = 'none', guisp = nil }
   hi.Italic                             = { guifg = nil, guibg = nil, gui = 'none', guisp = nil }
   hi.Macro                              = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.MatchParen                         = { guifg = nil, guibg = c.gray_400, gui = nil, guisp = nil }
   hi.ModeMsg                            = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
   hi.MoreMsg                            = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
   hi.Question                           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.Search                             = { guifg = nil, guibg = c.gray_300, gui = nil, guisp = nil }
-  hi.Substitute                         = { guifg = nil, guibg = c.gray_400, gui = 'none', guisp = nil }
+  hi.Search                             = { guifg = nil, guibg = c.yellow_300, gui = nil, guisp = nil }
+  hi.Substitute                         = { guifg = nil, guibg = c.yellow_500, gui = 'none', guisp = nil }
   hi.SpecialKey                         = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
   hi.TooLong                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.Underlined                         = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
@@ -581,14 +581,14 @@ function M.setup(opts)
   hi.IlluminatedWordWrite         = { guibg = c.gray_200, gui = nil }
 
   -- nvim-cmp
-  hi.CmpItemAbbr                  = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil } -- Completion items default
-  hi.CmpItemAbbrDeprecated        = { guifg = c.gray_400, guibg = nil, gui = 'strikethrough', guisp = nil }
+  hi.CmpItemAbbr                  = { guifg = c.gray_700, guibg = nil, gui = nil, guisp = nil } -- Completion items default
+  hi.CmpItemAbbrDeprecated        = { guifg = c.gray_600, guibg = nil, gui = 'strikethrough', guisp = nil }
   hi.CmpItemAbbrDeprecatedDefault = 'CmpItemAbbrDeprecated'
   hi.CmpItemAbbrMatch             = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil } -- Matched portion of completion items
   hi.CmpItemAbbrMatchFuzzy        = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.CmpItemMenu                  = { guifg = nil, guibg = nil, gui = nil, guisp = nil }
   -- Color of "<icon> symbol" on the right
-  hi.CmpItemKindDefault           = { guifg = c.gray_800, guibg = nil, gui = nil, guisp = nil }
+  hi.CmpItemKindDefault           = { guifg = c.gray_700, guibg = nil, gui = nil, guisp = nil }
   hi.CmpItemKindKeyword           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.CmpItemKindVariable          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.CmpItemKindConstant          = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }

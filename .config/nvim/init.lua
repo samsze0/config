@@ -271,6 +271,7 @@ require("lazy").setup({
       require('scrollview').setup({})
     end
   },
+
   {
     'sindrets/diffview.nvim',
     config = function()

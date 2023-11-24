@@ -20,7 +20,7 @@ theme.inactive.c.fg = colors.gray_500
 local mode_session = {
   'mode',
   fmt = function(mode)
-    return mode:sub(1, 1)
+    return ' '
   end
 }
 
@@ -134,7 +134,7 @@ require('lualine').setup {
   },
   sections = {
     lualine_a = {
-      mode_session
+      -- mode_session
     },
     lualine_b = {
       filename_session

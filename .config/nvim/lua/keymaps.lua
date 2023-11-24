@@ -4,6 +4,7 @@ M.setup = function()
   local keymap = vim.api.nvim_set_keymap
   local opts = { silent = true, noremap = true }
   local opts_can_remap = { silent = true, noremap = false }
+  local opts_expr = { silent = true, expr = true, noremap = true }
 
   local config = require('config')
 
@@ -15,7 +16,45 @@ M.setup = function()
   keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", opts) -- Execute <C-u> twice in normal mode
   keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
 
+  -- Find and replace
+  local function get_command_history()
+    local history = {}
+    for i = 1, vim.fn.histlen(":") do
+      table.insert(history, vim.fn.histget(":", i))
+    end
+    return history
+  end
+  local function get_register_length(reg)
+    local content = vim.fn.getreg(reg)
+    return #content
+  end
+  keymap("n", "rw", "*N:%s///g<left><left>", opts) -- Select next occurrence of word under cursor then go back to current instance
+  keymap("n", "r.", ":&c<cr>", opts)               -- Multiple "c" flags are acceptable
+  keymap("v", "ry", [["ry]], opts)                 -- Yank it into register "r" for later use with "rp"
+  vim.keymap.set("n", "rp",                        -- Use register "r" as the replacement rather than the subject
+    function()                                     -- Get the length of the content of register "r" and move cursor to the left by that amount
+      return ([[:s//<C-r>r/gc<left><left><left>]] ..
+        string.rep("<left>", get_register_length("r")) ..
+        [[<left>]])
+    end,
+    opts_expr)
+  vim.keymap.set("v", "rp",
+    function()
+      return ([[:%s//<C-r>r/gc<left><left><left>]] ..
+        string.rep("<left>", get_register_length("r")) ..
+        [[<left>]])
+    end,
+    opts_expr)
+  keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts)    -- Paste selection into register "y" and paste it into command line with <C-r>
+  keymap("v", "ri", [["rygv*N:s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
+  keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts)  -- "ra" but forward direction only
+
+  -- Move by word
+  keymap("n", "<C-Left>", "B", opts)
+  keymap("n", "<C-Right>", "W", opts)
+
   -- Delete word
+  keymap("i", "<C-BS>", "<C-W>", opts)
   keymap("i", "<C-BS>", "<C-W>", opts)
 
   -- Move/swap line/selection up/down
@@ -40,8 +79,11 @@ M.setup = function()
   keymap("v", "m", "%", opts)
 
   -- Macro
-  keymap("n", ",", "@", opts) -- replay macro x
-  keymap("n", "<", "Q", opts) -- replay last macro
+  local macro_keymaps = false
+  if macro_keymaps then
+    keymap("n", ",", "@", opts) -- replay macro x
+    keymap("n", "<", "Q", opts) -- replay last macro
+  end
 
   -- Clear search highlights
   keymap("n", "<Space>/", "<cmd>noh<CR>", opts)
@@ -75,8 +117,11 @@ M.setup = function()
   keymap("v", "<Tab>", ">gv", opts) -- keep selection after
   keymap("v", "<S-Tab>", "<gv", opts)
 
-  -- Yank - stay at cursor after
-  keymap("v", "y", "ygv<Esc>", opts)
+  -- Yank
+  keymap("v", "y", "ygv<Esc>", opts) -- Stay at cursor after yank
+
+  -- Paste
+  keymap("v", "p", '"pdP', opts) -- Don't keep the overwritten text in register "+". Instead, keep it in "p"
 
   -- Fold
   keymap("n", "z.", "zo", opts)
@@ -148,11 +193,11 @@ M.setup = function()
   keymap("n", "xx", "dd", opts)
   keymap("n", "X", "D", opts)
 
-  -- Change (add to register 'c')
-  keymap('n', 'c', '"cc', opts)
-  keymap('n', 'C', '"cC', opts)
-  keymap('v', 'c', '"cc', opts)
-  keymap('v', 'C', '"cC', opts)
+  -- Change (add to register 'd')
+  keymap('n', 'c', '"dc', opts)
+  keymap('n', 'C', '"dC', opts)
+  keymap('v', 'c', '"dc', opts)
+  keymap('v', 'C', '"dC', opts)
 
   -- Jump (jumplist)
   keymap("n", "<C-u>", "<C-o>", opts)
@@ -262,6 +307,7 @@ M.setup = function()
   -- Comment
   keymap("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)", opts)
   keymap("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)gv", opts) -- Re-select the last block
+  -- keymap("i", "<C-/>", "<C-o><Plug>(comment_toggle_linewise_visual)", opts)
 
   -- GitSigns
   keymap("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>", opts)
@@ -278,6 +324,7 @@ M.setup = function()
   keymap("n", "<space><BS>", ":q!<cr>", opts)
   keymap("n", "<space>s", ":w!<cr>", opts)
   keymap("n", "<space>a", ":qa<cr>", opts)
+  keymap("n", "<space>e", ":e<cr>", opts)
   keymap("n", "<space><delete>", ":qa!<cr>", opts)
 
   -- Command line window
@@ -291,12 +338,12 @@ M.setup = function()
     vim.cmd [[ColorizerToggle]]
     vim.notify("Colorizer toggled")
   end
-  vim.keymap.set("n", "<leader>r", colorizer_toggle_and_notify, {})
+  vim.keymap.set("n", "<leader>c", colorizer_toggle_and_notify, {})
   local function colorizer_reload_and_notify()
     vim.cmd [[ColorizerReloadAllBuffers]]
     vim.notify("Colorizer reloaded")
   end
-  vim.keymap.set("n", "<leader>R", colorizer_reload_and_notify, {})
+  vim.keymap.set("n", "<leader>C", colorizer_reload_and_notify, {})
 
   -- Nvim Cmp
   vim.keymap.set("i", "<M-r>", function()

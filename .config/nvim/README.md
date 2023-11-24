@@ -2,10 +2,10 @@
 
 ```
 Fn->fuzzy/git/panels
-Q-. W->window E-> R-> T->tab Y-. U-. I-. O-. P-. [-> ]-> \->leader
+Q-. W->window E-> R->replace T->tab Y-. U-. I-. O-. P-. [->jump ]->jump \->leader-misc
 A-. S->hunk D-. F-> G-. H-> J-> K-> L->lsp ;-> '->
 Z-. X->git C-. V-. B-> N-> M-> ,->macro .-. /-.
-<Alt>->kitty <Ctrl>-> <Space>->editor <Alt+Ctrl>->edit/completion
+<Alt>->kitty <Ctrl>->tab/window/edit/jump <Space>->editor <Alt+Ctrl>->edit/completion
 ```
 
 # Good resources
@@ -22,8 +22,12 @@ Visual mode
     - `=` in visual mode let you re-indent the selected text
     - While in insert mode, use `C-o` to do a normal mode command
     - Caution: marks in visual mode are only set after leaving visual mode. `<cmd>` will execute a command without leaving visual mode while `:` leaves visual mode and enters command mode before processing the command.
+Command line mode
+    - Use `<C-r>` to insert things like content of registers `<C-r>a`, current word under cursor w/ `<C-r><C-w>`, etc
+    - Use `<C-/>e` to evaluate arbitrary vimscript expression and append the result to the command line
+    - Also see: ex mode
 Normal mode
-    - `*` to select all occurrences of word under cursor
+    - `*` to highlight all occurrences of word under cursor, or current visual selection. And advance to the next occurrence. Useful to pair with `N` i.e. `*N`
     - (TODO)
 Ranges in command line mode
     - `60` targets line 60
@@ -101,6 +105,9 @@ Ranges in command line mode
     - (TODO)
 - Command line window
     - (TODO)
+- Keymapping
+    - `noremap` flag: don't remap to other user-defined keymap
+    - `expr` flag: `<expr>` is eavluated when the key combination is invoked, such that the command (`rhs`) can be dynamic
 
 # Plugin Development
 

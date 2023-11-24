@@ -9,9 +9,16 @@ for _, mode in ipairs({ "normal", "insert", "visual", "replace", "command", "ina
   }
 end
 
-theme.normal.a.bg = colors.blue_700
-theme.insert.a.bg = colors.gray_500
-theme.visual.a.bg = colors.yellow_700
+local multi_color = false
+if multi_color then
+  theme.normal.a.bg = colors.blue_700
+  theme.insert.a.bg = colors.gray_500
+  theme.visual.a.bg = colors.yellow_700
+else
+  theme.normal.a.bg = colors.gray_600
+  theme.insert.a.bg = colors.gray_600
+  theme.visual.a.bg = colors.gray_600
+end
 theme.replace.a.bg = colors.gray_500
 theme.command.a.bg = colors.gray_500
 theme.inactive.b.fg = colors.gray_500
@@ -20,7 +27,7 @@ theme.inactive.c.fg = colors.gray_500
 local mode_session = {
   'mode',
   fmt = function(mode)
-    return ' '
+    return ''
   end
 }
 
@@ -119,13 +126,14 @@ local filename_session = {
   }
 }
 
+local use_triangle_separator = false
 
 require('lualine').setup {
   options = {
     icons_enabled = true,
     theme = theme,
     component_separators = { left = ' ', right = ' ' },
-    section_separators = { left = '', right = '' },
+    section_separators = { left = use_triangle_separator and '' or ' ', right = use_triangle_separator and '' or ' ' },
     refresh = {
       statusline = 1000,
       tabline = 1000,
@@ -134,7 +142,7 @@ require('lualine').setup {
   },
   sections = {
     lualine_a = {
-      -- mode_session
+      mode_session
     },
     lualine_b = {
       filename_session

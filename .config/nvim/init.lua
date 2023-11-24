@@ -8,28 +8,33 @@ vim.opt.signcolumn = "auto"
 vim.opt.signcolumn = 'yes:1' -- Maximum 1 signs, fixed
 vim.opt.wrap = false
 
+-- Mouse
+vim.opt.mousescroll = "ver:10"
+
 -- :help fo-table
 vim.cmd [[set formatoptions-=o]] -- Disable auto comment in normal mode
 vim.cmd [[set formatoptions-=r]] -- Disable auto comment in insert mode
 vim.cmd [[set formatoptions-=c]] -- Disable auto wrap comment
 
+-- Format
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 2
 vim.opt.smarttab = true
 vim.opt.showtabline = 0
+vim.cmd [[filetype on]]
+vim.cmd [[filetype plugin off]]
 
+-- Search
 vim.opt.smartcase = true
 vim.opt.ignorecase = true
 vim.opt.hlsearch = true -- Highlight all matches. Pair with keymap :noh to clear highlights
 
+-- Backup and swap
 vim.cmd [[set backupdir=~/.cache/nvim/backup]]
 vim.cmd [[set directory=~/.cache/nvim/swap]]
 vim.cmd [[set undodir=~/.cache/nvim/undo]]
-
-vim.cmd [[filetype on]]
-vim.cmd [[filetype plugin off]]
 
 vim.opt.fillchars:append { diff = "╱" }
 

@@ -29,7 +29,7 @@ require("flash").setup {
     offset = nil, ---@type number
   },
   label = {
-    uppercase = false,
+    uppercase = true,
     exclude = "",
     current = true, -- Add label for first match
     min_pattern_length = 0,
@@ -66,10 +66,10 @@ require("flash").setup {
     },
     -- `f`, `F`, `t`, `T`, `;` and `,` motions
     char = {
-      enabled = false,
-      jump_labels = true,
+      enabled = true,
+      jump_labels = false,
       multi_line = true,
-      keys = { "f", "F", "t", "T", ";", "," },
+      keys = { "f", "F", "t", "T" },
       search = { wrap = false },
       jump = { register = false },
     },

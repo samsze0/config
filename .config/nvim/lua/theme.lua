@@ -128,7 +128,7 @@ local default_syntax_hl = {
   TSEmphasis = c.yellow_900,
   TSUnderline = c.gray_100,
   TSStrike = c.gray_100,
-  TSTitle = c.gray_blue,
+  TSTitle = c.blue,
   TSLiteral = c.yellow_900,
   TSURI = c.gray_blue,
   TSType = c.blue,
@@ -245,7 +245,7 @@ function M.setup(opts)
   hi.MoreMsg                            = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
   hi.Question                           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.Search                             = { guifg = nil, guibg = c.yellow_300, gui = nil, guisp = nil }
-  hi.Substitute                         = { guifg = nil, guibg = c.yellow_500, gui = 'none', guisp = nil }
+  hi.Substitute                         = { guifg = c.white, guibg = c.yellow_400, gui = 'none', guisp = nil }
   hi.SpecialKey                         = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
   hi.TooLong                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.Underlined                         = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }

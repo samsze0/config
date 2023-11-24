@@ -6,25 +6,23 @@ local config = require("config")
 local M = {}
 
 M.colors = {
-  black = "#000000",
-  gray_35 = "#090909",
-  gray_50 = "#111111",
+  black = "#0c0d0d",
   gray_100 = "#17191f",
   gray_200 = "#1a1c24",
   gray_300 = '#2c313c',
   gray_400 = '#3e4451',
-  gray_500 = '#535d6c',
-  gray_600 = '#687184',
-  gray_700 = '#8a95a7',
-  gray_800 = '#abb2bf',
+  gray_500 = '#5c6675',
+  gray_600 = '#727b8f',
+  gray_700 = '#95a1b3',
+  gray_800 = '#b7beca',
   white = "#cbd1da",
 
-  red_100 = "#1e0b0b",
-  blue_100 = "#0b131c",
-  yellow_100 = "#1e1307",
-  red_300 = "#2f0f0f",
-  blue_300 = "#122241",
-  yellow_300 = "#34200c",
+  red_100 = "#280f0f",
+  blue_100 = "#0e1a27",
+  yellow_100 = "#291a0a",
+  red_300 = "#3e1414",
+  blue_300 = "#16274b",
+  yellow_300 = "#412810",
   red_400 = "#571919",
   blue_400 = "#1b3567",
   yellow_400 = "#693e13",
@@ -34,21 +32,20 @@ M.colors = {
   red_600 = "#913333",
   blue_600 = "#2955a7",
   yellow_600 = "#9d5925",
-  red_700 = "#af4343",
-  blue_700 = "#2f66cd",
-  yellow_700 = "#b86b31",
+  red_700 = "#b54949",
+  blue_700 = "#4071cb",
+  yellow_700 = "#c87e46",
   red_800 = "#c64d4d",
   blue_800 = "#537dcd",
-  yellow_800 = "#c27941",
-  red_900 = "#d96363",
-  blue_900 = "#6095f6",
-  yellow_900 = "#ec9959",
+  yellow_800 = "#ca7a3d",
+  red_900 = "#e36c6c",
+  blue_900 = "#6b9af1",
+  yellow_900 = "#e9a069",
 
-  red = "#eb5858",
-  blue = "#549eff",
-  yellow = "#f59953",
-  teal = "#8dc7e6",
-  purple = "#9fb5ec",
+  red = "#e66666",
+  blue = "#61a5ff",
+  gray_blue = "#8598bc",
+  yellow = "#ed9a57",
 }
 local c = M.colors
 
@@ -62,11 +59,11 @@ local github_syntax_hl = {
 local default_syntax_hl = {
   Comment = c.gray_600,
   Boolean = c.yellow,
-  Character = c.blue,
-  Conditional = c.blue,
+  Character = c.yellow,
+  Conditional = c.gray_blue,
   Constant = c.yellow,
-  Define = c.blue,
-  Delimiter = c.blue,
+  Define = c.gray_blue,
+  Delimiter = c.gray_blue,
   Float = c.yellow,
   Function = c.blue,
   Identifier = c.gray_800,
@@ -74,7 +71,7 @@ local default_syntax_hl = {
   Keyword = c.blue,
   Label = c.blue,
   Number = c.yellow,
-  Operator = c.blue,
+  Operator = c.gray_blue,
   Preproc = c.blue,
   Repeat = c.blue,
   Special = c.yellow,
@@ -83,20 +80,20 @@ local default_syntax_hl = {
   Storageclass = c.blue,
   String = c.yellow,
   Structure = c.blue,
-  Tag = c.blue,
-  Type = c.teal,
+  Tag = c.gray_blue,
+  Type = c.red,
   Typedef = c.blue,
 
-  TSAnnotation = c.blue_900,
-  TSAttribute = c.blue_900,
+  TSAnnotation = c.gray_blue,
+  TSAttribute = c.gray_blue,
   TSBoolean = c.yellow_900,
   TSCharacter = c.yellow_900,
   TSComment = c.gray_600,
   TSConstructor = c.blue,
-  TSConditional = c.blue_800,
+  TSConditional = c.gray_blue,
   TSConstant = c.yellow,
   TSConstBuiltin = c.yellow_900,
-  TSConstMacro = c.blue_900,
+  TSConstMacro = c.gray_blue,
   TSError = c.red,
   TSException = c.red,
   TSField = c.gray_800,
@@ -104,40 +101,40 @@ local default_syntax_hl = {
   TSFunction = c.blue,
   TSFuncBuiltin = c.blue,
   TSFuncMacro = c.blue,
-  TSInclude = c.blue_900,
-  TSKeyword = c.blue_800,
-  TSKeywordFunction = c.blue_800,
-  TSKeywordOperator = c.blue_800,
+  TSInclude = c.gray_blue,
+  TSKeyword = c.gray_blue,
+  TSKeywordFunction = c.gray_blue,
+  TSKeywordOperator = c.gray_blue,
   TSLabel = c.gray_800,
   TSMethod = c.blue,
   TSNamespace = c.blue,
   TSNone = c.gray_800,
   TSNumber = c.yellow,
-  TSOperator = c.blue_900,
+  TSOperator = c.gray_blue,
   TSParameter = c.gray_800,
   TSParameterReference = c.gray_800,
   TSProperty = c.gray_800,
-  TSPunctDelimiter = c.blue,
+  TSPunctDelimiter = c.gray_blue,
   TSPunctBracket = c.gray_800,
   TSPunctSpecial = c.gray_800,
-  TSRepeat = c.blue_800,
+  TSRepeat = c.gray_blue,
   TSString = c.yellow_900,
   TSStringRegex = c.gray_800,
   TSStringEscape = c.gray_600,
   TSSymbol = c.yellow_900,
-  TSTag = c.blue,
-  TSTagDelimiter = c.blue_900,
+  TSTag = c.gray_blue,
+  TSTagDelimiter = c.gray_blue,
   TSText = c.gray_800,
   TSEmphasis = c.yellow_900,
   TSUnderline = c.gray_100,
   TSStrike = c.gray_100,
-  TSTitle = c.blue_900,
+  TSTitle = c.gray_blue,
   TSLiteral = c.yellow_900,
-  TSURI = c.blue_900,
-  TSType = c.teal,
-  TSTypeBuiltin = c.blue_900,
+  TSURI = c.gray_blue,
+  TSType = c.red,
+  TSTypeBuiltin = c.gray_blue,
   TSVariable = c.gray_800,
-  TSVariableBuiltin = c.blue_900,
+  TSVariableBuiltin = c.gray_blue,
 }
 
 local reset_non_ts_syntax_hl_tbl = {
@@ -260,22 +257,22 @@ function M.setup(opts)
   hi.Conceal                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.Cursor                             = { guifg = c.black, guibg = c.gray_800, gui = nil, guisp = nil }
   hi.NonText                            = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hi.LineNr                             = { guifg = c.gray_500, guibg = nil, gui = nil, guisp = nil }
-  hi.SignColumn                         = { guifg = c.gray_500, guibg = nil, gui = nil, guisp = nil }
+  hi.LineNr                             = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
+  hi.SignColumn                         = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
   hi.StatusLine                         = { guifg = c.gray_800, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.StatusLineNC                       = { guifg = c.gray_500, guibg = c.gray_300, gui = 'none', guisp = nil }
+  hi.StatusLineNC                       = { guifg = c.gray_600, guibg = c.gray_300, gui = 'none', guisp = nil }
   hi.WinBar                             = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
-  hi.WinBarNC                           = { guifg = c.gray_500, guibg = nil, gui = 'none', guisp = nil }
+  hi.WinBarNC                           = { guifg = c.gray_600, guibg = nil, gui = 'none', guisp = nil }
   hi.VertSplit                          = { guifg = c.gray_300, guibg = nil, gui = 'none', guisp = nil }
   hi.ColorColumn                        = { guifg = nil, guibg = c.gray_300, gui = 'none', guisp = nil }
   hi.CursorColumn                       = { guifg = nil, guibg = c.gray_300, gui = 'none', guisp = nil }
   hi.CursorLine                         = { guifg = nil, guibg = c.gray_300, gui = 'none', guisp = nil }
-  hi.CursorLineNr                       = { guifg = c.gray_500, guibg = c.gray_300, gui = nil, guisp = nil }
+  hi.CursorLineNr                       = { guifg = c.gray_600, guibg = c.gray_300, gui = nil, guisp = nil }
   hi.QuickFixLine                       = { guifg = nil, guibg = c.gray_300, gui = 'none', guisp = nil }
   hi.PMenu                              = { guifg = c.gray_600, guibg = c.gray_100, gui = 'none', guisp = nil }
   hi.PMenuSel                           = { guifg = c.gray_800, guibg = c.gray_400, gui = nil, guisp = nil }
   hi.PMenuSbar                          = { guifg = nil, guibg = c.gray_300, gui = 'none', guisp = nil }
-  hi.PMenuThumb                         = { guifg = nil, guibg = c.gray_500, gui = nil, guisp = nil }
+  hi.PMenuThumb                         = { guifg = nil, guibg = c.gray_600, gui = nil, guisp = nil }
   hi.TabLine                            = { guifg = c.gray_600, guibg = nil, gui = 'none', guisp = nil }
   hi.TabLineFill                        = { guifg = c.gray_600, guibg = nil, gui = 'none', guisp = nil }
   hi.TabLineSel                         = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
@@ -312,7 +309,7 @@ function M.setup(opts)
   -- Diff highlighting
   hi.DiffAdd                            = { guifg = nil, guibg = c.blue_100, gui = nil, guisp = nil }
   hi.DiffChange                         = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.DiffDelete                         = { guifg = c.gray_200, guibg = c.gray_50, gui = nil, guisp = nil }
+  hi.DiffDelete                         = { guifg = c.gray_200, guibg = c.gray_100, gui = nil, guisp = nil }
   hi.DiffText                           = { guifg = nil, guibg = c.blue_300, gui = nil, guisp = nil }
   hi.DiffAdded                          = { guifg = nil, guibg = c.blue_100, gui = nil, guisp = nil }
   hi.DiffFile                           = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
@@ -353,20 +350,20 @@ function M.setup(opts)
   hi.DiagnosticWarn                     = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
   hi.DiagnosticInfo                     = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
   hi.DiagnosticHint                     = { guifg = c.blue, guibg = nil, gui = 'none', guisp = nil }
-  hi.DiagnosticUnderlineError           = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.red }
-  hi.DiagnosticUnderlineWarning         = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.yellow }
-  hi.DiagnosticUnderlineWarn            = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.yellow }
-  hi.DiagnosticUnderlineInformation     = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.blue }
-  hi.DiagnosticUnderlineHint            = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.blue }
+  hi.DiagnosticUnderlineError           = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.red_700 }
+  hi.DiagnosticUnderlineWarning         = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.yellow_700 }
+  hi.DiagnosticUnderlineWarn            = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.yellow_700 }
+  hi.DiagnosticUnderlineInformation     = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.blue_700 }
+  hi.DiagnosticUnderlineHint            = { guifg = nil, guibg = nil, gui = 'undercurl', guisp = c.blue_700 }
 
   hi.DiagnosticVirtualTextError         = { guifg = c.red_700, guibg = c.red_100 }
   hi.DiagnosticVirtualTextWarn          = { guifg = c.yellow_700, guibg = c.yellow_100 }
   hi.DiagnosticVirtualTextInfo          = { guifg = c.blue_700, guibg = c.blue_100 }
   hi.DiagnosticVirtualTextHint          = { guifg = c.blue_700, guibg = c.blue_100 }
 
-  hi.LspReferenceText                   = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
-  hi.LspReferenceRead                   = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
-  hi.LspReferenceWrite                  = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
+  hi.LspReferenceText                   = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_600 }
+  hi.LspReferenceRead                   = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_600 }
+  hi.LspReferenceWrite                  = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_600 }
   hi.LspDiagnosticsDefaultError         = 'DiagnosticError'
   hi.LspDiagnosticsDefaultWarning       = 'DiagnosticWarn'
   hi.LspDiagnosticsDefaultInformation   = 'DiagnosticInfo'
@@ -430,8 +427,8 @@ function M.setup(opts)
   hi.TSVariableBuiltin                  = { guifg = c.TSVariableBuiltin, guibg = nil, gui = 'italic', guisp = nil }
 
   hi.TSStrong                           = { guifg = nil, guibg = nil, gui = 'bold', guisp = nil }
-  hi.TSDefinition                       = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
-  hi.TSDefinitionUsage                  = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_500 }
+  hi.TSDefinition                       = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_600 }
+  hi.TSDefinitionUsage                  = { guifg = nil, guibg = nil, gui = 'underline', guisp = c.gray_600 }
   hi.TSCurrentScope                     = { guifg = nil, guibg = nil, gui = 'bold', guisp = nil }
 
   if vim.fn.has('nvim-0.8.0') then
@@ -615,7 +612,7 @@ function M.setup(opts)
   hi.CmpItemKindSnippet           = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
 
   -- diffview
-  hi.DiffviewDiffDelete           = { guifg = c.gray_50, guibg = nil }  -- Region of padding to make editors align. fg = color of diff char symbol
+  hi.DiffviewDiffDelete           = { guifg = c.gray_100, guibg = nil } -- Region of padding to make editors align. fg = color of diff char symbol
   hi.DiffviewDiffAdd              = { guifg = nil, guibg = c.blue_100 } -- Added/changed lines
   hi.DiffviewDiffChange           = { guifg = nil, guibg = c.blue_100 } -- Changed lines (on both editors)
   hi.DiffviewDiffText             = { guifg = nil, guibg = c.blue_300 } -- Actual changed region (within added/changed lines)
@@ -640,7 +637,7 @@ function M.setup(opts)
   hi.DiffviewDim1                 = { guifg = c.blue }
   hi.DiffviewFilePanelFileName    = { guifg = c.white }
   hi.DiffviewFilePanelCounter     = { guifg = c.blue, gui = "bold" }
-  hi.DiffviewDiffAddAsDelete      = { gui = "bold", guifg = c.blue, guibg = c.gray_500 }
+  hi.DiffviewDiffAddAsDelete      = { gui = "bold", guifg = c.blue, guibg = c.gray_600 }
 
   -- Git signs
   hi.GitSignsChangeInline         = { guifg = nil, guibg = c.blue_300 } -- Current state of the hunk for preview_hunk
@@ -657,15 +654,15 @@ function M.setup(opts)
   end
 
   -- bufferline
-  hi.BufferLineBackground          = { guifg = c.gray_500, guibg = c.gray_50 }  -- Inactive tab
-  hi.BufferLineBufferSelected      = { guifg = c.gray_700, guibg = c.gray_200 } -- Active tab
+  hi.BufferLineBackground          = { guifg = c.gray_600, guibg = c.gray_100 } -- Inactive tab
+  hi.BufferLineBufferSelected      = { guifg = c.gray_800, guibg = c.gray_300 } -- Active tab
   hi.BufferLineSeparator           = { guifg = c.black, guibg = c.black }
   -- Indicators
-  hi.BufferLineError               = { guifg = c.red_600, guibg = c.gray_50 }
+  hi.BufferLineError               = { guifg = c.red_600, guibg = c.gray_100 }
   hi.BufferLineErrorSelected       = { guifg = c.red_600, guibg = c.gray_100 }
-  hi.BufferLineModified            = { guifg = c.gray_700, guibg = c.gray_50 }
-  hi.BufferLineModifiedSelected    = { guifg = c.gray_700, guibg = c.gray_100 }
-  hi.BufferLineDiagnosticSelected  = { guifg = c.gray_700, guibg = c.gray_100 }
+  hi.BufferLineModified            = { guifg = c.gray_700, guibg = c.gray_100 }
+  hi.BufferLineModifiedSelected    = { guifg = c.gray_700, guibg = c.gray_300 }
+  hi.BufferLineDiagnosticSelected  = { guifg = c.gray_700, guibg = c.gray_300 }
   hi.BufferLinePickSelected        = 'BufferLineDiagnosticSelected'
   hi.BufferLineIndicatorSelected   = 'BufferLineDiagnosticSelected'
   hi.BufferLineNumbersSelected     = 'BufferLineDiagnosticSelected'

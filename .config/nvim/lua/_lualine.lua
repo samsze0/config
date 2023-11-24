@@ -4,8 +4,8 @@ local theme = {}
 for _, mode in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do
   theme[mode] = {
     a = { fg = colors.white, gui = "bold" },
-    b = { bg = colors.gray_50, fg = colors.gray_700 },
-    c = { bg = colors.gray_50, fg = colors.gray_600 }
+    b = { bg = colors.gray_100, fg = colors.gray_700 },
+    c = { bg = colors.gray_100, fg = colors.gray_600 }
   }
 end
 
@@ -51,19 +51,19 @@ local tab_session = {
 local indicator_colors = {
   red = {
     fg = colors.red_700,
-    bg = colors.gray_50,
+    bg = colors.gray_100,
   },
   yellow = {
     fg = colors.yellow_700,
-    bg = colors.gray_50,
+    bg = colors.gray_100,
   },
   blue = {
     fg = colors.blue_700,
-    bg = colors.gray_50,
+    bg = colors.gray_100,
   },
   gray = {
     fg = colors.gray_700,
-    bg = colors.gray_50,
+    bg = colors.gray_100,
   },
 }
 

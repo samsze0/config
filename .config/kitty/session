@@ -4,14 +4,14 @@ new_tab config
 layout stack
 cd /home/sam
 title ~
-launch --env KITTY_WINDOW_ID=10 --env PWD=/home/sam zsh
-title v
-launch --env KITTY_WINDOW_ID=76 --env PWD=/home/sam zsh
+launch --env KITTY_WINDOW_ID=1 --env PWD=/home/sam zsh
 focus
+title ~
+launch --env KITTY_WINDOW_ID=2 --env PWD=/home/sam zsh
 
 
 new_tab nixos-config
-layout fat
+layout stack
 cd /home/sam/nixos-config
 title ~/nixos-config
 launch --env KITTY_WINDOW_ID=3 --env PWD=/home/sam/nixos-config zsh
@@ -29,42 +29,56 @@ focus
 new_tab pytorch-dqn
 layout stack
 cd /home/sam/dev/more/pytorch-dqn
-title nix-dev
-launch --env KITTY_WINDOW_ID=70 --env PWD=/home/sam/dev/more/pytorch-dqn zsh
 title v
-launch --env KITTY_WINDOW_ID=73 --env PWD=/home/sam/dev/more/pytorch-dqn zsh
+launch --env KITTY_WINDOW_ID=6 --env PWD=/home/sam/dev/more/pytorch-dqn zsh
+title …/dev/more/pytorch-dqn
+launch --env KITTY_WINDOW_ID=17 --env PWD=/home/sam/dev/more/pytorch-dqn zsh
 focus
 
 
 new_tab lf
-layout fat
+layout stack
 cd /home/sam/dev/lf
 title ~/dev/lf
-launch --env KITTY_WINDOW_ID=67 --env PWD=/home/sam/dev/lf zsh
+launch --env KITTY_WINDOW_ID=7 --env PWD=/home/sam/dev/lf zsh
+title kitty-save-session
+launch --env KITTY_WINDOW_ID=8 --env PWD=/home/sam/dev/lf zsh
 focus
 
 
-new_tab pico-lf
-layout fat
-cd /home/sam/dev/pico-lf
+new_tab ff
+layout stack
+cd /home/sam/dev/ff
 title ~/dev/pico-lf
-launch --env KITTY_WINDOW_ID=6 --env PWD=/home/sam/dev/pico-lf zsh
+launch --env KITTY_WINDOW_ID=9 --env PWD=/home/sam/dev/ff zsh
 focus
+title ~/dev/ff
+launch --env KITTY_WINDOW_ID=14 --env PWD=/home/sam zsh
 
 
-new_tab ~/dev/motion-canvas-test
+new_tab ff-term
+layout fat
+cd /home/sam/dev/ff
+title kitty-save-session
+launch --env KITTY_WINDOW_ID=19 --env PWD=/home/sam/dev/ff zsh
+focus
+title ~/dev/ff
+launch --env KITTY_WINDOW_ID=21 --env PWD=/home/sam/dev/ff zsh
+
+
+new_tab motion-canavs-test
 layout fat
 cd /home/sam/dev/motion-canvas-test
 title ~/dev/motion-canvas-test
-launch --env KITTY_WINDOW_ID=16 --env PWD=/home/sam zsh
+launch --env KITTY_WINDOW_ID=11 --env PWD=/home/sam/dev/motion-canvas-test zsh
 focus
 
 
 new_tab motion-canvas
 layout fat
-cd /home/sam/dev
+cd /home/sam/dev/motion-canvas
 title ~/dev
-launch --env KITTY_WINDOW_ID=18 --env PWD=/home/sam/dev zsh
+launch --env KITTY_WINDOW_ID=12 --env PWD=/home/sam/dev/motion-canvas zsh
 focus
 
 
@@ -72,5 +86,5 @@ new_tab gymnasium
 layout fat
 cd /home/sam/dev/more/Gymnasium
 title kitty-save-session
-launch --env KITTY_WINDOW_ID=71 --env PWD=/home/sam/dev/more/pytorch-dqn zsh
+launch --env KITTY_WINDOW_ID=13 --env PWD=/home/sam/dev/more/Gymnasium zsh
 focus

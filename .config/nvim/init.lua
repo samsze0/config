@@ -189,7 +189,7 @@ require("lazy").setup({
     -- Configure lua-language-server for neovim config
     -- TODO: not working
     'folke/neodev.nvim',
-    enabled = true,
+    enabled = false,
     config = function()
       require("neodev").setup({})
     end
@@ -212,7 +212,28 @@ require("lazy").setup({
     -- Indentation markers
     'lukas-reineke/indent-blankline.nvim',
     config = function()
-      require("ibl").setup()
+      require("ibl").setup({
+        indent = { char = "▏" },
+        scope = {
+          highlight = require('theme').rainbow_hl_groups,
+          show_start = false, -- underline on scope start
+          show_end = false,   -- underline on scope end
+          include = {
+            node_type = { ["*"] = { "*" } }
+          },
+          exclude = {
+            language = {},
+            node_type = {},
+          }
+        }
+      })
+    end
+  },
+  {
+    -- Brackets colorizer
+    'HiPhish/rainbow-delimiters.nvim',
+    config = function()
+      vim.g.rainbow_delimiters = { highlight = require('theme').rainbow_hl_groups }
     end
   },
   {

@@ -80,8 +80,6 @@ require("diffview").setup({
   keymaps = {
     disable_defaults = true,
     view = { -- Bindings that are active in the diff buffers
-      { "n", "xe", actions.goto_file_edit, },
-      { "n", "xw", actions.goto_file_split, },
       { "n", "xt", actions.goto_file_tab, },
       { "n", "xi", actions.prev_conflict, },
       { "n", "xk", actions.next_conflict, },
@@ -133,8 +131,6 @@ require("diffview").setup({
       { "n", "<C-S-down>",    actions.scroll_view(5), },
       { "n", "<C-down>",      actions.select_next_entry, },
       { "n", "<C-up>",        actions.select_prev_entry, },
-      { "n", "xe",            actions.goto_file_edit, },
-      { "n", "xw",            actions.goto_file_split, },
       { "n", "xt",            actions.goto_file_tab, },
       { "n", "I",             actions.listing_style, },
       { "n", "R",             actions.refresh_files, },
@@ -159,8 +155,6 @@ require("diffview").setup({
       { "n", "<C-S-down>",    actions.scroll_view(5), },
       { "n", "<C-down>",      actions.select_next_entry, },
       { "n", "<C-up>",        actions.select_prev_entry, },
-      { "n", "xe",            actions.goto_file_edit, },
-      { "n", "xw",            actions.goto_file_split, },
       { "n", "xt",            actions.goto_file_tab, },
       { "n", "?",             actions.help("file_history_panel"), },
     },

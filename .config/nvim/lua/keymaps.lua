@@ -16,7 +16,7 @@ M.setup = function()
   keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", opts) -- Execute <C-u> twice in normal mode
   keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
 
-  -- Find and replace
+  -- Find and replace (local)
   local function get_command_history()
     local history = {}
     for i = 1, vim.fn.histlen(":") do
@@ -48,6 +48,8 @@ M.setup = function()
   keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts)    -- Paste selection into register "y" and paste it into command line with <C-r>
   keymap("v", "ri", [["rygv*N:s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
   keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts)  -- "ra" but forward direction only
+
+  -- Find and replace (global)
 
   -- Move by word
   keymap("n", "<C-Left>", "B", opts)
@@ -153,6 +155,11 @@ M.setup = function()
   keymap("n", "<C-s>", "<cmd>wincmd h<CR>", opts)
   keymap("n", "<C-f>", "<cmd>wincmd l<CR>", opts)
 
+  keymap("n", "<C-S-->", "10<C-w>-", opts) -- Decrease height
+  keymap("n", "<C-S-=>", "10<C-w>+", opts) -- Increase height
+  keymap("n", "<C-S-.>", "20<C-w>>", opts) -- Increase width
+  keymap("n", "<C-S-,>", "20<C-w><", opts) -- Decrease width
+
   keymap("n", "ww", "<cmd>clo<CR>", opts)
 
   keymap("n", "wd", "<cmd>split<CR><cmd>wincmd j<CR>", opts) -- Switch to bottom window after creating it
@@ -185,7 +192,6 @@ M.setup = function()
   keymap("n", "<C-S-l>", "<cmd>tabm +1<CR>", opts)
 
   -- Delete & cut
-  -- Ref: https://github.com/gbprod/cutlass.nvim/blob/main/lua/cutlass.lua
   keymap("n", "d", '"dd', opts) -- Put in d register, in case if needed
   keymap("v", "d", '"dd', opts)
   keymap("n", "x", "d", opts)
@@ -299,7 +305,8 @@ M.setup = function()
   keymap("n", "lL", [[<cmd>lua require("keymaps").lsp_pick_formatter()<CR>]], opts)
 
   -- Terminal
-  if config.terminal_plugin == "floaterm" then
+  local use_floaterm = false
+  if config.terminal_plugin == "floaterm" and use_floaterm then
     keymap("n", "<f12>", "<cmd>FloatermToggle<CR>", opts)
     keymap("t", "<f12>", "<cmd>FloatermToggle<CR>", opts)
   end

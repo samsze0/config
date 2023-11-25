@@ -28,6 +28,7 @@ Command line mode
     - Also see: ex mode
 Normal mode
     - `*` to highlight all occurrences of word under cursor, or current visual selection. And advance to the next occurrence. Useful to pair with `N` i.e. `*N`
+    - `#` same as `*` but in opposite direction
     - (TODO)
 Ranges in command line mode
     - `60` targets line 60

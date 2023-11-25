@@ -1,10 +1,15 @@
 require("flash").setup {
-  labels = "asdfghjklqwertyuiopzxcvbnm",
+  labels = "asdfjklqwertyuiopzxcvbnm",
   search = {
     multi_window = false,
     forward = true,
-    wrap = false,   -- Also search the other direction by wrapping
+    wrap = false, -- Also search the other direction by wrapping
     ---@type Flash.Pattern.Mode
+    -- Each mode will take ignorecase and smartcase into account.
+    -- * exact: exact match
+    -- * search: regular search
+    -- * fuzzy: fuzzy search
+    -- * fun(str): custom function that returns a pattern
     mode = "exact", -- fuzzy? custom function? regular search?
     incremental = false,
     ---@type (string|fun(win:window))[]
@@ -32,6 +37,14 @@ require("flash").setup {
     uppercase = true,
     exclude = "",
     current = true, -- Add label for first match
+    -- show the label after the match
+    after = true, ---@type boolean|number[]
+    -- show the label before the match
+    before = false, ---@type boolean|number[]
+    style = "overlay", ---@type "eol" | "overlay" | "right_align" | "inline"
+    -- flash tries to re-use labels that were already assigned to a position,
+    -- when typing more characters. By default only lower-case labels are re-used.
+    reuse = "lowercase", ---@type "lowercase" | "all" | "none"
     min_pattern_length = 0,
     rainbow = {
       enabled = false,
@@ -52,10 +65,11 @@ require("flash").setup {
   },
   ---@type fun(match:Flash.Match, state:Flash.State)|nil
   action = nil, -- action to perform when picking a label
+  -- When `true`, flash will try to continue the last search
+  continue = false,
   -- Set config to a function to dynamically change the config
   config = nil, ---@type fun(opts:Flash.Config)|nil
-  -- You can override the default options for a specific mode.
-  -- Use it with `require("flash").jump({mode = "forward"})`
+  -- Overriding default with specific modes
   ---@type table<string, Flash.Config>
   modes = {
     -- `/` or `?`
@@ -66,9 +80,10 @@ require("flash").setup {
     },
     -- `f`, `F`, `t`, `T`, `;` and `,` motions
     char = {
-      enabled = true,
+      enabled = false,
       jump_labels = false,
       multi_line = true,
+      label = { exclude = "hjkliardc" },
       keys = { "f", "F", "t", "T" },
       search = { wrap = false },
       jump = { register = false },

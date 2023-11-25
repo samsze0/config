@@ -5,6 +5,22 @@ local config = require("config")
 
 local M = {}
 
+local all_rainbow_colors = false
+M.rainbow_hl_groups = all_rainbow_colors and {
+  "RainbowRed",
+  "RainbowOrange",
+  "RainbowYellow",
+  "RainbowBlue",
+  "RainbowGreen",
+  "RainbowViolet",
+  "RainbowCyan",
+} or {
+  "RainbowBlue",
+  "RainbowGreen",
+  "RainbowViolet",
+  "RainbowCyan",
+}
+
 M.colors = {
   black = "#0c0d0d",
   gray_100 = "#17191f",
@@ -135,6 +151,11 @@ local default_syntax_hl = {
   TSTypeBuiltin = c.gray_blue,
   TSVariable = c.gray_800,
   TSVariableBuiltin = c.gray_blue,
+
+  RainbowViolet = "#abadda",
+  RainbowGreen = "#a4c9c2",
+  RainbowBlue = "#7dabe7",
+  RainbowCyan = "#74bddd",
 }
 
 local reset_non_ts_syntax_hl_tbl = {
@@ -373,6 +394,15 @@ function M.setup(opts)
   hi.LspDiagnosticsUnderlineInformation = 'DiagnosticUnderlineInformation'
   hi.LspDiagnosticsUnderlineHint        = 'DiagnosticUnderlineHint'
   hi.LspInlayHint                       = { guifg = c.gray_600, guibg = nil, gui = 'italic', guisp = nil }
+
+  hi.RainbowRed                         = { guifg = c.RainbowRed, guibg = nil, gui = nil, guisp = nil }
+  hi.RainbowOrange                      = { guifg = c.RainbowOrange, guibg = nil, gui = nil, guisp = nil }
+  hi.RainbowYellow                      = { guifg = c.RainbowYellow, guibg = nil, gui = nil, guisp = nil }
+  hi.RainbowGreen                       = { guifg = c.RainbowGreen, guibg = nil, gui = nil, guisp = nil }
+  hi.RainbowBlue                        = { guifg = c.RainbowBlue, guibg = nil, gui = nil, guisp = nil }
+  hi.RainbowPurple                      = { guifg = c.RainbowPurple, guibg = nil, gui = nil, guisp = nil }
+  hi.RainbowViolet                      = { guifg = c.RainbowViolet, guibg = nil, gui = nil, guisp = nil }
+  hi.RainbowCyan                        = { guifg = c.RainbowCyan, guibg = nil, gui = nil, guisp = nil }
 
   hi.TSAnnotation                       = { guifg = c.TSAnnotation, guibg = nil, gui = 'none', guisp = nil }
   hi.TSAttribute                        = { guifg = c.TSAttribute, guibg = nil, gui = 'none', guisp = nil }
@@ -632,7 +662,7 @@ function M.setup(opts)
   hi.DiffviewFilePanelInsertions  = { guifg = c.gray_600, guibg = nil }
   -- Misc
   hi.DiffviewFilePanelTitle       = { gui = "bold", guifg = c.yellow }
-  hi.DiffviewSecondary            = { guifg = c.red }
+  hi.DiffviewSecondary            = { guifg = c.yellow }
   hi.DiffviewPrimary              = { guifg = c.blue }
   hi.DiffviewDim1                 = { guifg = c.blue }
   hi.DiffviewFilePanelFileName    = { guifg = c.white }

@@ -11,7 +11,7 @@ cat <<EOT >> ~/.gitconfig
     prompt = false
 
 [difftool "nvimdiff"]
-    cmd = "nvim -d \"$LOCAL\" \"$REMOTE\""
+    cmd = "nvim -d \\"\$LOCAL\\" \\"\$REMOTE\\""
 
 [merge]
     tool = nvimdiff
@@ -20,7 +20,7 @@ cat <<EOT >> ~/.gitconfig
     prompt = true
 
 [mergetool "nvimdiff"]
-    cmd = "nvim -d \"$LOCAL\" \"$REMOTE\" \"$MERGED\" -c 'wincmd w' -c 'wincmd J'"
+    cmd = "nvim -d \\"\$LOCAL\\" \\"\$REMOTE\\" \\"\$MERGED\\" -c 'wincmd w' -c 'wincmd J'"
 
 [core]
     pager = delta
@@ -29,8 +29,8 @@ cat <<EOT >> ~/.gitconfig
     diffFilter = delta --color-only
 
 [delta]
-    side-by-side                  = true
-    line-numbers                  = true
+    side-by-side                  = false
+    line-numbers                  = false
     commit-style                  = raw
     file-style                    = white
     hunk-header-style             = bold

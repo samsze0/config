@@ -3,7 +3,7 @@ require("flash").setup {
   search = {
     multi_window = false,
     forward = true,
-    wrap = false, -- Also search the other direction by wrapping
+    wrap = true, -- Also search the other direction by wrapping
     ---@type Flash.Pattern.Mode
     -- Each mode will take ignorecase and smartcase into account.
     -- * exact: exact match

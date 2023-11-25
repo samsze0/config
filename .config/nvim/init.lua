@@ -74,7 +74,7 @@ require("lazy").setup({
     'ibhagwan/fzf-lua',
     enabled = not config.telescope_over_fzflua,
     config = function()
-      require('_fzflua')
+      require('_fzflua').setup()
     end,
   },
   {
@@ -256,6 +256,7 @@ require("lazy").setup({
   {
     -- Highlight occurences of word current cursor
     'RRethy/vim-illuminate',
+    enabled = config.illuminate_plugin,
     config = function()
       require('illuminate').configure({})
     end
@@ -419,6 +420,12 @@ require("lazy").setup({
     'nacro90/numb.nvim',
     enabled = false,
     -- TODO
+  },
+  {
+    'kylechui/nvim-surround',
+    config = function()
+      require('_surround')
+    end
   }
 })
 
@@ -428,7 +435,6 @@ require('commands')
 require('theme').setup({
   debug = {
     enabled = false,
-    source = ":highlights",
     toggle_colorizer = false,
     hide_defined_entries = false,
     show_non_ts_syntax_hl_only = true

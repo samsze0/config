@@ -3,3 +3,7 @@ local opts = {}
 
 -- Utils
 command("CopyRelPath", "call setreg('+', expand('%'))", opts)
+
+-- FzfLua
+local fzflua = require('_fzflua')
+command("FzfLuaUndoTree", fzflua.undo_tree, opts)

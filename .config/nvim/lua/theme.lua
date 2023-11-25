@@ -233,7 +233,6 @@ function M.setup(opts)
   local default_opts = {
     debug = {
       enabled = false,
-      source = ":highlights", -- @Types "vim_fn_getcompletion" | ":highlights"
       hide_defined_entries = true,
       toggle_colorizer = false,
       show_non_ts_syntax_hl_only = false
@@ -601,14 +600,16 @@ function M.setup(opts)
   end
 
   -- indent-blankline
-  hi.IblIndent                    = { guifg = indent_marker }
-  hi.IblWhitespace                = { guifg = indent_marker }
-  hi.IblScope                     = { guifg = indent_marker }
+  hi.IblIndent     = { guifg = indent_marker }
+  hi.IblWhitespace = { guifg = indent_marker }
+  hi.IblScope      = { guifg = indent_marker }
 
   -- vim-illuminate
-  hi.IlluminatedWordText          = { guibg = c.gray_200, gui = nil }
-  hi.IlluminatedWordRead          = { guibg = c.gray_200, gui = nil }
-  hi.IlluminatedWordWrite         = { guibg = c.gray_200, gui = nil }
+  if config.illuminate_plugin then
+    hi.IlluminatedWordText  = { guibg = c.gray_200, gui = nil }
+    hi.IlluminatedWordRead  = { guibg = c.gray_200, gui = nil }
+    hi.IlluminatedWordWrite = { guibg = c.gray_200, gui = nil }
+  end
 
   -- nvim-cmp
   hi.CmpItemAbbr                  = { guifg = c.gray_700, guibg = nil, gui = nil, guisp = nil } -- Completion items default
@@ -642,36 +643,38 @@ function M.setup(opts)
   hi.CmpItemKindSnippet           = { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
 
   -- diffview
-  hi.DiffviewDiffDelete           = { guifg = c.gray_100, guibg = nil } -- Region of padding to make editors align. fg = color of diff char symbol
-  hi.DiffviewDiffAdd              = { guifg = nil, guibg = c.blue_100 } -- Added/changed lines
-  hi.DiffviewDiffChange           = { guifg = nil, guibg = c.blue_100 } -- Changed lines (on both editors)
-  hi.DiffviewDiffText             = { guifg = nil, guibg = c.blue_300 } -- Actual changed region (within added/changed lines)
-  -- Color of sign in sign column in tree view
-  hi.DiffviewSignColumn           = { guifg = c.gray_800, guibg = nil }
-  hi.DiffviewStatusAdded          = { guifg = c.blue, guibg = nil }
-  hi.DiffviewStatusUntracked      = { guifg = c.blue, guibg = nil }
-  hi.DiffviewStatusRenamed        = { guifg = c.yellow, guibg = nil }
-  hi.DiffviewStatusUnmerged       = { guifg = c.yellow, guibg = nil }
-  hi.DiffviewStatusIgnored        = { guifg = c.gray_600, guibg = nil }
-  hi.DiffviewStatusModified       = { guifg = c.yellow, guibg = nil }
-  hi.DiffviewStatusBroken         = { guifg = c.red, guibg = nil }
-  hi.DiffviewStatusDeleted        = { guifg = c.red, guibg = nil }
-  hi.DiffviewStatusUnknown        = { guifg = c.gray_800, guibg = nil }
-  -- Color of the number of added/deleted lines in tree view
-  hi.DiffviewFilePanelDeletions   = { guifg = c.gray_600, guibg = nil }
-  hi.DiffviewFilePanelInsertions  = { guifg = c.gray_600, guibg = nil }
-  -- Misc
-  hi.DiffviewFilePanelTitle       = { gui = "bold", guifg = c.yellow }
-  hi.DiffviewSecondary            = { guifg = c.yellow }
-  hi.DiffviewPrimary              = { guifg = c.blue }
-  hi.DiffviewDim1                 = { guifg = c.blue }
-  hi.DiffviewFilePanelFileName    = { guifg = c.white }
-  hi.DiffviewFilePanelCounter     = { guifg = c.blue, gui = "bold" }
-  hi.DiffviewDiffAddAsDelete      = { gui = "bold", guifg = c.blue, guibg = c.gray_600 }
+  if config.diffview_plugin then
+    hi.DiffviewDiffDelete          = { guifg = c.gray_100, guibg = nil } -- Region of padding to make editors align. fg = color of diff char symbol
+    hi.DiffviewDiffAdd             = { guifg = nil, guibg = c.blue_100 } -- Added/changed lines
+    hi.DiffviewDiffChange          = { guifg = nil, guibg = c.blue_100 } -- Changed lines (on both editors)
+    hi.DiffviewDiffText            = { guifg = nil, guibg = c.blue_300 } -- Actual changed region (within added/changed lines)
+    -- Color of sign in sign column in tree view
+    hi.DiffviewSignColumn          = { guifg = c.gray_800, guibg = nil }
+    hi.DiffviewStatusAdded         = { guifg = c.blue, guibg = nil }
+    hi.DiffviewStatusUntracked     = { guifg = c.blue, guibg = nil }
+    hi.DiffviewStatusRenamed       = { guifg = c.yellow, guibg = nil }
+    hi.DiffviewStatusUnmerged      = { guifg = c.yellow, guibg = nil }
+    hi.DiffviewStatusIgnored       = { guifg = c.gray_600, guibg = nil }
+    hi.DiffviewStatusModified      = { guifg = c.yellow, guibg = nil }
+    hi.DiffviewStatusBroken        = { guifg = c.red, guibg = nil }
+    hi.DiffviewStatusDeleted       = { guifg = c.red, guibg = nil }
+    hi.DiffviewStatusUnknown       = { guifg = c.gray_800, guibg = nil }
+    -- Color of the number of added/deleted lines in tree view
+    hi.DiffviewFilePanelDeletions  = { guifg = c.gray_600, guibg = nil }
+    hi.DiffviewFilePanelInsertions = { guifg = c.gray_600, guibg = nil }
+    -- Misc
+    hi.DiffviewFilePanelTitle      = { gui = "bold", guifg = c.yellow }
+    hi.DiffviewSecondary           = { guifg = c.yellow }
+    hi.DiffviewPrimary             = { guifg = c.blue }
+    hi.DiffviewDim1                = { guifg = c.blue }
+    hi.DiffviewFilePanelFileName   = { guifg = c.white }
+    hi.DiffviewFilePanelCounter    = { guifg = c.blue, gui = "bold" }
+    hi.DiffviewDiffAddAsDelete     = { gui = "bold", guifg = c.blue, guibg = c.gray_600 }
+  end
 
   -- Git signs
-  hi.GitSignsChangeInline         = { guifg = nil, guibg = c.blue_300 } -- Current state of the hunk for preview_hunk
-  hi.GitSignsDeleteVirtLn         = { guifg = nil, guibg = c.red_300 }  -- Previous state of the hunk for preview_hunk
+  hi.GitSignsChangeInline = { guifg = nil, guibg = c.blue_300 } -- Current state of the hunk for preview_hunk
+  hi.GitSignsDeleteVirtLn = { guifg = nil, guibg = c.red_300 }  -- Previous state of the hunk for preview_hunk
 
   if config.spectre then
     hi.SpectreHeader  = { guifg = c.blue }
@@ -732,49 +735,32 @@ function M.setup(opts)
       return lines
     end
 
-    if opts.debug.source == "vim_fn_getcompletion" then
-      local fn = vim.fn
-      local highlights = fn.getcompletion("", "highlight")
+    local hl_raw = vim.api.nvim_exec('highlight', true)
+    local hl_groups = split_string(hl_raw, "\n")
 
-      local function get_color(group, attr)
-        return fn.synIDattr(fn.synIDtrans(fn.hlID(group)), attr)
+    hl_groups = join_lines_if_begins_with_links(hl_groups)
+
+    buf_lines = map(hl_groups, function(i, g)
+      local parts = split_string(g, " ")
+      local links_to = string.match(g, "links to (%w+)")
+
+      if opts.debug.hide_defined_entries and require("utils").contains(M.defined_highlight_groups, parts[1]) then
+        return nil
+      elseif opts.debug.show_non_ts_syntax_hl_only and (reset_non_ts_syntax_hl_tbl[parts[1]] == nil and not (links_to ~= nil and reset_non_ts_syntax_hl_tbl[links_to] ~= nil)) then
+        -- Skip entry if it's not a non-TS syntax hl group and it doesn't link to one
+        return nil
       end
 
-      buf_lines = map(highlights, function(i, hl)
-        local bg = get_color(hl, "bg#")
-        bg = get_color_name_if_exists(bg)
-        local fg = get_color(hl, "fg#")
-        fg = get_color_name_if_exists(fg)
-        return hl .. " fg " .. fg .. " bg " .. bg
-      end)
-    elseif opts.debug.source == ":highlights" then
-      local hl_raw = vim.api.nvim_exec('highlight', true)
-      local hl_groups = split_string(hl_raw, "\n")
-
-      hl_groups = join_lines_if_begins_with_links(hl_groups)
-
-      buf_lines = map(hl_groups, function(i, g)
-        local parts = split_string(g, " ")
-        local links_to = string.match(g, "links to (%w+)")
-
-        if opts.debug.hide_defined_entries and require("utils").contains(M.defined_highlight_groups, parts[1]) then
-          return nil
-        elseif opts.debug.show_non_ts_syntax_hl_only and (reset_non_ts_syntax_hl_tbl[parts[1]] == nil and not (links_to ~= nil and reset_non_ts_syntax_hl_tbl[links_to] ~= nil)) then
-          -- Skip entry if it's not a non-TS syntax hl group and it doesn't link to one
-          return nil
+      return table.concat(map(parts, function(i, part)
+        -- a = letter; x = hexidecimal digit
+        local k, v = string.match(part, "(gui%a+)=(#%x+)")
+        if k and v then
+          return k .. "-" .. get_color_name_if_exists(v)
+        else
+          return part
         end
-
-        return table.concat(map(parts, function(i, part)
-          -- a = letter; x = hexidecimal digit
-          local k, v = string.match(part, "(gui%a+)=(#%x+)")
-          if k and v then
-            return k .. "-" .. get_color_name_if_exists(v)
-          else
-            return part
-          end
-        end), " ")
-      end)
-    end
+      end), " ")
+    end)
 
     if not buf_lines then return end
 

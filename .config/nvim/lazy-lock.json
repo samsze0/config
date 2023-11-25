@@ -26,6 +26,7 @@
   "nvim-lint": { "branch": "master", "commit": "3a7c15331a57ba40a56f00f29173700af853fa03" },
   "nvim-lspconfig": { "branch": "master", "commit": "553c4e0e667167640c5398573f6f3a488ff8047a" },
   "nvim-scrollview": { "branch": "main", "commit": "74ab63b598cca206888e83090ed6312aac324b4c" },
+  "nvim-surround": { "branch": "main", "commit": "0855a89e00a5822c3a482a82e5223fcf2e9ede13" },
   "nvim-treesitter": { "branch": "master", "commit": "71bdf97bf6dafc776ad957169533f2f669a8c562" },
   "persistence.nvim": { "branch": "main", "commit": "ad538bfd5336f1335cdb6fd4e0b0eebfa6e12f32" },
   "rainbow-delimiters.nvim": { "branch": "master", "commit": "fdd507455a10c3841027c04ab33012d24d5b2c92" },

@@ -7,6 +7,7 @@ M.setup = function()
   local opts_expr = { silent = true, expr = true, noremap = true }
 
   local config = require('config')
+  local utils = require('utils')
 
   -- Pageup/down
   keymap("n", "<PageUp>", "<C-u><C-u>", opts)
@@ -17,34 +18,18 @@ M.setup = function()
   keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
 
   -- Find and replace (local)
-  local function get_command_history()
-    local history = {}
-    for i = 1, vim.fn.histlen(":") do
-      table.insert(history, vim.fn.histget(":", i))
-    end
-    return history
-  end
-  local function get_register_length(reg)
-    local content = vim.fn.getreg(reg)
-    return #content
-  end
   keymap("n", "rw", "*N:%s///g<left><left>", opts) -- Select next occurrence of word under cursor then go back to current instance
   keymap("n", "r.", ":&c<cr>", opts)               -- Multiple "c" flags are acceptable
   keymap("v", "ry", [["ry]], opts)                 -- Yank it into register "r" for later use with "rp"
-  vim.keymap.set("n", "rp",                        -- Use register "r" as the replacement rather than the subject
-    function()                                     -- Get the length of the content of register "r" and move cursor to the left by that amount
-      return ([[:s//<C-r>r/gc<left><left><left>]] ..
-        string.rep("<left>", get_register_length("r")) ..
-        [[<left>]])
-    end,
-    opts_expr)
-  vim.keymap.set("v", "rp",
-    function()
-      return ([[:%s//<C-r>r/gc<left><left><left>]] ..
-        string.rep("<left>", get_register_length("r")) ..
-        [[<left>]])
-    end,
-    opts_expr)
+  local function rp_rhs(whole_file)                -- Use register "r" as the replacement rather than the subject
+    return function()
+      return ((whole_file and ":%s" or ":s") .. [[//<C-r>r/gc<left><left><left>]] ..
+        string.rep("<left>", utils.get_register_length("r")) ..
+        "<left>")
+    end
+  end
+  vim.keymap.set("n", "rp", rp_rhs(true), opts_expr)
+  vim.keymap.set("v", "rp", rp_rhs(false), opts_expr)
   keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts)    -- Paste selection into register "y" and paste it into command line with <C-r>
   keymap("v", "ri", [["rygv*N:s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
   keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts)  -- "ra" but forward direction only
@@ -210,70 +195,85 @@ M.setup = function()
   keymap("n", "<C-o>", "<C-i>", opts)
 
   -- Telescope / FzfLua
-  keymap("n", "<f1>",
-    "<cmd>" .. (config.telescope_over_fzflua and 'lua require("telescope.builtin").builtin()' or "FzfLua") .. "<cr>",
-    opts)
-  keymap("n", "<f3><f3>",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").find_files()' or "FzfLua files") .. "<cr>",
-    opts)
-  keymap("n", "<f3><f2>",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").buffers()' or "FzfLua buffers") .. "<cr>",
-    opts)
-  keymap("n", "<f3><f1>", -- TODO
-    "<cmd>" .. (config.telescope_over_fzflua and 'lua require("telescope.builtin").' or "FzfLua tabs") .. "<cr>", opts)
-  keymap("n", "<f5>",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").live_grep()' or "FzfLua live_grep") .. "<cr>",
-    opts) -- Ripgrep whole project
-  keymap("n", "<f11><f5>",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").git_commits()' or "FzfLua git_commits") .. "<cr>",
-    opts) -- Project commit history
-  keymap("n", "<f11><f4>",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").git_bcommits()' or "FzfLua git_bcommits") ..
-    "<cr>",
-    opts) -- File (i.e. buffer) commit history
-  keymap("n", "<f11><f3>",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").git_status()' or "FzfLua git_status") .. "<cr>",
-    opts)
+  local fuzzy_finder_keymaps = {
+    [{ mode = "n", lhs = "<f1>" }] = {
+      -- telescope = require("telescope.builtin").builtin,
+      fzflua = require("fzf-lua").builtin,
+    },
+    [{ mode = "n", lhs = "<f3><f3>" }] = {
+      -- telescope = require("telescope.builtin").find_files,
+      fzflua = require("fzf-lua").files,
+    },
+    [{ mode = "n", lhs = "<f3><f2>" }] = {
+      -- telescope = require("telescope.builtin").buffers,
+      fzflua = require("fzf-lua").buffers,
+    },
+    [{ mode = "n", lhs = "<f3><f1>" }] = {
+      telescope = nil,
+      fzflua = require("fzf-lua").tabs,
+    },
+    [{ mode = "n", lhs = "<f5><f5>" }] = {
+      -- telescope = require("telescope.builtin").live_grep,
+      fzflua = require("fzf-lua").live_grep,
+    },
+    [{ mode = "n", lhs = "<f11><f5>" }] = {
+      -- telescope = require("telescope.builtin").git_commits,
+      fzflua = require("fzf-lua").git_commits,
+    },
+    [{ mode = "n", lhs = "<f11><f4>" }] = {
+      -- telescope = require("telescope.builtin").git_bcommits,
+      fzflua = require("fzf-lua").git_bcommits,
+    },
+    [{ mode = "n", lhs = "<f11><f3>" }] = {
+      -- telescope = require("telescope.builtin").git_status,
+      fzflua = require("fzf-lua").git_status,
+    },
+    [{ mode = "n", lhs = "li" }] = {
+      -- telescope = require("telescope.builtin").lsp_definitions,
+      fzflua = require("fzf-lua").lsp_definitions,
+    },
+    [{ mode = "n", lhs = "lr" }] = {
+      -- telescope = require("telescope.builtin").lsp_references,
+      fzflua = require("fzf-lua").lsp_references,
+    },
+    [{ mode = "n", lhs = "<f4><f4>" }] = {
+      -- telescope = require("telescope.builtin").lsp_document_symbols,
+      fzflua = require("fzf-lua").lsp_document_symbols,
+    },
+    [{ mode = "n", lhs = "<f4><f5>" }] = {
+      -- telescope = require("telescope.builtin").lsp_workspace_symbols,
+      fzflua = require("fzf-lua").lsp_workspace_symbols,
+    },
+    [{ mode = "n", lhs = "ld" }] = {
+      -- telescope = require("telescope.builtin").lsp_document_diagnostics,
+      fzflua = require("fzf-lua").lsp_document_diagnostics,
+    },
+    [{ mode = "n", lhs = "lD" }] = {
+      -- telescope = require("telescope.builtin").lsp_workspace_diagnostics,
+      fzflua = require("fzf-lua").lsp_workspace_diagnostics,
+    },
+    [{ mode = "n", lhs = "la" }] = {
+      telescope = nil,
+      fzflua = require("fzf-lua").lsp_code_actions
+    },
+    [{ mode = "n", lhs = "<f6>" }] = {
+      telescope = nil,
+      fzflua = require("_fzflua").undo_tree
+    },
+    [{ mode = "n", lhs = "<f7>" }] = {
+      telescope = nil,
+      fzflua = require("_fzflua").test
+    }
+  }
 
-  -- Telescope / FzfLua - LSP
-  keymap("n", "li",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").lsp_definitions()' or "FzfLua lsp_definitions") ..
-    "<cr>",
-    opts)
-  keymap("n", "lr",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").lsp_references()' or "FzfLua lsp_references") ..
-    "<cr>",
-    opts)
-  keymap("n", "<f4><f4>",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").lsp_document_symbols()' or "FzfLua lsp_document_symbols") ..
-    "<cr>", opts)
-  keymap("n", "<f4><f5>",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").lsp_workspace_symbols()' or "FzfLua lsp_live_workspace_symbols") ..
-    "<cr>",
-    opts)
-  keymap("n", "ld",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").diagnostics({ bufnr = 0 })' or "FzfLua lsp_document_diagnostics") ..
-    "<cr>", opts) -- Show list of problems
-  keymap("n", "lD",
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin")..diagnostics({ bufnr = nil })' or "FzfLua lsp_workspace_diagnostics") ..
-    "<cr>",
-    opts)
-  keymap("n", "la", -- TODO
-    "<cmd>" ..
-    (config.telescope_over_fzflua and 'lua require("telescope.builtin").' or "FzfLua lsp_code_actions") .. "<cr>",
-    opts)
+  for k, v in pairs(fuzzy_finder_keymaps) do
+    if v.telescope ~= nil then
+      vim.keymap.set(k.mode, k.lhs, v.telescope, {})
+    end
+    if v.fzflua ~= nil then
+      vim.keymap.set(k.mode, k.lhs, v.fzflua, {})
+    end
+  end
 
   -- LSP
   keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
@@ -283,11 +283,7 @@ M.setup = function()
   keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
   keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
 
-  local function lsp_format_and_notify()
-    vim.lsp.buf.format()
-    vim.notify("Formatted")
-  end
-  vim.keymap.set("n", "ll", lsp_format_and_notify, {})
+  vim.keymap.set("n", "ll", utils.run_and_notify(vim.lsp.buf.format, "Formatted"), {})
 
   local overwrite_formatter_on_lsp_attach = false
 
@@ -305,8 +301,7 @@ M.setup = function()
   keymap("n", "lL", [[<cmd>lua require("keymaps").lsp_pick_formatter()<CR>]], opts)
 
   -- Terminal
-  local use_floaterm = false
-  if config.terminal_plugin == "floaterm" and use_floaterm then
+  if config.terminal_plugin == "floaterm" then
     keymap("n", "<f12>", "<cmd>FloatermToggle<CR>", opts)
     keymap("t", "<f12>", "<cmd>FloatermToggle<CR>", opts)
   end
@@ -314,7 +309,7 @@ M.setup = function()
   -- Comment
   keymap("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)", opts)
   keymap("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)gv", opts) -- Re-select the last block
-  -- keymap("i", "<C-/>", "<C-o><Plug>(comment_toggle_linewise_visual)", opts)
+  vim.keymap.set("i", "<C-/>", require("Comment.api").toggle.linewise.current, {})
 
   -- GitSigns
   keymap("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>", opts)
@@ -341,16 +336,12 @@ M.setup = function()
   keymap("n", "<Space>r", [[<cmd>lua require("persistence").load()<cr>]], opts)
 
   -- Colorizer
-  local function colorizer_toggle_and_notify()
+  vim.keymap.set("n", "<leader>c", utils.run_and_notify(function()
     vim.cmd [[ColorizerToggle]]
-    vim.notify("Colorizer toggled")
-  end
-  vim.keymap.set("n", "<leader>c", colorizer_toggle_and_notify, {})
-  local function colorizer_reload_and_notify()
+  end, "Colorizer toggled"), {})
+  vim.keymap.set("n", "<leader>C", utils.run_and_notify(function()
     vim.cmd [[ColorizerReloadAllBuffers]]
-    vim.notify("Colorizer reloaded")
-  end
-  vim.keymap.set("n", "<leader>C", colorizer_reload_and_notify, {})
+  end, "Colorizer reloaded"), {})
 
   -- Nvim Cmp
   vim.keymap.set("i", "<M-r>", function()

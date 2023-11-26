@@ -1,6 +1,8 @@
 -- Tweaked from:
 -- https://github.com/sindrets/diffview.nvim/blob/main/lua/diffview/lazy.lua
 
+-- Don't think needed because `require` in lua caches the result anyway?
+
 local fmt = string.format
 
 local lazy = {}

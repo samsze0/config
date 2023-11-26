@@ -2,6 +2,7 @@
 -- https://github.com/RRethy/nvim-base16/blob/master/lua/base16-colorscheme.lua
 
 local config = require("m.config")
+local utils = require("m.utils")
 
 local M = {}
 
@@ -701,10 +702,34 @@ function M.setup(opts)
   hi.BufferLineNumbersSelected     = 'BufferLineDiagnosticSelected'
   hi.BufferLineCloseButtonSelected = 'BufferLineDiagnosticSelected'
 
+  -- nvim-notify
+  if config.notify_backend == "nvim-notify" then
+    hi.NotifyERRORBorder = { guifg = c.red_400, guibg = nil }
+    hi.NotifyWARNBorder  = { guifg = c.yellow_400, guibg = nil }
+    hi.NotifyINFOBorder  = { guifg = c.blue_400, guibg = nil }
+    hi.NotifyDEBUGBorder = { guifg = c.gray_400, guibg = nil }
+    hi.NotifyTRACEBorder = { guifg = c.gray_400, guibg = nil }
+    hi.NotifyERRORIcon   = { guifg = c.red_800, guibg = nil }
+    hi.NotifyWARNIcon    = { guifg = c.yellow_800, guibg = nil }
+    hi.NotifyINFOIcon    = { guifg = c.blue_800, guibg = nil }
+    hi.NotifyDEBUGIcon   = { guifg = c.gray_700, guibg = nil }
+    hi.NotifyTRACEIcon   = { guifg = c.gray_700, guibg = nil }
+    hi.NotifyERRORTitle  = { guifg = c.red_700, guibg = nil }
+    hi.NotifyWARNTitle   = { guifg = c.yellow_700, guibg = nil }
+    hi.NotifyINFOTitle   = { guifg = c.blue_700, guibg = nil }
+    hi.NotifyDEBUGTitle  = { guifg = c.gray_700, guibg = nil }
+    hi.NotifyTRACETitle  = { guifg = c.gray_700, guibg = nil }
+    hi.NotifyERRORBody   = 'Normal'
+    hi.NotifyWARNBody    = 'Normal'
+    hi.NotifyINFOBody    = 'Normal'
+    hi.NotifyDEBUGBody   = 'Normal'
+    hi.NotifyTRACEBody   = 'Normal'
+  end
+
   if opts.debug.enabled then
-    local log_opts = false
+    local log_opts = true
     if log_opts then
-      vim.print(vim.inspect(opts))
+      vim.notify(vim.inspect(opts))
     end
 
     local function get_color_name_if_exists(target)
@@ -716,12 +741,12 @@ function M.setup(opts)
       return target
     end
 
-    local map = require("utils").map
-    local split_string = require("utils").split_string
+    local map = utils.map
+    local split_string = utils.split_string
 
     local buf_lines = nil
 
-    function join_lines_if_begins_with_links(lines)
+    local function join_lines_if_begins_with_links(lines)
       local i = 1
       while i < #lines do
         -- Trim the leading and trailing whitespace and check if first 5 char is "links"
@@ -762,11 +787,9 @@ function M.setup(opts)
       end), " ")
     end)
 
-
-
     if not buf_lines then return end
 
-    require("utils").show_content_as_buf(buf_lines)
+    utils.show_content_as_buf(buf_lines)
     if opts.debug.toggle_colorizer then
       vim.cmd("ColorizerToggle")
     end

@@ -1,25 +1,26 @@
 return {
-  copilot_plugin = "lua", -- @type "vim" | "lua" | false
-  lf_plugin = "vim",      -- @type "vim" | "nvim" | false
-
-  notify_backend = false, -- @type "fidget" | "vim-notify" | false
-  -- Fidget is totally unnecessary, notifications on the side make them hard to read too
-
-  terminal_plugin = false, -- @type "floaterm" | "toggleterm" | false
-  -- Unnecessary. Just use another terminal window
-
-  filetree_plugin = nil, -- @type "nvimtree" | false
-  -- Unnecessary. use lf
-
-  telescope_over_fzflua = false, -- Telescope is heavier
+  copilot_plugin = "lua",
+  lf_plugin = "vim",
+  notify_backend = "nvim-notify",
+  terminal_plugin = false,
+  filetree_plugin = false,
+  telescope_over_fzflua = false,
   dap_plugins = false,
-  diffview_plugin = true,        -- Most of its functionalities can be replicated w/ fzflua + custom mappings
-  chatgpt_plugin = false,        -- TODO
-  ssr_plugin = false,            -- TODO
+  diffview_plugin = true,
+  chatgpt_plugin = false,
+  ssr_plugin = false,
+  illuminate_plugin = false,
+  spectre_plugin = false,
+  vgit_plugin = false,
+  trouble_plugin = false,
+  maximize_plugin = false,
 
-  illuminate_plugin = false,     -- Unnecessary, can be replaced by keymap w/ :s
-  spectre_plugin = false,        -- Prefer quickfix/loclist over something that force writes to all buffers w/ no undo capabilities
-  vgit_plugin = false,           -- Tested v0.2.1, very unstable, and no updates for 7 months
-  trouble_plugin = false,        -- Non-intuitive UI and totally replaceable by fzf
-  maximize_plugin = false,       -- Doesn't work with non-buffers e.g. help and command line window
+  theme_opts = {
+    debug = {
+      enabled = false,
+      toggle_colorizer = false,
+      hide_defined_entries = false,
+      show_non_ts_syntax_hl_only = false
+    }
+  }
 }

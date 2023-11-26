@@ -2,6 +2,12 @@ local M = {}
 
 local config = require('m.config')
 local utils = require('m.utils')
+local safe_require = function(module)
+  return utils.safe_require(module, {
+    notify = true,
+    log_level = vim.log.levels.ERROR,
+  })
+end
 
 M.setup = function()
   local keymap = vim.api.nvim_set_keymap
@@ -19,9 +25,11 @@ M.setup = function()
 
   -- Find and replace (local)
   keymap("n", "rw", "*N:%s///g<left><left>", opts) -- Select next occurrence of word under cursor then go back to current instance
-  keymap("n", "r.", ":&c<cr>", opts)               -- Multiple "c" flags are acceptable
-  keymap("v", "ry", [["ry]], opts)                 -- Yank it into register "r" for later use with "rp"
-  local function rp_rhs(whole_file)                -- Use register "r" as the replacement rather than the subject
+  keymap("n", "rr", ":%s//g<left><left>", opts)
+  keymap("v", "rr", ":s//g<left><left>", opts)
+  keymap("n", "r.", ":&c<cr>", opts) -- Multiple "c" flags are acceptable
+  keymap("v", "ry", [["ry]], opts)   -- Yank it into register "r" for later use with "rp"
+  local function rp_rhs(whole_file)  -- Use register "r" as the replacement rather than the subject
     return function()
       return ((whole_file and ":%s" or ":s") .. [[//<C-r>r/gc<left><left><left>]] ..
         string.rep("<left>", utils.get_register_length("r")) ..
@@ -30,9 +38,9 @@ M.setup = function()
   end
   vim.keymap.set("n", "rp", rp_rhs(true), opts_expr)
   vim.keymap.set("v", "rp", rp_rhs(false), opts_expr)
-  keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts)    -- Paste selection into register "y" and paste it into command line with <C-r>
-  keymap("v", "ri", [["rygv*N:s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
-  keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts)  -- "ra" but forward direction only
+  keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts)   -- Paste selection into register "y" and paste it into command line with <C-r>
+  keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts)       -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
+  keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but forward direction only
 
   -- Find and replace (global)
 
@@ -157,7 +165,7 @@ M.setup = function()
   local maximize_plugin = config.maximize_plugin
 
   if maximize_plugin then
-    keymap("n", 'wz', "<Cmd>lua require('maximize').toggle()<CR>", opts)
+    vim.keymap.set("n", 'wz', safe_require('maximize').toggle, {})
   else
     keymap("n", 'wz', "<C-W>_<C-W>|", opts) -- Maximise both horizontally and vertically
     keymap("n", 'wx', "<C-W>=", opts)
@@ -197,73 +205,77 @@ M.setup = function()
   -- Telescope / FzfLua
   local fuzzy_finder_keymaps = {
     [{ mode = "n", lhs = "<f1>" }] = {
-      -- telescope = require("telescope.builtin").builtin,
-      fzflua = require("fzf-lua").builtin,
+      telescope = safe_require("telescope.builtin").builtin,
+      fzflua = safe_require('fzf-lua').builtin,
     },
     [{ mode = "n", lhs = "<f3><f3>" }] = {
-      -- telescope = require("telescope.builtin").find_files,
-      fzflua = require("fzf-lua").files,
+      telescope = safe_require("telescope.builtin").find_files,
+      fzflua = safe_require('fzf-lua').files,
     },
     [{ mode = "n", lhs = "<f3><f2>" }] = {
-      -- telescope = require("telescope.builtin").buffers,
-      fzflua = require("fzf-lua").buffers,
+      telescope = safe_require("telescope.builtin").buffers,
+      fzflua = safe_require('fzf-lua').buffers,
     },
     [{ mode = "n", lhs = "<f3><f1>" }] = {
       telescope = nil,
-      fzflua = require("fzf-lua").tabs,
+      fzflua = safe_require('fzf-lua').tabs,
     },
     [{ mode = "n", lhs = "<f5><f5>" }] = {
-      -- telescope = require("telescope.builtin").live_grep,
-      fzflua = require("fzf-lua").live_grep,
+      telescope = safe_require("telescope.builtin").live_grep,
+      fzflua = safe_require('fzf-lua').live_grep,
     },
     [{ mode = "n", lhs = "<f11><f5>" }] = {
-      -- telescope = require("telescope.builtin").git_commits,
-      fzflua = require("fzf-lua").git_commits,
+      telescope = safe_require("telescope.builtin").git_commits,
+      fzflua = safe_require('fzf-lua').git_commits,
     },
     [{ mode = "n", lhs = "<f11><f4>" }] = {
-      -- telescope = require("telescope.builtin").git_bcommits,
-      fzflua = require("fzf-lua").git_bcommits,
+      telescope = safe_require("telescope.builtin").git_bcommits,
+      fzflua = safe_require('fzf-lua').git_bcommits,
     },
     [{ mode = "n", lhs = "<f11><f3>" }] = {
-      -- telescope = require("telescope.builtin").git_status,
-      fzflua = require("fzf-lua").git_status,
+      telescope = safe_require("telescope.builtin").git_status,
+      fzflua = safe_require('fzf-lua').git_status,
     },
     [{ mode = "n", lhs = "li" }] = {
-      -- telescope = require("telescope.builtin").lsp_definitions,
-      fzflua = require("fzf-lua").lsp_definitions,
+      telescope = safe_require("telescope.builtin").lsp_definitions,
+      fzflua = safe_require('fzf-lua').lsp_definitions,
     },
     [{ mode = "n", lhs = "lr" }] = {
-      -- telescope = require("telescope.builtin").lsp_references,
-      fzflua = require("fzf-lua").lsp_references,
+      telescope = safe_require("telescope.builtin").lsp_references,
+      fzflua = safe_require('fzf-lua').lsp_references,
     },
     [{ mode = "n", lhs = "<f4><f4>" }] = {
-      -- telescope = require("telescope.builtin").lsp_document_symbols,
-      fzflua = require("fzf-lua").lsp_document_symbols,
+      telescope = safe_require("telescope.builtin").lsp_document_symbols,
+      fzflua = safe_require('fzf-lua').lsp_document_symbols,
     },
     [{ mode = "n", lhs = "<f4><f5>" }] = {
-      -- telescope = require("telescope.builtin").lsp_workspace_symbols,
-      fzflua = require("fzf-lua").lsp_workspace_symbols,
+      telescope = safe_require("telescope.builtin").lsp_workspace_symbols,
+      fzflua = safe_require('fzf-lua').lsp_workspace_symbols,
     },
     [{ mode = "n", lhs = "ld" }] = {
-      -- telescope = require("telescope.builtin").lsp_document_diagnostics,
-      fzflua = require("fzf-lua").lsp_document_diagnostics,
+      telescope = safe_require("telescope.builtin").lsp_document_diagnostics,
+      fzflua = safe_require('fzf-lua').lsp_document_diagnostics,
     },
     [{ mode = "n", lhs = "lD" }] = {
-      -- telescope = require("telescope.builtin").lsp_workspace_diagnostics,
-      fzflua = require("fzf-lua").lsp_workspace_diagnostics,
+      telescope = safe_require("telescope.builtin").lsp_workspace_diagnostics,
+      fzflua = safe_require('fzf-lua').lsp_workspace_diagnostics,
     },
     [{ mode = "n", lhs = "la" }] = {
       telescope = nil,
-      fzflua = require("fzf-lua").lsp_code_actions
+      fzflua = safe_require('fzf-lua').lsp_code_actions
     },
-    [{ mode = "n", lhs = "<f6>" }] = {
+    [{ mode = "n", lhs = "<f5><f4>" }] = {
       telescope = nil,
-      fzflua = require('m.fzflua').undo_tree
+      fzflua = safe_require('fzf-lua').blines
     },
-    [{ mode = "n", lhs = "<f7>" }] = {
+    [{ mode = "n", lhs = "<space>u" }] = {
       telescope = nil,
-      fzflua = require('m.fzflua').test
-    }
+      fzflua = safe_require('m.fzflua').undo_tree
+    },
+    [{ mode = "n", lhs = "<space>m" }] = {
+      telescope = nil,
+      fzflua = safe_require('m.fzflua').notifications
+    },
   }
 
   for k, v in pairs(fuzzy_finder_keymaps) do
@@ -298,7 +310,30 @@ M.setup = function()
     })
   end
 
-  keymap("n", "lL", [[<cmd>lua require("m.keymaps").lsp_pick_formatter()<CR>]], opts)
+  local lsp_pick_formatter = function()
+    local clients = vim.lsp.get_active_clients({
+      bufnr = 0, -- current buffer
+    })
+
+    local format_providers = {}
+    for _, c in ipairs(clients) do
+      if c.server_capabilities.documentFormattingProvider then
+        table.insert(format_providers, c.name)
+      end
+    end
+
+    vim.ui.select(format_providers, {
+      prompt = 'Select format providers:',
+      format_item = function(provider_name)
+        return provider_name
+      end,
+    }, function(provider_name)
+      vim.lsp.buf.format({
+        filter = function(client) return client.name == provider_name end
+      })
+    end)
+  end
+  vim.keymap.set("n", "lL", lsp_pick_formatter, {})
 
   -- Terminal
   if config.terminal_plugin == "floaterm" then
@@ -333,7 +368,7 @@ M.setup = function()
   keymap("n", "<space>;", "q:", opts)
 
   -- Session restore
-  keymap("n", "<Space>r", [[<cmd>lua require("persistence").load()<cr>]], opts)
+  vim.keymap.set("n", "<Space>r", require("persistence").load, {})
 
   -- Colorizer
   vim.keymap.set("n", "<leader>c", utils.run_and_notify(function()
@@ -356,14 +391,14 @@ M.setup = function()
   if config.copilot_plugin == "vim" then
     keymap("n", "<leader>p", "<cmd>Copilot setup<CR>", opts)
   elseif config.copilot_plugin == "lua" then
-    vim.keymap.set("i", "<M-a>", require("copilot.suggestion").accept, {})
-    vim.keymap.set("i", "<M-w>", require("copilot.suggestion").accept_line, {})
-    vim.keymap.set("i", "<M-d>", require("copilot.suggestion").next, {})
-    vim.keymap.set("i", "<M-e>", require("copilot.suggestion").prev, {})
+    vim.keymap.set("i", "<M-a>", safe_require("copilot.suggestion").accept, {})
+    vim.keymap.set("i", "<M-w>", safe_require("copilot.suggestion").accept_line, {})
+    vim.keymap.set("i", "<M-d>", safe_require("copilot.suggestion").next, {})
+    vim.keymap.set("i", "<M-e>", safe_require("copilot.suggestion").prev, {})
   end
 
   if config.ssr_plugin then
-    vim.keymap.set({ "n", "v" }, "<leader>f", function() require("ssr").open() end)
+    vim.keymap.set({ "n", "v" }, "<leader>f", safe_require("ssr").open, {})
   end
 
   -- Diffview
@@ -381,30 +416,6 @@ M.setup = function()
     keymap("n", "<f2><f2>", "<cmd>LfWorkingDirectory<cr>", opts)
     keymap("n", "<f2><f3>", "<cmd>LfCurrentFile<cr>", opts)
   end
-end
-
-M.lsp_pick_formatter = function()
-  local clients = vim.lsp.get_active_clients({
-    bufnr = 0, -- current buffer
-  })
-
-  local format_providers = {}
-  for _, c in ipairs(clients) do
-    if c.server_capabilities.documentFormattingProvider then
-      table.insert(format_providers, c.name)
-    end
-  end
-
-  vim.ui.select(format_providers, {
-    prompt = 'Select format providers:',
-    format_item = function(provider_name)
-      return provider_name
-    end,
-  }, function(provider_name)
-    vim.lsp.buf.format({
-      filter = function(client) return client.name == provider_name end
-    })
-  end)
 end
 
 return M

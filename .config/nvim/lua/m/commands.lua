@@ -6,4 +6,6 @@ command("CopyRelPath", "call setreg('+', expand('%'))", opts)
 
 -- FzfLua
 local fzflua = require('m.fzflua')
+command("FzfLuaTest", fzflua.test, opts)
 command("FzfLuaUndoTree", fzflua.undo_tree, opts)
+command("FzfLuaNotifications", fzflua.notifications, opts)

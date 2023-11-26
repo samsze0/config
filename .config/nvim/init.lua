@@ -70,7 +70,6 @@ require("lazy").setup({
     end
   },
   {
-    -- TODO: open file when swap file exists throw cryptic error
     'ibhagwan/fzf-lua',
     enabled = not config.telescope_over_fzflua,
     config = function()
@@ -184,7 +183,6 @@ require("lazy").setup({
   },
   {
     -- Configure lua-language-server for neovim config
-    -- TODO: not working
     'folke/neodev.nvim',
     enabled = false,
     config = function()
@@ -348,8 +346,7 @@ require("lazy").setup({
     end
   },
   {
-    -- TODO: doesn't work if window is not buffer? (e.g. help or command line window)
-    -- Probably relies on closing the instance and reopening it again
+    -- Relies on closing the instance and reopening it again. Doesn't work with help / command line window
     'declancm/maximize.nvim',
     enabled = config.maximize_plugin,
     config = function()
@@ -379,7 +376,6 @@ require("lazy").setup({
     'mfussenegger/nvim-dap',
     enabled = config.dap_plugins,
     config = function()
-      -- TODO
     end
   },
   {
@@ -390,7 +386,6 @@ require("lazy").setup({
     end
   },
   {
-    -- TODO: replace by forking fzflua
     'folke/todo-comments.nvim',
     enabled = false,
   },
@@ -407,16 +402,22 @@ require("lazy").setup({
     end
   },
   {
+    -- vim.notify() backend
+    'rcarriga/nvim-notify',
+    enabled = config.notify_backend == "nvim-notify",
+    config = function()
+      require('m.notify')
+    end
+  },
+  {
     -- Change code by utilizing treesitter
     'Wansmer/treesj',
     enabled = false,
-    -- TODO
   },
   {
     -- Peek lines when doing `:<line>` on cmdline
     'nacro90/numb.nvim',
     enabled = false,
-    -- TODO
   },
   {
     'kylechui/nvim-surround',
@@ -429,14 +430,7 @@ require("lazy").setup({
 require('m.keymaps').setup()
 require('m.winbar').setup() -- i.e. breadcrumbs
 require('m.commands')
-require('m.theme').setup({
-  debug = {
-    enabled = false,
-    toggle_colorizer = false,
-    hide_defined_entries = false,
-    show_non_ts_syntax_hl_only = true
-  }
-})
+require('m.theme').setup(config.theme_opts)
 
 if vim.g.neovide then
   require("m.neovide")

@@ -95,6 +95,8 @@ end
 -- Tweaked from:
 -- https://github.com/debugloop/telescope-undo.nvim/blob/main/lua/telescope-undo/init.lua
 
+local timeago = require('m.timeago')
+
 local function traverse_undotree(opts, entries, alt_level)
   local undolist = {}
   -- create diffs for each entry in our undotree
@@ -180,7 +182,7 @@ local function traverse_undotree(opts, entries, alt_level)
       alt_level = alt_level, -- current level, i.e. how deep into alt branches are we, used to graph
       first = i == #entries, -- whether this is the first node in this branch, used to graph
       timestamp = entries[i].time,
-      time = require('m.timeago').timeago(entries[i].time),
+      time = timeago(entries[i].time),
       brief = brief,         -- brief message to describe the change
       diff = diff,           -- the proper diff, used for preview
       additions = additions, -- all additions, used to yank a result
@@ -219,6 +221,29 @@ M.get_undolist = function(opts)
   vim.api.nvim_win_set_cursor(0, cursor)
 
   return undolist
+end
+
+M.safe_require = function(module_name, opts)
+  opts = opts or {}
+  opts = vim.tbl_deep_extend("keep", opts, {
+    notify = true,
+    log_level = vim.log.levels.ERROR,
+  })
+  local ok, module = pcall(require, module_name)
+  if not ok then
+    if opts.notify then
+      vim.notify(string.format("Failed to load module %s", module_name), opts.log_level)
+    end
+    return setmetatable({}, {
+      __index = function(_, key)
+        if opts.notify then
+          vim.notify(string.format("Failed to access key %s in module %s", key, module_name), opts.log_level)
+        end
+        return nil
+      end,
+    }) -- In case we try to index into the result of safe_require
+  end
+  return module
 end
 
 return M

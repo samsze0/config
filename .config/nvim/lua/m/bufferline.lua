@@ -1,8 +1,4 @@
--- TODO: move to winbar once stable
-
 local bufferline = require('bufferline')
-
-local colors = require('m.theme').colors
 
 bufferline.setup({
   options = {

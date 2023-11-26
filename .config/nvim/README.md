@@ -11,6 +11,7 @@ Z-. X->git C-. V-. B-> N-> M-> ,->macro .-. /-.
 # Good resources
 
 - https://neovimcraft.com/plugin/nanotee/nvim-lua-guide
+- [Programming in Lua (first edition) online ver.](https://www.lua.org/pil/contents.html)
 
 # Less common vim keymaps/tips
 

@@ -1,4 +1,5 @@
--- TODO: https://github.com/zbirenbaum/copilot.lua/issues/172
+-- TODO: copilot chat support
+-- https://github.com/zbirenbaum/copilot.lua/issues/172
 
 require('copilot').setup({
   panel = {

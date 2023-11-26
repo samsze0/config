@@ -4,7 +4,7 @@ local config = require('m.config')
 local utils = require('m.utils')
 local safe_require = function(module)
   return utils.safe_require(module, {
-    notify = true,
+    notify = false,
     log_level = vim.log.levels.ERROR,
   })
 end

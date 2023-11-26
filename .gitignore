@@ -119,8 +119,7 @@
 # Neovim
 !.config/nvim/
 !.config/nvim/**
-.config/nvim/plugin
-.config/nvim/lua/.luarc.json
+.config/nvim/.luarc.json
 
 # Tmux
 !.config/tmux/

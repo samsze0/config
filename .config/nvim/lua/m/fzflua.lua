@@ -380,28 +380,28 @@ end
 
 M.undo_tree = function()
   local undolist = utils.get_undolist()
+  local current_buf = vim.api.nvim_get_current_buf()
 
   -- Tweaked from
   -- https://github.com/debugloop/telescope-undo.nvim/tree/main
   require('fzf-lua').fzf_exec(function(fzf_cb)
     coroutine.wrap(function()
-      local co = coroutine.running()
-      -- TODO: can block UI if `utils.get_undolist` is expensive
-      vim.schedule(function()
+      local co = coroutine.running() -- Get running coroutine
+      vim.schedule(function()        -- Schedule function to run on vim main loop (with full API accessibility)
         for i, undo in ipairs(undolist) do
           fzf_cb(string.format("[%d] seq %d (%s)", i, undo.seq, undo.time),
             function() coroutine.resume(co) end)
         end
       end)
       coroutine.yield()
-      fzf_cb()
+      fzf_cb() -- EOF (close fzf named pipe)
     end)()
   end, {
     prompt = 'UndoTree❯ ',
     preview = require 'fzf-lua'.shell.raw_preview_action_cmd(function(selected)
       local undo = undolist[tonumber(selected[1]:match("%[(.-)%]"))]
       local delta_opts = ""
-      return string.format([[echo '%s' | delta "%s" %s]], undo.diff:gsub("'", [['"'"']]), undo.time, delta_opts)
+      return string.format([[echo '%s' | delta "%s" %s]], undo.diff:gsub([[']], [['"'"']]), undo.time, delta_opts)
     end),
     actions = {
       ['ctrl-a'] = {
@@ -417,7 +417,9 @@ M.undo_tree = function()
       ['ctrl-o'] = function(selected, opts)
         local undo = undolist[tonumber(selected[1]:match("%[(.-)%]"))]
         local before_and_after = utils.get_undo_before_and_after(undo.seq)
-        utils.open_diff_in_new_tab(before_and_after[1], before_and_after[2])
+        utils.open_diff_in_new_tab(before_and_after[1], before_and_after[2], {
+          filetype = vim.api.nvim_buf_get_option(current_buf, "filetype")
+        })
       end
     }
   })
@@ -452,10 +454,11 @@ M.notifications = function()
     preview = require 'fzf-lua'.shell.raw_preview_action_cmd(function(selected)
       local parts = vim.split(selected[1], " ")
       local noti = notifications[tonumber(parts[#parts])]
-      return string.format([[echo '%s']], noti.message[1])
+      return string.format([[cat <<FZFLUAEOM
+%s
+FZFLUAEOM]], table.concat(noti.message, "\n"))
     end),
     actions = {
-
     }
   })
 end

@@ -76,27 +76,6 @@ M.run_and_notify = function(f, msg)
   end
 end
 
-M.get_undo_before_and_after = function(seq)
-  -- TODO: refactor this with M.get_undolist
-  -- save our current cursor
-  local cursor = vim.api.nvim_win_get_cursor(0)
-
-  -- get all diffs of current buf
-  local ut = vim.fn.undotree()
-
-  vim.cmd("silent undo " .. seq)
-  local buffer_after = vim.api.nvim_buf_get_lines(0, 0, -1, false) or {}
-
-  vim.cmd("silent undo")
-  local buffer_before = vim.api.nvim_buf_get_lines(0, 0, -1, false) or {}
-
-  -- restore everything after all diffs have been created
-  vim.cmd("silent undo " .. ut.seq_cur)
-  vim.api.nvim_win_set_cursor(0, cursor)
-
-  return { buffer_before, buffer_after }
-end
-
 M.open_diff_in_new_tab = function(buf1_content, buf2_content, opts)
   opts = opts or {}
 
@@ -230,6 +209,21 @@ function M.undolist_entry_producer(opts, entries, alt_level)
   end)
 end
 
+M.mess_with_undotree = function(f, ...)
+  -- save our current cursor
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  -- get all diffs of current buf
+  local undotree = vim.fn.undotree()
+
+  local return_val = f(undotree, ...)
+
+  -- restore everything after
+  vim.cmd("silent undo " .. undotree.seq_cur)
+  vim.api.nvim_win_set_cursor(0, cursor)
+
+  return return_val
+end
+
 M.get_undolist = function(opts)
   opts = opts or {}
   opts = vim.tbl_deep_extend("force", opts, {
@@ -238,37 +232,39 @@ M.get_undolist = function(opts)
     debug = false            -- Whether to log out entry inside coroutine
   })
 
-  -- save our current cursor
-  local cursor = vim.api.nvim_win_get_cursor(0)
+  return M.mess_with_undotree(function(undotree)
+    -- procedurally generate undotree entries w/ coroutine
+    local undolist = {}
+    local undolist_entry_producer = M.undolist_entry_producer(opts, undotree.entries)
+    for i = 1, opts.max_entries do
+      local ok, entry = coroutine.resume(undolist_entry_producer)
+      if not ok then
+        error("Failed to produce undotree entry: " .. entry)
+      end
 
-  -- get all diffs of current buf
-  local ut = vim.fn.undotree()
+      table.insert(undolist, entry)
+      if coroutine.status(undolist_entry_producer) == "dead" then
+        break
+      end
 
-  -- procedurally generate undotree entries w/ coroutine
-  local undolist = {}
-  local undolist_entry_producer = M.undolist_entry_producer(opts, ut.entries)
-  for i = 1, opts.max_entries do
-    local ok, entry = coroutine.resume(undolist_entry_producer)
-    if not ok then
-      error("Failed to produce undotree entry: " .. entry)
+      if i == opts.max_entries then
+        coroutine.close(undolist_entry_producer)
+      end
     end
+    return undolist
+  end)
+end
 
-    table.insert(undolist, entry)
-    if coroutine.status(undolist_entry_producer) == "dead" then
-      break
-    end
+M.get_undo_before_and_after = function(seq)
+  return M.mess_with_undotree(function(undotree)
+    vim.cmd("silent undo " .. seq)
+    local buffer_after = vim.api.nvim_buf_get_lines(0, 0, -1, false) or {}
 
-    if i == opts.max_entries then
-      coroutine.close(undolist_entry_producer)
-    end
-  end
+    vim.cmd("silent undo")
+    local buffer_before = vim.api.nvim_buf_get_lines(0, 0, -1, false) or {}
 
-  -- restore everything after all diffs have been created
-  -- BUG: `gi` (last insert location) is being killed by our method, we should save that as well
-  vim.cmd("silent undo " .. ut.seq_cur)
-  vim.api.nvim_win_set_cursor(0, cursor)
-
-  return undolist
+    return { buffer_before, buffer_after }
+  end)
 end
 
 M.safe_require = function(module_name, opts)

@@ -54,9 +54,9 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-local config = require('config')
+local config = require('m.config')
 
-require('theme').setup({}) -- Setup once because some plugins might read existing highlight groups values
+require('m.theme').setup({}) -- Setup once because some plugins might read existing highlight groups values
 
 require("lazy").setup({
   {
@@ -66,7 +66,7 @@ require("lazy").setup({
       'nvim-lua/plenary.nvim'
     },
     config = function()
-      require('_telescope')
+      require('m.telescope')
     end
   },
   {
@@ -74,7 +74,7 @@ require("lazy").setup({
     'ibhagwan/fzf-lua',
     enabled = not config.telescope_over_fzflua,
     config = function()
-      require('_fzflua').setup()
+      require('m.fzflua').setup()
     end,
   },
   {
@@ -96,20 +96,20 @@ require("lazy").setup({
     'zbirenbaum/copilot.lua',
     enabled = config.copilot_plugin == "lua",
     config = function()
-      require('_copilotlua')
+      require('m.copilotlua')
     end
   },
   {
     'nvim-lualine/lualine.nvim',
     config = function()
-      require("_lualine")
+      require('m.lualine')
     end
   },
   {
     -- Show colors for color values e.g. hex
     'norcalli/nvim-colorizer.lua',
     config = function()
-      require('_colorizer')
+      require('m.colorizer')
     end
   },
   {
@@ -133,17 +133,14 @@ require("lazy").setup({
     'akinsho/toggleterm.nvim',
     enabled = config.terminal_plugin == "toggleterm",
     config = function()
-      require('_toggleterm')
+      require('m.toggleterm')
     end
   },
   {
     'lmburns/lf.nvim',
     enabled = config.lf_plugin == "nvim",
     requires = {
-      'akinsho/toggleterm.nvim',
-      config = function()
-        require("toggleterm").setup()
-      end
+      'akinsho/toggleterm.nvim'
     },
     config = function()
       -- This feature will not work if the plugin is lazy-loaded
@@ -168,21 +165,21 @@ require("lazy").setup({
       'hrsh7th/cmp-nvim-lsp'
     },
     config = function()
-      require('_lspconfig')
+      require('m.lspconfig')
     end
   },
   {
     -- Autoclosing brackets
     'windwp/nvim-autopairs',
     config = function()
-      require('_autopairs')
+      require('m.autopairs')
     end
   },
   {
     -- Hop. Hijack search and f/t
     'folke/flash.nvim',
     config = function()
-      require('_flash')
+      require('m.flash')
     end
   },
   {
@@ -198,14 +195,14 @@ require("lazy").setup({
     -- Git status in sign column and git hunk preview/navigation and line blame
     'lewis6991/gitsigns.nvim',
     config = function()
-      require('_gitsigns')
+      require('m.gitsigns')
     end
   },
   {
     'nvim-tree/nvim-tree.lua',
     enabled = config.filetree_plugin == "nvimtree",
     config = function()
-      require('_nvimtree')
+      require('m.nvimtree')
     end
   },
   {
@@ -215,7 +212,7 @@ require("lazy").setup({
       require("ibl").setup({
         indent = { char = "▏" },
         scope = {
-          highlight = require('theme').rainbow_hl_groups,
+          highlight = require('m.theme').rainbow_hl_groups,
           show_start = false, -- underline on scope start
           show_end = false,   -- underline on scope end
           include = {
@@ -233,7 +230,7 @@ require("lazy").setup({
     -- Brackets colorizer
     'HiPhish/rainbow-delimiters.nvim',
     config = function()
-      vim.g.rainbow_delimiters = { highlight = require('theme').rainbow_hl_groups }
+      vim.g.rainbow_delimiters = { highlight = require('m.theme').rainbow_hl_groups }
     end
   },
   {
@@ -250,7 +247,7 @@ require("lazy").setup({
     enabled = true,
     priority = 100, -- Default priority is 50. Must load befor
     config = function()
-      require('_neoconf')
+      require('m.neoconf')
     end
   },
   {
@@ -265,21 +262,21 @@ require("lazy").setup({
     -- Formatters interface that calculates minimal diff
     'stevearc/conform.nvim',
     config = function()
-      require('_conform')
+      require('m.conform')
     end
   },
   {
     -- Linters interface that reports to vim.diagnostic, unlike ALE
     'mfussenegger/nvim-lint',
     config = function()
-      require('_nvimlint')
+      require('m.nvimlint')
     end
   },
   {
     -- Completion
     'hrsh7th/nvim-cmp',
     config = function()
-      require('_nvimcmp')
+      require('m.nvimcmp')
     end,
     dependencies = {
       'hrsh7th/cmp-nvim-lsp', -- nvim-cmp source for built-in language server client
@@ -302,7 +299,7 @@ require("lazy").setup({
   {
     'sindrets/diffview.nvim',
     config = function()
-      require('_diffview')
+      require('m.diffview')
     end
   },
   {
@@ -312,7 +309,7 @@ require("lazy").setup({
       'nvim-lua/plenary.nvim'
     },
     config = function()
-      require('_spectre')
+      require('m.spectre')
     end
   },
   {
@@ -330,7 +327,7 @@ require("lazy").setup({
   {
     'nvim-treesitter/nvim-treesitter',
     config = function()
-      require('_treesitter')
+      require('m.treesitter')
     end
   },
   {
@@ -340,21 +337,21 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter'
     },
     config = function()
-      require('_treesitter_textobjects')
+      require('m.treesitter_textobjects')
     end
   },
   {
     -- Act as tab bar
     'akinsho/bufferline.nvim',
     config = function()
-      require('_bufferline')
+      require('m.bufferline')
     end
   },
   {
     -- TODO: doesn't work if window is not buffer? (e.g. help or command line window)
     -- Probably relies on closing the instance and reopening it again
     'declancm/maximize.nvim',
-    enabled = require('config').maximize_plugin,
+    enabled = config.maximize_plugin,
     config = function()
       require('maximize').setup({
         default_keymaps = false,
@@ -365,7 +362,7 @@ require("lazy").setup({
     'cshuaimin/ssr.nvim',
     enabled = config.ssr_plugin,
     config = function()
-      require('_ssr')
+      require('m.ssr')
     end
   },
   {
@@ -375,7 +372,7 @@ require("lazy").setup({
       'nvim-lua/plenary.nvim'
     },
     config = function()
-      require('_vgit')
+      require('m.vgit')
     end
   },
   {
@@ -389,7 +386,7 @@ require("lazy").setup({
     'folke/trouble.nvim',
     enabled = config.trouble_plugin,
     config = function()
-      require('_trouble')
+      require('m.trouble')
     end
   },
   {
@@ -406,7 +403,7 @@ require("lazy").setup({
     'j-hui/fidget.nvim',
     enabled = config.notify_backend == "fidget",
     config = function()
-      require('_fidget')
+      require('m.fidget')
     end
   },
   {
@@ -424,15 +421,15 @@ require("lazy").setup({
   {
     'kylechui/nvim-surround',
     config = function()
-      require('_surround')
+      require('m.surround')
     end
   }
 })
 
-require('keymaps').setup()
-require('winbar').setup() -- i.e. breadcrumbs
-require('commands')
-require('theme').setup({
+require('m.keymaps').setup()
+require('m.winbar').setup() -- i.e. breadcrumbs
+require('m.commands')
+require('m.theme').setup({
   debug = {
     enabled = false,
     toggle_colorizer = false,
@@ -442,5 +439,5 @@ require('theme').setup({
 })
 
 if vim.g.neovide then
-  require("neovide")
+  require("m.neovide")
 end

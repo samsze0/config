@@ -348,7 +348,7 @@ M.setup = function()
   require('fzf-lua').register_ui_select()
 end
 
-local utils = require("utils")
+local utils = require("m.utils")
 
 M.test = function()
   require('fzf-lua').fzf_exec(function(fzf_cb)
@@ -397,20 +397,27 @@ M.undo_tree = function()
     end)()
   end, {
     prompt = 'UndoTree❯ ',
-    preview = require 'fzf-lua'.shell.raw_preview_action_cmd(function(items) -- arg: selected items
-      local undo = undolist[tonumber(items[1]:match("%[(.-)%]"))]
+    preview = require 'fzf-lua'.shell.raw_preview_action_cmd(function(selected)
+      local undo = undolist[tonumber(selected[1]:match("%[(.-)%]"))]
       local delta_opts = ""
-      return string.format([[echo "%s" | delta "%s" %s]], undo.diff, undo.time, delta_opts)
+      return string.format([[echo '%s' | delta "%s" %s]], undo.diff:gsub("'", [['"'"']]), undo.time, delta_opts)
     end),
     actions = {
-      ['alt-x'] = {
-        fn = function(selected)
-          for _, f in ipairs(selected) do
-            print("deleting:", f)
-          end
+      ['ctrl-a'] = {
+        -- See action reload
+        -- https://github.com/ibhagwan/fzf-lua/wiki/Advanced#action-reload
+        fn = function(selected, opts)
+          local undo = undolist[tonumber(selected[1]:match("%[(.-)%]"))]
+          vim.cmd(string.format("slient undo %s", undo.seq))
+          vim.notify(string.format("Undo %s", undo.seq))
         end,
         reload = true,
-      }
+      },
+      ['ctrl-o'] = function(selected, opts)
+        local undo = undolist[tonumber(selected[1]:match("%[(.-)%]"))]
+        local before_and_after = utils.get_undo_before_and_after(undo.seq)
+        utils.open_diff_in_new_tab(before_and_after[1], before_and_after[2])
+      end
     }
   })
 end

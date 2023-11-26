@@ -23,9 +23,13 @@ M.split_string = function(inputstr, sep)
 end
 
 M.show_content_as_buf = function(buf_lines)
-  local buf = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_lines(buf, 0, -1, false, buf_lines)
-  vim.api.nvim_set_current_buf(buf)
+  local buf_nr = vim.api.nvim_create_buf(false, false)
+
+  vim.api.nvim_buf_set_lines(buf_nr, 0, -1, false, buf_lines)
+  vim.api.nvim_set_current_buf(buf_nr)
+  vim.api.nvim_buf_call(buf_nr, function()
+    vim.cmd("filetype detect")
+  end)
 end
 
 M.contains = function(tbl, str)
@@ -67,20 +71,40 @@ M.run_and_notify = function(f, msg)
   end
 end
 
+M.get_undo_before_and_after = function(seq)
+  vim.cmd("silent undo " .. seq)
+  local buffer_after = vim.api.nvim_buf_get_lines(0, 0, -1, false) or {}
+
+  vim.cmd("silent undo")
+  local buffer_before = vim.api.nvim_buf_get_lines(0, 0, -1, false) or {}
+
+  return { buffer_before, buffer_after }
+end
+
+M.open_diff_in_new_tab = function(buf1_content, buf2_content)
+  vim.api.nvim_command("tabnew")
+  M.show_content_as_buf(buf1_content)
+  vim.api.nvim_command("diffthis")
+
+  vim.api.nvim_command("vsplit")
+  vim.api.nvim_command("wincmd l")
+  M.show_content_as_buf(buf2_content)
+  vim.api.nvim_command("diffthis")
+end
+
 -- Tweaked from:
 -- https://github.com/debugloop/telescope-undo.nvim/blob/main/lua/telescope-undo/init.lua
 
-local function _traverse_undotree(opts, entries, alt_level)
+local function traverse_undotree(opts, entries, alt_level)
   local undolist = {}
   -- create diffs for each entry in our undotree
   for i = #entries, 1, -1 do
-    vim.cmd("silent undo " .. entries[i].seq)
-    local buffer_after_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false) or {}
-    local buffer_after = table.concat(buffer_after_lines, "\n")
+    local undo_before_and_after = M.get_undo_before_and_after(entries[i].seq)
 
-    vim.cmd("silent undo")
-    local buffer_before_lines = vim.api.nvim_buf_get_lines(0, 0, -1, false) or {}
-    local buffer_before = table.concat(buffer_before_lines, "\n")
+    local before_lines = undo_before_and_after[1]
+    local before = table.concat(before_lines, "\n")
+    local after_lines = undo_before_and_after[2]
+    local after = table.concat(after_lines, "\n")
 
     -- create temporary vars and prepare this iteration
     local diff = ""
@@ -104,36 +128,40 @@ local function _traverse_undotree(opts, entries, alt_level)
       diff = diff .. " @@"
       -- get front context based on options
       local context_lines = 0
+
+
       if opts.diff_context_lines ~= nil then
         context_lines = opts.diff_context_lines
       end
       for j = start_a - context_lines, start_a - 1 do
-        if buffer_before_lines[j] ~= nil then
-          diff = diff .. "\n " .. buffer_before_lines[j]
+        if before_lines[j] ~= nil then
+          diff = diff .. "\n " .. before_lines[j]
         end
       end
       -- get deletions
       for j = start_a, start_a + count_a - 1 do
-        diff = diff .. "\n-" .. buffer_before_lines[j]
-        table.insert(deletions, buffer_before_lines[j])
-        brief = brief .. buffer_before_lines[j]
+        diff = diff .. "\n-" .. before_lines[j]
+        table.insert(deletions, before_lines[j])
+        brief = brief .. before_lines[j]
       end
+      brief = brief .. " -> "
       -- get additions
       for j = start_b, start_b + count_b - 1 do
-        diff = diff .. "\n+" .. buffer_after_lines[j]
-        table.insert(additions, buffer_after_lines[j])
+        diff = diff .. "\n+" .. after_lines[j]
+        table.insert(additions, after_lines[j])
+        brief = brief .. before_lines[j]
       end
       -- and finally, get some more context in the back
       for j = start_a + count_a, start_a + count_a + context_lines - 1 do
-        if buffer_before_lines[j] ~= nil then
-          diff = diff .. "\n " .. buffer_before_lines[j]
+        if before_lines[j] ~= nil then
+          diff = diff .. "\n " .. before_lines[j]
         end
       end
       -- terminate all this with a newline, so we're ready for the next hunk
       diff = diff .. "\n"
     end
 
-    vim.diff(buffer_before, buffer_after, {
+    vim.diff(before, after, {
       result_type = "indices",
       on_hunk = on_hunk_callback,
       algorithm = "patience",
@@ -152,7 +180,7 @@ local function _traverse_undotree(opts, entries, alt_level)
       alt_level = alt_level, -- current level, i.e. how deep into alt branches are we, used to graph
       first = i == #entries, -- whether this is the first node in this branch, used to graph
       timestamp = entries[i].time,
-      time = require('timeago').timeago(entries[i].time),
+      time = require('m.timeago').timeago(entries[i].time),
       brief = brief,         -- brief message to describe the change
       diff = diff,           -- the proper diff, used for preview
       additions = additions, -- all additions, used to yank a result
@@ -162,7 +190,7 @@ local function _traverse_undotree(opts, entries, alt_level)
 
     -- descend recursively into alternate histories of undo states
     if entries[i].alt ~= nil then
-      local alt_undolist = _traverse_undotree(opts, entries[i].alt, alt_level + 1)
+      local alt_undolist = traverse_undotree(opts, entries[i].alt, alt_level + 1)
       for _, elem in pairs(alt_undolist) do
         table.insert(undolist, elem)
       end
@@ -183,7 +211,7 @@ M.get_undolist = function(opts)
   -- get all diffs of current buf
   local ut = vim.fn.undotree()
   -- TODO: maybe use this opportunity to limit the number of root nodes we process overall, to ensure good performance
-  local undolist = _traverse_undotree(opts, ut.entries, 0)
+  local undolist = traverse_undotree(opts, ut.entries, 0)
 
   -- restore everything after all diffs have been created
   -- BUG: `gi` (last insert location) is being killed by our method, we should save that as well

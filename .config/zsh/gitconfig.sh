@@ -30,6 +30,7 @@ cat <<EOT >> ~/.gitconfig
 
 [delta]
     # Tweaked from: https://github.com/maxfangx
+    # https://github.com/dandavison/delta/blob/main/themes.gitconfig
     # General appearance
     dark = true
     syntax-theme = base16

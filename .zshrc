@@ -110,7 +110,7 @@ alias deff='delta --raw'
 alias ts-get='tailscale_get'
 alias ts-send='tailscale_send'
 alias jq='gojq'
-alias v='nvim'
+alias v='PAGER="nvim -RM" nvim' # Used by lf.vim
 alias vv='neovide'
 alias lf='PAGER="nvim -RM" lf'
 

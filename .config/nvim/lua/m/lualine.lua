@@ -1,4 +1,4 @@
-local colors = require('theme').colors
+local colors = require('m.theme').colors
 
 local theme = {}
 for _, mode in ipairs({ "normal", "insert", "visual", "replace", "command", "inactive" }) do

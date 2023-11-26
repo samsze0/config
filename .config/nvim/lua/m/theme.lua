@@ -1,7 +1,7 @@
 -- Tweak from RRethy/nvim-base16
 -- https://github.com/RRethy/nvim-base16/blob/master/lua/base16-colorscheme.lua
 
-local config = require("config")
+local config = require("m.config")
 
 local M = {}
 
@@ -555,7 +555,7 @@ function M.setup(opts)
 
   hi.TreesitterContext          = { guifg = nil, guibg = c.gray_300, gui = 'italic', guisp = nil }
 
-  local override_terminal_color = true
+  local override_terminal_color = vim.g.neovide
 
   if override_terminal_color then
     vim.g.terminal_color_0  = c.black
@@ -761,6 +761,8 @@ function M.setup(opts)
         end
       end), " ")
     end)
+
+
 
     if not buf_lines then return end
 

@@ -1,13 +1,13 @@
 local M = {}
 
+local config = require('m.config')
+local utils = require('m.utils')
+
 M.setup = function()
   local keymap = vim.api.nvim_set_keymap
   local opts = { silent = true, noremap = true }
   local opts_can_remap = { silent = true, noremap = false }
   local opts_expr = { silent = true, expr = true, noremap = true }
-
-  local config = require('config')
-  local utils = require('utils')
 
   -- Pageup/down
   keymap("n", "<PageUp>", "<C-u><C-u>", opts)
@@ -154,7 +154,7 @@ M.setup = function()
 
   keymap("n", "wt", "<cmd>wincmd T<CR>", opts) -- Move to new tab
 
-  local maximize_plugin = require('config').maximize_plugin
+  local maximize_plugin = config.maximize_plugin
 
   if maximize_plugin then
     keymap("n", 'wz', "<Cmd>lua require('maximize').toggle()<CR>", opts)
@@ -258,11 +258,11 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f6>" }] = {
       telescope = nil,
-      fzflua = require("_fzflua").undo_tree
+      fzflua = require('m.fzflua').undo_tree
     },
     [{ mode = "n", lhs = "<f7>" }] = {
       telescope = nil,
-      fzflua = require("_fzflua").test
+      fzflua = require('m.fzflua').test
     }
   }
 
@@ -298,7 +298,7 @@ M.setup = function()
     })
   end
 
-  keymap("n", "lL", [[<cmd>lua require("keymaps").lsp_pick_formatter()<CR>]], opts)
+  keymap("n", "lL", [[<cmd>lua require("m.keymaps").lsp_pick_formatter()<CR>]], opts)
 
   -- Terminal
   if config.terminal_plugin == "floaterm" then

@@ -2,7 +2,7 @@
 
 local bufferline = require('bufferline')
 
-local colors = require('theme').colors
+local colors = require('m.theme').colors
 
 bufferline.setup({
   options = {

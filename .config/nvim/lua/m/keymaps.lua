@@ -11,9 +11,9 @@ end
 
 M.setup = function()
   local keymap = vim.api.nvim_set_keymap
-  local opts = { silent = true, noremap = true }
-  local opts_can_remap = { silent = true, noremap = false }
-  local opts_expr = { silent = true, expr = true, noremap = true }
+  local opts = { silent = false, noremap = true }
+  local opts_can_remap = { silent = false, noremap = false }
+  local opts_expr = { silent = false, expr = true, noremap = true }
 
   -- Pageup/down
   keymap("n", "<PageUp>", "<C-u><C-u>", opts)

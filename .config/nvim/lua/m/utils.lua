@@ -77,17 +77,25 @@ M.run_and_notify = function(f, msg)
   end
 end
 
-M.open_diff_in_new_tab = function(buf1_content, buf2_content, opts)
+M.open_diff_in_new_tab = function(buf1_content, buf2_content_or_filepath, opts)
   opts = opts or {}
 
   vim.api.nvim_command("tabnew")
-  M.show_content_as_buf(buf1_content, opts)
+
+  -- Create the right window first
+  if type(buf2_content_or_filepath) == "string" then
+    vim.api.nvim_command(string.format("edit %s", buf2_content_or_filepath))
+    opts.filetype = vim.bo.filetype -- Overwrite filetype if existing file was given as buf2
+  else
+    M.show_content_as_buf(buf2_content_or_filepath, opts)
+  end
   vim.api.nvim_command("diffthis")
 
   vim.api.nvim_command("vsplit")
-  vim.api.nvim_command("wincmd l")
-  M.show_content_as_buf(buf2_content, opts)
+  M.show_content_as_buf(buf1_content, opts)
   vim.api.nvim_command("diffthis")
+
+  vim.api.nvim_command("wincmd l") -- Move focus to right window
 end
 
 M.safe_require = function(module_name, opts)

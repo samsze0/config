@@ -29,14 +29,9 @@ return {
         vim.notify(file_path)
 
         local before_file_content = vim.fn.system(string.format("git show HEAD:%s", file_path))
-        local before_file_lines = utils.iter_to_table(before_file_content:gmatch("[^\n]+"))
+        local before_file_lines = utils.iter_to_table(before_file_content:gmatch("(.-)\n"))
 
-        local after_file_content = vim.fn.system(string.format("cat %s", file_path))
-        local after_file_lines = utils.iter_to_table(after_file_content:gmatch("[^\n]+"))
-
-        utils.open_diff_in_new_tab(before_file_lines, after_file_lines, {
-          filetype = "lua"
-        })
+        utils.open_diff_in_new_tab(before_file_lines, file_path)
       end,
     },
   },

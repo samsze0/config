@@ -33,6 +33,7 @@ M.colors = {
   gray_700 = '#95a1b3',
   gray_800 = '#b7beca',
   white = "#cbd1da",
+  true_white = "#ffffff",
 
   red_100 = "#280f0f",
   blue_100 = "#0e1a27",
@@ -258,7 +259,7 @@ function M.setup(opts)
   hi.Exception                          = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
   hi.FoldColumn                         = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
   hi.Folded                             = { guifg = c.gray_600, guibg = c.gray_200, gui = nil, guisp = nil }
-  hi.IncSearch                          = { guifg = c.black, guibg = c.yellow, gui = 'none', guisp = nil }
+  hi.IncSearch                          = { guifg = c.true_white, guibg = c.yellow_800, gui = 'none', guisp = nil }
   hi.Italic                             = { guifg = nil, guibg = nil, gui = 'none', guisp = nil }
   hi.Macro                              = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.MatchParen                         = { guifg = nil, guibg = c.gray_400, gui = nil, guisp = nil }
@@ -266,7 +267,7 @@ function M.setup(opts)
   hi.MoreMsg                            = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
   hi.Question                           = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.Search                             = { guifg = nil, guibg = c.yellow_300, gui = nil, guisp = nil }
-  hi.Substitute                         = { guifg = c.white, guibg = c.yellow_400, gui = 'none', guisp = nil }
+  hi.Substitute                         = { guifg = nil, guibg = c.yellow_500, gui = 'none', guisp = nil }
   hi.SpecialKey                         = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
   hi.TooLong                            = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.Underlined                         = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
@@ -725,6 +726,9 @@ function M.setup(opts)
     hi.NotifyDEBUGBody   = 'Normal'
     hi.NotifyTRACEBody   = 'Normal'
   end
+
+  -- Flash
+  hi.FlashLabel = { guifg = c.true_white, guibg = c.blue_700 }
 
   if opts.debug.enabled then
     local log_opts = true

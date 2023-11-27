@@ -1,5 +1,5 @@
 require("flash").setup {
-  labels = "asdfjklqwertyuiopzxcvbnm",
+  labels = "asdfjghklqwertyuiopzxcvbnm",
   search = {
     multi_window = false,
     forward = true,

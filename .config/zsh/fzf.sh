@@ -34,5 +34,7 @@ EOT
     --border \
     --margin=1 \
     --padding=1 \
+    --pointer='' \
+    --marker='' \
   "
 }

@@ -1,8 +1,14 @@
 local M = {}
 
-M.setup = function()
-  local actions = require "fzf-lua.actions"
+-- See default
+-- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/defaults.lua
 
+local utils = require("m.utils")
+local config = require("m.config")
+local timeago = require('m.timeago')
+local actions = require("fzf-lua.actions")
+
+M.setup = function()
   local config = {
     winopts = {
       fullscreen = false,
@@ -53,13 +59,17 @@ M.setup = function()
         --   oldfiles, quickfix, loclist, tags, btags
         --   args
         ["default"] = actions.file_edit,
-        ["alt-q"]   = actions.file_sel_to_qf, -- send to quickfix
-        ["alt-l"]   = actions.file_sel_to_ll, -- send to loclist
+        ["ctrl-q"]  = actions.file_sel_to_qf, -- send to quickfix
+        ["ctrl-l"]  = actions.file_sel_to_ll, -- send to loclist
+        ["ctrl-w"]  = actions.file_vsplit,
+        ["ctrl-t"]  = actions.file_tabedit,
       },
       buffers = {
         -- providers that inherit these actions:
         --   buffers, tabs, lines, blines
         ["default"] = actions.buf_edit,
+        ["ctrl-w"]  = actions.buf_vsplit,
+        ["ctrl-t"]  = actions.buf_tabedit,
       }
     },
     fzf_opts = {
@@ -89,102 +99,6 @@ M.setup = function()
     },
   }
 
-  local git_providers_config = {
-    files = {
-      prompt = 'GitFiles❯ ',
-      cmd    = 'git ls-files --exclude-standard',
-    },
-    status = {
-      prompt        = 'GitStatus❯ ',
-      cmd           = "git -c color.status=false status -su", -- Disable color. Show in short format and show all untracked files.
-      previewer     = "git_diff",
-      preview_pager = "delta --width=$FZF_PREVIEW_COLUMNS",
-      actions       = {
-        -- actions inherit from 'actions.files' and merge
-        ["right"] = { fn = actions.git_unstage, reload = true },
-        ["left"]  = { fn = actions.git_stage, reload = true },
-        ["alt-x"] = { fn = actions.git_reset, reload = true },
-      },
-    },
-    commits = {
-      prompt        = 'ProjectCommits❯ ',
-      -- {1} : commit SHA
-      -- <file> : current file
-
-      -- Show hash (%h) in yellow,
-      -- date (%cr) in green, right-aligned and padded to 12 chars w/ %><(12), truncates to 12 if longer w/ %><|(12)
-      -- author (%an) in blue
-      cmd           =
-      "git log --color --pretty=format:'%C(yellow)%h%Creset %Cgreen(%><(12)%cr%><|(12))%Creset %s %C(blue)<%an>%Creset'",
-
-      -- Show (diff in commit):
-      -- commit hash (%H) in red,
-      -- author (%an) and email (%ae) in blue,
-      -- commit date (%cd) in yellow,
-      -- commit subject (first line of commit msg) (%s) in green
-      preview       = "git show --pretty='%Cred%H%n%Cblue%an <%ae>%n%C(yellow)%cD%n%Cgreen%s' --color {1}",
-      preview_pager = "delta --width=$FZF_PREVIEW_COLUMNS",
-      actions       = {
-        ["default"] = actions.git_checkout,
-        ["alt-y"]   = { fn = actions.git_yank_commit, exec_silent = true },
-      },
-    },
-    bcommits = {
-      prompt        = 'FileCommits❯ ',
-
-      -- Show hash (%h) in yellow,
-      -- date (%cr) in green, right-aligned and padded to 12 chars w/ %><(12), truncates to 12 if longer w/ %><|(12)
-      -- author (%an) in blue
-      cmd           =
-      "git log --color --pretty=format:'%C(yellow)%h%Creset %C(green)(%><(12)%cr%><|(12))%Creset %s %C(blue)<%an>%Creset' <file>",
-
-      -- Show diff between current and <file>:
-      -- <hash>^! denotes single commit referred by the hash (^! means to ignore all of its parents)
-      preview       = "git diff --color {1}^! -- <file>",
-      preview_pager = "delta --width=$FZF_PREVIEW_COLUMNS",
-      actions       = {
-        ["default"] = actions.git_buf_edit,
-        ["alt-w"]   = actions.git_buf_vsplit,
-        ["alt-t"]   = actions.git_buf_tabedit,
-        ["alt-y"]   = { fn = actions.git_yank_commit, exec_silent = true },
-      },
-    },
-    branches = {
-      prompt  = 'Branches❯ ',
-
-      cmd     = "git branch --all --color",
-      -- Show log graph of a branch where each commit is one-liner w/ abbreviated hash (%h)
-      preview = "git log --graph --pretty=oneline --abbrev-commit --color {1}",
-      actions = {
-        ["default"] = actions.git_switch,
-      },
-    },
-    tags = {
-      cmd      = "git for-each-ref --color --sort=-taggerdate --format "
-          .. "'%(color:yellow)%(refname:short)%(color:reset) "
-          .. "%(color:green)(%(taggerdate:relative))%(color:reset)"
-          .. " %(subject) %(color:blue)%(taggername)%(color:reset)' refs/tags",
-      preview  = "git log --graph --color --pretty=format:'%C(yellow)%h%Creset "
-          .. "%Cgreen(%><(12)%cr%><|(12))%Creset %s %C(blue)<%an>%Creset' {1}",
-      fzf_opts = { ["--no-multi"] = "" },
-      actions  = { ["default"] = actions.git_checkout },
-    },
-    stash = {
-      prompt   = 'Stash❯ ',
-      cmd      = "git --no-pager stash list",
-      -- Show in patch format (diff; like `git show`)
-      preview  = "git --no-pager stash show --patch --color {1}",
-      actions  = {
-        ["default"] = actions.git_stash_apply,
-        ["alt-x"]   = { fn = actions.git_stash_drop, reload = true },
-      },
-      fzf_opts = {
-        ["--no-multi"]  = '',
-        ['--delimiter'] = "'[:]'",
-      },
-    },
-  }
-
   local providers_config = {
     defaults = {
       file_icons  = false,
@@ -202,11 +116,11 @@ M.setup = function()
         -- inherits from 'actions.files', here we can override
         -- or set bind to 'false' to disable a default action
         ["default"] = actions.file_edit,
-        ["alt-y"]   = function(selected) print(selected[1]) end,
-        ["alt-i"]   = { actions.toggle_ignore },
+        ["ctrl-y"]  = function(selected) print(selected[1]) end,
+        ["ctrl-i"]  = { actions.toggle_ignore },
       }
     },
-    git = git_providers_config,
+    git = require('m.fzflua-git'),
     grep = {
       prompt         = 'Rg❯ ',
       input_prompt   = 'Grep For❯ ',
@@ -222,14 +136,14 @@ M.setup = function()
       end, -- Return pair: { search query, additional rg flags } }
       actions        = {
         -- actions inherit from 'actions.files' and merge
-        ["alt-g"] = { actions.grep_lgrep } -- Toggle live grep
+        ["ctrl-g"] = { actions.grep_lgrep } -- Toggle live grep
       },
     },
     args = {
       prompt     = 'Args❯ ',
       files_only = true,
       actions    = {
-        ["alt-x"] = { fn = actions.arg_del, reload = true }
+        ["ctrl-x"] = { fn = actions.arg_del, reload = true }
       },
     },
     oldfiles = {
@@ -245,7 +159,7 @@ M.setup = function()
       cwd_only      = false, -- buffers for the cwd only
       actions       = {
         -- actions inherit from 'actions.buffers' and merge
-        ["alt-x"] = { fn = actions.buf_del, reload = true },
+        ["ctrl-x"] = { fn = actions.buf_del, reload = true },
       }
     },
     tabs = {
@@ -255,7 +169,7 @@ M.setup = function()
       actions    = {
         -- actions inherit from 'actions.buffers' and merge
         ["default"] = actions.buf_switch,
-        ["alt-x"]   = { fn = actions.buf_del, reload = true },
+        ["ctrl-x"]  = { fn = actions.buf_del, reload = true },
       },
       fzf_opts   = {
         -- hide tabnr
@@ -279,12 +193,12 @@ M.setup = function()
       },
       actions         = {
         ["default"] = actions.buf_edit_or_qf,
-        ["alt-q"]   = actions.buf_sel_to_qf,
-        ["alt-l"]   = actions.buf_sel_to_ll
+        ["ctrl-q"]  = actions.buf_sel_to_qf,
+        ["ctrl-l"]  = actions.buf_sel_to_ll
       },
     },
     blines = {
-      prompt          = 'BLines❯ ',
+      prompt          = 'Lines❯ ',
       previewer       = "builtin", -- set to 'false' to disable
       show_unlisted   = true,      -- include 'help' buffers
       no_term_buffers = false,     -- include 'term' buffers
@@ -299,12 +213,44 @@ M.setup = function()
       -- actions inherit from 'actions.buffers' and merge
       actions         = {
         ["default"] = actions.buf_edit_or_qf,
-        ["alt-q"]   = actions.buf_sel_to_qf,
-        ["alt-l"]   = actions.buf_sel_to_ll
+        ["ctrl-q"]  = actions.buf_sel_to_qf,
+        ["ctrl-l"]  = actions.buf_sel_to_ll
       },
     },
-    -- TODO: tag, btag, colorscheme, keymap, highlights
-    -- TODO: marks, jumps, registers, changes, loclist, loclist_stack
+    -- TODO: tag, btag, colorscheme, keymap, highlights, changes
+    jumps = {
+      prompt = 'Jumps❯ ',
+      actions = {
+        ["default"] = actions.goto_jump,
+      },
+    },
+    marks = {
+      prompt = 'Marks❯ ',
+      actions = {
+        ["default"] = actions.goto_mark,
+      },
+    },
+    registers = {
+      prompt = 'Registers❯ ',
+      ignore_empty = true,
+      actions = {
+        ["default"] = actions.paste_register,
+      },
+    },
+    loclist = {
+      prompt = 'Loclist❯ ',
+      actions = {
+
+      },
+    },
+    loclist_stack = {
+      prompt   = 'LoclistStack❯ ',
+      cwd_only = false,
+      marker   = ">",
+      actions  = {
+        ["default"] = actions.set_qflist,
+      },
+    },
     -- TODO: dap
     quickfix = {
       prompt = "Quickfix❯ ",
@@ -312,24 +258,11 @@ M.setup = function()
     quickfix_stack = {
       prompt = "QuickfixStack❯ ",
       marker = ">",
+      actions = {
+        ["default"] = actions.set_qflist,
+      }
     },
-    lsp = {
-      prompt_postfix     = '❯ ',
-      cwd_only           = true,
-      -- :lua vim.lsp.buf.references({includeDeclaration = ?})
-      includeDeclaration = true,
-      symbols            = {
-        symbol_style = 1, -- false = disable; 1 = icon + kind; 2 = icon; 3 = kind
-      },
-      -- colorize using Treesitter '@' highlight groups ("@function", etc).
-      symbol_hl          = function(s) return "@" .. s:lower() end,
-      symbol_fmt         = function(s, opts) return "[" .. s .. "]" end,
-      fzf_opts           = {
-        ["--tiebreak"] = "begin",
-        ["--info"]     = "default",
-      },
-      -- TODO: code actions, LSP finder, references, definitions, declarations, typedefs, implementations, document symbols, workspace symbols, incoming/outgoing calls, and more
-    },
+    lsp = require('m.fzflua-lsp'),
     diagnostics = {
       prompt         = 'Diagnostics❯ ',
       cwd_only       = true,
@@ -346,121 +279,6 @@ M.setup = function()
 
   -- vim.ui.select
   require('fzf-lua').register_ui_select()
-end
-
-local utils = require("m.utils")
-
-M.test = function()
-  require('fzf-lua').fzf_exec(function(fzf_cb)
-    coroutine.wrap(function()
-      -- See libuv
-      -- http://docs.libuv.org/en/v1.x/
-      -- :help lua-loop
-      -- :h luvref :h lua-loop
-      -- https://www.lua.org/pil/9.1.html
-      local co = coroutine.running()
-      for _, b in ipairs(vim.api.nvim_list_bufs()) do
-        vim.schedule(function()
-          local name = vim.api.nvim_buf_get_name(b)
-          name = #name > 0 and name or "[No Name]"
-          fzf_cb(b .. ":" .. name, function() coroutine.resume(co) end)
-        end)
-        coroutine.yield()
-      end
-      fzf_cb()
-    end)()
-  end, {
-    prompt = 'Test❯ ',
-    preview = "echo {}",
-    actions = {
-
-    }
-  })
-end
-
-M.undo_tree = function()
-  local undolist = utils.get_undolist()
-  local current_buf = vim.api.nvim_get_current_buf()
-
-  -- Tweaked from
-  -- https://github.com/debugloop/telescope-undo.nvim/tree/main
-  require('fzf-lua').fzf_exec(function(fzf_cb)
-    coroutine.wrap(function()
-      local co = coroutine.running() -- Get running coroutine
-      vim.schedule(function()        -- Schedule function to run on vim main loop (with full API accessibility)
-        for i, undo in ipairs(undolist) do
-          fzf_cb(string.format("[%d] seq %d (%s)", i, undo.seq, undo.time),
-            function() coroutine.resume(co) end)
-        end
-      end)
-      coroutine.yield()
-      fzf_cb() -- EOF (close fzf named pipe)
-    end)()
-  end, {
-    prompt = 'UndoTree❯ ',
-    preview = require 'fzf-lua'.shell.raw_preview_action_cmd(function(selected)
-      local undo = undolist[tonumber(selected[1]:match("%[(.-)%]"))]
-      local delta_opts = ""
-      return string.format([[echo '%s' | delta "%s" %s]], undo.diff:gsub([[']], [['"'"']]), undo.time, delta_opts)
-    end),
-    actions = {
-      ['ctrl-a'] = {
-        -- See action reload
-        -- https://github.com/ibhagwan/fzf-lua/wiki/Advanced#action-reload
-        fn = function(selected, opts)
-          local undo = undolist[tonumber(selected[1]:match("%[(.-)%]"))]
-          vim.cmd(string.format("slient undo %s", undo.seq))
-          vim.notify(string.format("Undo %s", undo.seq))
-        end,
-        reload = true,
-      },
-      ['ctrl-o'] = function(selected, opts)
-        local undo = undolist[tonumber(selected[1]:match("%[(.-)%]"))]
-        local before_and_after = utils.get_undo_before_and_after(undo.seq)
-        utils.open_diff_in_new_tab(before_and_after[1], before_and_after[2], {
-          filetype = vim.api.nvim_buf_get_option(current_buf, "filetype")
-        })
-      end
-    }
-  })
-end
-
-local config = require("m.config")
-local timeago = require('m.timeago')
-
-M.notifications = function()
-  if not config.notify_backend == "nvim-notify" then
-    vim.notify("Feature only supported with nvim-notify backend", vim.log.levels.WARN)
-    return
-  end
-
-  local notifications = require('notify').history()
-
-  require('fzf-lua').fzf_exec(function(fzf_cb)
-    coroutine.wrap(function()
-      local co = coroutine.running()
-      vim.schedule(function()
-        for i = #notifications, 1, -1 do
-          local noti = notifications[i]
-          fzf_cb(string.format("(%s) %s %d", timeago(noti.time), noti.message[1], i),
-            function() coroutine.resume(co) end)
-        end
-      end)
-      coroutine.yield()
-      fzf_cb()
-    end)()
-  end, {
-    prompt = 'Notifications❯ ',
-    preview = require 'fzf-lua'.shell.raw_preview_action_cmd(function(selected)
-      local parts = vim.split(selected[1], " ")
-      local noti = notifications[tonumber(parts[#parts])]
-      return string.format([[cat <<FZFLUAEOM
-%s
-FZFLUAEOM]], table.concat(noti.message, "\n"))
-    end),
-    actions = {
-    }
-  })
 end
 
 return M

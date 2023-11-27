@@ -270,11 +270,11 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<space>u" }] = {
       telescope = nil,
-      fzflua = safe_require('m.fzflua').undo_tree
+      fzflua = safe_require('m.fzflua-custom').undo_tree
     },
     [{ mode = "n", lhs = "<space>m" }] = {
       telescope = nil,
-      fzflua = safe_require('m.fzflua').notifications
+      fzflua = safe_require('m.fzflua-custom').notifications
     },
   }
 

@@ -105,7 +105,7 @@ function M.undolist_entry_producer(opts, entries, alt_level)
 
       -- descend recursively into alternate histories of undo states
       if entries[i].alt ~= nil then
-        local alt_undotree_producer = M.produce_undotree_entry(opts, entries[i].alt, alt_level + 1)
+        local alt_undotree_producer = M.undolist_entry_producer(opts, entries[i].alt, alt_level + 1)
         repeat
           local ok, alt_undolist_entry = coroutine.resume(alt_undotree_producer)
           if not ok then

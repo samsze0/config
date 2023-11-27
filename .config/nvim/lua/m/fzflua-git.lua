@@ -5,7 +5,7 @@ local git = require('m.git')
 local actions = require("fzf-lua.actions")
 
 local get_last_word = function(str)
-  local parts = vim.split(str, " ")
+  local parts = vim.split(str, utils.fzflua_nbsp)
   return parts[#parts]
 end
 
@@ -25,18 +25,23 @@ return {
       ["left"]   = { fn = actions.git_stage, reload = true },
       ["ctrl-x"] = { fn = actions.git_reset, reload = true },
       ['ctrl-o'] = function(selected, opts)
-        local current_buf = vim.api.nvim_get_current_buf()
+        local file_path = vim.trim(get_last_word(selected[1]))
+        vim.notify(file_path)
 
-        local file = get_last_word(selected[1])
-        local before_and_after = { { "hi" }, { "hello" } }
-        utils.open_diff_in_new_tab(before_and_after[1], before_and_after[2], {
-          filetype = vim.api.nvim_buf_get_option(current_buf, "filetype")
+        local before_file_content = vim.fn.system(string.format("git show HEAD:%s", file_path))
+        local before_file_lines = utils.iter_to_table(before_file_content:gmatch("[^\n]+"))
+
+        local after_file_content = vim.fn.system(string.format("cat %s", file_path))
+        local after_file_lines = utils.iter_to_table(after_file_content:gmatch("[^\n]+"))
+
+        utils.open_diff_in_new_tab(before_file_lines, after_file_lines, {
+          filetype = "lua"
         })
-      end
+      end,
     },
   },
   commits = {
-    prompt        = 'ProjectCommits❯ ',
+    prompt        = 'GitLog❯ ',
     -- {1} : commit SHA
     -- <file> : current file
 
@@ -59,7 +64,7 @@ return {
     },
   },
   bcommits = {
-    prompt        = 'FileCommits❯ ',
+    prompt        = 'GitLog(File)❯ ',
 
     -- Show hash (%h) in yellow,
     -- date (%cr) in green, right-aligned and padded to 12 chars w/ %><(12), truncates to 12 if longer w/ %><|(12)

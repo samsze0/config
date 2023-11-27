@@ -210,6 +210,10 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f3><f3>" }] = {
       telescope = safe_require("telescope.builtin").find_files,
+      fzflua = safe_require('fzf-lua').git_files,
+    },
+    [{ mode = "n", lhs = "<f3><f5>" }] = {
+      telescope = nil,
       fzflua = safe_require('fzf-lua').files,
     },
     [{ mode = "n", lhs = "<f3><f2>" }] = {
@@ -275,6 +279,10 @@ M.setup = function()
     [{ mode = "n", lhs = "<space>m" }] = {
       telescope = nil,
       fzflua = safe_require('m.fzflua-custom').notifications
+    },
+    [{ mode = "n", lhs = "<f11><f11>" }] = {
+      telescope = nil,
+      fzflua = safe_require('m.fzflua-custom').git_reflog
     },
   }
 

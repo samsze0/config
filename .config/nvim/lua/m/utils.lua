@@ -25,6 +25,7 @@ end
 M.show_content_as_buf = function(buf_lines, opts)
   opts = opts or {}
   opts = vim.tbl_deep_extend("keep", opts, {
+    -- Prefer this over "filetype detect"
     filetype = "text",
   })
 
@@ -110,6 +111,53 @@ M.safe_require = function(module_name, opts)
     }) -- In case we try to index into the result of safe_require
   end
   return module
+end
+
+-- Tweaked from:
+-- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/utils.lua
+function M.strip_ansi_coloring(str)
+  if not str then return str end
+  -- remove escape sequences of the following formats:
+  -- 1. ^[[34m
+  -- 2. ^[[0;34m
+  -- 3. ^[[m
+  return str:gsub("%[[%d;]-m", "")
+end
+
+-- From:
+-- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/utils.lua
+-- Sets an invisible unicode character as icon separator
+-- the below was reached after many iterations, a short summary of everything
+-- that was tried and why it failed:
+-- nbsp, U+00a0: the original separator, fails with files that contain nbsp
+-- nbsp + zero-width space (U+200b): works only with `sk` (`fzf` shows <200b>)
+-- word joiner (U+2060): display works fine, messes up fuzzy search highlights
+-- line separator (U+2028), paragraph separator (U+2029): created extra space
+-- EN space (U+2002): seems to work well
+-- For more unicode SPACE options see:
+-- http://unicode-search.net/unicode-namesearch.pl?term=SPACE&.submit=Search
+M.fzflua_nbsp = "\xe2\x80\x82" -- "\u{2002}"
+
+-- Tweaked from:
+-- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/path.lua
+function M.strip_before_last_occurrence_of(str, sep)
+  local idx = M.last_index_of(str, sep) or 0
+  return str:sub(idx + 1), idx
+end
+
+-- Tweaked from:
+-- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/path.lua
+function M.last_index_of(haystack, needle)
+  local i = haystack:match(".*" .. needle .. "()")
+  if i == nil then return nil else return i - 1 end
+end
+
+function M.iter_to_table(iter)
+  local tbl = {}
+  for v in iter do
+    table.insert(tbl, v)
+  end
+  return tbl
 end
 
 return M

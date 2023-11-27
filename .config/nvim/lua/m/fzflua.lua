@@ -10,7 +10,7 @@ local actions = require("fzf-lua.actions")
 
 M.setup = function()
   local config = {
-    winopts = {
+    winopts    = {
       fullscreen = false,
       preview    = {
         border     = 'noborder',
@@ -40,7 +40,7 @@ M.setup = function()
       on_close   = function()
       end
     },
-    keymap = {
+    keymap     = {
       builtin = { -- For built-in previewer e.g. vim buffer
         ["<S-PageDown>"] = "preview-page-down",
         ["<S-PageUp>"]   = "preview-page-up",
@@ -52,7 +52,7 @@ M.setup = function()
         ["shift-up"]   = "preview-page-up",
       },
     },
-    actions = {
+    actions    = {
       files = {
         -- providers that inherit these actions:
         --   files, git_files, git_status, grep, lsp
@@ -61,8 +61,24 @@ M.setup = function()
         ["default"] = actions.file_edit,
         ["ctrl-q"]  = actions.file_sel_to_qf, -- send to quickfix
         ["ctrl-l"]  = actions.file_sel_to_ll, -- send to loclist
-        ["ctrl-w"]  = actions.file_vsplit,
+        ["ctrl-w"]  = function(selected)      -- actions.file_vsplit open the split on the left
+          local s = utils.strip_ansi_coloring(selected[1])
+          local relpath, _ = utils.strip_before_last_occurrence_of(s, utils.fzflua_nbsp)
+          vim.cmd [[vsplit]]
+          vim.cmd [[wincmd l]]
+          vim.cmd(string.format("e %s", relpath))
+        end,
         ["ctrl-t"]  = actions.file_tabedit,
+        ["ctrl-y"]  = {
+          function(selected)
+            local s = utils.strip_ansi_coloring(selected[1])
+            local relpath, _ = utils.strip_before_last_occurrence_of(s, utils.fzflua_nbsp)
+            vim.fn.setreg("+", relpath)
+            vim.notify(string.format("Copied %s", relpath))
+          end,
+          -- https://github.com/ibhagwan/fzf-lua/wiki/Advanced#fzf-exec-act-resume
+          actions.resume
+        }
       },
       buffers = {
         -- providers that inherit these actions:
@@ -72,7 +88,7 @@ M.setup = function()
         ["ctrl-t"]  = actions.buf_tabedit,
       }
     },
-    fzf_opts = {
+    fzf_opts   = {
       -- Set to false to remove a flag
       ["--ansi"]   = "",
       ["--info"]   = "inline",
@@ -116,7 +132,6 @@ M.setup = function()
         -- inherits from 'actions.files', here we can override
         -- or set bind to 'false' to disable a default action
         ["default"] = actions.file_edit,
-        ["ctrl-y"]  = function(selected) print(selected[1]) end,
         ["ctrl-i"]  = { actions.toggle_ignore },
       }
     },

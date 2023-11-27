@@ -281,8 +281,6 @@ function M.setup(opts)
   hi.NonText                            = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
   hi.LineNr                             = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
   hi.SignColumn                         = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hi.StatusLine                         = { guifg = c.gray_800, guibg = c.gray_400, gui = 'none', guisp = nil }
-  hi.StatusLineNC                       = { guifg = c.gray_600, guibg = c.gray_300, gui = 'none', guisp = nil }
   hi.WinBar                             = { guifg = c.gray_800, guibg = nil, gui = 'none', guisp = nil }
   hi.WinBarNC                           = { guifg = c.gray_600, guibg = nil, gui = 'none', guisp = nil }
   hi.VertSplit                          = { guifg = c.gray_300, guibg = nil, gui = 'none', guisp = nil }
@@ -295,9 +293,18 @@ function M.setup(opts)
   hi.PMenuSel                           = { guifg = c.gray_800, guibg = c.gray_400, gui = nil, guisp = nil }
   hi.PMenuSbar                          = { guifg = nil, guibg = c.gray_300, gui = 'none', guisp = nil }
   hi.PMenuThumb                         = { guifg = nil, guibg = c.gray_600, gui = nil, guisp = nil }
-  hi.TabLine                            = { guifg = c.gray_600, guibg = nil, gui = 'none', guisp = nil }
-  hi.TabLineFill                        = { guifg = c.gray_600, guibg = nil, gui = 'none', guisp = nil }
-  hi.TabLineSel                         = { guifg = c.yellow, guibg = nil, gui = 'none', guisp = nil }
+  hi.StatusLine                         = { guifg = c.gray_800, guibg = c.gray_100, gui = 'none', guisp = nil } -- Active status line
+  hi.StatusLineNC                       = { guifg = c.gray_600, guibg = c.gray_100, gui = 'none', guisp = nil } -- Inactive status line
+  hi.TabLine                            = { guifg = c.gray_600, guibg = c.black, gui = 'none', guisp = nil }    -- Inactive tab
+  hi.TabLineFill                        = { guifg = nil, guibg = nil, gui = 'none', guisp = nil }
+  hi.TabLineSel                         = { guifg = c.gray_800, guibg = c.gray_300, gui = 'none', guisp = nil } -- Active tab
+
+  -- Status line (custom)
+  hi.StatusLineDiagnosticError          = { guifg = c.red, guibg = c.gray_100, gui = nil, guisp = nil }
+  hi.StatusLineDiagnosticWarn           = { guifg = c.yellow, guibg = c.gray_100, gui = nil, guisp = nil }
+  hi.StatusLineDiagnosticInfo           = { guifg = c.blue, guibg = c.gray_100, gui = nil, guisp = nil }
+  hi.StatusLineDiagnosticHint           = { guifg = c.blue, guibg = c.gray_100, gui = nil, guisp = nil }
+  hi.StatusLineMuted                    = { guifg = c.gray_600, guibg = c.gray_100, gui = nil, guisp = nil }
 
   -- Standard syntax highlighting
   hi.Comment                            = { guifg = c.Comment, guibg = nil, gui = nil, guisp = nil }
@@ -689,19 +696,21 @@ function M.setup(opts)
   end
 
   -- bufferline
-  hi.BufferLineBackground          = { guifg = c.gray_600, guibg = c.gray_100 } -- Inactive tab
-  hi.BufferLineBufferSelected      = { guifg = c.gray_800, guibg = c.gray_300 } -- Active tab
-  hi.BufferLineSeparator           = { guifg = c.black, guibg = c.black }
-  -- Indicators
-  hi.BufferLineError               = { guifg = c.red_600, guibg = c.gray_100 }
-  hi.BufferLineErrorSelected       = { guifg = c.red_600, guibg = c.gray_100 }
-  hi.BufferLineModified            = { guifg = c.gray_700, guibg = c.gray_100 }
-  hi.BufferLineModifiedSelected    = { guifg = c.gray_700, guibg = c.gray_300 }
-  hi.BufferLineDiagnosticSelected  = { guifg = c.gray_700, guibg = c.gray_300 }
-  hi.BufferLinePickSelected        = 'BufferLineDiagnosticSelected'
-  hi.BufferLineIndicatorSelected   = 'BufferLineDiagnosticSelected'
-  hi.BufferLineNumbersSelected     = 'BufferLineDiagnosticSelected'
-  hi.BufferLineCloseButtonSelected = 'BufferLineDiagnosticSelected'
+  if config.tabline_plugin == "bufferline" then
+    hi.BufferLineBackground          = { guifg = c.gray_600, guibg = c.gray_100 } -- Inactive tab
+    hi.BufferLineBufferSelected      = { guifg = c.gray_800, guibg = c.gray_300 } -- Active tab
+    hi.BufferLineSeparator           = { guifg = c.black, guibg = c.black }
+    -- Indicators
+    hi.BufferLineError               = { guifg = c.red_600, guibg = c.gray_100 }
+    hi.BufferLineErrorSelected       = { guifg = c.red_600, guibg = c.gray_100 }
+    hi.BufferLineModified            = { guifg = c.gray_700, guibg = c.gray_100 }
+    hi.BufferLineModifiedSelected    = { guifg = c.gray_700, guibg = c.gray_300 }
+    hi.BufferLineDiagnosticSelected  = { guifg = c.gray_700, guibg = c.gray_300 }
+    hi.BufferLinePickSelected        = 'BufferLineDiagnosticSelected'
+    hi.BufferLineIndicatorSelected   = 'BufferLineDiagnosticSelected'
+    hi.BufferLineNumbersSelected     = 'BufferLineDiagnosticSelected'
+    hi.BufferLineCloseButtonSelected = 'BufferLineDiagnosticSelected'
+  end
 
   -- nvim-notify
   if config.notify_backend == "nvim-notify" then

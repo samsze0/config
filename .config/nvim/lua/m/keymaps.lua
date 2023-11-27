@@ -45,8 +45,10 @@ M.setup = function()
   -- Find and replace (global)
 
   -- Move by word
-  keymap("n", "<C-Left>", "B", opts)
-  keymap("n", "<C-Right>", "W", opts)
+  keymap("n", "<C-Left>", "b", opts)
+  keymap("n", "<C-S-Left>", "B", opts)
+  keymap("n", "<C-Right>", "w", opts)
+  keymap("n", "<C-S-Right>", "W", opts)
 
   -- Delete word
   keymap("i", "<C-BS>", "<C-W>", opts)
@@ -302,6 +304,7 @@ M.setup = function()
   keymap("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
   keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
   keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
+  keymap("n", "<space>l", "<cmd>LspInfo<CR>", opts)
 
   vim.keymap.set("n", "ll", utils.run_and_notify(vim.lsp.buf.format, "Formatted"), {})
 
@@ -376,7 +379,7 @@ M.setup = function()
   keymap("n", "<space>;", "q:", opts)
 
   -- Session restore
-  vim.keymap.set("n", "<Space>r", require("persistence").load, {})
+  vim.keymap.set("n", "<Space>r", utils.run_and_notify(require("persistence").load, "Reloaded session"), {})
 
   -- Colorizer
   vim.keymap.set("n", "<leader>c", utils.run_and_notify(function()
@@ -403,6 +406,10 @@ M.setup = function()
     vim.keymap.set("i", "<M-w>", safe_require("copilot.suggestion").accept_line, {})
     vim.keymap.set("i", "<M-d>", safe_require("copilot.suggestion").next, {})
     vim.keymap.set("i", "<M-e>", safe_require("copilot.suggestion").prev, {})
+    vim.keymap.set("i", "<M-q>", safe_require("copilot.panel").open, {})
+    vim.keymap.set("n", "<M-e>", safe_require("copilot.panel").jump_prev, {})
+    vim.keymap.set("n", "<M-d>", safe_require("copilot.panel").jump_next, {})
+    vim.keymap.set("n", "<M-a>", safe_require("copilot.panel").accept, {})
   end
 
   if config.ssr_plugin then

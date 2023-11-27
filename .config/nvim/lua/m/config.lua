@@ -6,7 +6,7 @@ return {
   filetree_plugin = false,
   telescope_over_fzflua = false,
   dap_plugins = false,
-  diffview_plugin = true,
+  diffview_plugin = false,
   chatgpt_plugin = false,
   ssr_plugin = false,
   illuminate_plugin = false,
@@ -14,6 +14,9 @@ return {
   vgit_plugin = false,
   trouble_plugin = false,
   maximize_plugin = false,
+  surround_plugin = false,
+  tabline_plugin = "custom",
+  statusline_plugin = "custom",
 
   theme_opts = {
     debug = {

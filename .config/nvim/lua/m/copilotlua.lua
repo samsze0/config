@@ -5,7 +5,13 @@ require('copilot').setup({
   panel = {
     enabled = false,
     auto_refresh = false,
-    keymap = {},
+    keymap = {
+      jump_prev = false,
+      jump_next = false,
+      accept = false,
+      refresh = false,
+      open = false
+    },
     layout = {
       position = "bottom", -- | top | left | right
       ratio = 0.4
@@ -15,7 +21,14 @@ require('copilot').setup({
     enabled = true,
     auto_trigger = true,
     debounce = 75,
-    keymap = {},
+    keymap = {
+      accept = false,
+      accept_word = false,
+      accept_line = false,
+      next = false,
+      prev = false,
+      dismiss = false,
+    },
   },
   filetypes = {
     yaml = false,

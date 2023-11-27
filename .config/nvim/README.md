@@ -3,7 +3,7 @@
 ```
 Fn->fuzzy/git/panels
 Q-. W->window E-> R->replace T->tab Y-. U-. I-. O-. P-. [->jump ]->jump \->leader-misc
-A-. S->hunk D-. F-> G-. H-> J-> K-> L->lsp ;-> '->
+A-. S->hunk D-. F->search G-. H-> J-> K-> L->lsp ;-> '->
 Z-. X->git C-. V-. B-> N-> M-> ,->macro .-. /-.
 <Alt>->kitty <Ctrl>->tab/window/edit/jump <Space>->editor <Alt+Ctrl>->edit/completion
 ```

@@ -100,6 +100,7 @@ require("lazy").setup({
   },
   {
     'nvim-lualine/lualine.nvim',
+    enabled = config.statusline_plugin == "lualine",
     config = function()
       require('m.lualine')
     end
@@ -296,6 +297,7 @@ require("lazy").setup({
 
   {
     'sindrets/diffview.nvim',
+    enabled = config.diffview_plugin,
     config = function()
       require('m.diffview')
     end
@@ -341,6 +343,7 @@ require("lazy").setup({
   {
     -- Act as tab bar
     'akinsho/bufferline.nvim',
+    enabled = config.tabbar_plugin == "bufferline",
     config = function()
       require('m.bufferline')
     end
@@ -421,6 +424,7 @@ require("lazy").setup({
   },
   {
     'kylechui/nvim-surround',
+    enabled = config.surround_plugin == "nvim-surround",
     config = function()
       require('m.surround')
     end
@@ -431,6 +435,17 @@ require('m.keymaps').setup()
 require('m.winbar').setup() -- i.e. breadcrumbs
 require('m.commands')
 require('m.theme').setup(config.theme_opts)
+if config.tabline_plugin == "custom" then
+  -- :h tabbline
+  -- :h tabbar
+  require('m.tabline').setup({})
+  vim.opt.showtabline = 2 -- 2 = always ; 1 = at least 2 tabs ; 0 = never
+end
+if config.statusline_plugin == "custom" then
+  -- :h statusline
+  vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
+  require('m.statusline').setup({})
+end
 
 if vim.g.neovide then
   require("m.neovide")

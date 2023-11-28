@@ -202,4 +202,14 @@ M.sum = function(list)
   return M.reduce(list, function(acc, v) return acc + v end, 0)
 end
 
+M.filter = function(list, fn)
+  local new_list = {}
+  for _, v in ipairs(list) do
+    if fn(v) then
+      table.insert(new_list, v)
+    end
+  end
+  return new_list
+end
+
 return M

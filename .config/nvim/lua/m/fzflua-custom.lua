@@ -185,7 +185,7 @@ M.notifications = function()
       local noti = get_noti_with_string(selected[1])
       return string.format([[cat <<FZFLUAEOM
 %s
-FZFLUAEOM]], noti.message)
+FZFLUAEOM]], ansi_codes.white(noti.message))
     end),
     actions = {
     },

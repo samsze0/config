@@ -427,6 +427,11 @@ M.setup = function()
   if config.lf_plugin == "vim" then
     keymap("n", "<f2><f2>", "<cmd>LfWorkingDirectory<cr>", opts)
     keymap("n", "<f2><f3>", "<cmd>LfCurrentFile<cr>", opts)
+  elseif config.lf_plugin == "custom" then
+    vim.keymap.set("n", "<f2><f2>", safe_require("m.lf").lf, {})
+    vim.keymap.set("n", "<f2><f3>", function()
+      safe_require("m.lf").lf({ path = vim.fn.expand("%:p:h") })
+    end, {})
   end
 end
 

@@ -16,6 +16,7 @@ local opts = {
   exclude_filetype = {
     'help',
     'fzf',
+    'lf'
   }
 }
 

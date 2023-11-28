@@ -1,6 +1,6 @@
 return {
   copilot_plugin = "lua",
-  lf_plugin = "vim",
+  lf_plugin = "custom",
   notify_backend = "custom",
   terminal_plugin = false,
   filetree_plugin = false,

@@ -467,6 +467,9 @@ end
 if config.notify_backend == "custom" then
   require('m.notify')
 end
+if config.lf_plugin == "custom" then
+  require('m.lf')
+end
 
 if vim.g.neovide then
   require("m.neovide")

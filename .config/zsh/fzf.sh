@@ -13,7 +13,7 @@ fzf_init() {
   COLORS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
     --color=
       bg+:#2c313c,
-      preview-bg:#131516,
+      preview-bg:#101213,
       bg:#000000,
       border:#535d6c,
       spinner:#549eff,

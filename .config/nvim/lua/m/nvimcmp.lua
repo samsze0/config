@@ -105,9 +105,7 @@ cmp.setup({
     end
   },
   completion = {
-    -- autocomplete = false, -- cmp.TriggerEvent | false
     keyword_length = 1, -- Number of char to trigger auto-completion
-    -- completeopt = ,  -- See vim's completeopt
   },
   matching = {
     disallow_fuzzy_matching = false,
@@ -128,18 +126,23 @@ cmp.setup({
     }
   },
   mapping = mapping,
-  sources = cmp.config.sources({ -- Group index 1
+  sources = cmp.config.sources({
     {
       name = 'nvim_lsp',
-      -- option = ,
-      -- keyword_length = ,
-      -- priority = ,
-      -- max_item_count = ,
-      -- entry_filter = function(entry, ctx) end
+      entry_filter = function(entry, ctx) return entry end,
+      priority = 100,
     },
-    { name = 'path' }
-  }, { -- Group index 2
-    -- { name = 'buffer' },
+    {
+      name = 'path',
+      keyword_length = 1,
+      max_item_count = 5,
+      priority = 30,
+    },
+    {
+      name = 'buffer',
+      max_item_count = 5,
+      priority = 30,
+    }
   }),
   formatting = {
     format = require('lspkind').cmp_format({
@@ -163,7 +166,6 @@ cmp.setup({
 cmp.setup.filetype('gitcommit', {
   sources = cmp.config.sources({
     { name = 'git' },
-  }, {
     { name = 'buffer' },
   })
 })
@@ -171,11 +173,10 @@ cmp.setup.filetype('gitcommit', {
 -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
 cmp.setup.cmdline({ '/', '?' }, {
   completion = {
-    autocomplete = false, -- TODO: find out what `cmp.TriggerEvent[]` are
-    -- keyword_length = 1, -- Number of char to trigger auto-completion
+    keyword_length = 1, -- Number of char to trigger auto-completion
   },
   sources = {
-    { name = 'buffer' } -- Can coverup the editor
+    { name = 'buffer', max_item_count = 10 }
   }
 })
 
@@ -184,8 +185,7 @@ cmp.setup.cmdline(':', {
   completion = {
   },
   sources = cmp.config.sources({
-    { name = 'path' }
-  }, {
+    { name = 'path',   max_item_count = 10 },
     { name = 'cmdline' }
   })
 })

@@ -61,7 +61,8 @@ M.setup = function()
         ["default"] = actions.file_edit,
         ["ctrl-q"]  = actions.file_sel_to_qf, -- send to quickfix
         ["ctrl-l"]  = actions.file_sel_to_ll, -- send to loclist
-        ["ctrl-w"]  = function(selected)      -- actions.file_vsplit open the split on the left
+        ["ctrl-w"]  = actions.file_vsplit,
+        ["ctrl-b"]  = function(selected)      -- deprecated
           -- Expect entry to be in the either formats:
           -- ((.*) nbsp*) relpath
           -- ((.*) nbsp*) relpath:row:col[:(.*)*]
@@ -76,7 +77,7 @@ M.setup = function()
           end
           vim.cmd [[vsplit]]
           vim.cmd [[wincmd l]]
-          vim.cmd(string.format("e %s", relpath))
+          vim.cmd(string.format("e %s", vim.fn.fnameescape(relpath)))
           if #parts > 1 then
             vim.cmd(string.format([[call cursor(%s, %s)]], parts[2], parts[3]))
             vim.api.nvim_feedkeys("zz", "n", true) -- Center screen

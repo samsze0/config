@@ -25,7 +25,7 @@ Visual mode
     - Caution: marks in visual mode are only set after leaving visual mode. `<cmd>` will execute a command without leaving visual mode while `:` leaves visual mode and enters command mode before processing the command.
 Command line mode
     - Use `<C-r>` to insert things like content of registers `<C-r>a`, current word under cursor w/ `<C-r><C-w>`, etc
-    - Use `<C-/>e` to evaluate arbitrary vimscript expression and append the result to the command line
+    - Use `<C-\>e` to evaluate arbitrary vimscript expression and append the result to the command line. E.g. `expand("%")` to get the current filename. Other filename modifiers (`:h filename-modifiers`) include `%:p`, `%:p:t`, etc
     - Also see: ex mode
 Normal mode
     - `*` to highlight all occurrences of word under cursor, or current visual selection. And advance to the next occurrence. Useful to pair with `N` i.e. `*N`
@@ -43,7 +43,7 @@ Ranges in command line mode
     - `:h ex-commands` or `:h holy-grail`
     - `ex` is the predecessor of `vi`/`vim`. And commands such as 
     - ':s' for substitution. `:%s/<a>/<b>/gc` let you substitute in current buffer every occurence of `a` with `b` and ask for confirmation
-        - `:&` repeat last `:s`
+        - `:&` repeat last `:s` (without its flags). Use `:&&` to repeat with all flags
         - Custom escape char / delimiter: e.g. `:s#a#b#gc`
         - When `<a>` is omitted e.g. `:s//<b>/g`, it auto uses the current selection (from `*` or search `/` `?`)
         - Capture gruop (?): `\0` refers to the whole search term. `\1` refers to the first capture group, ... E.g. `:%s/some\(.*\)/\1/g`. `()` has to be escaped

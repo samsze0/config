@@ -26,6 +26,7 @@
   "nvim-scrollview": { "branch": "main", "commit": "74ab63b598cca206888e83090ed6312aac324b4c" },
   "nvim-treesitter": { "branch": "master", "commit": "71bdf97bf6dafc776ad957169533f2f669a8c562" },
   "persistence.nvim": { "branch": "main", "commit": "ad538bfd5336f1335cdb6fd4e0b0eebfa6e12f32" },
+  "plenary.nvim": { "branch": "master", "commit": "366b0837486f60ae0e7550c15de8ff66d057c4cd" },
   "rainbow-delimiters.nvim": { "branch": "master", "commit": "fdd507455a10c3841027c04ab33012d24d5b2c92" },
   "vim-floaterm": { "branch": "master", "commit": "3f01a623376957437f9376327637491b74719e38" }
 }

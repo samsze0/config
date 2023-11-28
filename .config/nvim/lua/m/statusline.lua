@@ -29,7 +29,7 @@ end
 
 local function get_diagnostic_count(id) return #vim.diagnostic.get(0, { severity = id }) end
 
-M.setup = function()
+M.setup = function(opts)
   _G.Statusline = M
 
   local augroup = vim.api.nvim_create_augroup('Statusline', {})

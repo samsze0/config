@@ -15,20 +15,7 @@ local opts = {
 
   exclude_filetype = {
     'help',
-    'startify',
-    'dashboard',
-    'packer',
-    'neogitstatus',
-    'NvimTree',
-    'Trouble',
-    'alpha',
-    'lir',
-    'Outline',
-    'spectre_panel',
-    'toggleterm',
-    'floaterm', -- TODO: filetype not floatterm?
     'fzf',
-    'DiffviewFiles'
   }
 }
 
@@ -49,8 +36,6 @@ local winbar_file = function()
   file_path = file_path:gsub('^%/', '')
 
   if not isempty(filename) then
-    local default = false
-
     value = ' '
     local file_path_list = {}
     local _ = string.gsub(file_path, '[^/]+', function(w)

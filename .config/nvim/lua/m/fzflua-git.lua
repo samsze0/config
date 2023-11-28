@@ -1,7 +1,6 @@
 local utils = require("m.utils")
 local config = require("m.config")
 local timeago = require('m.timeago')
-local git = require('m.git')
 local actions = require("fzf-lua.actions")
 
 local get_last_word = function(str)

@@ -27,9 +27,9 @@ M.setup = function()
   keymap("n", "rw", "*N:%s///g<left><left>", opts) -- Select next occurrence of word under cursor then go back to current instance
   keymap("n", "rr", ":%s//g<left><left>", opts)
   keymap("v", "rr", ":s//g<left><left>", opts)
-  keymap("n", "r.", ":&c<cr>", opts) -- Multiple "c" flags are acceptable
-  keymap("v", "ry", [["ry]], opts)   -- Yank it into register "r" for later use with "rp"
-  local function rp_rhs(whole_file)  -- Use register "r" as the replacement rather than the subject
+  keymap("v", "r.", ":&gc<CR>", opts) -- Reset flags & add flags
+  keymap("v", "ry", [["ry]], opts)    -- Yank it into register "r" for later use with "rp"
+  local function rp_rhs(whole_file)   -- Use register "r" as the replacement rather than the subject
     return function()
       return ((whole_file and ":%s" or ":s") .. [[//<C-r>r/gc<left><left><left>]] ..
         string.rep("<left>", utils.get_register_length("r")) ..
@@ -100,6 +100,8 @@ M.setup = function()
   -- Insert/append swap
   keymap("n", "i", "a", opts)
   keymap("n", "a", "i", opts)
+  keymap("n", "I", "A", opts)
+  keymap("n", "A", "I", opts)
   keymap("v", "I", "A", opts)
   keymap("v", "A", "I", opts)
 
@@ -157,8 +159,8 @@ M.setup = function()
 
   keymap("n", "ww", "<cmd>clo<CR>", opts)
 
-  keymap("n", "wd", "<cmd>split<CR><cmd>wincmd j<CR>", opts) -- Switch to bottom window after creating it
-  keymap("n", "wf", "<cmd>vsplit<CR><cmd>wincmd l<CR>", opts)
+  keymap("n", "wd", "<cmd>split<CR>", opts)
+  keymap("n", "wf", "<cmd>vsplit<CR>", opts)
   keymap("n", "we", "<cmd>split<CR>", opts)
   keymap("n", "ws", "<cmd>vsplit<CR>", opts)
 
@@ -177,7 +179,13 @@ M.setup = function()
   keymap("n", "tj", "<cmd>tabp<CR>", opts)
   keymap("n", "tl", "<cmd>tabn<CR>", opts)
   keymap("n", "tt", "<cmd>tabnew<CR>", opts)
-  keymap("n", "tw", "<cmd>tabclose<CR>", opts)
+  local close_tab_and_left = function()
+    vim.cmd [[tabclose]]
+    if vim.fn.tabpagenr() > 1 then
+      vim.cmd [[tabprevious]]
+    end
+  end
+  vim.keymap.set("n", "tw", close_tab_and_left, {})
   keymap("n", "<C-j>", "<cmd>tabp<CR>", opts)
   keymap("n", "<C-l>", "<cmd>tabn<CR>", opts)
 
@@ -308,19 +316,6 @@ M.setup = function()
 
   vim.keymap.set("n", "ll", utils.run_and_notify(vim.lsp.buf.format, "Formatted"), {})
 
-  local overwrite_formatter_on_lsp_attach = false
-
-  if overwrite_formatter_on_lsp_attach then
-    vim.api.nvim_create_autocmd('LspAttach', {
-      callback = function(args)
-        local client = vim.lsp.get_client_by_id(args.data.client_id)
-        if client.server_capabilities.documentFormattingProvider then
-          vim.keymap.set("n", "ll", vim.lsp.buf.format, { buffer = args.buf })
-        end
-      end,
-    })
-  end
-
   local lsp_pick_formatter = function()
     local clients = vim.lsp.get_active_clients({
       bufnr = 0, -- current buffer
@@ -417,9 +412,11 @@ M.setup = function()
   end
 
   -- Diffview
-  keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
-  keymap("n", "<f11><f2>", "<cmd>DiffviewFileHistory %<cr>", opts) -- See current file git history
-  keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts)     -- See current selection git history
+  if config.diffview_plugin then
+    keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
+    keymap("n", "<f11><f2>", "<cmd>DiffviewFileHistory %<cr>", opts) -- See current file git history
+    keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts)     -- See current selection git history
+  end
 
   -- File tree
   if config.filetree_plugin == "nvimtree" then

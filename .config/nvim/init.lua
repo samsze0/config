@@ -8,6 +8,18 @@ vim.opt.signcolumn = "auto"
 vim.opt.signcolumn = 'yes:1' -- Maximum 1 signs, fixed
 vim.opt.wrap = false
 
+-- New window spawn on right or bottom
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+-- Make help window open as right split
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = vim.api.nvim_create_augroup("help_window", { clear = true }),
+  pattern = { "*.txt" },
+  callback = function()
+    if vim.o.filetype == 'help' then vim.cmd.wincmd("L") end
+  end
+})
+
 -- Mouse
 vim.opt.mousescroll = "ver:10"
 
@@ -208,6 +220,7 @@ require("lazy").setup({
     -- Indentation markers
     'lukas-reineke/indent-blankline.nvim',
     config = function()
+      require('m.theme').setup({})
       require("ibl").setup({
         indent = { char = "▏" },
         scope = {
@@ -229,6 +242,7 @@ require("lazy").setup({
     -- Brackets colorizer
     'HiPhish/rainbow-delimiters.nvim',
     config = function()
+      require('m.theme').setup({})
       vim.g.rainbow_delimiters = { highlight = require('m.theme').rainbow_hl_groups }
     end
   },
@@ -337,7 +351,7 @@ require("lazy").setup({
       'nvim-treesitter/nvim-treesitter'
     },
     config = function()
-      require('m.treesitter_textobjects')
+      require('m.treesitter-textobjects')
     end
   },
   {
@@ -428,6 +442,10 @@ require("lazy").setup({
     config = function()
       require('m.surround')
     end
+  },
+  {
+    -- Requried for search-n-replace
+    'nvim-lua/plenary.nvim',
   }
 })
 

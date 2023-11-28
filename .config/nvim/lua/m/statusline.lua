@@ -2,12 +2,13 @@
 -- https://github.com/echasnovski/mini.statusline/blob/main/lua/mini/statusline.lua
 
 local M = {}
-local Helpers = {}
 
 local padding = "  "
 local args = {
   trunc_width = 20000, -- i.e. never truncate
 }
+
+local utils = require("m.utils")
 
 local default_hl = 'StatusLine'
 
@@ -46,6 +47,14 @@ M.setup = function(opts)
 
   -- - Disable built-in statusline in Quickfix window
   vim.g.qf_disable_statusline = 1
+
+  -- Refresh window if dependencies changes
+  _G.notification_subscribers = _G.notification_subscribers or {} -- TODO: properly define dependencies
+  table.insert(_G.notification_subscribers, function()
+    if vim.api.nvim_get_current_win() == vim.api.nvim_get_current_win() then
+      set_active()
+    end
+  end)
 end
 
 M.active = function()
@@ -59,6 +68,8 @@ M.active = function()
       M.section_copilot(args) ..
       padding ..
       "%=" .. -- Align the remaining to the right
+      padding ..
+      M.section_notifications(args) ..
       padding ..
       M.section_fileinfo(args) .. ' '
 end
@@ -163,6 +174,18 @@ M.section_copilot = function(args)
 
   if ok then return val end
   return hl("StatusLineDiagnosticWarn", " ")
+end
+
+M.section_notifications = function(args)
+  if vim.tbl_isempty(_G.notification_meta.unread) then return "" end
+
+  local count = utils.sum(vim.tbl_values(_G.notification_meta.unread))
+  local severity_hl = _G.notification_meta.unread[vim.log.levels.ERROR] and "StatusLineDiagnosticError"
+      or _G.notification_meta.unread[vim.log.levels.WARN] and "StatusLineDiagnosticWarn"
+      or _G.notification_meta.unread[vim.log.levels.INFO] and "StatusLineDiagnosticInfo"
+      or "StatusLineMuted"
+
+  return hl(severity_hl, string.format("󰂚 %d", count))
 end
 
 return M

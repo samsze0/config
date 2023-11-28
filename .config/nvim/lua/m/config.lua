@@ -1,7 +1,7 @@
 return {
   copilot_plugin = "lua",
   lf_plugin = "vim",
-  notify_backend = "nvim-notify",
+  notify_backend = "custom",
   terminal_plugin = false,
   filetree_plugin = false,
   telescope_over_fzflua = false,

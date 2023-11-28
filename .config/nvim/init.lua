@@ -423,7 +423,7 @@ require("lazy").setup({
     'rcarriga/nvim-notify',
     enabled = config.notify_backend == "nvim-notify",
     config = function()
-      require('m.notify')
+      require('m.nvim-notify')
     end
   },
   {
@@ -463,6 +463,9 @@ if config.statusline_plugin == "custom" then
   -- :h statusline
   vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
   require('m.statusline').setup({})
+end
+if config.notify_backend == "custom" then
+  require('m.notify')
 end
 
 if vim.g.neovide then

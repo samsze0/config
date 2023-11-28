@@ -186,4 +186,20 @@ function M.get_visual_selection()
   return table.concat(lines, '')
 end
 
+M.reduce = function(list, fn, init)
+  local acc = init
+  for k, v in ipairs(list) do
+    if 1 == k and not init then
+      acc = v
+    else
+      acc = fn(acc, v)
+    end
+  end
+  return acc
+end
+
+M.sum = function(list)
+  return M.reduce(list, function(acc, v) return acc + v end, 0)
+end
+
 return M

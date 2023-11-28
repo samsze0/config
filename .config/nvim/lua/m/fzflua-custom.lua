@@ -101,7 +101,7 @@ M.undo_tree = function()
     })
 end
 
-M.notifications = function()
+M.nvim_notify_notifications = function()
   if not config.notify_backend == "nvim-notify" then
     vim.notify("Feature only supported with nvim-notify backend", vim.log.levels.WARN)
     return
@@ -137,6 +137,62 @@ FZFLUAEOM]], table.concat(noti.message, "\n"))
       ["--delimiter"] = "'[\\]:]'", -- In awk, a character set matches either ] or :
       ["--with-nth"]  = "2..",      -- from field 2 onwards
       ["--header"]    = "'Time Brief'",
+      ["--no-multi"]  = "",
+    }
+  })
+end
+
+M.notifications = function()
+  if not config.notify_backend == "custom" then
+    vim.notify("Feature only supported with custom notify backend", vim.log.levels.WARN)
+    return
+  end
+
+  local notifications = _G.notifications
+  local get_noti_with_string = function(str)
+    local parts = vim.split(str, " ")
+    return notifications[tonumber(parts[1])]
+  end
+
+  -- Clear unread notifications
+  _G.notification_meta.unread = {}
+
+  require('fzf-lua').fzf_exec(function(fzf_cb)
+    for i = #notifications, 1, -1 do
+      local noti = notifications[i]
+      local level = noti.level
+      if level == vim.log.levels.INFO then
+        level = ansi_codes.blue("󰋼 ")
+      elseif level == vim.log.levels.WARN then
+        level = ansi_codes.yellow(" ")
+      elseif level == vim.log.levels.ERROR then
+        level = ansi_codes.red(" ")
+      elseif level == vim.log.levels.DEBUG or level == vim.log.levels.TRACE then
+        level = ansi_codes.grey(" ")
+      else
+        level = ansi_codes.grey(" ")
+      end
+      local brief = ""
+      local brief_max_length = 30
+      brief = #brief > brief_max_length and brief:sub(1, brief_max_length - 3) .. "..." or brief
+      fzf_cb(string.format("%d : %s %s  %s", i, level, ansi_codes.blue(timeago(noti.time)), brief))
+    end
+    fzf_cb()
+  end, {
+    prompt = 'Notifications❯ ',
+
+    preview = require 'fzf-lua'.shell.raw_preview_action_cmd(function(selected)
+      local noti = get_noti_with_string(selected[1])
+      return string.format([[cat <<FZFLUAEOM
+%s
+FZFLUAEOM]], noti.message)
+    end),
+    actions = {
+    },
+    fzf_opts = {
+      ["--delimiter"] = "'[\\]:]'", -- In awk, a character set matches either ] or :
+      ["--with-nth"]  = "2..",      -- from field 2 onwards
+      ["--header"]    = "'Level Time Brief'",
       ["--no-multi"]  = "",
     }
   })
@@ -188,6 +244,5 @@ M.git_reflog = function()
     }
   })
 end
-
 
 return M

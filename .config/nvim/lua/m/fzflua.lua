@@ -62,17 +62,39 @@ M.setup = function()
         ["ctrl-q"]  = actions.file_sel_to_qf, -- send to quickfix
         ["ctrl-l"]  = actions.file_sel_to_ll, -- send to loclist
         ["ctrl-w"]  = function(selected)      -- actions.file_vsplit open the split on the left
+          -- Expect entry to be in the either formats:
+          -- ((.*) nbsp*) relpath
+          -- ((.*) nbsp*) relpath:row:col[:(.*)*]
           local s = utils.strip_ansi_coloring(selected[1])
-          local relpath, _ = utils.strip_before_last_occurrence_of(s, utils.fzflua_nbsp)
+          s = utils.strip_before_last_occurrence_of(s, utils.fzflua_nbsp)
+          local parts = vim.split(s, ":")
+          local relpath
+          if #parts > 1 then
+            relpath = parts[1]
+          else
+            relpath = s
+          end
           vim.cmd [[vsplit]]
           vim.cmd [[wincmd l]]
           vim.cmd(string.format("e %s", relpath))
+          if #parts > 1 then
+            vim.cmd(string.format([[call cursor(%s, %s)]], parts[2], parts[3]))
+            vim.api.nvim_feedkeys("zz", "n", true) -- Center screen
+          end
         end,
         ["ctrl-t"]  = actions.file_tabedit,
         ["ctrl-y"]  = {
           function(selected)
+            -- Expect entry to be in the either formats:
+            -- ((.*) nbsp*) relpath
+            -- ((.*) nbsp*) relpath:(.*)*
             local s = utils.strip_ansi_coloring(selected[1])
-            local relpath, _ = utils.strip_before_last_occurrence_of(s, utils.fzflua_nbsp)
+            s = utils.strip_before_last_occurrence_of(s, utils.fzflua_nbsp)
+            local parts = vim.split(s, ":")
+            if #parts > 0 then
+              s = parts[1]
+            end
+            local relpath = s
             vim.fn.setreg("+", relpath)
             vim.notify(string.format("Copied %s", relpath))
           end,

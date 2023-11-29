@@ -15,23 +15,23 @@ Z-. X->git C-. V-. B-> N-> M-> ,->macro .-. /-.
 
 # Less common vim keymaps/tips
 
-Help
+- Help
     - `:h v_i` to lookup what `i` does in visual mode. Or `c_<Up>` likewise
-Visual mode
+- Visual mode
     - E.g. `aw` in visual mode **extends** the selection, so can do `vawaW`, which extends selection from a word to a WORD
     - `o` in visual mode let you "change end"
     - `=` in visual mode let you re-indent the selected text
     - While in insert mode, use `C-o` to do a normal mode command
     - Caution: marks in visual mode are only set after leaving visual mode. `<cmd>` will execute a command without leaving visual mode while `:` leaves visual mode and enters command mode before processing the command.
-Command line mode
+- Command line mode
     - Use `<C-r>` to insert things like content of registers `<C-r>a`, current word under cursor w/ `<C-r><C-w>`, etc
     - Use `<C-\>e` to evaluate arbitrary vimscript expression and append the result to the command line. E.g. `expand("%")` to get the current filename. Other filename modifiers (`:h filename-modifiers`) include `%:p`, `%:p:t`, etc
     - Also see: ex mode
-Normal mode
+- Normal mode
     - `*` to highlight all occurrences of word under cursor, or current visual selection. And advance to the next occurrence. Useful to pair with `N` i.e. `*N`
     - `#` same as `*` but in opposite direction
     - (TODO)
-Ranges in command line mode
+- Ranges in command line mode
     - `60` targets line 60
     - `%` in cmdline is a shorthand for `1,$`, which targets the whole file
     - Interoperable with marks (see below)

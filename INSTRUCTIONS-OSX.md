@@ -5,8 +5,10 @@
 Install homebrew under custom location (e.g. `~/homebrew`):
  
 ```bash
-mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew
+mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
 ```
+
+Install XCode from app store
 
 Formulae
 ```bash
@@ -15,7 +17,6 @@ brew install \
   koekeishiya/formulae/yabai \
   koekeishiya/formulae/skhd \
   less \
-  tree \
   wget \
   curl \
   fd \
@@ -32,6 +33,15 @@ brew install \
   rustup \
   starship \
   pyenv \
+  neovim \
+  lf \
+  delta \
+  eza \
+  node \
+  python@3.11 \
+  llvm \
+  rustup \
+  pyenv
 ```
 
 Cask
@@ -42,8 +52,7 @@ brew install --cask \
   warp \
   homebrew/cask-versions/firefox-developer-edition \
   karabiner-elements \
-  docker \
-  raycast 
+  docker
 ```
 
 **Karabiner**

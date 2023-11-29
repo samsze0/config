@@ -1,4 +1,4 @@
-require('fidget').setup {
+require("fidget").setup({
   -- LSP progress
   progress = {
     display = {
@@ -15,4 +15,4 @@ require('fidget').setup {
   notification = {
     override_vim_notify = false,
   },
-}
+})

@@ -1,16 +1,14 @@
-local config = require('m.config')
+local config = require("m.config")
 local command = vim.api.nvim_create_user_command
-local safe_require = require('m.utils').safe_require
-local utils = require('m.utils')
+local safe_require = require("m.utils").safe_require
+local utils = require("m.utils")
 local fmt = string.format
 
 -- Utils
-command("CopyRelPath", utils.run_and_notify(function()
-  vim.fn.setreg('+', vim.fn.expand('%'))
-end, fmt("Copied %s", vim.fn.expand('%'))), {})
+command("CopyRelPath", utils.run_and_notify(function() vim.fn.setreg("+", vim.fn.expand("%")) end, fmt("Copied %s", vim.fn.expand("%"))), {})
 
 -- FzfLua
-local fzflua_custom = safe_require('m.fzflua-custom')
+local fzflua_custom = safe_require("m.fzflua-custom")
 command("FzfLuaTest", fzflua_custom.test, {})
 command("FzfLuaUndoTree", fzflua_custom.undo_tree, {})
 if config.notify_backend == "nvim-notify" then
@@ -21,9 +19,9 @@ end
 command("FzfLuaGitReflog", fzflua_custom.git_reflog, {})
 
 -- Search n replace
-local snr = require('m.search-n-replace')
+local snr = require("m.search-n-replace")
 command("SearchNReplace", snr.open, {})
 
 -- Lf
-local lf = require('m.lf')
+local lf = require("m.lf")
 command("Lf", lf.lf, {})

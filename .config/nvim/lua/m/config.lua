@@ -23,7 +23,7 @@ return {
       enabled = false,
       toggle_colorizer = false,
       hide_defined_entries = false,
-      show_non_ts_syntax_hl_only = false
-    }
-  }
+      show_non_ts_syntax_hl_only = false,
+    },
+  },
 }

@@ -1,7 +1,7 @@
 _G.notification_subscribers = {}
 _G.notifications = {}
 _G.notification_meta = {
-  unread = {}
+  unread = {},
 }
 
 vim.notify = function(msg, level)
@@ -13,7 +13,7 @@ vim.notify = function(msg, level)
   local message = {
     message = msg,
     level = level,
-    time = t
+    time = t,
   }
   table.insert(_G.notifications, message)
 

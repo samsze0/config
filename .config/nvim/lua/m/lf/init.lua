@@ -4,9 +4,7 @@
 local open_floating_window = require("m.lf.window").open_floating_window
 local utils = require("m.utils")
 
-local function is_lf_available()
-  return vim.fn.executable('lf') == 1
-end
+local function is_lf_available() return vim.fn.executable("lf") == 1 end
 
 local debug = false
 
@@ -28,13 +26,7 @@ local function exec_lf_command(cmd, edit_cmd)
 
     local selection = vim.fn.readfile(selection_path)
     local lastdir = vim.fn.readfile(lastdir_path)
-    if debug then
-      vim.notify(string.format("LF\nExit code: %s\nSelection: %s\nLastdir %s",
-        code,
-        table.concat(selection, ", "),
-        lastdir[1])
-      )
-    end
+    if debug then vim.notify(string.format("LF\nExit code: %s\nSelection: %s\nLastdir %s", code, table.concat(selection, ", "), lastdir[1])) end
 
     -- Close LF window & restore focus to preview window
     if vim.api.nvim_win_is_valid(prev_win) then
@@ -42,21 +34,15 @@ local function exec_lf_command(cmd, edit_cmd)
       vim.api.nvim_set_current_win(prev_win)
       prev_win = -1
       -- Cleanup LF buf
-      if vim.api.nvim_buf_is_valid(buffer) and vim.api.nvim_buf_is_loaded(buffer) then
-        vim.api.nvim_buf_delete(buffer, { force = true })
-      end
+      if vim.api.nvim_buf_is_valid(buffer) and vim.api.nvim_buf_is_loaded(buffer) then vim.api.nvim_buf_delete(buffer, { force = true }) end
       buffer = -1
       win = -1
     end
 
     -- Filter invalid selection entries and open them
-    selection = utils.filter(selection, function(v)
-      return vim.trim(v) ~= ""
-    end)
+    selection = utils.filter(selection, function(v) return vim.trim(v) ~= "" end)
     if #selection > 0 then
-      if debug then
-        vim.notify("LF: opening selections")
-      end
+      if debug then vim.notify("LF: opening selections") end
       for _, file in ipairs(selection) do
         vim.cmd(string.format([[%s %s]], edit_cmd, file))
       end
@@ -88,11 +74,7 @@ local function lf(opts)
   vim.fn.writefile({ "" }, lastdir_path)
 
   exec_lf_command(
-    string.format([[PAGER="nvim -RM" lf -last-dir-path="%s" -selection-path="%s" "%s"]],
-      lastdir_path,
-      selection_path,
-      opts.path or vim.fn.expand("%:p:h")
-    ),
+    string.format([[PAGER="nvim -RM" lf -last-dir-path="%s" -selection-path="%s" "%s"]], lastdir_path, selection_path, opts.path or vim.fn.expand("%:p:h")),
     opts.edit_cmd or "vsplit"
   )
 end

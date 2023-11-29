@@ -1,93 +1,93 @@
 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 
 -- nvim-cmp supports more types of completion candidates than the default (omnifunc)
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
 -- Rust
-require('lspconfig').rust_analyzer.setup({
+require("lspconfig").rust_analyzer.setup({
   capabilities = capabilities,
 })
 
 -- Configuration
-require('lspconfig').taplo.setup({ -- TODO
+require("lspconfig").taplo.setup({ -- TODO
   capabilities = capabilities,
 })
-require('lspconfig').jsonls.setup({
+require("lspconfig").jsonls.setup({
   capabilities = capabilities,
 })
 
 -- Python
-require('lspconfig').pyright.setup({
+require("lspconfig").pyright.setup({
   capabilities = capabilities,
 })
-require('lspconfig').ruff_lsp.setup({ -- TODO
+require("lspconfig").ruff_lsp.setup({ -- TODO
   capabilities = capabilities,
 })
 
 -- Nix
-require('lspconfig').nil_ls.setup({
+require("lspconfig").nil_ls.setup({
   capabilities = capabilities,
 })
 
 -- Bash
-require('lspconfig').bashls.setup({
+require("lspconfig").bashls.setup({
   capabilities = capabilities,
 })
 
 -- Lua
-require('lspconfig').lua_ls.setup({
+require("lspconfig").lua_ls.setup({
   capabilities = capabilities,
 })
 
 -- Go
-require('lspconfig').gopls.setup({
+require("lspconfig").gopls.setup({
   capabilities = capabilities,
 })
-require('lspconfig').golangci_lint_ls.setup({
+require("lspconfig").golangci_lint_ls.setup({
   capabilities = capabilities,
 })
 
 -- C/C++
-require('lspconfig').clangd.setup({
+require("lspconfig").clangd.setup({
   capabilities = capabilities,
 })
-require('lspconfig').neocmake.setup({
+require("lspconfig").neocmake.setup({
   capabilities = capabilities,
 })
 
 -- Web
-require('lspconfig').cssls.setup({ -- TODO
+require("lspconfig").cssls.setup({ -- TODO
   capabilities = capabilities,
 })
-require('lspconfig').tailwindcss.setup({ -- TODO
+require("lspconfig").tailwindcss.setup({ -- TODO
   capabilities = capabilities,
 })
-require('lspconfig').html.setup({ -- TODO
+require("lspconfig").html.setup({ -- TODO
   capabilities = capabilities,
 })
-require('lspconfig').cssls.setup({ -- TODO
+require("lspconfig").cssls.setup({ -- TODO
   capabilities = capabilities,
 })
 
 -- Docker
-require('lspconfig').docker_compose_language_service.setup({ -- TODO
+require("lspconfig").docker_compose_language_service.setup({ -- TODO
   capabilities = capabilities,
 })
 
 -- Terraform
-require('lspconfig').terraformls.setup({ -- TODO
+require("lspconfig").terraformls.setup({ -- TODO
   capabilities = capabilities,
 })
-require('lspconfig').tflint.setup({ -- TODO
+require("lspconfig").tflint.setup({ -- TODO
   capabilities = capabilities,
 })
 
 -- Databases
-require('lspconfig').postgres_lsp.setup({
+require("lspconfig").postgres_lsp.setup({
   capabilities = capabilities,
 })
 
 -- Shading langauges
-require('lspconfig').glsl_analyzer.setup({
+require("lspconfig").glsl_analyzer.setup({
   capabilities = capabilities,
 })

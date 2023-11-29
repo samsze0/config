@@ -6,7 +6,7 @@ require("notify").setup({
     ERROR = "Error",
     INFO = "Info",
     TRACE = "Trace",
-    WARN = "Warn"
+    WARN = "Warn",
   },
   level = 2,
   minimum_width = 50,

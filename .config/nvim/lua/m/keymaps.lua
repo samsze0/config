@@ -1,7 +1,7 @@
 local M = {}
 
-local config = require('m.config')
-local utils = require('m.utils')
+local config = require("m.config")
+local utils = require("m.utils")
 local safe_require = function(module)
   return utils.safe_require(module, {
     notify = false,
@@ -15,9 +15,7 @@ local opts_can_remap = { silent = false, noremap = false }
 local opts_expr = { silent = false, expr = true, noremap = true }
 
 local lua_keymap = function(mode, lhs, rhs, opts)
-  if rhs ~= nil then
-    vim.keymap.set(mode, lhs, rhs, opts)
-  end
+  if rhs ~= nil then vim.keymap.set(mode, lhs, rhs, opts) end
 end
 
 M.setup = function()
@@ -34,18 +32,14 @@ M.setup = function()
   vim_keymap("n", "rr", ":%s//g<left><left>", opts)
   vim_keymap("v", "rr", ":s//g<left><left>", opts)
   vim_keymap("v", "r.", ":&gc<CR>", opts) -- Reset flags & add flags
-  vim_keymap("v", "ry", [["ry]], opts)    -- Yank it into register "r" for later use with "rp"
-  local function rp_rhs(whole_file)       -- Use register "r" as the replacement rather than the subject
-    return function()
-      return ((whole_file and ":%s" or ":s") .. [[//<C-r>r/gc<left><left><left>]] ..
-        string.rep("<left>", utils.get_register_length("r")) ..
-        "<left>")
-    end
+  vim_keymap("v", "ry", [["ry]], opts) -- Yank it into register "r" for later use with "rp"
+  local function rp_rhs(whole_file) -- Use register "r" as the replacement rather than the subject
+    return function() return ((whole_file and ":%s" or ":s") .. [[//<C-r>r/gc<left><left><left>]] .. string.rep("<left>", utils.get_register_length("r")) .. "<left>") end
   end
   lua_keymap("n", "rp", rp_rhs(true), opts_expr)
   lua_keymap("v", "rp", rp_rhs(false), opts_expr)
-  vim_keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts)   -- Paste selection into register "y" and paste it into command line with <C-r>
-  vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts)       -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
+  vim_keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts) -- Paste selection into register "y" and paste it into command line with <C-r>
+  vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
   vim_keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but forward direction only
 
   -- Find and replace (global)
@@ -175,10 +169,10 @@ M.setup = function()
   local maximize_plugin = config.maximize_plugin
 
   if maximize_plugin then
-    lua_keymap("n", 'wz', safe_require('maximize').toggle, {})
+    lua_keymap("n", "wz", safe_require("maximize").toggle, {})
   else
-    vim_keymap("n", 'wz', "<C-W>_<C-W>|", opts) -- Maximise both horizontally and vertically
-    vim_keymap("n", 'wx', "<C-W>=", opts)
+    vim_keymap("n", "wz", "<C-W>_<C-W>|", opts) -- Maximise both horizontally and vertically
+    vim_keymap("n", "wx", "<C-W>=", opts)
   end
 
   -- Tab
@@ -186,10 +180,8 @@ M.setup = function()
   vim_keymap("n", "tl", "<cmd>tabn<CR>", opts)
   vim_keymap("n", "tt", "<cmd>tabnew<CR>", opts)
   local close_tab_and_left = function()
-    vim.cmd [[tabclose]]
-    if vim.fn.tabpagenr() > 1 then
-      vim.cmd [[tabprevious]]
-    end
+    vim.cmd([[tabclose]])
+    if vim.fn.tabpagenr() > 1 then vim.cmd([[tabprevious]]) end
   end
   lua_keymap("n", "tw", close_tab_and_left, {})
   vim_keymap("n", "<C-j>", "<cmd>tabp<CR>", opts)
@@ -209,10 +201,10 @@ M.setup = function()
   vim_keymap("n", "X", "D", opts)
 
   -- Change (add to register 'd')
-  vim_keymap('n', 'c', '"dc', opts)
-  vim_keymap('n', 'C', '"dC', opts)
-  vim_keymap('v', 'c', '"dc', opts)
-  vim_keymap('v', 'C', '"dC', opts)
+  vim_keymap("n", "c", '"dc', opts)
+  vim_keymap("n", "C", '"dC', opts)
+  vim_keymap("v", "c", '"dc', opts)
+  vim_keymap("v", "C", '"dC', opts)
 
   -- Jump (jumplist)
   vim_keymap("n", "<C-u>", "<C-o>", opts)
@@ -222,93 +214,89 @@ M.setup = function()
   local fuzzy_finder_keymaps = {
     [{ mode = "n", lhs = "<f1>" }] = {
       telescope = safe_require("telescope.builtin").builtin,
-      fzflua = safe_require('fzf-lua').builtin,
+      fzflua = safe_require("fzf-lua").builtin,
     },
     [{ mode = "n", lhs = "<f3><f3>" }] = {
       telescope = safe_require("telescope.builtin").find_files,
-      fzflua = safe_require('fzf-lua').git_files,
+      fzflua = safe_require("fzf-lua").git_files,
     },
     [{ mode = "n", lhs = "<f3><f5>" }] = {
       telescope = nil,
-      fzflua = safe_require('fzf-lua').files,
+      fzflua = safe_require("fzf-lua").files,
     },
     [{ mode = "n", lhs = "<f3><f2>" }] = {
       telescope = safe_require("telescope.builtin").buffers,
-      fzflua = safe_require('fzf-lua').buffers,
+      fzflua = safe_require("fzf-lua").buffers,
     },
     [{ mode = "n", lhs = "<f3><f1>" }] = {
       telescope = nil,
-      fzflua = safe_require('fzf-lua').tabs,
+      fzflua = safe_require("fzf-lua").tabs,
     },
     [{ mode = "n", lhs = "<f5><f5>" }] = {
       telescope = safe_require("telescope.builtin").live_grep,
-      fzflua = safe_require('fzf-lua').live_grep,
+      fzflua = safe_require("fzf-lua").live_grep,
     },
     [{ mode = "n", lhs = "<f11><f5>" }] = {
       telescope = safe_require("telescope.builtin").git_commits,
-      fzflua = safe_require('fzf-lua').git_commits,
+      fzflua = safe_require("fzf-lua").git_commits,
     },
     [{ mode = "n", lhs = "<f11><f4>" }] = {
       telescope = safe_require("telescope.builtin").git_bcommits,
-      fzflua = safe_require('fzf-lua').git_bcommits,
+      fzflua = safe_require("fzf-lua").git_bcommits,
     },
     [{ mode = "n", lhs = "<f11><f3>" }] = {
       telescope = safe_require("telescope.builtin").git_status,
-      fzflua = safe_require('fzf-lua').git_status,
+      fzflua = safe_require("fzf-lua").git_status,
     },
     [{ mode = "n", lhs = "li" }] = {
       telescope = safe_require("telescope.builtin").lsp_definitions,
-      fzflua = safe_require('fzf-lua').lsp_definitions,
+      fzflua = safe_require("fzf-lua").lsp_definitions,
     },
     [{ mode = "n", lhs = "lr" }] = {
       telescope = safe_require("telescope.builtin").lsp_references,
-      fzflua = safe_require('fzf-lua').lsp_references,
+      fzflua = safe_require("fzf-lua").lsp_references,
     },
     [{ mode = "n", lhs = "<f4><f4>" }] = {
       telescope = safe_require("telescope.builtin").lsp_document_symbols,
-      fzflua = safe_require('fzf-lua').lsp_document_symbols,
+      fzflua = safe_require("fzf-lua").lsp_document_symbols,
     },
     [{ mode = "n", lhs = "<f4><f5>" }] = {
       telescope = safe_require("telescope.builtin").lsp_workspace_symbols,
-      fzflua = safe_require('fzf-lua').lsp_workspace_symbols,
+      fzflua = safe_require("fzf-lua").lsp_workspace_symbols,
     },
     [{ mode = "n", lhs = "ld" }] = {
       telescope = safe_require("telescope.builtin").lsp_document_diagnostics,
-      fzflua = safe_require('fzf-lua').lsp_document_diagnostics,
+      fzflua = safe_require("fzf-lua").lsp_document_diagnostics,
     },
     [{ mode = "n", lhs = "lD" }] = {
       telescope = safe_require("telescope.builtin").lsp_workspace_diagnostics,
-      fzflua = safe_require('fzf-lua').lsp_workspace_diagnostics,
+      fzflua = safe_require("fzf-lua").lsp_workspace_diagnostics,
     },
     [{ mode = "n", lhs = "la" }] = {
       telescope = nil,
-      fzflua = safe_require('fzf-lua').lsp_code_actions
+      fzflua = safe_require("fzf-lua").lsp_code_actions,
     },
     [{ mode = "n", lhs = "<f5><f4>" }] = {
       telescope = nil,
-      fzflua = safe_require('fzf-lua').blines
+      fzflua = safe_require("fzf-lua").blines,
     },
     [{ mode = "n", lhs = "<space>u" }] = {
       telescope = nil,
-      fzflua = safe_require('m.fzflua-custom').undo_tree
+      fzflua = safe_require("m.fzflua-custom").undo_tree,
     },
     [{ mode = "n", lhs = "<space>m" }] = {
       telescope = nil,
-      fzflua = safe_require('m.fzflua-custom').notifications
+      fzflua = safe_require("m.fzflua-custom").notifications,
     },
     [{ mode = "n", lhs = "<f11><f11>" }] = {
       telescope = nil,
-      fzflua = safe_require('m.fzflua-custom').git_reflog
+      fzflua = safe_require("m.fzflua-custom").git_reflog,
     },
   }
 
   for k, v in pairs(fuzzy_finder_keymaps) do
-    if v.telescope ~= nil then
-      lua_keymap(k.mode, k.lhs, v.telescope, {})
-    end
-    if v.fzflua ~= nil then
-      lua_keymap(k.mode, k.lhs, v.fzflua, {})
-    end
+    if v.telescope ~= nil then lua_keymap(k.mode, k.lhs, v.telescope, {}) end
+    if v.fzflua ~= nil then lua_keymap(k.mode, k.lhs, v.fzflua, {}) end
   end
 
   -- LSP
@@ -329,19 +317,15 @@ M.setup = function()
 
     local format_providers = {}
     for _, c in ipairs(clients) do
-      if c.server_capabilities.documentFormattingProvider then
-        table.insert(format_providers, c.name)
-      end
+      if c.server_capabilities.documentFormattingProvider then table.insert(format_providers, c.name) end
     end
 
     vim.ui.select(format_providers, {
-      prompt = 'Select format providers:',
-      format_item = function(provider_name)
-        return provider_name
-      end,
+      prompt = "Select format providers:",
+      format_item = function(provider_name) return provider_name end,
     }, function(provider_name)
       vim.lsp.buf.format({
-        filter = function(client) return client.name == provider_name end
+        filter = function(client) return client.name == provider_name end,
       })
     end)
   end
@@ -357,9 +341,7 @@ M.setup = function()
   vim_keymap("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)", opts)
   vim_keymap("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)gv", opts) -- Re-select the last block
   local comment_api = safe_require("Comment.api")
-  if not vim.tbl_isempty(comment_api) then
-    lua_keymap("i", "<C-/>", comment_api.toggle.linewise.current, {})
-  end
+  if not vim.tbl_isempty(comment_api) then lua_keymap("i", "<C-/>", comment_api.toggle.linewise.current, {}) end
 
   -- GitSigns
   vim_keymap("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>", opts)
@@ -386,20 +368,14 @@ M.setup = function()
   lua_keymap("n", "<Space>r", utils.run_and_notify(safe_require("persistence").load, "Reloaded session"), {})
 
   -- Colorizer
-  lua_keymap("n", "<leader>c", utils.run_and_notify(function()
-    vim.cmd [[ColorizerToggle]]
-  end, "Colorizer toggled"), {})
-  lua_keymap("n", "<leader>C", utils.run_and_notify(function()
-    vim.cmd [[ColorizerReloadAllBuffers]]
-  end, "Colorizer reloaded"), {})
+  lua_keymap("n", "<leader>c", utils.run_and_notify(function() vim.cmd([[ColorizerToggle]]) end, "Colorizer toggled"), {})
+  lua_keymap("n", "<leader>C", utils.run_and_notify(function() vim.cmd([[ColorizerReloadAllBuffers]]) end, "Colorizer reloaded"), {})
 
   -- Nvim Cmp
   lua_keymap("i", "<M-r>", function()
     local cmp = require("cmp")
 
-    if cmp.visible() then
-      cmp.confirm({ select = true })
-    end
+    if cmp.visible() then cmp.confirm({ select = true }) end
   end, {})
 
   -- Copilot
@@ -416,21 +392,17 @@ M.setup = function()
     lua_keymap("n", "<M-a>", safe_require("copilot.panel").accept, {})
   end
 
-  if config.ssr_plugin then
-    lua_keymap({ "n", "v" }, "<leader>f", safe_require("ssr").open, {})
-  end
+  if config.ssr_plugin then lua_keymap({ "n", "v" }, "<leader>f", safe_require("ssr").open, {}) end
 
   -- Diffview
   if config.diffview_plugin then
     vim_keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
     vim_keymap("n", "<f11><f2>", "<cmd>DiffviewFileHistory %<cr>", opts) -- See current file git history
-    vim_keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts)     -- See current selection git history
+    vim_keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts) -- See current selection git history
   end
 
   -- File tree
-  if config.filetree_plugin == "nvimtree" then
-    vim_keymap("n", "<f2><f1>", "<cmd>NvimTreeFindFile<cr>", opts)
-  end
+  if config.filetree_plugin == "nvimtree" then vim_keymap("n", "<f2><f1>", "<cmd>NvimTreeFindFile<cr>", opts) end
 
   -- File managers
   if config.lf_plugin == "vim" then
@@ -438,9 +410,7 @@ M.setup = function()
     vim_keymap("n", "<f2><f3>", "<cmd>LfCurrentFile<cr>", opts)
   elseif config.lf_plugin == "custom" then
     lua_keymap("n", "<f2><f2>", safe_require("m.lf").lf, {})
-    lua_keymap("n", "<f2><f3>", function()
-      safe_require("m.lf").lf({ path = vim.fn.expand("%:p:h") })
-    end, {})
+    lua_keymap("n", "<f2><f3>", function() safe_require("m.lf").lf({ path = vim.fn.expand("%:p:h") }) end, {})
   end
 end
 

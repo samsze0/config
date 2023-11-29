@@ -1,4 +1,4 @@
-require("flash").setup {
+require("flash").setup({
   labels = "asdfjghklqwertyuiopzxcvbnm",
   search = {
     multi_window = false,
@@ -18,9 +18,7 @@ require("flash").setup {
       "cmp_menu",
       "noice",
       "flash_prompt",
-      function(win)
-        return not vim.api.nvim_win_get_config(win).focusable
-      end,
+      function(win) return not vim.api.nvim_win_get_config(win).focusable end,
     },
     max_length = false, ---@type number|false
   },
@@ -55,9 +53,7 @@ require("flash").setup {
     ---@field hl_group string
     ---@field after boolean
     ---@type fun(opts:Flash.Format): string[][]
-    format = function(opts)
-      return { { opts.match.label, opts.hl_group } }
-    end,
+    format = function(opts) return { { opts.match.label, opts.hl_group } } end,
   },
   highlight = {
     backdrop = false,
@@ -98,4 +94,4 @@ require("flash").setup {
   prompt = {
     enabled = false,
   },
-}
+})

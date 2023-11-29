@@ -1,4 +1,4 @@
-require("ssr").setup {
+require("ssr").setup({
   border = "rounded",
   min_width = 50,
   min_height = 5,
@@ -12,4 +12,4 @@ require("ssr").setup {
     replace_confirm = "<cr>",
     replace_all = "<leader><cr>",
   },
-}
+})

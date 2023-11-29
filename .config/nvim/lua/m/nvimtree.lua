@@ -2,7 +2,7 @@
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
-require("nvim-tree").setup {
+require("nvim-tree").setup({
   on_attach = "default",
   hijack_cursor = true,
   auto_reload_on_write = true,
@@ -242,4 +242,4 @@ require("nvim-tree").setup {
       default_yes = false,
     },
   },
-}
+})

@@ -5,43 +5,31 @@ local fn = vim.fn
 
 -- TODO:check if the repo isa git repo
 local function append_git_repo_path(repo_path)
-  if repo_path == nil or not fn.isdirectory(repo_path) then
-    return
-  end
+  if repo_path == nil or not fn.isdirectory(repo_path) then return end
 
   for _, path in ipairs(lf_visited_git_repos) do
-    if path == repo_path then
-      return
-    end
+    if path == repo_path then return end
   end
 
   table.insert(lf_visited_git_repos, tostring(repo_path))
 end
 
-
 --- Strip leading and lagging whitespace
-local function trim(str)
-  return str:gsub('^%s+', ''):gsub('%s+$', '')
-end
-
+local function trim(str) return str:gsub("^%s+", ""):gsub("%s+$", "") end
 
 local function get_root(cwd)
-  local status, job = pcall(require, 'plenary.job')
-  if not status then
-    return fn.system('git rev-parse --show-toplevel')
-  end
+  local status, job = pcall(require, "plenary.job")
+  if not status then return fn.system("git rev-parse --show-toplevel") end
 
   local gitroot_job = job:new({
-    'git',
-    'rev-parse',
-    '--show-toplevel',
-    cwd = cwd
+    "git",
+    "rev-parse",
+    "--show-toplevel",
+    cwd = cwd,
   })
 
   local path, code = gitroot_job:sync()
-  if (code ~= 0) then
-    return nil
-  end
+  if code ~= 0 then return nil end
 
   return table.concat(path, "")
 end
@@ -50,21 +38,16 @@ end
 local function project_root_dir()
   -- always use bash on Unix based systems.
   local oldshell = vim.o.shell
-  if vim.fn.has('win32') == 0 then
-    vim.o.shell = 'bash'
-  end
+  if vim.fn.has("win32") == 0 then vim.o.shell = "bash" end
 
   local cwd = vim.loop.cwd()
   local root = get_root(cwd)
-  if root == nil then
-    return nil
-  end
+  if root == nil then return nil end
 
-  local cmd = string.format('cd "%s" && git rev-parse --show-toplevel',
-    fn.fnamemodify(fn.resolve(fn.expand('%:p')), ':h'), root)
+  local cmd = string.format('cd "%s" && git rev-parse --show-toplevel', fn.fnamemodify(fn.resolve(fn.expand("%:p")), ":h"), root)
   -- try symlinked file location instead
   local gitdir = fn.system(cmd)
-  local isgitdir = fn.matchstr(gitdir, '^fatal:.*') == ''
+  local isgitdir = fn.matchstr(gitdir, "^fatal:.*") == ""
 
   if isgitdir then
     vim.o.shell = oldshell
@@ -85,8 +68,8 @@ end
 --- Check if lf is available
 
 local function is_symlink()
-  local resolved = fn.resolve(fn.expand('%:p'))
-  return resolved ~= fn.expand('%:p')
+  local resolved = fn.resolve(fn.expand("%:p"))
+  return resolved ~= fn.expand("%:p")
 end
 
 return {

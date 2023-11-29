@@ -1,7 +1,7 @@
 -- TODO: copilot chat support
 -- https://github.com/zbirenbaum/copilot.lua/issues/172
 
-require('copilot').setup({
+require("copilot").setup({
   panel = {
     enabled = false,
     auto_refresh = false,
@@ -10,11 +10,11 @@ require('copilot').setup({
       jump_next = false,
       accept = false,
       refresh = false,
-      open = false
+      open = false,
     },
     layout = {
       position = "bottom", -- | top | left | right
-      ratio = 0.4
+      ratio = 0.4,
     },
   },
   suggestion = {
@@ -41,6 +41,6 @@ require('copilot').setup({
     cvs = false,
     ["."] = false,
   },
-  copilot_node_command = 'node', -- Node.js version must be > 18.x
+  copilot_node_command = "node", -- Node.js version must be > 18.x
   server_opts_overrides = {},
 })

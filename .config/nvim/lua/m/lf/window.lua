@@ -13,22 +13,22 @@ local function open_floating_window()
   local col = math.ceil(vim.o.columns - width) / 2
 
   local border_opts = {
-    style = 'minimal',
-    relative = 'editor',
+    style = "minimal",
+    relative = "editor",
     row = row - 1,
     col = col - 1,
     width = width + 2,
     height = height + 2,
   }
 
-  local opts = { style = 'minimal', relative = 'editor', row = row, col = col, width = width, height = height }
+  local opts = { style = "minimal", relative = "editor", row = row, col = col, width = width, height = height }
 
   local topleft, top, topright, right, botright, bot, botleft, left
-  local window_chars = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' }
+  local window_chars = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
   topleft, top, topright, right, botright, bot, botleft, left = unpack(window_chars)
 
   local border_lines = { topleft .. string.rep(top, width) .. topright }
-  local middle_line = left .. string.rep(' ', width) .. right
+  local middle_line = left .. string.rep(" ", width) .. right
   for _ = 1, height do
     table.insert(border_lines, middle_line)
   end
@@ -42,7 +42,7 @@ local function open_floating_window()
   -- create border window
   local border_window = api.nvim_open_win(border_buffer, true, border_opts)
   vim.api.nvim_set_hl(0, "LfBorder", { link = "Normal", default = true })
-  vim.cmd('set winhl=NormalFloat:LfBorder')
+  vim.cmd("set winhl=NormalFloat:LfBorder")
 
   -- create a unlisted scratch buffer
   if LF_BUFFER == nil or vim.fn.bufwinnr(LF_BUFFER) == -1 then
@@ -53,13 +53,13 @@ local function open_floating_window()
   -- create file window, enter the window, and use the options defined in opts
   local win = api.nvim_open_win(LF_BUFFER, true, opts)
 
-  vim.bo[LF_BUFFER].filetype = 'lf'
+  vim.bo[LF_BUFFER].filetype = "lf"
 
-  vim.cmd('setlocal bufhidden=hide')
-  vim.cmd('setlocal nocursorcolumn')
+  vim.cmd("setlocal bufhidden=hide")
+  vim.cmd("setlocal nocursorcolumn")
   vim.api.nvim_set_hl(0, "LfFloat", { link = "Normal", default = true })
-  vim.cmd('setlocal winhl=NormalFloat:LfFloat')
-  vim.cmd('set winblend=' .. winblend)
+  vim.cmd("setlocal winhl=NormalFloat:LfFloat")
+  vim.cmd("set winblend=" .. winblend)
 
   -- use autocommand to ensure that the border_buffer closes at the same time as the main buffer
   local cmd = [[autocmd WinLeave <buffer> silent! execute 'hide']]

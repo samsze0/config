@@ -1,4 +1,4 @@
-require('vgit').setup({
+require("vgit").setup({
   keymaps = {},
   settings = {
     live_gutter = {
@@ -9,10 +9,10 @@ require('vgit').setup({
       enabled = false,
     },
     scene = {
-      diff_preference = 'unified', -- unified or split
+      diff_preference = "unified", -- unified or split
       keymaps = {
-        quit = 'q'
-      }
+        quit = "q",
+      },
     },
     diff_preview = {
       keymaps = {},
@@ -27,52 +27,52 @@ require('vgit').setup({
       priority = 10,
       definitions = {
         GitSignsAddLn = {
-          linehl = 'GitSignsAddLn',
+          linehl = "GitSignsAddLn",
           texthl = nil,
           numhl = nil,
           icon = nil,
-          text = '',
+          text = "",
         },
         GitSignsDeleteLn = {
-          linehl = 'GitSignsDeleteLn',
+          linehl = "GitSignsDeleteLn",
           texthl = nil,
           numhl = nil,
           icon = nil,
-          text = '',
+          text = "",
         },
         GitSignsAdd = {
-          texthl = 'GitSignsAdd',
+          texthl = "GitSignsAdd",
           numhl = nil,
           icon = nil,
           linehl = nil,
-          text = '┃',
+          text = "┃",
         },
         GitSignsDelete = {
-          texthl = 'GitSignsDelete',
+          texthl = "GitSignsDelete",
           numhl = nil,
           icon = nil,
           linehl = nil,
-          text = '┃',
+          text = "┃",
         },
         GitSignsChange = {
-          texthl = 'GitSignsChange',
+          texthl = "GitSignsChange",
           numhl = nil,
           icon = nil,
           linehl = nil,
-          text = '┃',
+          text = "┃",
         },
       },
       usage = {
         screen = {
-          add = 'GitSignsAddLn',
-          remove = 'GitSignsDeleteLn',
+          add = "GitSignsAddLn",
+          remove = "GitSignsDeleteLn",
         },
         main = {
-          add = 'GitSignsAdd',
-          remove = 'GitSignsDelete',
-          change = 'GitSignsChange',
+          add = "GitSignsAdd",
+          remove = "GitSignsDelete",
+          change = "GitSignsChange",
         },
       },
     },
-  }
+  },
 })

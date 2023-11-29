@@ -23,6 +23,9 @@ local function tabline(options)
     local bufnr = buflist[winnr]
     local bufname = fn.bufname(bufnr)
     local bufmodified = fn.getbufvar(bufnr, '&mod')
+    local buffiletype = fn.getbufvar(bufnr, '&filetype')
+    local bufbuftype = fn.getbufvar(bufnr, '&buftype')
+    local buflisted = fn.getbufvar(bufnr, '&buflisted')
 
     s = s .. '%' .. index .. 'T'
     if index == fn.tabpagenr() then
@@ -37,36 +40,42 @@ local function tabline(options)
       s = s .. index .. ':'
     end
     -- icon
-    local icon = ''
-    if options.show_icon and M.has_devicons then
-      local ext = fn.fnamemodify(bufname, ':e')
-      icon = M.devicons.get_icon(bufname, ext, { default = true }) .. ' '
-    end
-    -- buf name
-    local pre_title_s_len = string.len(s)
-    if bufname ~= '' then
-      s = s .. icon .. fn.fnamemodify(bufname, options.fnamemodify)
+    if bufbuftype == "terminal" then
+      s = s .. '  '
+    elseif bufbuftype == "" then -- Normal buffer
+      local icon = ''
+      if options.show_icon and M.has_devicons then
+        local ext = fn.fnamemodify(bufname, ':e')
+        icon = M.devicons.get_icon(bufname, ext, { default = true }) .. ' '
+      end
+      -- buf name
+      local pre_title_s_len = string.len(s)
+      if bufname ~= '' then
+        s = s .. icon .. fn.fnamemodify(bufname, options.fnamemodify)
+      else
+        s = s .. options.no_name
+      end
+      if
+          options.inactive_tab_max_length
+          and options.inactive_tab_max_length > 0
+          and index ~= fn.tabpagenr()
+      then
+        s = string.sub(
+          s,
+          1,
+          pre_title_s_len + options.inactive_tab_max_length
+        )
+      end
+      -- modify indicator
+      if
+          bufmodified == 1
+          and options.show_modify
+          and options.modify_indicator ~= nil
+      then
+        s = s .. options.modify_indicator
+      end
     else
-      s = s .. options.no_name
-    end
-    if
-        options.inactive_tab_max_length
-        and options.inactive_tab_max_length > 0
-        and index ~= fn.tabpagenr()
-    then
-      s = string.sub(
-        s,
-        1,
-        pre_title_s_len + options.inactive_tab_max_length
-      )
-    end
-    -- modify indicator
-    if
-        bufmodified == 1
-        and options.show_modify
-        and options.modify_indicator ~= nil
-    then
-      s = s .. options.modify_indicator
+      s = s .. '  '
     end
     -- additional space at the end of each tab segment
     s = s .. options.padding

@@ -8,7 +8,7 @@ local function is_lf_available()
   return vim.fn.executable('lf') == 1
 end
 
-local debug = true
+local debug = false
 
 LF_BUFFER = nil
 LF_LOADED = false
@@ -88,7 +88,7 @@ local function lf(opts)
   vim.fn.writefile({ "" }, lastdir_path)
 
   exec_lf_command(
-    string.format([[lf -last-dir-path="%s" -selection-path="%s" "%s"]],
+    string.format([[PAGER="nvim -RM" lf -last-dir-path="%s" -selection-path="%s" "%s"]],
       lastdir_path,
       selection_path,
       opts.path or vim.fn.expand("%:p:h")

@@ -195,9 +195,9 @@ require("lazy").setup({
     end
   },
   {
-    -- Configure lua-language-server for neovim config
+    -- Configure lua-language-server for neovim config by modifying .luarc.json and lsp-config and add type annotations
+    -- for builtin
     'folke/neodev.nvim',
-    enabled = false,
     config = function()
       require("neodev").setup({})
     end
@@ -220,7 +220,6 @@ require("lazy").setup({
     -- Indentation markers
     'lukas-reineke/indent-blankline.nvim',
     config = function()
-      require('m.theme').setup({})
       require("ibl").setup({
         indent = { char = "▏" },
         scope = {
@@ -446,6 +445,13 @@ require("lazy").setup({
   {
     -- Requried for search-n-replace
     'nvim-lua/plenary.nvim',
+  },
+  {
+    'folke/twilight.nvim',
+    enabled = false,
+    config = function()
+      require('twilight').setup({})
+    end
   }
 })
 

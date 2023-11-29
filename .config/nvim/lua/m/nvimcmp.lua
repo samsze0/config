@@ -72,6 +72,16 @@ local mapping = {
     end,
     { 'i', 'c', 's' }
   ),
+  ['<M-x>'] = cmp.mapping(
+    function(fallback)
+      if cmp.visible() then
+        cmp.close()
+      else
+        fallback()
+      end
+    end,
+    { 'i', 'c', 's' }
+  ),
   ['<Tab>'] = cmp.mapping({
     i = fallback_if_cmp_has_no_active_entry(function() cmp.confirm() end),
     s = fallback_if_cmp_has_no_active_entry(function() cmp.confirm() end),

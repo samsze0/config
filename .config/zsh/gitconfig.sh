@@ -2,7 +2,7 @@
 
 # Append settings to `.gitconfig`. Require manual removal of old entries.
 gitconfig_init() {
-cat <<EOT >> ~/.gitconfig
+	cat <<EOT >>~/.gitconfig
 
 [diff]
     tool = nvimdiff

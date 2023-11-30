@@ -2,5 +2,5 @@
 
 # Restart xremap as systemctl user service
 xremap_restart() {
-  systemctl --user restart xremap
+	systemctl --user restart xremap
 }

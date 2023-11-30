@@ -5,6 +5,9 @@ require("conform").setup({
     -- Sublist: only run the first available formatter
     lua = { "stylua" },
     javascript = { { "prettierd", "prettier" } },
+    sh = { "shfmt" },
+    zsh = { "shfmt" },
+    bash = { "shfmt" },
   },
   format_on_save = {
     timeout_ms = 500,

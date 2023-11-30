@@ -1,9 +1,3 @@
-# https://apple.stackexchange.com/questions/388622/zsh-zprofile-zshrc-zlogin-what-goes-where
-# https://unix.stackexchange.com/questions/71253/what-should-shouldnt-go-in-zshenv-zshrc-zlogin-zprofile-zlogout
-
-# Warp still hasn't supported zsh completions yet (i.e. compdef, compctl, compsys, etc.)
-# https://github.com/warpdotdev/Warp/issues/2179
-
 # Custom lib
 source ~/.config/zsh/tailscale.sh
 source ~/.config/zsh/utils.sh
@@ -36,78 +30,89 @@ ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # Enable zsh completion
-autoload -U compinit; compinit
-compaudit || (compaudit | xargs chmod go-w)  # Remove group & other write permission for all insecure directories if there are any
+autoload -U compinit
+compinit
+compaudit || (compaudit | xargs chmod go-w) # Remove group & other write permission for all insecure directories if there are any
 
+function pyenv_init_if_available() {
+	if check_command_exists pyenv; then
+		export PYENV_ROOT="$HOME/.pyenv"
+		export PATH="$PYENV_ROOT/bin:$PATH"
+		eval "$(pyenv init -)"
+	fi
+}
 
-if [ $(arch) = "i386" ]  # OSX rosetta
-then
-    eval "$($HOME/homebrew-x86/bin/brew shellenv)"
+function pip_init_if_available() {
+	if check_command_exists pip; then
+		eval "$(pip completion --zsh)"
+	fi
+}
 
-    eval "$(starship init zsh)"
+function starship_init_if_available() {
+	if check_command_exists starship; then
+		eval "$(starship init zsh)"
+	fi
+}
 
-    eval "$(zoxide init zsh)"
+function zoxide_init_if_available() {
+	if check_command_exists zoxide; then
+		eval "$(zoxide init zsh)"
+	fi
+}
 
-    export PYENV_ROOT="$HOME/.pyenv-x86"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pip completion --zsh)"
+if [ $(arch) = "x86_64" ]; then # Linux / NixOS
+	starship_init_if_available
+	zoxide_init_if_available
+	pyenv_init_if_available
+	pip_init_if_available
 
-elif [ $(arch) = "x86_64" ]  # Linux / NixOS
-then
-    eval "$(starship init zsh)"
+	export PATH="/usr/local/cuda/bin:$PATH"
 
-    eval "$(zoxide init zsh)"
+	# ZLE bindings
+	bindkey "^[[H" beginning-of-line
+	bindkey "^[[F" end-of-line
+	bindkey "^H" backward-kill-word
 
-    if check_command_exists pyenv; then
-        export PYENV_ROOT="$HOME/.pyenv"
-        export PATH="$PYENV_ROOT/bin:$PATH"
-        eval "$(pyenv init -)"
-    fi
-    check_command_exists pip && eval "$(pip completion --zsh)"
+	if [[ $(uname -a) =~ "nixos" ]]; then # NixOS
+		alias nix-gc='nix-collect-garbage -d'
+		alias nix-dev='nix develop -c zsh'
+		function nix-run() {
+			nix run nixpkgs#"$1"
+		}
 
-    export PATH="/usr/local/cuda/bin:$PATH"
+		if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then # Hyprland
+			alias nixos-r='sudo nixos-rebuild switch --flake ~/nixos-config#hyprland --install-bootloader'
+			alias screen-record="bash ~/.config/hypr/screen-record.sh"
+		else # GNOME
+			alias nixos-r='sudo nixos-rebuild switch --flake ~/nixos-config#gnome --install-bootloader'
+			alias code='code --disable-gpu'
+		fi
+	fi
 
-    # ZLE bindings
-    bindkey "^[[H" beginning-of-line
-    bindkey "^[[F" end-of-line
-    bindkey "^H" backward-kill-word
+elif [ $(arch) = "i386" ]; then # OSX rosetta
+	eval "$($HOME/homebrew-x86/bin/brew shellenv)"
 
-    if [[ $(uname -a) =~ "nixos" ]]  # NixOS
-    then
-        alias nix-gc='nix-collect-garbage -d'
-        alias nix-dev='nix develop -c zsh'
+	starship_init_if_available
+	zoxide_init_if_available
+	pyenv_init_if_available
+	pip_init_if_available
 
-        if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]  # Hyprland
-        then
-            alias nixos-reload='sudo nixos-rebuild switch --flake ~/nixos-config#hyprland --install-bootloader'
-            alias screen-record="bash ~/.config/hypr/screen-record.sh"
-        else  # GNOME
-            alias nixos-reload='sudo nixos-rebuild switch --flake ~/nixos-config#gnome --install-bootloader'
-            alias code='code --disable-gpu'
-        fi
-    fi
-   
-else  # OSX m1
-    eval "$($HOME/homebrew/bin/brew shellenv)"
+else # OSX m1
+	eval "$($HOME/homebrew/bin/brew shellenv)"
 
-    eval "$(starship init zsh)"
-
-    eval "$(zoxide init zsh)"
-
-    export PYENV_ROOT="$HOME/.pyenv"
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pip completion --zsh)"
+	starship_init_if_available
+	zoxide_init_if_available
+	pyenv_init_if_available
+	pip_init_if_available
 fi
 
 export PATH=$HOME/bin:${PATH}
 
 alias ssha='eval $(ssh-agent) && ssh-add'
-alias manfzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
+alias man-fzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
 alias duf='duf -theme ansi'
 alias ll='eza -l'
-alias deff='delta --raw'
+alias diff-delta='delta --raw'
 alias ts-get='tailscale_get'
 alias ts-send='tailscale_send'
 alias jq='gojq'
@@ -121,11 +126,11 @@ export FZF_DEFAULT_OPTS=$(fzf_init)
 setopt share_history
 export HISTFILE=~/.zhistory
 export SAVEHIST=100 # Capacity of no. lines
-export HISTSIZE=50 # Capacity of no. lines for a session
+export HISTSIZE=50  # Capacity of no. lines for a session
 
 # Default apps
 export SHELL="$(which zsh)"
 export PAGER="less"
 export EDITOR="nvim"
 export BROWSER="firefox"
-export MANPAGER="nvim +Man\!"  # https://neovim.io/doc/user/filetype.html#ft-man-plugin
+export MANPAGER="nvim +Man\!" # https://neovim.io/doc/user/filetype.html#ft-man-plugin

@@ -68,11 +68,6 @@ if [ $(arch) = "x86_64" ]; then # Linux / NixOS
 
 	export PATH="/usr/local/cuda/bin:$PATH"
 
-	# ZLE bindings
-	bindkey "^[[H" beginning-of-line
-	bindkey "^[[F" end-of-line
-	bindkey "^H" backward-kill-word
-
 	if [[ $(uname -a) =~ "nixos" ]]; then # NixOS
 		alias nix-gc='nix-collect-garbage -d'
 		alias nix-dev='nix develop -c zsh'
@@ -107,6 +102,11 @@ else # OSX m1
 fi
 
 export PATH=$HOME/bin:${PATH}
+
+# ZLE (line editor) bindings
+bindkey "^[[H" beginning-of-line
+bindkey "^[[F" end-of-line
+bindkey "^H" backward-kill-word
 
 alias ssha='eval $(ssh-agent) && ssh-add'
 alias man-fzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'

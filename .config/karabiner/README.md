@@ -6,5 +6,5 @@ nix develop .
 ```
 
 ```shell
-tsx config.ts
+npx tsx config.ts
 ```

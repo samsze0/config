@@ -8,7 +8,11 @@ Install homebrew under custom location (e.g. `~/homebrew`):
 mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
 ```
 
-Install command line developer tools & XCode
+Install command line developer tools (& XCode ?):
+
+```bash
+sudo xcode-select --install
+```
 
 Formulae
 ```bash
@@ -23,7 +27,6 @@ brew install \
   fzf \
   bat \
   bottom \
-  nvm \
   git \
   ripgrep \
   gnu-sed \
@@ -35,7 +38,7 @@ brew install \
   pyenv \
   neovim \
   lf \
-  delta \
+  git-delta \
   eza \
   node \
   python@3.11 \

@@ -16,6 +16,7 @@ source ~/.config/zsh/gitconfig.sh
 source ~/.config/zsh/fzf.sh
 source ~/.config/zsh/socket.sh
 source ~/.config/zsh/unix.sh
+source ~/.config/zsh/git.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration

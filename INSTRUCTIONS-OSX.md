@@ -8,7 +8,7 @@ Install homebrew under custom location (e.g. `~/homebrew`):
 mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
 ```
 
-Install XCode from app store
+Install command line developer tools & XCode
 
 Formulae
 ```bash
@@ -41,7 +41,15 @@ brew install \
   python@3.11 \
   llvm \
   rustup \
-  pyenv
+  pyenv \
+  gh \
+  cmake \
+  make \
+  tailscale \
+  tldr \
+  rsync \
+  syncthing \
+  homebrew/cask-fonts/font-droid-sans-mono-nerd-font
 ```
 
 Cask
@@ -49,7 +57,6 @@ Cask
 brew install --cask \
   visual-studio-code \
   brave-browser \
-  warp \
   homebrew/cask-versions/firefox-developer-edition \
   karabiner-elements \
   docker
@@ -73,7 +80,7 @@ brew install --cask \
 - (In rosetta terminal) Install homebrew under custom location (e.g. `~/homebrew-x86`)
 
 ```bash
-mkdir homebrew-x86 && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew-x86
+mkdir homebrew-x86 && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew-x86  # Same command as before
 ```
 
 **iCloud**

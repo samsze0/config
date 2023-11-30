@@ -2,7 +2,7 @@ local api = vim.api
 
 local winblend = 0 -- 0 to 100
 local scaling_factor_horizontal = 0.9
-local scaling_factor_vertical = 0.9
+local scaling_factor_vertical = 0.95
 
 --- open floating window with nice borders
 local function open_floating_window()

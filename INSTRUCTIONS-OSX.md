@@ -40,6 +40,8 @@ brew install \
   lf \
   git-delta \
   eza \
+  zsh \
+  bash \
   node@20 \
   python@3.11 \
   llvm \
@@ -73,7 +75,7 @@ brew install --cask \
 
 **Yabai**
 - Disable SIP with `csrutil disable` (in recovery mode)
-- Enable arm64e (apple silicon) `sudo nvram boot-args=-arm64e_preview_abi` (then reboot)
+- Enable ARM64E ABI boot option w/ `sudo nvram boot-args=-arm64e_preview_abi` (then reboot again)
 - Load scripting addition `sudo yabai --load-sa`
 - Sometimes the desktop icons will appear on top of the windows. To fix this, run `killall Finder`
 

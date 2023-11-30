@@ -107,6 +107,8 @@ export PATH=$HOME/bin:${PATH}
 bindkey "^[[H" beginning-of-line
 bindkey "^[[F" end-of-line
 bindkey "^H" backward-kill-word
+bindkey "^[[1;5D" backward-word
+bindkey "^[[1;5C" forward-word
 
 alias ssha='eval $(ssh-agent) && ssh-add'
 alias man-fzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'

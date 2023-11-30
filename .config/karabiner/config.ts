@@ -87,11 +87,6 @@ const rules = [
         to: [{ key_code: "escape" }],
         type: "basic",
       },
-      {
-        from: { key_code: "left_control", modifiers: { optional: ["any"] } },
-        to: [{ key_code: "grave_accent_and_tilde" }],
-        type: "basic",
-      },
     ],
   },
   {
@@ -186,30 +181,30 @@ const rules = [
         to: [{ key_code: "page_down" }],
         type: "basic",
       },
-      // {
-      //   conditions: [
-      //     { name: "rcommand", type: "variable_if", value: 1 },
-      //     {
-      //       type: "frontmost_application_if",
-      //       bundle_identifiers: ["kitty$", "alacritty$", "sublime_text$"],
-      //     },
-      //   ],
-      //   from: { key_code: "j", modifiers: { optional: ["any"] } },
-      //   to: { key_code: "home" },
-      //   type: "basic",
-      // },
-      // {
-      //   conditions: [
-      //     { name: "rcommand", type: "variable_if", value: 1 },
-      //     {
-      //       type: "frontmost_application_if",
-      //       bundle_identifiers: ["kitty$", "alacritty$", "sublime_text$"],
-      //     },
-      //   ],
-      //   from: { key_code: "l", modifiers: { optional: ["any"] } },
-      //   to: { key_code: "end" },
-      //   type: "basic",
-      // },
+      {  // Use Home/End for terminal
+        conditions: [
+          { name: "rcommand", type: "variable_if", value: 1 },
+          {
+            type: "frontmost_application_if",
+            bundle_identifiers: ["kitty$", "alacritty$", "sublime_text$"],
+          },
+        ],
+        from: { key_code: "j", modifiers: { optional: ["any"] } },
+        to: { key_code: "home" },
+        type: "basic",
+      },
+      {  // Use Ctrl + left/right for other apps
+        conditions: [
+          { name: "rcommand", type: "variable_if", value: 1 },
+          {
+            type: "frontmost_application_if",
+            bundle_identifiers: ["kitty$", "alacritty$", "sublime_text$"],
+          },
+        ],
+        from: { key_code: "l", modifiers: { optional: ["any"] } },
+        to: { key_code: "end" },
+        type: "basic",
+      },
       {
         conditions: [{ name: "rcommand", type: "variable_if", value: 1 }],
         from: { key_code: "j", modifiers: { optional: ["any"] } },
@@ -248,52 +243,33 @@ const rules = [
       },
     ],
   },
-  // {
-  //   description: "Shift + Space -> Control + Space (Term)",
-  //   manipulators: [
-  //     {
-  //       conditions: [
-  //         {
-  //           type: "frontmost_application_if",
-  //           bundle_identifiers: ["kitty$", "alacritty$"],
-  //         },
-  //       ],
-  //       from: {
-  //         key_code: "spacebar",
-  //         modifiers: { mandatory: ["left_shift"] },
-  //       },
-  //       to: { key_code: "spacebar", modifiers: ["left_control"] },
-  //       type: "basic",
-  //     },
-  //   ],
-  // },
-  // {
-  //   description: "Commnd J/L -> Cmd + Opt + Left/Right (Firefox)",
-  //   manipulators: [
-  //     {
-  //       conditions: [
-  //         { type: "frontmost_application_if", bundle_identifiers: ["firefox"] },
-  //       ],
-  //       from: { key_code: "j", modifiers: { mandatory: ["left_command"] } },
-  //       to: {
-  //         key_code: "left_arrow",
-  //         modifiers: ["left_command", "left_option"],
-  //       },
-  //       type: "basic",
-  //     },
-  //     {
-  //       conditions: [
-  //         { type: "frontmost_application_if", bundle_identifiers: ["firefox"] },
-  //       ],
-  //       from: { key_code: "l", modifiers: { mandatory: ["left_command"] } },
-  //       to: {
-  //         key_code: "right_arrow",
-  //         modifiers: ["left_command", "left_option"],
-  //       },
-  //       type: "basic",
-  //     },
-  //   ],
-  // },
+  {  // Cannot be mapped in system preferences
+    description: "Commnd J/L -> Cmd + Opt + Left/Right (Firefox)",
+    manipulators: [
+      {
+        conditions: [
+          { type: "frontmost_application_if", bundle_identifiers: ["firefox"] },
+        ],
+        from: { key_code: "j", modifiers: { mandatory: ["left_command"] } },
+        to: {
+          key_code: "left_arrow",
+          modifiers: ["left_command", "left_option"],
+        },
+        type: "basic",
+      },
+      {
+        conditions: [
+          { type: "frontmost_application_if", bundle_identifiers: ["firefox"] },
+        ],
+        from: { key_code: "l", modifiers: { mandatory: ["left_command"] } },
+        to: {
+          key_code: "right_arrow",
+          modifiers: ["left_command", "left_option"],
+        },
+        type: "basic",
+      },
+    ],
+  },
   {
     description: "Hyper + -/= -> Hyper + Shift + -/= (skhd)",
     manipulators: [

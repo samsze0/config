@@ -186,7 +186,7 @@ const rules = [
           { name: "rcommand", type: "variable_if", value: 1 },
           {
             type: "frontmost_application_if",
-            bundle_identifiers: ["kitty$", "alacritty$", "sublime_text$"],
+            bundle_identifiers: ["kitty$"],
           },
         ],
         from: { key_code: "j", modifiers: { optional: ["any"] } },
@@ -198,7 +198,7 @@ const rules = [
           { name: "rcommand", type: "variable_if", value: 1 },
           {
             type: "frontmost_application_if",
-            bundle_identifiers: ["kitty$", "alacritty$", "sublime_text$"],
+            bundle_identifiers: ["kitty$"],
           },
         ],
         from: { key_code: "l", modifiers: { optional: ["any"] } },
@@ -221,27 +221,21 @@ const rules = [
   },
 
   // Application specific
-
   {
-    description: "Command + Left/Right -> Option + Left/Right",
+    description: "LCommand -> LCtrl (Terminal)",
     manipulators: [
       {
+        conditions: [
+          { type: "frontmost_application_if", bundle_identifiers: ["kitty$"] },
+        ],
         from: {
-          key_code: "left_arrow",
-          modifiers: { mandatory: ["left_command"], optional: ["any"] },
+          key_code: "left_command",
+          modifiers: { optional: ["any"] },
         },
-        to: { key_code: "left_arrow", modifiers: ["left_option"] },
-        type: "basic",
-      },
-      {
-        from: {
-          key_code: "right_arrow",
-          modifiers: { mandatory: ["left_command"], optional: ["any"] },
-        },
-        to: { key_code: "right_arrow", modifiers: ["left_option"] },
-        type: "basic",
-      },
-    ],
+        to: { key_code: "left_control" },
+        type: "basic"
+      }
+    ]
   },
   {  // Cannot be mapped in system preferences
     description: "Commnd J/L -> Cmd + Opt + Left/Right (Firefox)",
@@ -327,7 +321,6 @@ async function updateConfig() {
       from: { key_code: "fn" },
       to: [{ repeat: true, pointing_button: "button1" }],
     },
-    { from: { key_code: "left_command" }, to: [{ key_code: "left_control" }], conditions: [{ type: "frontmost_application_if", bundle_identifiers: ["kitty$"], }] },
   ];
   config.profiles[0].complex_modifications.rules = rules;
 

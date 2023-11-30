@@ -1,3 +1,6 @@
+# https://github.com/koekeishiya/yabai/wiki/Commands
+# https://github.com/koekeishiya/yabai/wiki/Configuration
+
 # Debug output
 yabai -m config debug_output on
 
@@ -15,9 +18,9 @@ yabai -m config window_gap     0
 yabai -m config auto_balance on
 
 # Mouse
-# yabai -m config mouse_modifier fn
-# yabai -m config mouse_action1 move
-# yabai -m config mouse_action2 resize
+yabai -m config mouse_modifier fn
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
 yabai -m config focus_follows_mouse autoraise
 yabai -m config mouse_follows_focus on
 
@@ -28,33 +31,11 @@ yabai -m config window_topmost on
 yabai -m config window_shadow off
 
 # Window opacity
-yabai -m config window_opacity off  # default to off
+yabai -m config window_opacity off
 yabai -m config active_window_opacity 1.0
-yabai -m config normal_window_opacity 0.7
+yabai -m config normal_window_opacity 1.0
 
-# Window border
-# yabai -m window --toggle border
+yabai -m rule --add app=".*" manage=off
 
-# By default all float
-# yabai -m rule --add app=".*" manage=off
-
-# Float window
-yabai -m rule --add app="^System Preferences$" manage=off
-yabai -m rule --add app="^Finder$" manage=off
-yabai -m rule --add app="^WeChat$" manage=off
-yabai -m rule --add app="^WhatsApp$" manage=off
-yabai -m rule --add app="^ColorSlurp$" manage=off
-# yabai -m rule --add app="^Xcode$" manage=off
-# yabai -m rule --add app="^Simulator$" manage=off
-# yabai -m rule --add app="^Unity$" manage=off
-
-# Sticky window
-# yabai -m rule --add app="^System Preferences$" sticky=on
-# yabai -m rule --add app="^Finder$" sticky=on
-
-# Übersicht & Spacebar
-# yabai -m signal --add event=space_changed action="osascript -e 'tell application \"Übersicht\" to refresh widget id \"imbar-main-jsx\"'"
-# yabai -m signal --add event=space_changed action=""
-# yabai -m config external_bar main:20:0
-yabai -m config external_bar all:20:0
-# yabai -m config external_bar all:0:0
+# External bar (e.g. spacebar)
+yabai -m config external_bar all:0:0

@@ -22,3 +22,15 @@ which_all() {
     # Type is file or symlink (becaues of NixOS). Redirect any error to /dev/null in case dir doesn't exist
   done
 }
+
+set_flags() {
+  set -o errexit
+  set -o nounset
+  set -o pipefail
+}
+
+unset_flags() {
+  set +o errexit
+  set +o nounset
+  set +o pipefail
+}

@@ -5,12 +5,8 @@
 # Return the command line args containing fzf's keybindings, colors and other config
 # The return value should be exported as `FZF_DEFAULT_OPTS`
 fzf_init() {
-  KEYMAPS=" \
-    --bind 'alt-a:toggle-all' \
-    --bind 'alt-i:toggle' \
-  "
-
-  COLORS=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
+  local colors
+  colors=$(cat << EOT | tr -d "\n "  # Remove newlines and spaces
     --color=
       bg+:#2c313c,
       preview-bg:#101213,
@@ -28,13 +24,19 @@ fzf_init() {
       hl+:#cbd1da
 EOT
   )
-  echo "$COLORS $KEYMAPS \
-    --layout=reverse \
-    --info=inline \
-    --border \
-    --margin=1 \
-    --padding=1 \
-    --pointer='' \
-    --marker='' \
-  "
+
+  cat << EOT | tr -d "\n" | tr -s " "  # Remove new lines and squeeze space
+    $colors
+   
+    --layout=reverse
+    --info=inline
+    --border
+    --margin=1
+    --padding=1
+    --pointer=''
+    --marker=''
+   
+    --bind 'ctrl-a:toggle-all'
+    --bind 'ctrl-i:toggle'
+EOT
 }

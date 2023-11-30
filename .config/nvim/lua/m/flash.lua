@@ -14,10 +14,6 @@ require("flash").setup({
     incremental = false,
     ---@type (string|fun(win:window))[]
     exclude = {
-      "notify",
-      "cmp_menu",
-      "noice",
-      "flash_prompt",
       function(win) return not vim.api.nvim_win_get_config(win).focusable end,
     },
     max_length = false, ---@type number|false
@@ -77,12 +73,6 @@ require("flash").setup({
     -- `f`, `F`, `t`, `T`, `;` and `,` motions
     char = {
       enabled = false,
-      jump_labels = false,
-      multi_line = true,
-      label = { exclude = "hjkliardc" },
-      keys = { "f", "F", "t", "T" },
-      search = { wrap = false },
-      jump = { register = false },
     },
     treesitter = {
       enabled = false,

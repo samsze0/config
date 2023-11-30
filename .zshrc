@@ -89,7 +89,7 @@ then
     fi
    
 else  # OSX m1
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+    eval "$($HOME/homebrew/bin/brew shellenv)"
 
     eval "$(starship init zsh)"
 

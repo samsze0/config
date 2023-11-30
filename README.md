@@ -5,7 +5,7 @@ Shared config for NixOS and OSX
 ## Usage
 
 ```shell
-git clone https://github.com/samsze0/config --recursive
+git clone https://github.com/samsze0/config --recursive config && cp -R config/{.,}* ~
 ```
 
 **NixOS**

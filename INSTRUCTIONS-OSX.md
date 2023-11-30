@@ -40,7 +40,7 @@ brew install \
   lf \
   git-delta \
   eza \
-  node \
+  node@20 \
   python@3.11 \
   llvm \
   rustup \

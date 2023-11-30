@@ -18,10 +18,6 @@ elseif config.notify_backend == "custom" then
 end
 command("FzfLuaGitReflog", fzflua_custom.git_reflog, {})
 
--- Search n replace
-local snr = require("m.search-n-replace")
-command("SearchNReplace", snr.open, {})
-
 -- Lf
 local lf = require("m.lf")
 command("Lf", lf.lf, {})

@@ -17,6 +17,10 @@ return {
   surround_plugin = false,
   tabline_plugin = "custom",
   statusline_plugin = "custom",
+  treesitter_textobjects_plugin = "custom",
+  nvim_dev_plugin = "neodev",
+  neoconf_plugin = false,
+  persist_plugin = "persistence",
 
   theme_opts = {
     debug = {

@@ -21,3 +21,7 @@ cmd create_new ${{
   ~/.config/lf/create_new.sh $@
 }}
 map a :push :create_new<space>
+
+cmd on-select &{{
+  echo "$fx" > ~/.cache/lf_current_selection
+}}

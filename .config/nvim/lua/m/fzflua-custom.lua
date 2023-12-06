@@ -55,7 +55,8 @@ M.undo_tree = function()
 
   require("fzf-lua").fzf_exec(function(fzf_cb)
     for i, undo in ipairs(undolist) do
-      fzf_cb(string.format("%d %s %s%d %s %s", i, utils.fzflua_nbsp, string.rep(" ", undo.alt_level), undo.seq, utils.fzflua_nbsp, ansi_codes.blue(undo.time)))
+      fzf_cb(string.format("%d %s %s%d %s %s", i, utils.fzflua_nbsp, string.rep(" ", undo.alt_level), undo.seq,
+        utils.fzflua_nbsp, ansi_codes.blue(undo.time)))
     end
     fzf_cb() -- EOF (close fzf named pipe)
   end, {
@@ -129,7 +130,7 @@ FZFLUAEOM]],
     actions = {},
     fzf_opts = {
       ["--delimiter"] = "'[\\]:]'", -- In awk, a character set matches either ] or :
-      ["--with-nth"] = "2..", -- from field 2 onwards
+      ["--with-nth"] = "2..",       -- from field 2 onwards
       ["--header"] = "'Time Brief'",
       ["--no-multi"] = "",
     },
@@ -185,9 +186,14 @@ FZFLUAEOM]],
       )
     end),
     actions = {},
+    winopts = {
+      preview = {
+        wrap = "wrap"
+      }
+    },
     fzf_opts = {
       ["--delimiter"] = "'[\\]:]'", -- In awk, a character set matches either ] or :
-      ["--with-nth"] = "2..", -- from field 2 onwards
+      ["--with-nth"] = "2..",       -- from field 2 onwards
       ["--header"] = "'Level Time Brief'",
       ["--no-multi"] = "",
     },

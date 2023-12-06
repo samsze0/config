@@ -14,7 +14,7 @@ source ~/.config/zsh/utils.sh
 MIME_TYPE=$(get_mimetype $fx)
 
 if [[ $MIME_TYPE =~ ^image ]]; then
-    imv $fx
+    $IMAGE_VIEWER $fx
     exit 0
 
 elif [[ $MIME_TYPE =~ ^text || $MIME_TYPE = application/json ]]; then
@@ -27,7 +27,7 @@ elif [[ $MIME_TYPE =~ ^text || $MIME_TYPE = application/json ]]; then
     exit 0
 
 elif [[ $MIME_TYPE =~ ^video ]]; then
-    celluloid $fx
+    $VIDEO_PLAYER $fx
     exit 0
 
 elif [[ $MIME_TYPE = application/pdf ]]; then

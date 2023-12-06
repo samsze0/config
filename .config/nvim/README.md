@@ -125,3 +125,38 @@ vim.api.create_user_command("Test", function()
   require("PackageName").my_func()
 end, {})
 ```
+
+# TODO
+
+- Persistent undo tree w/ https://neovim.io/doc/user/undo.html#undo-persistence
+- Backup and swap integration w/ fzflua
+- Fzflua preselect (for undo tree, resume state, jump list, and more)
+- Fzflua fzf scroll + preview scroll by line + page
+- Custom autopair
+- Fzflua LSP implementations remove self
+- Fzflua TODO comments
+- Fzflua git worktree
+- Fzflua multi-stage?
+- SSH lf preview
+- SSH setup
+- rsync backup
+- syncthing setup
+- Lf preview
+- Fzf preview
+- Custom tab and buf fzflua
+- Treesitter textobjects custom
+- Copilot
+- Fzflua fork
+- Custom Search n replace
+- LSP format no-auto. Integration w/ fzflua
+- Lf select don't go next entry
+- Lf create_new multi-layer dir support
+- react native setup
+- react dev setup
+- Flash fork
+- Persistence fork
+- Tabbar dedup
+- Statusline show line changes since last save
+- Statusilne show last notification message
+- Lf preview & open (mac)
+- Fix Ripgrep files fzflua respect git

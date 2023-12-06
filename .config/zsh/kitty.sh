@@ -2,7 +2,7 @@
 
 # Save kitty session
 kitty-save-session() {
-	kitty @ ls | python ~/.config/kitty/kitty-convert-dump.py >~/.config/kitty/session
+	kitty @ ls | python3 ~/.config/kitty/kitty-convert-dump.py >~/.config/kitty/session
 }
 
 # Spawn a kitty instance as child process with session specified

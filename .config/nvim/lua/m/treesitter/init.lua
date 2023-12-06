@@ -8,4 +8,8 @@ require("nvim-treesitter.configs").setup({
     disable = {},
     additional_vim_regex_highlighting = false,
   },
+  playground = {
+    enable = true,
+    disable = {},
+  }
 })

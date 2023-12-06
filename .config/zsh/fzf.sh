@@ -6,8 +6,8 @@
 # The return value should be exported as `FZF_DEFAULT_OPTS`
 fzf_init() {
 	local colors
+  # Remove newlines and spaces
 	colors=$(
-		# Remove newlines and spaces
 		cat <<EOT | tr -d "\n "
     --color=
       bg+:#2c313c,

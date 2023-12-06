@@ -37,10 +37,6 @@ ctrl + alt + cmd - 0 : yabai -m space --focus 10
 ctrl + alt + cmd + shift - 9 : yabai -m space --focus 11
 ctrl + alt + cmd + shift - 0 : yabai -m space --focus 12
 
-# Create/Delete space
-ctrl + alt + cmd - t : yabai -m space --create
-ctrl + alt + cmd - w : yabai -m space --destroy
-
 # Move window (space; prev/next)
 ctrl + alt + cmd - home : yabai -m window --space prev
 ctrl + alt + cmd - end : yabai -m window --space next
@@ -70,6 +66,3 @@ ctrl + alt + cmd + shift - p : yabai -m config focus_follows_mouse off
 # Enable/Disable window_opacity
 ctrl + alt + cmd - o : yabai -m config window_opacity on
 ctrl + alt + cmd + shift - o : yabai -m config window_opacity off
-
-# Enable/Disable float
-# ctrl + alt + cmd - [ : yabai -m window --toggle float

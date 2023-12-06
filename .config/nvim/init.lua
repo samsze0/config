@@ -3,7 +3,7 @@
 vim.cmd([[set clipboard+=unnamedplus]]) -- Use system clipboard
 
 vim.opt.number = true
-vim.opt.cursorline = false -- Highlight current line
+vim.opt.cursorline = false   -- Highlight current line
 vim.opt.signcolumn = "auto"
 vim.opt.signcolumn = "yes:1" -- Maximum 1 signs, fixed
 vim.opt.wrap = false
@@ -90,9 +90,11 @@ require("lazy").setup({
     config = function()
       local run_setup_on_startup = false
 
-      if run_setup_on_startup then vim.api.nvim_create_autocmd("VimEnter", {
-        callback = function() vim.cmd("Copilot setup") end,
-      }) end
+      if run_setup_on_startup then
+        vim.api.nvim_create_autocmd("VimEnter", {
+          callback = function() vim.cmd("Copilot setup") end,
+        })
+      end
     end,
   },
   {
@@ -174,7 +176,7 @@ require("lazy").setup({
     -- Configure lua-language-server for neovim config by modifying .luarc.json and lsp-config and add type annotations
     -- for builtin
     "folke/neodev.nvim",
-    config = function() require("neodev").setup({}) end,
+    enabled = config.nvim_dev_plugin == "neodev",
   },
   {
     -- Git status in sign column and git hunk preview/navigation and line blame
@@ -195,7 +197,7 @@ require("lazy").setup({
         scope = {
           highlight = require("m.theme").rainbow_hl_groups,
           show_start = false, -- underline on scope start
-          show_end = false, -- underline on scope end
+          show_end = false,   -- underline on scope end
           include = {
             node_type = { ["*"] = { "*" } },
           },
@@ -226,9 +228,7 @@ require("lazy").setup({
   {
     -- Project specific settings incl. LSP (w/ vscode interop)
     "folke/neoconf.nvim",
-    enabled = true,
-    priority = 100, -- Default priority is 50. Must load befor
-    config = function() require("m.neoconf") end,
+    enabled = config.neoconf_plugin,
   },
   {
     -- Highlight occurences of word current cursor
@@ -252,12 +252,12 @@ require("lazy").setup({
     config = function() require("m.nvimcmp") end,
     dependencies = {
       "hrsh7th/cmp-nvim-lsp", -- nvim-cmp source for built-in language server client
-      "hrsh7th/cmp-path", -- nvim-cmp source for filesystem paths
-      "hrsh7th/cmp-cmdline", -- nvim-cmp source for vim command line
-      "hrsh7th/cmp-buffer", -- nvim-cmp source for buffer words
-      "petertriho/cmp-git", -- nvim-cmp source for git (commits, issues, mentions, etc.)
+      "hrsh7th/cmp-path",     -- nvim-cmp source for filesystem paths
+      "hrsh7th/cmp-cmdline",  -- nvim-cmp source for vim command line
+      "hrsh7th/cmp-buffer",   -- nvim-cmp source for buffer words
+      "petertriho/cmp-git",   -- nvim-cmp source for git (commits, issues, mentions, etc.)
       "onsails/lspkind.nvim", -- add vscode-codicons to completion entries (function, class, etc.)
-      "L3MON4D3/LuaSnip", -- Snippet. For inserting text into editor
+      "L3MON4D3/LuaSnip",     -- Snippet. For inserting text into editor
     },
   },
   {
@@ -282,6 +282,7 @@ require("lazy").setup({
   {
     -- Make and resurrect sessions with vim's built-in mksession
     "folke/persistence.nvim",
+    enabled = config.persist_plugin == "persistence",
     config = function()
       require("persistence").setup({
         options = { "buffers", "curdir", "tabpages", "winsize" },
@@ -296,7 +297,7 @@ require("lazy").setup({
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",
-    enabled = false,
+    enabled = config.treesitter_textobjects_plugin == "default",
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
@@ -385,6 +386,12 @@ require("lazy").setup({
     enabled = false,
     config = function() require("twilight").setup({}) end,
   },
+  {
+    "nvim-treesitter/playground",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+    },
+  }
 })
 
 require("m.keymaps").setup()
@@ -399,10 +406,11 @@ if config.tabline_plugin == "custom" then
 end
 if config.statusline_plugin == "custom" then
   -- :h statusline
-  vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
   require("m.statusline").setup({})
+  vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
 end
 if config.notify_backend == "custom" then require("m.notify") end
 if config.lf_plugin == "custom" then require("m.lf") end
+if config.persist_plugin == "custom" then require("m.persist") end
 
 if vim.g.neovide then require("m.neovide") end

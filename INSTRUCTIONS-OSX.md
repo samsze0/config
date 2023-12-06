@@ -14,57 +14,9 @@ Install command line developer tools (& XCode ?):
 sudo xcode-select --install
 ```
 
-Formulae
+Install homebrew formulae and casks
 ```bash
-brew install \
-  cmacrae/formulae/spacebar \
-  koekeishiya/formulae/yabai \
-  koekeishiya/formulae/skhd \
-  less \
-  wget \
-  curl \
-  fd \
-  fzf \
-  bat \
-  bottom \
-  git \
-  ripgrep \
-  gnu-sed \
-  zoxide \
-  gh \
-  croc \
-  rustup \
-  starship \
-  pyenv \
-  neovim \
-  lf \
-  git-delta \
-  eza \
-  zsh \
-  bash \
-  node@20 \
-  python@3.11 \
-  llvm \
-  rustup \
-  pyenv \
-  gh \
-  cmake \
-  make \
-  tailscale \
-  tldr \
-  rsync \
-  syncthing \
-  homebrew/cask-fonts/font-droid-sans-mono-nerd-font
-```
-
-Cask
-```bash
-brew install --cask \
-  visual-studio-code \
-  brave-browser \
-  homebrew/cask-versions/firefox-developer-edition \
-  karabiner-elements \
-  docker
+brew_install_from
 ```
 
 **Karabiner**

@@ -11,6 +11,7 @@ source ~/.config/zsh/fzf.sh
 source ~/.config/zsh/socket.sh
 source ~/.config/zsh/unix.sh
 source ~/.config/zsh/git.sh
+source ~/.config/zsh/homebrew.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
@@ -82,23 +83,27 @@ if [ $(arch) = "x86_64" ]; then # Linux / NixOS
 			alias nixos-r='sudo nixos-rebuild switch --flake ~/nixos-config#gnome --install-bootloader'
 			alias code='code --disable-gpu'
 		fi
+
+		export BROWSER="firefox"
+		export IMAGE_VIEWER="imv"
+		export VIDEO_PLAYER="celluloid"
+	fi
+else                           # OSX
+	if [ $(arch) = "i386" ]; then # Rosetta
+		eval "$($HOME/homebrew-x86/bin/brew shellenv)"
+	else # M1
+		eval "$($HOME/homebrew/bin/brew shellenv)"
+		export PATH="$PATH:/usr/local/bin" # Node brew not working
 	fi
 
-elif [ $(arch) = "i386" ]; then # OSX rosetta
-	eval "$($HOME/homebrew-x86/bin/brew shellenv)"
-
 	starship_init_if_available
 	zoxide_init_if_available
 	pyenv_init_if_available
 	pip_init_if_available
 
-else # OSX m1
-	eval "$($HOME/homebrew/bin/brew shellenv)"
-
-	starship_init_if_available
-	zoxide_init_if_available
-	pyenv_init_if_available
-	pip_init_if_available
+	export BROWSER="open -a '/Applications/Firefox Developer Edition.app'"
+	export IMAGE_VIEWER="open"
+	export VIDEO_PLAYER="open"
 fi
 
 export PATH=$HOME/bin:${PATH}
@@ -130,9 +135,8 @@ export HISTFILE=~/.zhistory
 export SAVEHIST=100 # Capacity of no. lines
 export HISTSIZE=50  # Capacity of no. lines for a session
 
-# Default apps
+# Default apps (common)
 export SHELL="$(which zsh)"
 export PAGER="less"
 export EDITOR="nvim"
-export BROWSER="firefox"
 export MANPAGER="nvim +Man\!" # https://neovim.io/doc/user/filetype.html#ft-man-plugin

@@ -1,4 +1,6 @@
 *
+!casks.brew
+!formulae.brew
 !.gitignore
 !.gitmodules
 !.gitattributes

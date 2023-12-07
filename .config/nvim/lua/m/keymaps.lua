@@ -32,14 +32,14 @@ M.setup = function()
   vim_keymap("n", "rr", ":%s//g<left><left>", opts)
   vim_keymap("v", "rr", ":s//g<left><left>", opts)
   vim_keymap("v", "r.", ":&gc<CR>", opts) -- Reset flags & add flags
-  vim_keymap("v", "ry", [["ry]], opts) -- Yank it into register "r" for later use with "rp"
-  local function rp_rhs(whole_file) -- Use register "r" as the replacement rather than the subject
+  vim_keymap("v", "ry", [["ry]], opts)    -- Yank it into register "r" for later use with "rp"
+  local function rp_rhs(whole_file)       -- Use register "r" as the replacement rather than the subject
     return function() return ((whole_file and ":%s" or ":s") .. [[//<C-r>r/gc<left><left><left>]] .. string.rep("<left>", utils.get_register_length("r")) .. "<left>") end
   end
   lua_keymap("n", "rp", rp_rhs(true), opts_expr)
   lua_keymap("v", "rp", rp_rhs(false), opts_expr)
-  vim_keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts) -- Paste selection into register "y" and paste it into command line with <C-r>
-  vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
+  vim_keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts)   -- Paste selection into register "y" and paste it into command line with <C-r>
+  vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts)       -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
   vim_keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but forward direction only
 
   -- Find and replace (global)
@@ -366,11 +366,16 @@ M.setup = function()
   vim_keymap("n", "<space>;", "q:", opts)
 
   -- Session restore
-  lua_keymap("n", "<Space>r", utils.run_and_notify(safe_require("persistence").load, "Reloaded session"), {})
+  if config.persist_plugin == "persistence" then
+    lua_keymap("n", "<Space>r", utils.run_and_notify(safe_require("persistence").load, "Reloaded session"), {})
+  elseif config.persist_plugin == "custom" then
+    lua_keymap("n", "<Space>r", utils.run_and_notify(safe_require("m.persist").load_session, "Reloaded session"), {})
+  end
 
   -- Colorizer
   lua_keymap("n", "<leader>c", utils.run_and_notify(function() vim.cmd([[ColorizerToggle]]) end, "Colorizer toggled"), {})
-  lua_keymap("n", "<leader>C", utils.run_and_notify(function() vim.cmd([[ColorizerReloadAllBuffers]]) end, "Colorizer reloaded"), {})
+  lua_keymap("n", "<leader>C",
+    utils.run_and_notify(function() vim.cmd([[ColorizerReloadAllBuffers]]) end, "Colorizer reloaded"), {})
 
   -- Nvim Cmp
   lua_keymap("i", "<M-r>", function()
@@ -399,7 +404,7 @@ M.setup = function()
   if config.diffview_plugin then
     vim_keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
     vim_keymap("n", "<f11><f2>", "<cmd>DiffviewFileHistory %<cr>", opts) -- See current file git history
-    vim_keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts) -- See current selection git history
+    vim_keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts)     -- See current selection git history
   end
 
   -- File tree

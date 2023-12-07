@@ -20,7 +20,7 @@ return {
   treesitter_textobjects_plugin = "custom",
   nvim_dev_plugin = "neodev",
   neoconf_plugin = false,
-  persist_plugin = "persistence",
+  persist_plugin = "custom",
   autopairs_plugin = false,
 
   theme_opts = {

@@ -350,6 +350,7 @@ require("lazy").setup({
   {
     -- UI Component Library
     "MunifTanjim/nui.nvim",
+    enabled = false,
   },
   {
     -- vim.notify() backend + LSP $/progress handler
@@ -412,6 +413,6 @@ if config.statusline_plugin == "custom" then
 end
 if config.notify_backend == "custom" then require("m.notify") end
 if config.lf_plugin == "custom" then require("m.lf") end
-if config.persist_plugin == "custom" then require("m.persist") end
+if config.persist_plugin == "custom" then require("m.persist").setup() end
 
 if vim.g.neovide then require("m.neovide") end

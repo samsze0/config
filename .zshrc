@@ -13,6 +13,7 @@ source ~/.config/zsh/unix.sh
 source ~/.config/zsh/git.sh
 source ~/.config/zsh/homebrew.sh
 source ~/.config/zsh/syncthing.sh
+source ~/.config/zsh/osx.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration

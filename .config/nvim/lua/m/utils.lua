@@ -64,8 +64,8 @@ end
 
 M.run_and_notify = function(f, msg)
   return function()
-    f()
-    vim.notify(msg)
+    local val = f()
+    vim.notify(type(msg) == "function" and msg(val) or msg)
   end
 end
 
@@ -101,10 +101,7 @@ M.safe_require = function(module_name, opts)
     if opts.notify then vim.notify(string.format("Failed to load module %s", module_name), opts.log_level) end
     return setmetatable({}, {
       __index = function(_, key)
-        if opts.notify then
-          vim.notify(string.format("Failed to access key %s in module %s", key, module_name),
-            opts.log_level)
-        end
+        if opts.notify then vim.notify(string.format("Failed to access key %s in module %s", key, module_name), opts.log_level) end
         return nil
       end,
     }) -- In case we try to index into the result of safe_require
@@ -181,9 +178,7 @@ function M.get_visual_selection()
   return table.concat(lines, "")
 end
 
-M.is_array = function(t)
-  return #t > 0 and t[1] ~= nil
-end
+M.is_array = function(t) return #t > 0 and t[1] ~= nil end
 
 M.reduce = function(list, fn, init)
   local acc = init
@@ -219,8 +214,23 @@ M.filter = function(list, fn)
   return new_list
 end
 
-M.pad = function(str, length)
-  return string.format("%-" .. length .. "s", str)
+M.pad = function(str, length) return string.format("%-" .. length .. "s", str) end
+
+M.reverse = function(list)
+  local reversed = {}
+  for i = #list, 1, -1 do
+    table.insert(reversed, list[i])
+  end
+  return reversed
+end
+
+M.join_first_two_elements = function(list, join_fn)
+  if #list < 2 then return list end
+
+  local first = table.remove(list, 1)
+  local second = table.remove(list, 1)
+  table.insert(list, 1, join_fn(first, second))
+  return list
 end
 
 return M

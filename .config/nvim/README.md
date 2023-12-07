@@ -128,21 +128,22 @@ end, {})
 
 # TODO
 
-- Persistent undo tree w/ https://neovim.io/doc/user/undo.html#undo-persistence
-- Backup and swap integration w/ fzflua
 - Fzflua preselect (for undo tree, resume state, jump list, and more)
 - Fzflua fzf scroll + preview scroll by line + page
 - Custom autopair
-- Fzflua LSP implementations remove self
 - Fzflua TODO comments
 - Fzflua git worktree
 - Fzflua multi-stage?
 - SSH lf preview
 - SSH setup
+- Real "modified" & integration w/ persist
+- Statusline show line changes since last save
 - Git conflict workflow w/ fzflua integration
 - `git log` don't use delta
+- Fzflua Cumulative mode for undo, git, etc
 - rsync backup
 - syncthing setup
+- syncthing clipboard
 - Lf preview
 - Fzf preview
 - Custom tab and buf fzflua
@@ -150,15 +151,10 @@ end, {})
 - Copilot
 - Fzflua fork
 - Custom Search n replace
-- LSP format no-auto. Integration w/ fzflua
-- Lf select don't go next entry
 - Lf create_new multi-layer dir support
 - react native setup
 - react dev setup
 - Flash fork
-- Persistence fork
-- Tabbar dedup
-- Statusline show line changes since last save
 - Fix Ripgrep files fzflua respect git
 - Opened buffers file changes workflow
 - Karabiner cmd + backspace

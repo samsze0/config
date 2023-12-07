@@ -32,14 +32,14 @@ M.setup = function()
   vim_keymap("n", "rr", ":%s//g<left><left>", opts)
   vim_keymap("v", "rr", ":s//g<left><left>", opts)
   vim_keymap("v", "r.", ":&gc<CR>", opts) -- Reset flags & add flags
-  vim_keymap("v", "ry", [["ry]], opts)    -- Yank it into register "r" for later use with "rp"
-  local function rp_rhs(whole_file)       -- Use register "r" as the replacement rather than the subject
+  vim_keymap("v", "ry", [["ry]], opts) -- Yank it into register "r" for later use with "rp"
+  local function rp_rhs(whole_file) -- Use register "r" as the replacement rather than the subject
     return function() return ((whole_file and ":%s" or ":s") .. [[//<C-r>r/gc<left><left><left>]] .. string.rep("<left>", utils.get_register_length("r")) .. "<left>") end
   end
   lua_keymap("n", "rp", rp_rhs(true), opts_expr)
   lua_keymap("v", "rp", rp_rhs(false), opts_expr)
-  vim_keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts)   -- Paste selection into register "y" and paste it into command line with <C-r>
-  vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts)       -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
+  vim_keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts) -- Paste selection into register "y" and paste it into command line with <C-r>
+  vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
   vim_keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but forward direction only
 
   -- Find and replace (global)
@@ -309,7 +309,24 @@ M.setup = function()
   vim_keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
   vim_keymap("n", "<space>l", "<cmd>LspInfo<CR>", opts)
 
-  lua_keymap("n", "ll", utils.run_and_notify(vim.lsp.buf.format, "Formatted"), {})
+  local conform_over_lsp_format = true
+
+  if conform_over_lsp_format then
+    lua_keymap(
+      "n",
+      "ll",
+      utils.run_and_notify(safe_require("conform").format, function(success)
+        if success then
+          return string.format("Formatted with %s", safe_require("conform").list_formatters()[1].name) -- TODO: look for first available formatter
+        else
+          return "No available formatters"
+        end
+      end),
+      {}
+    )
+  else
+    lua_keymap("n", "ll", utils.run_and_notify(vim.lsp.buf.format, "Formatted"), {})
+  end
 
   local lsp_pick_formatter = function()
     local clients = vim.lsp.get_active_clients({
@@ -330,7 +347,21 @@ M.setup = function()
       })
     end)
   end
-  lua_keymap("n", "lL", lsp_pick_formatter, {})
+
+  local conform_pick_formatter = function()
+    local formatters = safe_require("conform").list_formatters()
+    formatters = utils.filter(formatters, function(formatter) return formatter.available end)
+    vim.ui.select(formatters, {
+      prompt = "Select formatter:",
+      format_item = function(formatter) return formatter.name end,
+    }, function(formatter) safe_require("conform").format({ formatters = formatter.name }) end)
+  end
+
+  if conform_over_lsp_format then
+    lua_keymap("n", "lL", conform_pick_formatter, {})
+  else
+    lua_keymap("n", "lL", lsp_pick_formatter, {})
+  end
 
   -- Terminal
   if config.terminal_plugin == "floaterm" then
@@ -374,8 +405,7 @@ M.setup = function()
 
   -- Colorizer
   lua_keymap("n", "<leader>c", utils.run_and_notify(function() vim.cmd([[ColorizerToggle]]) end, "Colorizer toggled"), {})
-  lua_keymap("n", "<leader>C",
-    utils.run_and_notify(function() vim.cmd([[ColorizerReloadAllBuffers]]) end, "Colorizer reloaded"), {})
+  lua_keymap("n", "<leader>C", utils.run_and_notify(function() vim.cmd([[ColorizerReloadAllBuffers]]) end, "Colorizer reloaded"), {})
 
   -- Nvim Cmp
   lua_keymap("i", "<M-r>", function()
@@ -404,7 +434,7 @@ M.setup = function()
   if config.diffview_plugin then
     vim_keymap("n", "<f11><f1>", "<cmd>DiffviewOpen<cr>", opts)
     vim_keymap("n", "<f11><f2>", "<cmd>DiffviewFileHistory %<cr>", opts) -- See current file git history
-    vim_keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts)     -- See current selection git history
+    vim_keymap("v", "<f11><f2>", ":DiffviewFileHistory %<cr>", opts) -- See current selection git history
   end
 
   -- File tree

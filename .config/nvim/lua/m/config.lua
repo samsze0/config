@@ -22,6 +22,7 @@ return {
   neoconf_plugin = false,
   persist_plugin = "custom",
   autopairs_plugin = false,
+  format_on_save = false,
 
   theme_opts = {
     debug = {

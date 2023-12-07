@@ -41,5 +41,10 @@ brew_install_from
 mkdir homebrew-x86 && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew-x86  # Same command as before
 ```
 
-**iCloud**
-- Make sym link with `ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud`
+**Misc**
+
+Setup iCloud symlink and keyboard repeat delay:
+
+```bash
+osx_init
+```

@@ -3,12 +3,11 @@
 
 local M = {}
 local fn = vim.fn
+local utils = require("m.utils")
 
 M.options = {
-  show_index = false,
   show_modify = true,
   show_icon = false,
-  fnamemodify = ":t",
   no_name = "No Name",
   modify_indicator = " ",
   inactive_tab_max_length = 0,
@@ -16,6 +15,47 @@ M.options = {
 }
 
 local function tabline(options)
+  -- Iterate over all tabs in advance for tab name de-duplication
+  local bufnames = {}
+  for index = 1, fn.tabpagenr("$") do
+    local winnr = fn.tabpagewinnr(index)
+    local buflist = fn.tabpagebuflist(index)
+    local bufnr = buflist[winnr]
+    local bufname = fn.bufname(bufnr)
+    local bufbuftype = fn.getbufvar(bufnr, "&buftype")
+
+    if bufbuftype ~= "" or bufname == "" then
+      table.insert(bufnames, nil)
+      goto continue
+    end
+
+    table.insert(bufnames, utils.reverse(vim.split(bufname, "/")))
+
+    ::continue::
+  end
+
+  local function get_unique_bufname(index)
+    local bufname_parts = bufnames[index]
+    if bufname_parts == nil then return "" end
+
+    local function is_unique(name)
+      local matches = utils.filter(bufnames, function(p) return p[1] == name end)
+      local unique = #matches == 1
+      if not unique then
+        for _, match in ipairs(matches) do
+          if #match > 1 then
+            utils.join_first_two_elements(match, function(p1, p2) return p2 .. "/" .. p1 end)
+          end
+        end
+      end
+      return unique
+    end
+
+    while not is_unique(bufname_parts[1]) do end
+
+    return bufname_parts[1]
+  end
+
   local s = ""
   for index = 1, fn.tabpagenr("$") do
     local winnr = fn.tabpagewinnr(index)
@@ -33,11 +73,9 @@ local function tabline(options)
     else
       s = s .. "%#TabLine#"
     end
-    -- tab index
+
     s = s .. options.padding
-    -- index
-    if options.show_index then s = s .. index .. ":" end
-    -- icon
+
     if bufbuftype == "terminal" then
       s = s .. "  "
     elseif bufbuftype == "" then -- Normal buffer
@@ -49,7 +87,7 @@ local function tabline(options)
       -- buf name
       local pre_title_s_len = string.len(s)
       if bufname ~= "" then
-        s = s .. icon .. fn.fnamemodify(bufname, options.fnamemodify)
+        s = s .. icon .. (true and get_unique_bufname(index) or fn.fnamemodify(bufname, ":t"))
       else
         s = s .. options.no_name
       end
@@ -61,7 +99,7 @@ local function tabline(options)
     else
       s = s .. "  "
     end
-    -- additional space at the end of each tab segment
+
     s = s .. options.padding
   end
 

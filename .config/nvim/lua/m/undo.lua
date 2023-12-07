@@ -51,7 +51,7 @@ function M.undolist_entry_producer(opts, entries, alt_level)
         for j = start_b, start_b + count_b - 1 do
           diff = diff .. "\n+" .. after_lines[j]
           table.insert(additions, after_lines[j])
-          brief = brief .. before_lines[j]
+          brief = brief .. after_lines[j]
         end
         -- and finally, get some more context in the back
         for j = start_a + count_a, start_a + count_a + context_lines - 1 do
@@ -72,13 +72,13 @@ function M.undolist_entry_producer(opts, entries, alt_level)
       if #brief == 0 then brief = "<empty>" end
 
       local entry = {
-        seq = entries[i].seq, -- save state number, used in display and to restore
+        seq = entries[i].seq,  -- save state number, used in display and to restore
         alt_level = alt_level, -- current level, i.e. how deep into alt branches are we, used to graph
         first = i == #entries, -- whether this is the first node in this branch, used to graph
         timestamp = entries[i].time,
         time = timeago(entries[i].time),
-        brief = brief, -- brief message to describe the change
-        diff = diff, -- the proper diff, used for preview
+        brief = brief,         -- brief message to describe the change
+        diff = diff,           -- the proper diff, used for preview
         additions = additions, -- all additions, used to yank a result
         deletions = deletions, -- all deletions, used to yank a result
         bufnr = vim.api.nvim_get_current_buf(),
@@ -105,10 +105,10 @@ end
 M.get_undolist = function(opts)
   opts = opts or {}
   opts = vim.tbl_deep_extend("keep", opts, {
-    diff_context_lines = 10, -- Number of surrounding lines to add to the preview for context
-    max_entries = 100, -- Maximum number of entries to process
-    debug = false, -- Whether to log out entry inside coroutine
-    coroutine = false, -- Whether to run as coroutine
+    diff_context_lines = 10,  -- Number of surrounding lines to add to the preview for context
+    max_entries = 100,        -- Maximum number of entries to process
+    debug = false,            -- Whether to log out entry inside coroutine
+    coroutine = false,        -- Whether to run as coroutine
     coroutine_callback = nil, -- Callback to invoke that takes the entry as arg
   })
 
@@ -125,7 +125,8 @@ M.get_undolist = function(opts)
       if coroutine.status(undolist_entry_producer) == "dead" then break end
       table.insert(undolist, entry)
 
-      if i == opts.max_entries then coroutine.close(undolist_entry_producer) end
+      -- if i == opts.max_entries then coroutine.close(undolist_entry_producer) end
+      if i == opts.max_entries then break end
     end
     return undolist
   else
@@ -143,7 +144,7 @@ M.get_undolist = function(opts)
       if opts.callback then opts.callback(entry) end
 
       if i == opts.max_entries then
-        coroutine.close(undolist_entry_producer)
+        -- coroutine.close(undolist_entry_producer)
         return
       end
 

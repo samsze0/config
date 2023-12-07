@@ -1,4 +1,5 @@
 return {
-  dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
-  session_options = { "buffers", "curdir", "tabpages", "winsize", "skiprtp" },
+  sessions_dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
+  autowrite = false,
+  autowrite_debounce_delay = 1000,
 }

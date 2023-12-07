@@ -3,7 +3,7 @@
 vim.cmd([[set clipboard+=unnamedplus]]) -- Use system clipboard
 
 vim.opt.number = true
-vim.opt.cursorline = false   -- Highlight current line
+vim.opt.cursorline = false -- Highlight current line
 vim.opt.signcolumn = "auto"
 vim.opt.signcolumn = "yes:1" -- Maximum 1 signs, fixed
 vim.opt.wrap = false
@@ -42,11 +42,6 @@ vim.cmd([[filetype plugin off]])
 vim.opt.smartcase = true
 vim.opt.ignorecase = true
 vim.opt.hlsearch = true -- Highlight all matches. Pair with keymap :noh to clear highlights
-
--- Backup and swap
-vim.cmd([[set backupdir=~/.cache/nvim/backup]])
-vim.cmd([[set directory=~/.cache/nvim/swap]])
-vim.cmd([[set undodir=~/.cache/nvim/undo]])
 
 vim.opt.fillchars:append({ diff = "╱" })
 
@@ -90,11 +85,9 @@ require("lazy").setup({
     config = function()
       local run_setup_on_startup = false
 
-      if run_setup_on_startup then
-        vim.api.nvim_create_autocmd("VimEnter", {
-          callback = function() vim.cmd("Copilot setup") end,
-        })
-      end
+      if run_setup_on_startup then vim.api.nvim_create_autocmd("VimEnter", {
+        callback = function() vim.cmd("Copilot setup") end,
+      }) end
     end,
   },
   {
@@ -198,7 +191,7 @@ require("lazy").setup({
         scope = {
           highlight = require("m.theme").rainbow_hl_groups,
           show_start = false, -- underline on scope start
-          show_end = false,   -- underline on scope end
+          show_end = false, -- underline on scope end
           include = {
             node_type = { ["*"] = { "*" } },
           },
@@ -253,12 +246,12 @@ require("lazy").setup({
     config = function() require("m.nvimcmp") end,
     dependencies = {
       "hrsh7th/cmp-nvim-lsp", -- nvim-cmp source for built-in language server client
-      "hrsh7th/cmp-path",     -- nvim-cmp source for filesystem paths
-      "hrsh7th/cmp-cmdline",  -- nvim-cmp source for vim command line
-      "hrsh7th/cmp-buffer",   -- nvim-cmp source for buffer words
-      "petertriho/cmp-git",   -- nvim-cmp source for git (commits, issues, mentions, etc.)
+      "hrsh7th/cmp-path", -- nvim-cmp source for filesystem paths
+      "hrsh7th/cmp-cmdline", -- nvim-cmp source for vim command line
+      "hrsh7th/cmp-buffer", -- nvim-cmp source for buffer words
+      "petertriho/cmp-git", -- nvim-cmp source for git (commits, issues, mentions, etc.)
       "onsails/lspkind.nvim", -- add vscode-codicons to completion entries (function, class, etc.)
-      "L3MON4D3/LuaSnip",     -- Snippet. For inserting text into editor
+      "L3MON4D3/LuaSnip", -- Snippet. For inserting text into editor
     },
   },
   {
@@ -393,7 +386,7 @@ require("lazy").setup({
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
-  }
+  },
 })
 
 require("m.keymaps").setup()

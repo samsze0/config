@@ -317,9 +317,9 @@ async function updateConfig() {
   // Simple modifications are applied before complex modifications.
   config.profiles[0].simple_modifications = [
     {
-      from: { key_code: "fn" },
-      to: [{ repeat: true, pointing_button: "button1" }],
-    },
+      from: { key_code: "right_option" },
+      to: [{ key_code: "right_option", modifiers: ["left_command"] }],
+    }
   ];
   config.profiles[0].complex_modifications.rules = rules;
 

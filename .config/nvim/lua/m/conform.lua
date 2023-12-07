@@ -1,3 +1,5 @@
+local config = require("m.config")
+
 -- https://github.com/mfussenegger/nvim-lint#available-linters
 require("conform").setup({
   formatters_by_ft = {
@@ -9,8 +11,8 @@ require("conform").setup({
     zsh = { "shfmt" },
     bash = { "shfmt" },
   },
-  format_on_save = {
+  format_on_save = config.format_on_save and {
     timeout_ms = 500,
     lsp_fallback = true,
-  },
+  } or nil,
 })

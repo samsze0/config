@@ -165,6 +165,7 @@ require("lazy").setup({
   {
     -- Autoclosing brackets
     "windwp/nvim-autopairs",
+    enabled = config.autopairs_plugin == "nvim-autopairs",
     config = function() require("m.autopairs") end,
   },
   {

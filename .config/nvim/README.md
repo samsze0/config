@@ -139,6 +139,8 @@ end, {})
 - Fzflua multi-stage?
 - SSH lf preview
 - SSH setup
+- Git conflict workflow w/ fzflua integration
+- `git log` don't use delta
 - rsync backup
 - syncthing setup
 - Lf preview
@@ -158,5 +160,6 @@ end, {})
 - Tabbar dedup
 - Statusline show line changes since last save
 - Statusilne show last notification message
-- Lf preview & open (mac)
 - Fix Ripgrep files fzflua respect git
+- Opened buffers file changes workflow
+- Karabiner cmd + backspace

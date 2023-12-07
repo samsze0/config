@@ -21,6 +21,7 @@ return {
   nvim_dev_plugin = "neodev",
   neoconf_plugin = false,
   persist_plugin = "persistence",
+  autopairs_plugin = false,
 
   theme_opts = {
     debug = {

@@ -12,6 +12,7 @@ source ~/.config/zsh/socket.sh
 source ~/.config/zsh/unix.sh
 source ~/.config/zsh/git.sh
 source ~/.config/zsh/homebrew.sh
+source ~/.config/zsh/syncthing.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
@@ -103,7 +104,7 @@ else                           # OSX
 
 	export BROWSER="open -a '/Applications/Firefox Developer Edition.app'"
 	export IMAGE_VIEWER="open"
-	export VIDEO_PLAYER="open"
+	export VIDEO_PLAYER="iina"
 fi
 
 export PATH=$HOME/bin:${PATH}

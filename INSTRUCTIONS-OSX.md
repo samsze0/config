@@ -16,6 +16,7 @@ sudo xcode-select --install
 
 Install homebrew formulae and casks
 ```bash
+brew install gojq  # Required by install script
 brew_install_from
 ```
 

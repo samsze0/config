@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Show all installed formulae
-brew_list() {
+brew_formulae_list() {
 	brew leaves --installed-on-request -v
 }
 
@@ -10,14 +10,30 @@ brew_casks_list() {
 	brew ls --casks -1 --full-name
 }
 
+# Show info of a formula
+brew_formula_info() {
+	brew info "$1" --json=v2 | gojq '.formulae | .[] | .name + "  Description: " + .desc + "  Version: " + .versions.stable + "  Installed-version: " + .installed[0].version' --raw-output
+}
+
+# Show info of a cask
+brew_cask_info() {
+	brew info "$1" --json=v2 | gojq '.casks | .[] | .name'
+}
+
 # Show all installed formulae w/ their descriptions
-brew_info() {
-	brew_list | xargs brew desc --eval-all
+brew_formulae_info() {
+	if false; then
+		brew_formulae_list | xargs brew desc --eval-all
+	fi
+	brew_formuale_list | xargs brew_formula_info
 }
 
 # Show all installed casks w/ their descriptions
 brew_casks_info() {
-	brew_casks_list | xargs brew desc --eval-all
+	if false; then
+		brew_casks_list | xargs brew desc --eval-all
+	fi
+	brew_casks_list | xargs brew_cask_info
 }
 
 # Show all installed taps
@@ -42,7 +58,7 @@ brew_freeze() (
 		CASKS_FILE=~/casks.brew
 	fi
 
-	brew_list >$FORMULAE_FILE
+	brew_formulae_list >$FORMULAE_FILE
 
 	CASK_TOKENS=$(brew_taps_cask_token_list)
 

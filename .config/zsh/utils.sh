@@ -34,3 +34,10 @@ unset_flags() {
 	set +o nounset
 	set +o pipefail
 }
+
+c_green='\033[0;32m'
+c_clear='\033[0m'
+
+color_green() {
+	echo "${c_green}$1${c_clear}"
+}

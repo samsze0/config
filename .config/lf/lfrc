@@ -29,3 +29,7 @@ map a :push :create_new<space>
 cmd on-select &{{
   echo "$fx" > ~/.cache/lf_current_selection
 }}
+
+map <space> :toggle
+
+map x :cut

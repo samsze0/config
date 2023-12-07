@@ -22,9 +22,6 @@ gitconfig_init() {
 [mergetool "nvimdiff"]
     cmd = "nvim -d \\"\$LOCAL\\" \\"\$REMOTE\\" \\"\$MERGED\\" -c 'wincmd w' -c 'wincmd J'"
 
-[core]
-    pager = delta
-
 [interactive]
     diffFilter = delta --color-only
 

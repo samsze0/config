@@ -139,7 +139,6 @@ end, {})
 - Real "modified" & integration w/ persist
 - Statusline show line changes since last save
 - Git conflict workflow w/ fzflua integration
-- `git log` don't use delta
 - Fzflua Cumulative mode for undo, git, etc
 - rsync backup
 - syncthing setup

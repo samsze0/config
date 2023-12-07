@@ -81,7 +81,7 @@ require("lazy").setup({
   },
   {
     "github/copilot.vim",
-    enabled = config.copilot_plugin == "vim",
+    enabled = config.copilot_plugin == "vim" and not vim.g.vi_mode,
     config = function()
       local run_setup_on_startup = false
 
@@ -92,7 +92,7 @@ require("lazy").setup({
   },
   {
     "zbirenbaum/copilot.lua",
-    enabled = config.copilot_plugin == "lua",
+    enabled = config.copilot_plugin == "lua" and not vim.g.vi_mode,
     config = function() require("m.copilotlua") end,
   },
   {

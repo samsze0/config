@@ -6,6 +6,7 @@ croc
 curl
 eza
 fd
+ffmpeg
 fzf
 gh
 git
@@ -33,5 +34,6 @@ starship
 syncthing
 tailscale
 tldr
+trash
 wget
 zoxide

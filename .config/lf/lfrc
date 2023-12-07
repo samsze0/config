@@ -12,6 +12,10 @@ cmd delete ${{
   ~/.config/lf/delete.sh $fx
 }}
 map <delete> delete
+cmd trash ${{
+  ~/.config/lf/delete.sh $fx --trash
+}}
+map d trash
 
 cmd open ${{
   ~/.config/lf/open.sh

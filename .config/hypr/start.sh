@@ -2,7 +2,7 @@
 
 # Wallpaper
 swww init &
-swww img ~/.config/wallpapers/nixos.png &
+swww img ~/.config/wallpapers/osx-monterey.jpg &
 
 # Network manager applet
 nm-applet --indicator &

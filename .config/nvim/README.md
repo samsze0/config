@@ -159,7 +159,6 @@ end, {})
 - Persistence fork
 - Tabbar dedup
 - Statusline show line changes since last save
-- Statusilne show last notification message
 - Fix Ripgrep files fzflua respect git
 - Opened buffers file changes workflow
 - Karabiner cmd + backspace

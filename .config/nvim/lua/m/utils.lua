@@ -101,7 +101,10 @@ M.safe_require = function(module_name, opts)
     if opts.notify then vim.notify(string.format("Failed to load module %s", module_name), opts.log_level) end
     return setmetatable({}, {
       __index = function(_, key)
-        if opts.notify then vim.notify(string.format("Failed to access key %s in module %s", key, module_name), opts.log_level) end
+        if opts.notify then
+          vim.notify(string.format("Failed to access key %s in module %s", key, module_name),
+            opts.log_level)
+        end
         return nil
       end,
     }) -- In case we try to index into the result of safe_require
@@ -178,13 +181,27 @@ function M.get_visual_selection()
   return table.concat(lines, "")
 end
 
+M.is_array = function(t)
+  return #t > 0 and t[1] ~= nil
+end
+
 M.reduce = function(list, fn, init)
   local acc = init
-  for k, v in ipairs(list) do
-    if 1 == k and not init then
-      acc = v
-    else
-      acc = fn(acc, v)
+  if M.is_array(list) then
+    for i, v in ipairs(list) do
+      if 1 == i and init == nil then
+        acc = v
+      else
+        acc = fn(acc, v)
+      end
+    end
+  else
+    for k, v in pairs(list) do
+      if init == nil then
+        acc = v
+      else
+        acc = fn(acc, v)
+      end
     end
   end
   return acc
@@ -200,6 +217,10 @@ M.filter = function(list, fn)
     if fn(v) then table.insert(new_list, v) end
   end
   return new_list
+end
+
+M.pad = function(str, length)
+  return string.format("%-" .. length .. "s", str)
 end
 
 return M

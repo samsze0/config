@@ -145,11 +145,13 @@ M.notifications = function()
 
   local notifications = _G.notifications
   local get_noti_with_string = function(str)
-    local parts = vim.split(str, " ")
+    local s = utils.strip_ansi_coloring(str)
+    local parts = vim.split(s, utils.fzflua_nbsp)
     return notifications[tonumber(parts[1])]
   end
 
   -- Clear unread notifications
+  local num_unread = utils.sum(_G.notification_meta.unread)
   _G.notification_meta.unread = {}
 
   require("fzf-lua").fzf_exec(function(fzf_cb)
@@ -167,10 +169,13 @@ M.notifications = function()
       else
         level = ansi_codes.grey(" ")
       end
-      local brief = ""
-      local brief_max_length = 30
-      brief = #brief > brief_max_length and brief:sub(1, brief_max_length - 3) .. "..." or brief
-      fzf_cb(string.format("%d : %s %s  %s", i, level, ansi_codes.blue(timeago(noti.time)), brief))
+      local brief = noti.message
+      local brief_max_length = 50
+      brief = #brief > brief_max_length and brief:sub(1, brief_max_length - 3) .. "..." or
+      utils.pad(brief, brief_max_length)
+      fzf_cb(string.format("%d %s %s %s %s %s", i, utils.fzflua_nbsp, level, ansi_codes.blue(timeago(noti.time)),
+        ansi_codes.white(brief),
+        i <= num_unread and "new" or ""))
     end
     fzf_cb()
   end, {
@@ -192,9 +197,9 @@ FZFLUAEOM]],
       }
     },
     fzf_opts = {
-      ["--delimiter"] = "'[\\]:]'", -- In awk, a character set matches either ] or :
-      ["--with-nth"] = "2..",       -- from field 2 onwards
-      ["--header"] = "'Level Time Brief'",
+      ["--delimiter"] = string.format("'%s'", utils.fzflua_nbsp),
+      ["--with-nth"] = "2..", -- from field 2 onwards
+      ["--header"] = "'Level Time Brief New?'",
       ["--no-multi"] = "",
     },
   })

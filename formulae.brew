@@ -26,9 +26,11 @@ neovim
 nvm
 prettier
 pyenv
+pyright
 python@3.11
 ripgrep
 rsync
+ruff-lsp
 rustup-init
 shellcheck
 shfmt
@@ -36,7 +38,11 @@ starship
 stylua
 syncthing
 tailscale
+tailwindcss-language-server
+taplo
 tldr
 trash
+typescript-language-server
+vscode-langservers-extracted
 wget
 zoxide

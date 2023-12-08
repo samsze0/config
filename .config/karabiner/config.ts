@@ -219,6 +219,40 @@ const rules = [
       },
     ],
   },
+  {
+    description: "Command Backspace -> Option Backspace",
+    manipulators: [
+      {
+        from: {
+          key_code: "delete_or_backspace",
+          modifiers: { mandatory: ["left_command"], optional: ["any"] },
+        },
+        to: { key_code: "delete_or_backspace", modifiers: ["left_option"] },
+        type: "basic",
+      },
+    ],
+  },
+  {  // TODO
+    description: "Command Left/Right -> Option Left/Right",
+    manipulators: [
+      {
+        from: {
+          key_code: "left_arrow",
+          modifiers: { mandatory: ["left_command"], optional: ["any"] },
+        },
+        to: { key_code: "left_arrow", modifiers: ["left_option"] },
+        type: "basic",
+      },
+      {
+        from: {
+          key_code: "right_arrow",
+          modifiers: { mandatory: ["left_command"], optional: ["any"] },
+        },
+        to: { key_code: "right_arrow", modifiers: ["left_option"] },
+        type: "basic",
+      },
+    ],
+  },
 
   // Application specific
   {

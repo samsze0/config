@@ -1,4 +1,5 @@
 bash
+bash-language-server
 bat
 bottom
 cmake
@@ -23,6 +24,7 @@ lua-language-server
 make
 neovim
 nvm
+prettier
 pyenv
 python@3.11
 ripgrep

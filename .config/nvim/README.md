@@ -156,4 +156,4 @@ end, {})
 - Flash fork
 - Fix Ripgrep files fzflua respect git
 - Opened buffers file changes workflow
-- Karabiner cmd + backspace
+- Karabiner command left/right

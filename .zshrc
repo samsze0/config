@@ -106,6 +106,12 @@ else                           # OSX
 	export BROWSER="open -a '/Applications/Firefox Developer Edition.app'"
 	export IMAGE_VIEWER="open"
 	export VIDEO_PLAYER="iina"
+
+  if true; then
+    bindkey "^H" backward-kill-word
+    bindkey "^[[1;5D" backward-word
+    bindkey "^[[1;5C" forward-word
+  fi
 fi
 
 export PATH=$HOME/bin:${PATH}
@@ -113,9 +119,6 @@ export PATH=$HOME/bin:${PATH}
 # ZLE (line editor) bindings
 bindkey "^[[H" beginning-of-line
 bindkey "^[[F" end-of-line
-bindkey "^H" backward-kill-word
-bindkey "^[[1;5D" backward-word
-bindkey "^[[1;5C" forward-word
 
 alias ssha='eval $(ssh-agent) && ssh-add'
 alias man-fzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'

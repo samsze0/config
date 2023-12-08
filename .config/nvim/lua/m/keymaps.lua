@@ -180,12 +180,15 @@ M.setup = function()
   vim_keymap("n", "tl", "<cmd>tabn<CR>", opts)
   vim_keymap("n", "tt", "<cmd>tabnew<CR>", opts)
   local close_tab_and_left = function()
-    local is_last_tab = vim.fn.tabpagenr("$") == vim.api.nvim_tabpage_get_number(0)
-    if is_last_tab then
+    local is_only_tab = vim.fn.tabpagenr("$") == 1
+    if is_only_tab then
       vim.cmd([[tabnew]])
       vim.cmd([[tabprevious]])
     end
+
     vim.cmd([[tabclose]])
+
+    local is_last_tab = vim.fn.tabpagenr("$") == vim.api.nvim_tabpage_get_number(0)
     if not is_last_tab and vim.fn.tabpagenr() > 1 then vim.cmd([[tabprevious]]) end
   end
   lua_keymap("n", "tw", close_tab_and_left, {})

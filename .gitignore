@@ -28,6 +28,7 @@
 
 # Warp
 !.warp/
+!.warp/themes/
 !.warp/themes/**
 !.warp/keybindings.yaml
 

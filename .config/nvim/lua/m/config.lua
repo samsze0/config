@@ -23,6 +23,7 @@ return {
   persist_plugin = "custom",
   autopairs_plugin = false,
   format_on_save = false,
+  fzf_plugin = "custom",
 
   theme_opts = {
     debug = {

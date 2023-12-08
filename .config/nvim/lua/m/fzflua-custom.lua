@@ -40,7 +40,9 @@ M.undo_tree = function()
     local f = function(fzf_cb)
       undo.get_undolist({
         coroutine = true,
-        callback = function(undo) fzf_cb(string.format("[%d] seq %d (%s)", i, undo.seq, undo.time)) end,
+        callback = function(undo)
+          fzf_cb(string.format("[%d] seq %d (%s)", i, undo.seq, undo.time))
+        end,
       })
       fzf_cb() -- EOF (close fzf named pipe
     end
@@ -55,17 +57,33 @@ M.undo_tree = function()
 
   require("fzf-lua").fzf_exec(function(fzf_cb)
     for i, undo in ipairs(undolist) do
-      fzf_cb(string.format("%d %s %s%d %s %s", i, utils.fzflua_nbsp, string.rep(" ", undo.alt_level), undo.seq,
-        utils.fzflua_nbsp, ansi_codes.blue(undo.time)))
+      fzf_cb(
+        string.format(
+          "%d %s %s%d %s %s",
+          i,
+          utils.fzflua_nbsp,
+          string.rep(" ", undo.alt_level),
+          undo.seq,
+          utils.fzflua_nbsp,
+          ansi_codes.blue(undo.time)
+        )
+      )
     end
     fzf_cb() -- EOF (close fzf named pipe)
   end, {
     prompt = "UndoTree❯ ",
-    preview = require("fzf-lua").shell.raw_preview_action_cmd(function(selected)
-      local undo = get_undo_with_string(selected[1])
-      local delta_opts = ""
-      return string.format([[echo '%s' | delta "%s" %s]], undo.diff:gsub([[']], [['"'"']]), undo.time, delta_opts)
-    end),
+    preview = require("fzf-lua").shell.raw_preview_action_cmd(
+      function(selected)
+        local undo = get_undo_with_string(selected[1])
+        local delta_opts = ""
+        return string.format(
+          [[echo '%s' | delta "%s" %s]],
+          undo.diff:gsub([[']], [['"'"']]),
+          undo.time,
+          delta_opts
+        )
+      end
+    ),
     actions = {
       ["ctrl-a"] = {
         -- See action reload
@@ -96,7 +114,10 @@ end
 
 M.nvim_notify_notifications = function()
   if not config.notify_backend == "nvim-notify" then
-    vim.notify("Feature only supported with nvim-notify backend", vim.log.levels.WARN)
+    vim.notify(
+      "Feature only supported with nvim-notify backend",
+      vim.log.levels.WARN
+    )
     return
   end
 
@@ -111,26 +132,37 @@ M.nvim_notify_notifications = function()
       local noti = notifications[i]
       local brief = vim.trim(noti.message[1])
       local brief_max_length = 30
-      brief = #brief > brief_max_length and brief:sub(1, brief_max_length - 3) .. "..." or brief
-      fzf_cb(string.format("%d : %s  %s", i, ansi_codes.blue(timeago(noti.time)), brief))
+      brief = #brief > brief_max_length
+          and brief:sub(1, brief_max_length - 3) .. "..."
+        or brief
+      fzf_cb(
+        string.format(
+          "%d : %s  %s",
+          i,
+          ansi_codes.blue(timeago(noti.time)),
+          brief
+        )
+      )
     end
     fzf_cb()
   end, {
     prompt = "Notifications❯ ",
 
-    preview = require("fzf-lua").shell.raw_preview_action_cmd(function(selected)
-      local noti = get_noti_with_string(selected[1])
-      return string.format(
-        [[cat <<FZFLUAEOM
+    preview = require("fzf-lua").shell.raw_preview_action_cmd(
+      function(selected)
+        local noti = get_noti_with_string(selected[1])
+        return string.format(
+          [[cat <<FZFLUAEOM
 %s
 FZFLUAEOM]],
-        table.concat(noti.message, "\n")
-      )
-    end),
+          table.concat(noti.message, "\n")
+        )
+      end
+    ),
     actions = {},
     fzf_opts = {
       ["--delimiter"] = "'[\\]:]'", -- In awk, a character set matches either ] or :
-      ["--with-nth"] = "2..",       -- from field 2 onwards
+      ["--with-nth"] = "2..", -- from field 2 onwards
       ["--header"] = "'Time Brief'",
       ["--no-multi"] = "",
     },
@@ -139,7 +171,10 @@ end
 
 M.notifications = function()
   if not config.notify_backend == "custom" then
-    vim.notify("Feature only supported with custom notify backend", vim.log.levels.WARN)
+    vim.notify(
+      "Feature only supported with custom notify backend",
+      vim.log.levels.WARN
+    )
     return
   end
 
@@ -169,32 +204,38 @@ M.notifications = function()
       else
         level = ansi_codes.grey(" ")
       end
-      local brief = noti.message
+      local brief = vim.split(noti.message, "\n")[1]
       local brief_max_length = 50
-      brief = #brief > brief_max_length and brief:sub(1, brief_max_length - 3) .. "..." or
-      utils.pad(brief, brief_max_length)
-      fzf_cb(string.format("%d %s %s %s %s %s", i, utils.fzflua_nbsp, level, ansi_codes.blue(timeago(noti.time)),
-        ansi_codes.white(brief),
-        i <= num_unread and "new" or ""))
+      brief = #brief > brief_max_length
+          and brief:sub(1, brief_max_length - 3) .. "..."
+        or utils.pad(brief, brief_max_length)
+      fzf_cb(
+        string.format(
+          "%d %s %s %s %s %s",
+          i,
+          utils.fzflua_nbsp,
+          level,
+          ansi_codes.blue(timeago(noti.time)),
+          ansi_codes.white(brief),
+          i <= num_unread and "new" or ""
+        )
+      )
     end
     fzf_cb()
   end, {
     prompt = "Notifications❯ ",
 
-    preview = require("fzf-lua").shell.raw_preview_action_cmd(function(selected)
-      local noti = get_noti_with_string(selected[1])
-      return string.format(
-        [[cat <<FZFLUAEOM
-%s
-FZFLUAEOM]],
-        ansi_codes.white(noti.message)
-      )
-    end),
+    preview = require("fzf-lua").shell.raw_preview_action_cmd(
+      function(selected)
+        local noti = get_noti_with_string(selected[1])
+        return string.format([[echo "%s"]], ansi_codes.white(noti.message))
+      end
+    ),
     actions = {},
     winopts = {
       preview = {
-        wrap = "wrap"
-      }
+        wrap = "wrap",
+      },
     },
     fzf_opts = {
       ["--delimiter"] = string.format("'%s'", utils.fzflua_nbsp),
@@ -217,22 +258,39 @@ M.git_reflog = function()
   require("fzf-lua").fzf_exec(function(fzf_cb)
     local output = vim.fn.system("git reflog")
     for line in output:gmatch("[^\n]+") do
-      local sha, ref, action, description = line:match("(%w+) (%w+@{%d+}): ([^:]+): (.+)")
+      local sha, ref, action, description =
+        line:match("(%w+) (%w+@{%d+}): ([^:]+): (.+)")
       if sha and ref and action and description then
-        table.insert(entries, { sha = sha, ref = ref, action = action, description = description })
+        table.insert(
+          entries,
+          { sha = sha, ref = ref, action = action, description = description }
+        )
       else
-        vim.notify("Failed to parse git reflog entry: " .. line, vim.log.levels.WARN)
+        vim.notify(
+          "Failed to parse git reflog entry: " .. line,
+          vim.log.levels.WARN
+        )
       end
-      fzf_cb(string.format("%d %s %s %s", #entries, utils.fzflua_nbsp, ansi_codes.blue(action), description))
+      fzf_cb(
+        string.format(
+          "%d %s %s %s",
+          #entries,
+          utils.fzflua_nbsp,
+          ansi_codes.blue(action),
+          description
+        )
+      )
     end
     fzf_cb()
   end, {
     prompt = "GitReflog❯ ",
 
-    preview = require("fzf-lua").shell.raw_preview_action_cmd(function(selected)
-      local ref = get_ref_from_str(selected[1]).ref
-      return string.format([[git diff "%s" | delta]], ref) -- TODO: $FZF_PREVIEW_COLUMNS undefined
-    end),
+    preview = require("fzf-lua").shell.raw_preview_action_cmd(
+      function(selected)
+        local ref = get_ref_from_str(selected[1]).ref
+        return string.format([[git diff "%s" | delta]], ref) -- TODO: $FZF_PREVIEW_COLUMNS undefined
+      end
+    ),
     actions = {
       ["ctrl-y"] = {
         function(selected)

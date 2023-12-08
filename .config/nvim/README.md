@@ -157,3 +157,5 @@ end, {})
 - Fix Ripgrep files fzflua respect git
 - Opened buffers file changes workflow
 - Karabiner command left/right
+- Fix tabline dedup tabname goes empty
+- Fix fzflua/lf can freeze

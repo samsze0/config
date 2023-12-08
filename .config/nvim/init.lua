@@ -407,5 +407,6 @@ end
 if config.notify_backend == "custom" then require("m.notify") end
 if config.lf_plugin == "custom" then require("m.lf") end
 if config.persist_plugin == "custom" then require("m.persist").setup() end
+if config.fzf_plugin == "custom" then require("m.fzf").setup() end
 
 if vim.g.neovide then require("m.neovide") end

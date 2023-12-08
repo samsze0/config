@@ -105,7 +105,7 @@ local function lf(opts)
       selection_path,
       opts.path or vim.fn.expand("%:p:h")
     ),
-    opts.edit_cmd or "vsplit"
+    opts.edit_cmd or "e"
   )
 end
 

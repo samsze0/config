@@ -81,6 +81,9 @@ if [ $(arch) = "x86_64" ]; then # Linux / NixOS
 		if [[ -n "$HYPRLAND_INSTANCE_SIGNATURE" ]]; then # Hyprland
 			alias nixos-r='sudo nixos-rebuild switch --flake ~/nixos-config#hyprland --install-bootloader'
 			alias screen-record="bash ~/.config/hypr/screen-record.sh"
+
+			export NOTIFIER=""
+
 		else # GNOME
 			alias nixos-r='sudo nixos-rebuild switch --flake ~/nixos-config#gnome --install-bootloader'
 			alias code='code --disable-gpu'
@@ -106,6 +109,7 @@ else                           # OSX
 	export BROWSER="open -a '/Applications/Firefox Developer Edition.app'"
 	export IMAGE_VIEWER="open"
 	export VIDEO_PLAYER="iina"
+	export NOTIFIER="osx_notify"
 fi
 
 export PATH=$HOME/bin:${PATH}

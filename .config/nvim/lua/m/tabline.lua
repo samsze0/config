@@ -36,22 +36,25 @@ local function tabline(options)
 
   local function get_unique_bufname(index)
     local bufname_parts = bufnames[index]
-    if bufname_parts == nil then return "" end
+    if bufname_parts == "" then return "" end
 
-    local function is_unique(name)
-      local matches = utils.filter(bufnames, function(p) return p[1] == name end)
+    local function expand_if_not_unique(bufname_parts)
+      local matches = utils.filter(bufnames, function(p) return p[1] == bufname_parts[1] end)
       local unique = #matches == 1
       if not unique then
         for _, match in ipairs(matches) do
           if #match > 1 then
+            -- "Expand" by joining the first two elements. In the end the first element will become the de-duplicated filename
             utils.join_first_two_elements(match, function(p1, p2) return p2 .. "/" .. p1 end)
           end
         end
+        if #bufname_parts > 1 then
+          expand_if_not_unique(bufname_parts)
+        end
       end
-      return unique
     end
 
-    while not is_unique(bufname_parts[1]) do end
+    expand_if_not_unique(bufname_parts)
 
     return bufname_parts[1]
   end

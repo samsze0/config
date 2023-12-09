@@ -128,7 +128,6 @@ end, {})
 
 # TODO
 
-- Hangs if open a file that is already opened in other buffers. Unrelated to persist or fzf or lf
 - Custom autopair
 - Fzf TODO comments
 - Fzf git worktree

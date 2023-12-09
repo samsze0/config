@@ -2,6 +2,27 @@ local M = {}
 
 local config = require("m.fzf.config")
 local utils = require("m.utils")
+local uv_utils = require("m.uv")
+
+local fzf_on_focus
+
+FZF_PORT = nil
+local server_socket, server_socket_path, close_server = uv_utils.create_server(
+  function(message)
+    if config.debug then
+      vim.notify(string.format("Fzf server received: %s", message))
+    end
+
+    if string.match(message, "^port") then
+      FZF_PORT = string.match(message, "^port (%d+)")
+    elseif string.match(message, "^focus") then
+      local selection = string.match(message, "^focus (.+)")
+      if selection and fzf_on_focus and type(fzf_on_focus) == "function" then
+        fzf_on_focus(selection)
+      end
+    end
+  end
+)
 
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 local open_floating_window = require("m.fzf.window").open_floating_window
@@ -19,10 +40,11 @@ local selection_path = vim.fn.glob("~/.cache/lf_current_selection")
 
 M.fzf = function(content, on_selection, opts)
   opts = vim.tbl_extend("force", {
-    extra_fzf_args = "",
+    fzf_extra_args = "",
     fzf_preview_window = {},
     fzf_preview_cmd = nil,
     fzf_initial_position = nil,
+    fzf_on_focus = nil,
   }, opts or {})
 
   if M.is_fzf_available() ~= true then
@@ -53,15 +75,20 @@ M.fzf = function(content, on_selection, opts)
     }, ",")
   )
 
+  fzf_on_focus = opts.fzf_on_focus
+
   vim.fn.termopen(
     string.format(
-      [[echo "%s" | fzf --border=none --height=~100%% --preview-window=%s --preview='%s' --bind 'start:pos(%d)' --bind '%s' %s > %s]],
+      [[echo "%s" | fzf --listen --bind 'start:execute-silent(echo "port $FZF_PORT" | nc -U %s)' --bind 'focus:execute-silent(echo "focus {}" | nc -U %s)' --border=none --height=100%% --preview-window=%s --preview='%s' --bind 'start:pos(%d)' --bind '%s' --delimiter=%s %s > %s]],
       content,
+      server_socket_path,
+      server_socket_path,
       preview_window_arg,
       opts.fzf_preview_cmd or "",
       opts.fzf_initial_position or 1,
       keybinds_arg,
-      opts.extra_fzf_args,
+      string.format("'%s'", utils.nbsp),
+      opts.fzf_extra_args,
       selection_path
     ),
     {

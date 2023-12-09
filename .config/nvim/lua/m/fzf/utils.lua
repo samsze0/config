@@ -5,6 +5,10 @@ local config = require("m.fzf.config")
 
 M.git_toplevel = [[git -C "$(git rev-parse --show-toplevel)"]]
 
+-- Trick git into thinking it's running in a tty
+-- https://github.com/dandavison/delta/discussions/840
+M.like_tty = [[script -q /dev/null]]
+
 M.get_git_toplevel = function()
   return vim.trim(vim.fn.system([[git rev-parse --show-toplevel]]))
 end

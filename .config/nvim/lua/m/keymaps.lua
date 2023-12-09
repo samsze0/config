@@ -335,6 +335,11 @@ M.setup = function()
       fzflua = nil,
       fzf = safe_require("m.fzf").git_files,
     },
+    [{ mode = "n", lhs = "<f7>" }] = {
+      telescope = nil,
+      fzflua = nil,
+      fzf = safe_require("m.fzf").git_status,
+    },
   }
 
   for k, v in pairs(fuzzy_finder_keymaps) do

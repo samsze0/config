@@ -132,7 +132,7 @@ end
 -- EN space (U+2002): seems to work well
 -- For more unicode SPACE options see:
 -- http://unicode-search.net/unicode-namesearch.pl?term=SPACE&.submit=Search
-M.fzflua_nbsp = "\xe2\x80\x82" -- "\u{2002}"
+M.nbsp = "\xe2\x80\x82" -- "\u{2002}"
 
 -- Tweaked from:
 -- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/path.lua

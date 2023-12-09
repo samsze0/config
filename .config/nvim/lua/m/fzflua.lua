@@ -67,7 +67,7 @@ M.setup = function()
           -- ((.*) nbsp*) relpath
           -- ((.*) nbsp*) relpath:row:col[:(.*)*]
           local s = utils.strip_ansi_coloring(selected[1])
-          s = utils.strip_before_last_occurrence_of(s, utils.fzflua_nbsp)
+          s = utils.strip_before_last_occurrence_of(s, utils.nbsp)
           local parts = vim.split(s, ":")
           local relpath
           if #parts > 1 then
@@ -90,7 +90,7 @@ M.setup = function()
             -- ((.*) nbsp*) relpath
             -- ((.*) nbsp*) relpath:(.*)*
             local s = utils.strip_ansi_coloring(selected[1])
-            s = utils.strip_before_last_occurrence_of(s, utils.fzflua_nbsp)
+            s = utils.strip_before_last_occurrence_of(s, utils.nbsp)
             local parts = vim.split(s, ":")
             if #parts > 0 then s = parts[1] end
             local relpath = s

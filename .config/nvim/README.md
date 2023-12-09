@@ -128,12 +128,10 @@ end, {})
 
 # TODO
 
-- Fzflua preselect (for undo tree, resume state, jump list, and more)
-- Fzflua fzf scroll + preview scroll by line + page
+- Hangs if open a file that is already opened in other buffers. Unrelated to persist or fzf or lf
 - Custom autopair
-- Fzflua TODO comments
-- Fzflua git worktree
-- Fzflua multi-stage?
+- Fzf TODO comments
+- Fzf git worktree
 - SSH lf preview
 - SSH setup
 - Real "modified" & integration w/ persist
@@ -143,19 +141,14 @@ end, {})
 - rsync backup
 - syncthing setup
 - syncthing clipboard
-- Lf preview
-- Fzf preview
-- Custom tab and buf fzflua
 - Treesitter textobjects custom
 - Copilot
-- Fzflua fork
 - Custom Search n replace
 - Lf create_new multi-layer dir support
 - react native setup
 - react dev setup
 - Flash fork
-- Fix Ripgrep files fzflua respect git
 - Opened buffers file changes workflow
 - Karabiner command left/right
-- Fix tabline dedup tabname goes empty
-- Fix fzflua/lf can freeze
+- Lf image preview
+- Fzf image preview

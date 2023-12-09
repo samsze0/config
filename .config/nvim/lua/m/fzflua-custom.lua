@@ -51,7 +51,7 @@ M.undo_tree = function()
   local undolist = undo.get_undolist()
   local current_buf = vim.api.nvim_get_current_buf()
   local get_undo_with_string = function(str)
-    local parts = vim.split(str, utils.fzflua_nbsp)
+    local parts = vim.split(str, utils.nbsp)
     return undolist[tonumber(parts[1])]
   end
 
@@ -61,10 +61,10 @@ M.undo_tree = function()
         string.format(
           "%d %s %s%d %s %s",
           i,
-          utils.fzflua_nbsp,
+          utils.nbsp,
           string.rep(" ", undo.alt_level),
           undo.seq,
-          utils.fzflua_nbsp,
+          utils.nbsp,
           ansi_codes.blue(undo.time)
         )
       )
@@ -104,7 +104,7 @@ M.undo_tree = function()
       end,
     },
     fzf_opts = {
-      ["--delimiter"] = string.format("'%s'", utils.fzflua_nbsp),
+      ["--delimiter"] = string.format("'%s'", utils.nbsp),
       ["--with-nth"] = "2..",
       ["--header"] = "'Seq Time'",
       ["--no-multi"] = "",
@@ -181,7 +181,7 @@ M.notifications = function()
   local notifications = _G.notifications
   local get_noti_with_string = function(str)
     local s = utils.strip_ansi_coloring(str)
-    local parts = vim.split(s, utils.fzflua_nbsp)
+    local parts = vim.split(s, utils.nbsp)
     return notifications[tonumber(parts[1])]
   end
 
@@ -213,7 +213,7 @@ M.notifications = function()
         string.format(
           "%d %s %s %s %s %s",
           i,
-          utils.fzflua_nbsp,
+          utils.nbsp,
           level,
           ansi_codes.blue(timeago(noti.time)),
           ansi_codes.white(brief),
@@ -238,7 +238,7 @@ M.notifications = function()
       },
     },
     fzf_opts = {
-      ["--delimiter"] = string.format("'%s'", utils.fzflua_nbsp),
+      ["--delimiter"] = string.format("'%s'", utils.nbsp),
       ["--with-nth"] = "2..", -- from field 2 onwards
       ["--header"] = "'Level Time Brief New?'",
       ["--no-multi"] = "",
@@ -250,7 +250,7 @@ M.git_reflog = function()
   local entries = {}
   local function get_ref_from_str(str)
     local s = utils.strip_ansi_coloring(str)
-    local parts = vim.split(s, utils.fzflua_nbsp)
+    local parts = vim.split(s, utils.nbsp)
     local index = tonumber(parts[1])
     return entries[index]
   end
@@ -275,7 +275,7 @@ M.git_reflog = function()
         string.format(
           "%d %s %s %s",
           #entries,
-          utils.fzflua_nbsp,
+          utils.nbsp,
           ansi_codes.blue(action),
           description
         )
@@ -302,7 +302,7 @@ M.git_reflog = function()
       },
     },
     fzf_opts = {
-      ["--delimiter"] = string.format("'%s'", utils.fzflua_nbsp),
+      ["--delimiter"] = string.format("'%s'", utils.nbsp),
       ["--with-nth"] = "2..",
       ["--header"] = "'Action Description'",
       ["--no-multi"] = "",

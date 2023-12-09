@@ -4,7 +4,7 @@ local timeago = require("m.timeago")
 local actions = require("fzf-lua.actions")
 
 local get_last_word = function(str)
-  local parts = vim.split(str, utils.fzflua_nbsp)
+  local parts = vim.split(str, utils.nbsp)
   return parts[#parts]
 end
 

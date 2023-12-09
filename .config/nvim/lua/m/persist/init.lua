@@ -5,6 +5,9 @@
 local config = require("m.persist.config")
 local persist_utils = require("m.persist.utils")
 local debug = true
+local utils = require("m.utils")
+local save_session_on = "exit"
+local save_session_timer = vim.loop.new_timer()
 
 local M = {}
 ---@type string?
@@ -21,7 +24,12 @@ end
 
 function M.get_last_session()
   local sessions = M.list_sessions()
-  table.sort(sessions, function(a, b) return vim.loop.fs_stat(a).mtime.sec > vim.loop.fs_stat(b).mtime.sec end)
+  table.sort(
+    sessions,
+    function(a, b)
+      return vim.loop.fs_stat(a).mtime.sec > vim.loop.fs_stat(b).mtime.sec
+    end
+  )
   return sessions[1]
 end
 
@@ -37,7 +45,16 @@ function M.setup()
 
   vim.bo.bufhidden = "hide"
 
-  vim.opt.sessionoptions = table.concat({ "buffers", "curdir", "tabpages", "winsize", "skiprtp" }, ",")
+  vim.opt.sessionoptions = table.concat({
+    "buffers",
+    "curdir",
+    "tabpages",
+    "winsize",
+    "skiprtp",
+    "help",
+    "folds",
+    "blank",
+  }, ",")
 
   M.start()
 end
@@ -45,34 +62,39 @@ end
 function M.start()
   -- Session
   M.cwd_session = M.get_cwd_session()
-  vim.api.nvim_create_autocmd("VimLeavePre", {
-    group = vim.api.nvim_create_augroup("persist-session", { clear = true }),
-    desc = "Save session",
-    callback = function()
-      local bufs = vim.tbl_filter(function(b)
-        if vim.bo[b].buftype ~= "" then return false end
-        if vim.bo[b].filetype == "gitcommit" then return false end
-        return vim.api.nvim_buf_get_name(b) ~= ""
-      end, vim.api.nvim_list_bufs())
-
-      if #bufs == 0 then return end
-
-      M.save_session()
-    end,
-  })
+  if save_session_on == "exit" then
+    vim.api.nvim_create_autocmd("VimLeavePre", {
+      group = vim.api.nvim_create_augroup("persist-session", { clear = true }),
+      desc = "Save session",
+      callback = M.save_session,
+    })
+  else
+    save_session_timer:start(
+      0, -- Timeout (ms)
+      1000, -- Every n (ms)
+      function()
+        vim.schedule_wrap(M.save_session)
+      end
+    )
+  end
 
   -- Backup
   vim.api.nvim_create_autocmd("BufWritePre", {
     group = vim.api.nvim_create_augroup("persist-backup", { clear = true }),
     desc = "Add timestamp to backup extension",
     pattern = "*",
-    callback = function() vim.opt.backupext = "-" .. vim.fn.strftime("%Y%m%d%H%M") end,
+    callback = function()
+      vim.opt.backupext = "-" .. vim.fn.strftime("%Y%m%d%H%M")
+    end,
   })
 
   -- Autowrite
   if config.autowrite then
     vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
-      group = vim.api.nvim_create_augroup("persist-autowrite", { clear = true }),
+      group = vim.api.nvim_create_augroup(
+        "persist-autowrite",
+        { clear = true }
+      ),
       desc = "Autowrite",
       pattern = "*",
       callback = function(ctx)
@@ -84,7 +106,15 @@ function M.start()
           if vim.bo[buf].filetype == "gitcommit" then return end -- Filter file types
           if vim.api.nvim_buf_get_name(buf) == "" then return end -- Filter unnamed buf
 
-          if debug then vim.notify(string.format("Autowriting %s @ %s", vim.api.nvim_buf_get_name(0), vim.fn.strftime("%H:%M:%S"))) end
+          if debug then
+            vim.notify(
+              string.format(
+                "Autowriting %s @ %s",
+                vim.api.nvim_buf_get_name(0),
+                vim.fn.strftime("%H:%M:%S")
+              )
+            )
+          end
 
           vim.api.nvim_buf_call(buf, function() vim.cmd("silent! write") end)
         end, config.autowrite_debounce_delay, ctx.buf)
@@ -94,26 +124,39 @@ function M.start()
 
   -- Delete hidden buffer
   vim.api.nvim_create_autocmd("BufHidden", {
-    group = vim.api.nvim_create_augroup("persist-delete-hidden", { clear = true }),
+    group = vim.api.nvim_create_augroup(
+      "persist-delete-hidden",
+      { clear = true }
+    ),
     desc = "Delete hidden buffer",
     pattern = "*",
     callback = function(ctx)
       local buf = ctx.buf
-      if vim.api.nvim_buf_get_option(buf, "buftype") ~= "" then return end
-      if vim.api.nvim_buf_get_option(buf, "readonly") then return end
-      if vim.api.nvim_buf_get_name(buf) == "" then return end
 
-      if vim.api.nvim_buf_get_option(buf, "modified") then
-        vim.ui.input({ prompt = string.format("Attempting to delete hidden buffer %s. Write changes? [y/n] ", vim.api.nvim_buf_get_name(buf)) }, function(val)
+      if vim.api.nvim_buf_get_option(buf, "buftype") ~= "" then return end
+
+      local write = true
+      if vim.api.nvim_buf_get_option(buf, "readonly") then write = false end
+      if vim.api.nvim_buf_get_name(buf) == "" then write = false end
+      if not vim.api.nvim_buf_get_option(buf, "modified") then write = false end
+
+      if write then
+        vim.ui.input({
+          prompt = string.format(
+            "Attempting to delete hidden buffer %s. Write changes? [y/n] ",
+            vim.api.nvim_buf_get_name(buf)
+          ),
+        }, function(val)
           if val == "y" then
-              vim.api.nvim_buf_call(buf, function() vim.cmd("silent! write") end)
+            vim.api.nvim_buf_call(buf, function() vim.cmd("silent! write") end)
           end
         end)
-      end
 
-      vim.defer_fn(function()
-        vim.api.nvim_buf_delete(buf, { force = true })
-      end, 500)
+        vim.defer_fn(
+          function() vim.api.nvim_buf_delete(buf, { force = true }) end,
+          500
+        )
+      end
     end,
   })
 end
@@ -122,16 +165,50 @@ function M.stop()
   -- Session
   M.cwd_session = nil
   pcall(vim.api.nvim_del_augroup_by_name, "persist-session")
+  save_session_timer:stop()
   pcall(vim.api.nvim_del_augroup_by_name, "persist-autowrite")
   pcall(vim.api.nvim_del_augroup_by_name, "persist-delete-hidden")
 end
 
-function M.save_session() vim.cmd("mks! " .. e(M.cwd_session or M.get_cwd_session())) end
+function M.save_session()
+  local bufs = vim.tbl_filter(function(b)
+    if vim.bo[b].buftype ~= "" then return false end
+    if vim.bo[b].filetype == "gitcommit" then return false end
+    return vim.api.nvim_buf_get_name(b) ~= ""
+  end, vim.api.nvim_list_bufs())
+
+  if #bufs == 0 then return end
+
+  local hidden_bufs = utils.filter(
+    vim.api.nvim_list_bufs(),
+    function(buf) return vim.api.nvim_buf_get_option(buf, "bufhidden") ~= "" end
+  )
+
+  if false and #hidden_bufs > 0 then
+    if debug then
+      vim.notify(
+        string.format(
+          "Cannot save session with hidden buffers: %s",
+          table.concat(hidden_bufs, ", ")
+        ),
+        vim.log.levels.WARN
+      )
+    end
+    return
+  end
+
+  vim.cmd("mks! " .. e(M.cwd_session or M.get_cwd_session()))
+  if debug then
+    vim.notify(string.format("Saved session @ %s", vim.fn.strftime("%H:%M:%S")))
+  end
+end
 
 function M.load_session(opt)
   opt = opt or {}
   local sfile = opt.last and M.get_last_session() or M.get_cwd_session()
-  if sfile and vim.fn.filereadable(sfile) ~= 0 then vim.cmd("silent! source " .. e(sfile)) end
+  if sfile and vim.fn.filereadable(sfile) ~= 0 then
+    vim.cmd("silent! source " .. e(sfile))
+  end
 end
 
 function M.list_sessions() return vim.fn.glob(config.sessions_dir .. "*.vim") end

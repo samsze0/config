@@ -25,7 +25,7 @@ local function tabline(options)
     local bufbuftype = fn.getbufvar(bufnr, "&buftype")
 
     if bufbuftype ~= "" or bufname == "" then
-      table.insert(bufnames, nil)
+      table.insert(bufnames, "")
       goto continue
     end
 

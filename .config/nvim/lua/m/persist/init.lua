@@ -72,9 +72,7 @@ function M.start()
     save_session_timer:start(
       0, -- Timeout (ms)
       1000, -- Every n (ms)
-      function()
-        vim.schedule_wrap(M.save_session)
-      end
+      function() vim.schedule_wrap(M.save_session) end
     )
   end
 
@@ -151,12 +149,23 @@ function M.start()
             vim.api.nvim_buf_call(buf, function() vim.cmd("silent! write") end)
           end
         end)
-
-        vim.defer_fn(
-          function() vim.api.nvim_buf_delete(buf, { force = true }) end,
-          500
-        )
       end
+
+      vim.defer_fn(function()
+        xpcall(
+          function() vim.api.nvim_buf_delete(buf, { force = true }) end,
+          function(err)
+            vim.notify(
+              string.format(
+                "Error deleting buffer %s: %s",
+                vim.api.nvim_buf_get_name(buf),
+                err
+              ),
+              vim.log.levels.ERROR
+            )
+          end
+        )
+      end, 500)
     end,
   })
 end

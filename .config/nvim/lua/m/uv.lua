@@ -32,7 +32,9 @@ M.create_server = function(on_message, opts)
       assert(not err)
       if chunk then
         on_message(chunk)
-        client:write("ok!") -- Echo message back to client
+        if false then
+          client:write("ok!") -- Echo message back to client
+        end
       else -- EOF (stream closed)
         client:close()
       end
@@ -66,7 +68,9 @@ M.create_tcp_server = function(host, port, on_message)
       assert(not err, err)
       if chunk then
         on_message(chunk)
-        client:write("ok!") -- Echo message back to client
+        if false then
+          client:write("ok!") -- Echo message back to client
+        end
       else -- EOF (stream closed)
         client:close()
       end

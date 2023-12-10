@@ -34,4 +34,24 @@ M.edit_selected_files = function(edit_cmd, selection)
   end
 end
 
+M.get_filepath_from_git_root = function(filepath, opts)
+  opts = vim.tbl_extend("force", {
+    git_root = M.get_git_toplevel(),
+    include_git_root = false,
+  }, opts or {})
+
+  -- Make filepath relative to the full path (relative to ~) to git root
+  local path = vim.fn.fnamemodify(filepath, ":~" .. opts.git_root .. ":.")
+  if not opts.include_git_root then path = path:gsub("[^/]+/", "", 1) end
+  return path
+end
+
+M.convert_git_root_filepath_to_fullpath = function(filepath, opts)
+  opts = vim.tbl_extend("force", {
+    git_root = M.get_git_toplevel(),
+  }, opts or {})
+
+  return opts.git_root .. "/" .. filepath
+end
+
 return M

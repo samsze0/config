@@ -129,6 +129,7 @@ end, {})
 # TODO
 
 - Custom autopair
+- Safer tabline and statusline and autocmds (wrap in pcall)
 - Fzf TODO comments
 - Fzf git worktree
 - SSH lf preview
@@ -152,3 +153,4 @@ end, {})
 - Lf image preview
 - Fzf image preview
 - Tabline dedup by git-files
+- Tabline trunc character

@@ -2,6 +2,7 @@ local M = {}
 
 local config = require("m.fzf.config")
 local utils = require("m.utils")
+local fzf_utils = require("m.fzf.utils")
 local uv_utils = require("m.uv")
 
 local fzf_on_focus
@@ -24,11 +25,11 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         vim.schedule(function() fzf_on_focus(selection) end)
       end
     elseif string.match(message, "^event") then
-      local event = string.match(message, "^event (.+)")
+      local event = string.match(message, "^event ([^\n]+)")
       if event and FZF_EVENT_CALLBACK_MAP[event] then
         local callback = FZF_EVENT_CALLBACK_MAP[event]
         if type(callback) == "function" then
-          callback()
+          vim.schedule(callback)
         else
           vim.notify(
             string.format(
@@ -39,6 +40,11 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
             vim.log.levels.ERROR
           )
         end
+      else
+        vim.notify(
+          string.format("Invalid fzf event: %s", event),
+          vim.log.levels.ERROR
+        )
       end
     else
       vim.notify(
@@ -57,6 +63,7 @@ M.send_to_fzf = function(message)
   vim.fn.system(
     string.format([[curl -X POST localhost:%s -d '%s']], FZF_PORT, message)
   )
+  vim.notify("Sent message to fzf " .. message)
 end
 
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
@@ -74,6 +81,8 @@ local capture_stderr = false
 local selection_path = vim.fn.glob("~/.cache/lf_current_selection")
 
 M.fzf = function(content, on_selection, opts)
+  -- TODO: content can be a function that returns a string. Invoked whenever "reload"
+
   opts = vim.tbl_extend("force", {
     fzf_extra_args = "",
     fzf_prompt = "",
@@ -111,21 +120,13 @@ M.fzf = function(content, on_selection, opts)
     opts.fzf_preview_window.wrap and "wrap" or "nowrap"
   )
 
-  local keybinds_arg = string.format(
-    "%s",
-    table.concat({
-      "shift-up:preview-up+preview-up+preview-up+preview-up+preview-up",
-      "shift-down:preview-down+preview-down+preview-down+preview-down+preview-down",
-    }, ",")
-  )
-
   fzf_on_focus = opts.fzf_on_focus
 
   for k, v in pairs(opts.fzf_binds) do
     if type(v) == "function" then
       FZF_EVENT_CALLBACK_MAP[k] = v
       opts.fzf_binds[k] = string.format(
-        [[execute-silent(echo "trigger %s" | nc -U %s)]],
+        [[execute-silent(echo "event %s" | nc -U %s)]],
         k,
         server_socket_path
       )
@@ -162,10 +163,24 @@ M.fzf = function(content, on_selection, opts)
   end
   opts.fzf_binds.start = opts.fzf_binds.start
     .. string.format(
-      [[execute-silent(echo "port $FZF_PORT" | nc -U %s)+pos(%d)]],
-      server_socket_path,
-      opts.fzf_initial_position
+      [[execute-silent(echo "port $FZF_PORT" | nc -U %s)]],
+      server_socket_path
     )
+
+  if opts.fzf_binds.load then
+    opts.fzf_binds.load = opts.fzf_binds.load .. "+"
+  else
+    opts.fzf_binds.load = ""
+  end
+  -- Nondeterministic behaviour if "pos" bind to start event
+  opts.fzf_binds.load = opts.fzf_binds.load
+    .. string.format([[pos(%d)]], opts.fzf_initial_position)
+
+  -- Default keybinds
+  opts.fzf_binds["shift-up"] =
+    "preview-up+preview-up+preview-up+preview-up+preview-up"
+  opts.fzf_binds["shift-down"] =
+    "preview-down+preview-down+preview-down+preview-down+preview-down"
 
   local binds_arg = table.concat(
     utils.map(
@@ -181,14 +196,13 @@ M.fzf = function(content, on_selection, opts)
 
   vim.fn.termopen(
     string.format(
-      [[echo "%s" | fzf --listen --ansi --prompt='%s❯ ' --border=none --height=100%% --preview-window=%s %s --bind '%s' --bind '%s' --delimiter=%s %s > %s]],
+      [[echo "%s" | fzf --listen --ansi --prompt='%s❯ ' --border=none --height=100%% --preview-window=%s %s --bind '%s' --delimiter=%s %s > %s]],
       content,
       opts.fzf_prompt,
       preview_window_arg,
       opts.fzf_preview_cmd
           and string.format([[--preview='%s']], opts.fzf_preview_cmd)
         or "",
-      keybinds_arg,
       binds_arg,
       string.format("'%s'", utils.nbsp),
       opts.fzf_extra_args,

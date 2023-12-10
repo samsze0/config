@@ -333,12 +333,12 @@ M.setup = function()
     [{ mode = "n", lhs = "<f6>" }] = {
       telescope = nil,
       fzflua = nil,
-      fzf = safe_require("m.fzf").git_files,
+      fzf = false and safe_require("m.fzf").git_files or nil,
     },
     [{ mode = "n", lhs = "<f7>" }] = {
       telescope = nil,
       fzflua = nil,
-      fzf = safe_require("m.fzf").git_status,
+      fzf = false and safe_require("m.fzf").git_status or nil,
     },
   }
 

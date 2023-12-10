@@ -85,9 +85,11 @@ require("lazy").setup({
     config = function()
       local run_setup_on_startup = false
 
-      if run_setup_on_startup then vim.api.nvim_create_autocmd("VimEnter", {
-        callback = function() vim.cmd("Copilot setup") end,
-      }) end
+      if run_setup_on_startup then
+        vim.api.nvim_create_autocmd("VimEnter", {
+          callback = function() vim.cmd("Copilot setup") end,
+        })
+      end
     end,
   },
   {
@@ -144,7 +146,9 @@ require("lazy").setup({
 
       vim.api.nvim_create_autocmd({ "User" }, {
         pattern = "LfTermEnter",
-        callback = function(a) vim.api.nvim_buf_set_keymap(a.buf, "t", "q", "q", { nowait = true }) end,
+        callback = function(a)
+          vim.api.nvim_buf_set_keymap(a.buf, "t", "q", "q", { nowait = true })
+        end,
       })
     end,
   },
@@ -208,7 +212,8 @@ require("lazy").setup({
     "HiPhish/rainbow-delimiters.nvim",
     config = function()
       require("m.theme").setup({})
-      vim.g.rainbow_delimiters = { highlight = require("m.theme").rainbow_hl_groups }
+      vim.g.rainbow_delimiters =
+        { highlight = require("m.theme").rainbow_hl_groups }
     end,
   },
   {

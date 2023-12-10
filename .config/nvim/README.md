@@ -151,3 +151,4 @@ end, {})
 - Karabiner command left/right
 - Lf image preview
 - Fzf image preview
+- Tabline dedup by git-files

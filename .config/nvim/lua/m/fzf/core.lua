@@ -6,7 +6,9 @@ local uv_utils = require("m.uv")
 
 local fzf_on_focus
 
+FZF_EVENT_CALLBACK_MAP = {}
 FZF_PORT = nil
+FZF_CURRENT_SELECTION = nil
 local server_socket, server_socket_path, close_server = uv_utils.create_server(
   function(message)
     if config.debug then
@@ -16,13 +18,46 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
     if string.match(message, "^port") then
       FZF_PORT = string.match(message, "^port (%d+)")
     elseif string.match(message, "^focus") then
-      local selection = string.match(message, "^focus (.+)")
+      local selection = string.match(message, "^focus '(.+)'")
+      FZF_CURRENT_SELECTION = selection
       if selection and fzf_on_focus and type(fzf_on_focus) == "function" then
-        fzf_on_focus(selection)
+        vim.schedule(function() fzf_on_focus(selection) end)
       end
+    elseif string.match(message, "^event") then
+      local event = string.match(message, "^event (.+)")
+      if event and FZF_EVENT_CALLBACK_MAP[event] then
+        local callback = FZF_EVENT_CALLBACK_MAP[event]
+        if type(callback) == "function" then
+          callback()
+        else
+          vim.notify(
+            string.format(
+              "Invalid fzf event callback for event %s: %s",
+              event,
+              vim.inspect(callback)
+            ),
+            vim.log.levels.ERROR
+          )
+        end
+      end
+    else
+      vim.notify(
+        string.format("Fzf server received invalid message: %s", message),
+        vim.log.levels.ERROR
+      )
     end
   end
 )
+
+M.send_to_fzf = function(message)
+  if not FZF_PORT then
+    vim.notify("Fzf server not ready", vim.log.levels.ERROR)
+    return
+  end
+  vim.fn.system(
+    string.format([[curl -X POST localhost:%s -d '%s']], FZF_PORT, message)
+  )
+end
 
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 local open_floating_window = require("m.fzf.window").open_floating_window
@@ -41,11 +76,20 @@ local selection_path = vim.fn.glob("~/.cache/lf_current_selection")
 M.fzf = function(content, on_selection, opts)
   opts = vim.tbl_extend("force", {
     fzf_extra_args = "",
+    fzf_prompt = "",
     fzf_preview_window = {},
     fzf_preview_cmd = nil,
-    fzf_initial_position = nil,
+    fzf_initial_position = 1,
     fzf_on_focus = nil,
+    fzf_binds = {},
   }, opts or {})
+
+  if debug then vim.notify(vim.inspect(opts)) end
+
+  -- Reset state
+  FZF_EVENT_CALLBACK_MAP = {}
+  FZF_PORT = nil
+  FZF_CURRENT_SELECTION = nil
 
   if M.is_fzf_available() ~= true then
     vim.notify(
@@ -77,16 +121,75 @@ M.fzf = function(content, on_selection, opts)
 
   fzf_on_focus = opts.fzf_on_focus
 
+  for k, v in pairs(opts.fzf_binds) do
+    if type(v) == "function" then
+      FZF_EVENT_CALLBACK_MAP[k] = v
+      opts.fzf_binds[k] = string.format(
+        [[execute-silent(echo "trigger %s" | nc -U %s)]],
+        k,
+        server_socket_path
+      )
+    elseif type(v) == "string" then
+    elseif type(v) == "table" then
+      -- TODO: support list type and recursive parsing
+    else
+      vim.notify(
+        string.format(
+          "Invalid fzf bind value for key %s: %s",
+          k,
+          vim.inspect(v)
+        ),
+        vim.log.levels.ERROR
+      )
+    end
+  end
+
+  if opts.fzf_binds.focus then
+    opts.fzf_binds.focus = opts.fzf_binds.focus .. "+"
+  else
+    opts.fzf_binds.focus = ""
+  end
+  opts.fzf_binds.focus = opts.fzf_binds.focus
+    .. string.format(
+      [[execute-silent(echo "focus {}" | nc -U %s)]],
+      server_socket_path
+    )
+
+  if opts.fzf_binds.start then
+    opts.fzf_binds.start = opts.fzf_binds.start .. "+"
+  else
+    opts.fzf_binds.start = ""
+  end
+  opts.fzf_binds.start = opts.fzf_binds.start
+    .. string.format(
+      [[execute-silent(echo "port $FZF_PORT" | nc -U %s)+pos(%d)]],
+      server_socket_path,
+      opts.fzf_initial_position
+    )
+
+  local binds_arg = table.concat(
+    utils.map(
+      opts.fzf_binds,
+      function(k, v) return string.format([[%s:%s]], k, v) end
+    ),
+    ","
+  )
+
+  if config.debug then
+    vim.notify(string.format([[binds_arg\n%s]], vim.inspect(binds_arg)))
+  end
+
   vim.fn.termopen(
     string.format(
-      [[echo "%s" | fzf --listen --bind 'start:execute-silent(echo "port $FZF_PORT" | nc -U %s)' --bind 'focus:execute-silent(echo "focus {}" | nc -U %s)' --border=none --height=100%% --preview-window=%s --preview='%s' --bind 'start:pos(%d)' --bind '%s' --delimiter=%s %s > %s]],
+      [[echo "%s" | fzf --listen --ansi --prompt='%s❯ ' --border=none --height=100%% --preview-window=%s %s --bind '%s' --bind '%s' --delimiter=%s %s > %s]],
       content,
-      server_socket_path,
-      server_socket_path,
+      opts.fzf_prompt,
       preview_window_arg,
-      opts.fzf_preview_cmd or "",
-      opts.fzf_initial_position or 1,
+      opts.fzf_preview_cmd
+          and string.format([[--preview='%s']], opts.fzf_preview_cmd)
+        or "",
       keybinds_arg,
+      binds_arg,
       string.format("'%s'", utils.nbsp),
       opts.fzf_extra_args,
       selection_path

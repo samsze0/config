@@ -228,7 +228,12 @@ M.notifications = function()
     preview = require("fzf-lua").shell.raw_preview_action_cmd(
       function(selected)
         local noti = get_noti_with_string(selected[1])
-        return string.format([[echo "%s"]], ansi_codes.white(noti.message))
+        return string.format(
+          [[cat <<"FZFLUAEOM"
+%s
+FZFLUAEOM]],
+          ansi_codes.white(noti.message)
+        )
       end
     ),
     actions = {},

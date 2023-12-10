@@ -1,11 +1,30 @@
 local M = {}
 
-M.map = function(tbl, func)
+M.map = function(tbl, func, opts)
+  opts = vim.tbl_extend("force", { skip_nil = true }, opts or {})
+
   local new_tbl = {}
-  for i, v in ipairs(tbl) do
-    local result = func(i, v)
-    if result ~= nil then table.insert(new_tbl, result) end
+  if M.is_array(tbl) then
+    for i, v in ipairs(tbl) do
+      local result = func(i, v)
+      if opts.skip_nil and result == nil then
+        -- Skip
+      else
+        table.insert(new_tbl, result)
+      end
+    end
+    return new_tbl
+  else
+    for k, v in pairs(tbl) do
+      local result = func(k, v)
+      if opts.skip_nil and result == nil then
+        -- Skip
+      else
+        table.insert(new_tbl, result)
+      end
+    end
   end
+
   return new_tbl
 end
 
@@ -29,7 +48,10 @@ M.show_content_as_buf = function(buf_lines, opts)
 
   vim.api.nvim_buf_set_lines(buf_nr, 0, -1, false, buf_lines)
   vim.api.nvim_set_current_buf(buf_nr)
-  vim.api.nvim_buf_call(buf_nr, function() vim.cmd(string.format("set filetype=%s", opts.filetype)) end)
+  vim.api.nvim_buf_call(
+    buf_nr,
+    function() vim.cmd(string.format("set filetype=%s", opts.filetype)) end
+  )
 end
 
 M.contains = function(tbl, str)
@@ -98,10 +120,24 @@ M.safe_require = function(module_name, opts)
   })
   local ok, module = pcall(require, module_name)
   if not ok then
-    if opts.notify then vim.notify(string.format("Failed to load module %s", module_name), opts.log_level) end
+    if opts.notify then
+      vim.notify(
+        string.format("Failed to load module %s", module_name),
+        opts.log_level
+      )
+    end
     return setmetatable({}, {
       __index = function(_, key)
-        if opts.notify then vim.notify(string.format("Failed to access key %s in module %s", key, module_name), opts.log_level) end
+        if opts.notify then
+          vim.notify(
+            string.format(
+              "Failed to access key %s in module %s",
+              key,
+              module_name
+            ),
+            opts.log_level
+          )
+        end
         return nil
       end,
     }) -- In case we try to index into the result of safe_require
@@ -118,6 +154,36 @@ function M.strip_ansi_coloring(str)
   -- 2. ^[[0;34m
   -- 3. ^[[m
   return str:gsub("%[[%d;]-m", "")
+end
+
+-- Tweaked from:
+-- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/utils.lua
+M.ansi_codes = {}
+M.ansi_escseq = {
+  -- the "\x1b" esc sequence causes issues
+  -- with older Lua versions
+  -- clear    = "\x1b[0m",
+  clear = "[0m",
+  bold = "[1m",
+  italic = "[3m",
+  underline = "[4m",
+  black = "[0;30m",
+  red = "[0;31m",
+  green = "[0;32m",
+  yellow = "[0;33m",
+  blue = "[0;34m",
+  magenta = "[0;35m",
+  cyan = "[0;36m",
+  white = "[0;37m",
+  grey = "[0;90m",
+  dark_grey = "[0;97m",
+}
+for color, escseq in pairs(M.ansi_escseq) do
+  M.ansi_codes[color] = function(string)
+    if string == nil or #string == 0 then return "" end
+    if not escseq or #escseq == 0 then return string end
+    return escseq .. string .. M.ansi_escseq.clear
+  end
 end
 
 -- From:
@@ -174,7 +240,8 @@ function M.get_visual_selection()
     plusStart = 1
   end
   lines[#lines] = string.sub(lines[#lines], 0, end_pos[2] + plusEnd)
-  lines[1] = string.sub(lines[1], start_pos[2] + plusStart, string.len(lines[1]))
+  lines[1] =
+    string.sub(lines[1], start_pos[2] + plusStart, string.len(lines[1]))
   return table.concat(lines, "")
 end
 
@@ -187,7 +254,7 @@ M.reduce = function(list, fn, init)
       if 1 == i and init == nil then
         acc = v
       else
-        acc = fn(acc, v)
+        acc = fn(acc, i, v)
       end
     end
   else
@@ -195,7 +262,7 @@ M.reduce = function(list, fn, init)
       if init == nil then
         acc = v
       else
-        acc = fn(acc, v)
+        acc = fn(acc, k, v)
       end
     end
   end
@@ -203,7 +270,7 @@ M.reduce = function(list, fn, init)
 end
 
 M.sum = function(list)
-  return M.reduce(list, function(acc, v) return acc + v end, 0)
+  return M.reduce(list, function(acc, _, v) return acc + v end, 0)
 end
 
 M.filter = function(list, fn)
@@ -231,6 +298,30 @@ M.join_first_two_elements = function(list, join_fn)
   local second = table.remove(list, 1)
   table.insert(list, 1, join_fn(first, second))
   return list
+end
+
+M.find = function(list, fn)
+  for i, v in ipairs(list) do
+    if fn(v) then return v, i end
+  end
+  return nil
+end
+
+-- Sort in place
+M.sort_filepaths = function(list, fn)
+  table.sort(list, function(e1, e2)
+    local a = fn(e1)
+    local b = fn(e2)
+
+    local a_is_in_dir = string.find(a, "/") ~= nil
+    local b_is_in_dir = string.find(b, "/") ~= nil
+
+    if a_is_in_dir == b_is_in_dir then
+      return a:lower() < b:lower()
+    else
+      return a_is_in_dir
+    end
+  end)
 end
 
 return M

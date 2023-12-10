@@ -5,6 +5,16 @@ local config = require("m.fzf.config")
 
 M.git_toplevel = [[git -C "$(git rev-parse --show-toplevel)"]]
 
+M.git_files = string.format(
+  [[{ echo "$(%s ls-files --full-name --exclude-standard)"; echo "$(%s ls-files --full-name --others --exclude-standard)"; }]],
+  M.git_toplevel,
+  M.git_toplevel
+)
+
+M.git_files_cwd = string.format(
+  [[{ echo "$(git ls-files --full-name --exclude-standard)"; echo "$(git ls-files --full-name --others --exclude-standard)"; }]]
+)
+
 -- Trick git into thinking it's running in a tty
 -- https://github.com/dandavison/delta/discussions/840
 M.like_tty = [[script -q /dev/null]]

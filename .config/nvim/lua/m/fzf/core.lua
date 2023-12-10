@@ -10,6 +10,7 @@ local fzf_on_focus
 FZF_EVENT_CALLBACK_MAP = {}
 FZF_PORT = nil
 FZF_CURRENT_SELECTION = nil
+FZF_INITIAL_POS = nil
 local server_socket, server_socket_path, close_server = uv_utils.create_server(
   function(message)
     if config.debug then
@@ -18,6 +19,11 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
 
     if string.match(message, "^port") then
       FZF_PORT = string.match(message, "^port (%d+)")
+      -- Set initial position here rather than binds to `load` event as reload would also trigger `load` event
+      -- `start` event not applicable because input would still be being prepared (async)
+      vim.schedule(
+        function() M.send_to_fzf(string.format([[pos(%d)]], FZF_INITIAL_POS)) end
+      )
     elseif string.match(message, "^focus") then
       local selection = string.match(message, "^focus '(.+)'")
       FZF_CURRENT_SELECTION = selection
@@ -63,7 +69,7 @@ M.send_to_fzf = function(message)
   vim.fn.system(
     string.format([[curl -X POST localhost:%s -d '%s']], FZF_PORT, message)
   )
-  vim.notify("Sent message to fzf " .. message)
+  if config.debug then vim.notify("Sent message to fzf " .. message) end
 end
 
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
@@ -93,12 +99,13 @@ M.fzf = function(content, on_selection, opts)
     fzf_binds = {},
   }, opts or {})
 
-  if debug then vim.notify(vim.inspect(opts)) end
+  if config.debug then vim.notify(vim.inspect(opts)) end
 
   -- Reset state
   FZF_EVENT_CALLBACK_MAP = {}
   FZF_PORT = nil
   FZF_CURRENT_SELECTION = nil
+  FZF_INITIAL_POS = opts.fzf_initial_position
 
   if M.is_fzf_available() ~= true then
     vim.notify(
@@ -167,15 +174,6 @@ M.fzf = function(content, on_selection, opts)
       server_socket_path
     )
 
-  if opts.fzf_binds.load then
-    opts.fzf_binds.load = opts.fzf_binds.load .. "+"
-  else
-    opts.fzf_binds.load = ""
-  end
-  -- Nondeterministic behaviour if "pos" bind to start event
-  opts.fzf_binds.load = opts.fzf_binds.load
-    .. string.format([[pos(%d)]], opts.fzf_initial_position)
-
   -- Default keybinds
   opts.fzf_binds["shift-up"] =
     "preview-up+preview-up+preview-up+preview-up+preview-up"
@@ -229,7 +227,7 @@ M.fzf = function(content, on_selection, opts)
             function(_, s) return vim.trim(s) end
           )
           selection = utils.filter(selection, function(s) return s ~= "" end)
-          if debug then
+          if config.debug then
             vim.notify(
               string.format(
                 "Fzf\nExit code: %s\n%s",
@@ -240,6 +238,17 @@ M.fzf = function(content, on_selection, opts)
           end
 
           on_selection(selection)
+        elseif code == 130 then
+          -- 130 means no selections
+        else
+          vim.notify(
+            string.format(
+              "Fzf\nExit code: %s\nEvent: %s",
+              code,
+              vim.inspect(event)
+            ),
+            vim.log.levels.ERROR
+          )
         end
       end,
       stdout_buffered = false,

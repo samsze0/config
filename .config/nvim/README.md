@@ -126,31 +126,37 @@ vim.api.create_user_command("Test", function()
 end, {})
 ```
 
-# TODO
+# TODO (high priority)
 
-- Custom autopair
 - Safer tabline and statusline and autocmds (wrap in pcall)
-- Fzf TODO comments
-- Fzf git worktree
 - SSH lf preview
 - SSH setup
+- Git conflict workflow w/ fzflua integration
+- Syncthing clipboard
+- Custom Search n replace
+- Opened buffers file changes workflow. Autowrite?
+- Karabiner command left/right
+- Fzf
+- Fzf TODO comments, backups
+- Tests & refactoring
+- Git conflicts workflow
+- Performance profiling & optimization
+- LSP import path update
+
+# TODO (low priority)
+
+- Custom autopair
+- Custom pair motion
+- Git worktree setup
 - Real "modified" & integration w/ persist
 - Statusline show line changes since last save
-- Git conflict workflow w/ fzflua integration
-- Fzflua Cumulative mode for undo, git, etc
+- Fzf Cumulative mode for undo, git, etc
 - rsync backup
-- syncthing setup
-- syncthing clipboard
 - Treesitter textobjects custom
 - Copilot
-- Custom Search n replace
 - Lf create_new multi-layer dir support
-- react native setup
-- react dev setup
-- Flash fork
-- Opened buffers file changes workflow
-- Karabiner command left/right
-- Lf image preview
-- Fzf image preview
 - Tabline dedup by git-files
 - Tabline trunc character
+- React native setup
+- React dev setup
+- Flash fork

@@ -6,17 +6,19 @@ local fn = vim.fn
 local utils = require("utils")
 local fzf_utils = require("fzf.utils")
 
+_G.tabs = {}
+
 M.options = {
-  show_modify = true,
   show_icon = false,
-  no_name = "No Name",
   dedup_by = "opened_files",
   modify_indicator = " ",
-  inactive_tab_max_length = 0,
+  inactive_tab_max_length = false,
   padding = "  ",
 }
 
 local function tabline(options)
+  _G.tabs = {} -- Reset
+
   -- Iterate over all tabs in advance for tab name de-duplication
   local get_unique_filename
 
@@ -135,8 +137,14 @@ local function tabline(options)
 
     s = s .. options.padding
 
+    local tabname
+    local fulltabname
+
     if bufbuftype == "terminal" then
-      s = s .. "  "
+      tabname = "  "
+      fulltabname = "Terminal"
+
+      s = s .. tabname
     elseif bufbuftype == "" then -- Normal buffer
       local icon = ""
       if options.show_icon and M.has_devicons then
@@ -144,34 +152,38 @@ local function tabline(options)
         icon = M.devicons.get_icon(bufname, ext, { default = true }) .. " "
       end
       -- buf name
-      local pre_title_s_len = string.len(s)
       if bufname ~= "" then
-        s = s
-          .. icon
-          .. (
-            true and get_unique_filename(index) or fn.fnamemodify(bufname, ":t")
-          )
+        local name = get_unique_filename(index)
+        fulltabname = fn.fnamemodify(bufname, ":~:.")
+        tabname = icon .. fulltabname
       else
-        s = s .. options.no_name
+        tabname = "  "
+        fulltabname = "[No Name]"
       end
+
       if
         options.inactive_tab_max_length
         and options.inactive_tab_max_length > 0
         and index ~= fn.tabpagenr()
       then
-        s = string.sub(s, 1, pre_title_s_len + options.inactive_tab_max_length)
+        s = s .. tabname:sub(1, options.inactive_tab_max_length)
+      else
+        s = s .. tabname
       end
+
       -- modify indicator
-      if
-        bufmodified == 1
-        and options.show_modify
-        and options.modify_indicator ~= nil
-      then
-        s = s .. options.modify_indicator
-      end
+      if bufmodified == 1 then s = s .. options.modify_indicator end
     else
-      s = s .. "  "
+      tabname = "  "
+      fulltabname = bufbuftype
+
+      s = s .. tabname
     end
+
+    _G.tabs[index] = {
+      full = fulltabname,
+      display = tabname,
+    }
 
     s = s .. options.padding
   end

@@ -268,7 +268,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f3><f1>" }] = {
       fzflua = safe_require("fzf-lua").tabs,
-      fzf = nil,
+      fzf = safe_require("fzf").tabs,
     },
     [{ mode = "n", lhs = "<f5><f5>" }] = {
       fzflua = safe_require("fzf-lua").live_grep,

@@ -10,6 +10,7 @@ local fzf_on_focus
 local fzf_on_prompt_change
 
 FZF_BUFFER = nil
+FZF_PREVIEW_BUFFER = nil
 FZF_EVENT_CALLBACK_MAP = {}
 FZF_PORT = nil
 FZF_CURRENT_SELECTION = nil
@@ -36,7 +37,11 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
       end
     elseif string.match(message, "^change") then
       local query = string.match(message, "^change '(.+)'")
-      if query and fzf_on_prompt_change and type(fzf_on_prompt_change) == "function" then
+      if
+        query
+        and fzf_on_prompt_change
+        and type(fzf_on_prompt_change) == "function"
+      then
         vim.schedule(function() fzf_on_prompt_change(query) end)
       end
     elseif string.match(message, "^event") then
@@ -88,6 +93,8 @@ vim.g.fzf_opened = 0
 
 local prev_win = -1
 local win = -1
+local preview_win = -1
+local preview_buf = -1
 
 local capture_stdout = false
 local capture_stderr = false
@@ -105,6 +112,7 @@ M.fzf = function(content, on_selection, opts)
     fzf_initial_position = 1,
     fzf_on_focus = nil,
     fzf_binds = {},
+    nvim_preview = false,
   }, opts or {})
 
   if config.debug then vim.notify(vim.inspect(opts)) end
@@ -116,6 +124,7 @@ M.fzf = function(content, on_selection, opts)
   FZF_INITIAL_POS = opts.fzf_initial_position
   fzf_on_focus = opts.fzf_on_focus
   fzf_on_prompt_change = opts.fzf_on_prompt_change
+  FZF_PREVIEW_BUFFER = nil
 
   if M.is_fzf_available() ~= true then
     vim.notify(
@@ -124,11 +133,31 @@ M.fzf = function(content, on_selection, opts)
     )
     return
   end
-  prev_win = vim.api.nvim_get_current_win()
-  win, FZF_BUFFER = window_utils.open_floating_window({
-    buffer = FZF_BUFFER,
-    buffiletype = "fzf",
-  })
+
+  if opts.nvim_preview then
+    prev_win = vim.api.nvim_get_current_win()
+    win, FZF_BUFFER = window_utils.open_floating_window({
+      buffer = FZF_BUFFER,
+      buffiletype = "fzf",
+      position = "left",
+    })
+
+    preview_win, FZF_PREVIEW_BUFFER = window_utils.open_floating_window({
+      buffer = FZF_PREVIEW_BUFFER,
+      buffiletype = "fzf_preview",
+      position = "right",
+      enter_immediately = false,
+      parent_buffer = FZF_BUFFER,
+      style = "code",
+      main_win_extra_opts = {},
+    })
+  else
+    prev_win = vim.api.nvim_get_current_win()
+    win, FZF_BUFFER = window_utils.open_floating_window({
+      buffer = FZF_BUFFER,
+      buffiletype = "fzf",
+    })
+  end
 
   vim.g.fzf_opened = 1
   if type(content) == "table" then content = table.concat(content, "\n") end

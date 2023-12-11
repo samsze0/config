@@ -145,6 +145,7 @@ end, {})
 
 # TODO (low priority)
 
+- Better window_utils (parent - child buffer/window abstraction + start_insert when enter parent win + ctrl-s ctrl-f window nav shortcuts)
 - Custom autopair
 - Custom pair motion
 - Git worktree setup

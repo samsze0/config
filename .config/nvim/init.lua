@@ -185,7 +185,7 @@ require("lazy").setup({
     },
   },
   {
-    -- Scrollbar (show signs for git conflicts, diagnostics, search, etc.)
+    -- Scrollbar (+ show signs for git conflicts, diagnostics, search, etc.)
     "dstein64/nvim-scrollview",
     config = function() require("scrollview").setup({}) end,
   },
@@ -229,6 +229,9 @@ require("lazy").setup({
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
+  },
+  {
+    "nvim-lua/plenary.nvim",
   },
 })
 

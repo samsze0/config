@@ -113,6 +113,7 @@ M.open_diff_in_new_tab = function(buf1_content, buf2_content_or_filepath, opts)
 end
 
 M.safe_require = function(module_name, opts)
+  -- TODO: type annotations
   opts = opts or {}
   opts = vim.tbl_deep_extend("keep", opts, {
     notify = true,

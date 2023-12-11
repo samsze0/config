@@ -1,8 +1,8 @@
 -- Tweaked from:
 -- https://github.com/theniceboy/joshuto.nvim
 
-local open_floating_window = require("lf.window").open_floating_window
 local utils = require("utils")
+local window_utils = require("utils.window")
 
 local function is_lf_available() return vim.fn.executable("lf") == 1 end
 
@@ -80,7 +80,10 @@ local function lf(opts)
 
   prev_win = vim.api.nvim_get_current_win()
 
-  win = open_floating_window()
+  win, LF_BUFFER = window_utils.open_floating_window({
+    buffer = LF_BUFFER,
+    buffiletype = "lf"
+  })
 
   vim.keymap.set("t", "<C-t>", function()
     local selection = vim.fn.readfile(current_selection_path)

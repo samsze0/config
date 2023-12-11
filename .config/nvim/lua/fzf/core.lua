@@ -2,16 +2,19 @@ local M = {}
 
 local config = require("fzf.config")
 local utils = require("utils")
+local window_utils = require("utils.window")
 local fzf_utils = require("fzf.utils")
 local uv_utils = require("utils.uv")
 
 local fzf_on_focus
 local fzf_on_prompt_change
 
+FZF_BUFFER = nil
 FZF_EVENT_CALLBACK_MAP = {}
 FZF_PORT = nil
 FZF_CURRENT_SELECTION = nil
 FZF_INITIAL_POS = nil
+
 local server_socket, server_socket_path, close_server = uv_utils.create_server(
   function(message)
     if config.debug then
@@ -79,7 +82,6 @@ M.send_to_fzf = function(message)
 end
 
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
-local open_floating_window = require("fzf.window").open_floating_window
 
 FZF_BUFFER = nil
 vim.g.fzf_opened = 0
@@ -123,7 +125,10 @@ M.fzf = function(content, on_selection, opts)
     return
   end
   prev_win = vim.api.nvim_get_current_win()
-  win = open_floating_window()
+  win, FZF_BUFFER = window_utils.open_floating_window({
+    buffer = FZF_BUFFER,
+    buffiletype = "fzf",
+  })
 
   vim.g.fzf_opened = 1
   if type(content) == "table" then content = table.concat(content, "\n") end

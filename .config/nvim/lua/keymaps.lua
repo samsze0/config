@@ -264,7 +264,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f3><f2>" }] = {
       fzflua = safe_require("fzf-lua").buffers,
-      fzf = nil,
+      fzf = safe_require("fzf").buffers,
     },
     [{ mode = "n", lhs = "<f3><f1>" }] = {
       fzflua = safe_require("fzf-lua").tabs,

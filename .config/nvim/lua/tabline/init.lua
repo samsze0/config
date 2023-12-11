@@ -9,9 +9,7 @@ local fzf_utils = require("fzf.utils")
 _G.tabs = {}
 
 M.options = {
-  show_icon = false,
   dedup_by = "opened_files",
-  modify_indicator = " ",
   inactive_tab_max_length = false,
   padding = "  ",
 }
@@ -147,7 +145,7 @@ local function tabline(options)
       s = s .. tabname
     elseif bufbuftype == "" then -- Normal buffer
       local icon = ""
-      if options.show_icon and M.has_devicons then
+      if M.has_devicons then
         local ext = fn.fnamemodify(bufname, ":e")
         icon = M.devicons.get_icon(bufname, ext, { default = true }) .. " "
       end
@@ -172,7 +170,10 @@ local function tabline(options)
       end
 
       -- modify indicator
-      if bufmodified == 1 then s = s .. options.modify_indicator end
+      if fn.getbufvar(bufnr, "&mod") == 1 then s = s .. " " end
+
+      -- readonly indicator
+      if fn.getbufvar(bufnr, "&readonly") == 1 then s = s .. " " end
     else
       tabname = "  "
       fulltabname = bufbuftype

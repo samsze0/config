@@ -331,4 +331,26 @@ M.list_join = function(l1, l2)
   end
 end
 
+M.split_string_n = function(str, count, opts)
+  opts = vim.tbl_extend("force", { include_remaining = true }, opts or {})
+  local result = {}
+  local remaining = str
+  count = count == nil and 1 or count
+
+  while count > 0 do
+    -- .- means match as short as possible
+    -- + is not greedy in lua. * is
+    -- local match = string.match(remaining, "^(.-[(%s%s*)\n])")
+    local match, whitespace = string.match(remaining, "(%w+)(%s*)")
+    if not match then return nil end
+    remaining = remaining:sub(#match + #whitespace + 1)
+    table.insert(result, match)
+    count = count - 1
+  end
+
+  if opts.include_remaining then table.insert(result, remaining) end
+
+  return result
+end
+
 return M

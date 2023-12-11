@@ -334,6 +334,10 @@ M.setup = function()
       fzflua = nil,
       fzf = safe_require("fzf").grep,
     },
+    [{ mode = "n", lhs = "<space>j" }] = {
+      fzflua = safe_require("config.fzflua-custom").jumps,
+      fzf = safe_require("fzf").jumps,
+    },
   }
 
   for k, v in pairs(fuzzy_finder_keymaps) do

@@ -3,7 +3,6 @@ return {
   notify_backend = "custom",
   dap_plugins = false,
   diffview_plugin = false,
-  illuminate_plugin = false,
   tabline_plugin = "custom",
   statusline_plugin = "custom",
   treesitter_textobjects_plugin = "custom",
@@ -11,6 +10,8 @@ return {
   persist_plugin = "custom",
   autopairs_plugin = false,
   format_on_save = false,
+  indent_guide_plugin = false,
+  bracket_colorizer_plugin = false,
 
   theme_opts = {
     debug = {

@@ -460,14 +460,7 @@ M.setup = function()
   vim_keymap("n", "<space>;", "q:", opts)
 
   -- Session restore
-  if config.persist_plugin == "persistence" then
-    lua_keymap(
-      "n",
-      "<Space>r",
-      utils.run_and_notify(safe_require("persistence").load, "Reloaded session"),
-      {}
-    )
-  elseif config.persist_plugin == "custom" then
+  if config.persist_plugin == "custom" then
     lua_keymap(
       "n",
       "<Space>r",

@@ -703,13 +703,6 @@ function M.setup(opts)
   hi.IblWhitespace = { guifg = indent_marker }
   hi.IblScope = { guifg = indent_marker }
 
-  -- vim-illuminate
-  if config.illuminate_plugin then
-    hi.IlluminatedWordText = { guibg = c.gray_200, gui = nil }
-    hi.IlluminatedWordRead = { guibg = c.gray_200, gui = nil }
-    hi.IlluminatedWordWrite = { guibg = c.gray_200, gui = nil }
-  end
-
   -- nvim-cmp
   hi.CmpItemAbbr = { guifg = c.gray_700, guibg = nil, gui = nil, guisp = nil } -- Completion items default
   hi.CmpItemAbbrDeprecated =

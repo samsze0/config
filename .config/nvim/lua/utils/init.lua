@@ -354,4 +354,11 @@ M.split_string_n = function(str, count, opts)
   return result
 end
 
+M.in_list = function(value, list)
+  for _, v in ipairs(list) do
+    if v == value then return true end
+  end
+  return false
+end
+
 return M

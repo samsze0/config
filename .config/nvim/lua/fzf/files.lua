@@ -36,39 +36,46 @@ M.files = function(opts)
     {
       fzf_preview_cmd = not opts.nvim_preview and fzf_preview_cmd or nil,
       fzf_prompt = "Files",
-      fzf_on_focus = opts.nvim_preview and function(selection)
-        local filepath =
-          fzf_utils.convert_git_root_filepath_to_fullpath(selection)
+      fzf_on_focus = opts.nvim_preview
+          and function(selection)
+            local filepath =
+              fzf_utils.convert_git_root_filepath_to_fullpath(selection)
 
-        local ft = filetype.detect(filepath)
-        local is_binary =
-          vim.fn.system("file --mime " .. filepath):match("charset=binary")
+            local ft = filetype.detect(filepath)
+            local is_binary =
+              vim.fn.system("file --mime " .. filepath):match("charset=binary")
 
-        if fallback_to_bat and ft == "" then
-          core.send_to_fzf(
-            string.format([[change-preview(%s)]], fzf_preview_cmd)
-          )
-        end
+            if fallback_to_bat and ft == "" then
+              core.send_to_fzf(
+                string.format([[change-preview(%s)]], fzf_preview_cmd)
+              )
+            end
 
-        if not is_binary then
-          vim.api.nvim_buf_set_lines(
-            FZF_PREVIEW_BUFFER,
-            0,
-            -1,
-            false,
-            vim.fn.readfile(filepath)
-          )
-          vim.api.nvim_buf_set_option(FZF_PREVIEW_BUFFER, "filetype", ft)
-        else
-          vim.api.nvim_buf_set_lines(
-            FZF_PREVIEW_BUFFER,
-            0,
-            -1,
-            false,
-            { "No preview available" }
-          )
-        end
-      end or nil,
+            if not is_binary then
+              vim.api.nvim_buf_set_lines(
+                FZF_PREVIEW_BUFFER,
+                0,
+                -1,
+                false,
+                vim.fn.readfile(filepath)
+              )
+              vim.api.nvim_buf_set_option(FZF_PREVIEW_BUFFER, "filetype", ft)
+
+              -- Switch to preview window and back in order to refresh scrollbar
+              -- TODO: Remove this once scrollbar plugin support remote refresh
+              vim.api.nvim_set_current_win(FZF_PREVIEW_WINDOW)
+              vim.api.nvim_set_current_win(FZF_WINDOW)
+            else
+              vim.api.nvim_buf_set_lines(
+                FZF_PREVIEW_BUFFER,
+                0,
+                -1,
+                false,
+                { "No preview available" }
+              )
+            end
+          end
+        or nil,
       fzf_binds = {
         ["ctrl-y"] = function()
           local current_selection = FZF_CURRENT_SELECTION

@@ -9,12 +9,40 @@ local uv_utils = require("utils.uv")
 local fzf_on_focus
 local fzf_on_prompt_change
 
-FZF_BUFFER = nil
-FZF_PREVIEW_BUFFER = nil
-FZF_EVENT_CALLBACK_MAP = {}
 FZF_PORT = nil
-FZF_CURRENT_SELECTION = nil
+FZF_EVENT_CALLBACK_MAP = {}
+
 FZF_INITIAL_POS = nil
+FZF_CURRENT_SELECTION = nil
+
+FZF_PREV_WINDOW = nil
+FZF_WINDOW = nil
+FZF_BUFFER = nil
+FZF_BORDER_BUFFER = nil
+FZF_PREVIEW_WINDOW = nil
+FZF_PREVIEW_BUFFER = nil
+FZF_PREVIEW_BORDER_BUF = nil
+
+local reset_state = function()
+  fzf_on_focus = nil
+  fzf_on_prompt_change = nil
+
+  FZF_PORT = nil
+  FZF_EVENT_CALLBACK_MAP = {}
+
+  FZF_INITIAL_POS = nil
+  FZF_CURRENT_SELECTION = nil
+
+  FZF_PREV_WINDOW = -1
+  FZF_WINDOW = -1
+  FZF_BUFFER = nil
+  FZF_BORDER_BUFFER = nil
+  FZF_PREVIEW_WINDOW = -1
+  FZF_PREVIEW_BUFFER = nil
+  FZF_PREVIEW_BORDER_BUF = nil
+end
+
+reset_state()
 
 local server_socket, server_socket_path, close_server = uv_utils.create_server(
   function(message)
@@ -88,14 +116,6 @@ end
 
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 
-FZF_BUFFER = nil
-vim.g.fzf_opened = 0
-
-local prev_win = -1
-local win = -1
-local preview_win = -1
-local preview_buf = -1
-
 local capture_stdout = false
 local capture_stderr = false
 
@@ -103,6 +123,8 @@ local selection_path = vim.fn.glob("~/.cache/lf_current_selection")
 
 M.fzf = function(content, on_selection, opts)
   -- TODO: content can be a function that returns a string. Invoked whenever "reload"
+
+  reset_state()
 
   opts = vim.tbl_extend("force", {
     fzf_extra_args = "",
@@ -115,16 +137,11 @@ M.fzf = function(content, on_selection, opts)
     nvim_preview = false,
   }, opts or {})
 
-  if config.debug then vim.notify(vim.inspect(opts)) end
-
-  -- Reset/set state
-  FZF_EVENT_CALLBACK_MAP = {}
-  FZF_PORT = nil
-  FZF_CURRENT_SELECTION = nil
   FZF_INITIAL_POS = opts.fzf_initial_position
   fzf_on_focus = opts.fzf_on_focus
   fzf_on_prompt_change = opts.fzf_on_prompt_change
-  FZF_PREVIEW_BUFFER = nil
+
+  if config.debug then vim.notify(vim.inspect(opts)) end
 
   if M.is_fzf_available() ~= true then
     vim.notify(
@@ -135,27 +152,48 @@ M.fzf = function(content, on_selection, opts)
   end
 
   if opts.nvim_preview then
-    prev_win = vim.api.nvim_get_current_win()
-    win, FZF_BUFFER = window_utils.open_floating_window({
-      buffer = FZF_BUFFER,
-      buffiletype = "fzf",
-      position = "left",
-    })
+    FZF_PREVIEW_WINDOW, FZF_PREVIEW_BUFFER, _, FZF_PREVIEW_BORDER_BUF =
+      window_utils.open_floating_window({
+        buffer = FZF_PREVIEW_BUFFER,
+        buffiletype = "fzf_preview",
+        position = "right",
+        style = "code",
+        main_win_extra_opts = {},
+      })
 
-    preview_win, FZF_PREVIEW_BUFFER = window_utils.open_floating_window({
-      buffer = FZF_PREVIEW_BUFFER,
-      buffiletype = "fzf_preview",
-      position = "right",
-      enter_immediately = false,
-      parent_buffer = FZF_BUFFER,
-      style = "code",
-      main_win_extra_opts = {},
+    FZF_PREV_WINDOW = vim.api.nvim_get_current_win()
+    FZF_WINDOW, FZF_BUFFER, _, FZF_BORDER_BUFFER =
+      window_utils.open_floating_window({
+        buffer = FZF_BUFFER,
+        buffiletype = "fzf",
+        position = "left",
+      })
+
+    window_utils.create_autocmd_close_all_window_when_leave_window_group({
+      {
+        window = FZF_WINDOW,
+        buffer = FZF_BUFFER,
+        border_buffer = FZF_BORDER_BUFFER,
+      },
+      {
+        window = FZF_PREVIEW_WINDOW,
+        buffer = FZF_PREVIEW_BUFFER,
+        border_buffer = FZF_PREVIEW_BORDER_BUF,
+      },
     })
   else
-    prev_win = vim.api.nvim_get_current_win()
-    win, FZF_BUFFER = window_utils.open_floating_window({
-      buffer = FZF_BUFFER,
-      buffiletype = "fzf",
+    FZF_PREV_WINDOW = vim.api.nvim_get_current_win()
+    FZF_WINDOW, FZF_BUFFER, _, FZF_BORDER_BUFFER =
+      window_utils.open_floating_window({
+        buffer = FZF_BUFFER,
+        buffiletype = "fzf",
+      })
+    window_utils.create_autocmd_close_all_window_when_leave_window_group({
+      {
+        window = FZF_WINDOW,
+        buffer = FZF_BUFFER,
+        border_buffer = FZF_BORDER_BUFFER,
+      },
     })
   end
 
@@ -264,11 +302,11 @@ M.fzf = function(content, on_selection, opts)
         vim.cmd("silent! :checktime")
 
         -- Close Fzf window & restore focus to preview window
-        if vim.api.nvim_win_is_valid(prev_win) then
-          vim.api.nvim_win_close(win, true)
-          vim.api.nvim_set_current_win(prev_win)
-          prev_win = -1
-          win = -1
+        if vim.api.nvim_win_is_valid(FZF_PREV_WINDOW) then
+          vim.api.nvim_win_close(FZF_WINDOW, true)
+          vim.api.nvim_set_current_win(FZF_PREV_WINDOW)
+          FZF_PREV_WINDOW = nil
+          FZF_WINDOW = nil
         end
 
         if code == 0 then

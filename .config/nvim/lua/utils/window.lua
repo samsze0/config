@@ -1,6 +1,10 @@
 local api = vim.api
 
-local function open_floating_window(opts)
+local M = {}
+
+local utils = require("utils")
+
+M.open_floating_window = function(opts)
   opts = vim.tbl_extend("force", {
     width = 0.9,
     height = 0.9,
@@ -11,7 +15,6 @@ local function open_floating_window(opts)
     border_win_extra_opts = nil,
     main_win_extra_opts = nil,
     enter_immediately = true,
-    parent_buffer = nil,
     style = nil,
   }, opts or {})
 
@@ -51,7 +54,6 @@ local function open_floating_window(opts)
   local border_buffer = api.nvim_create_buf(false, true)
   api.nvim_buf_set_lines(border_buffer, 0, -1, true, border_lines)
   -- Create border window
-  local border_window
   local border_window = api.nvim_open_win(
     border_buffer,
     opts.enter_immediately,
@@ -63,6 +65,7 @@ local function open_floating_window(opts)
       width = width + 2,
       height = height + 2,
       zindex = 10,
+      focusable = false
     }, opts.border_win_extra_opts or {})
   )
   vim.api.nvim_set_hl(
@@ -94,6 +97,8 @@ local function open_floating_window(opts)
   )
   if opts.style == "code" then
     vim.wo[main_win].number = true
+    -- vim.bo[main_buffer].modifiable = false
+    -- vim.bo[main_buffer].readonly = true
   end
 
   vim.bo[main_buffer].filetype = opts.buffiletype
@@ -104,34 +109,54 @@ local function open_floating_window(opts)
   vim.cmd("setlocal winhl=NormalFloat:FloatingWindow")
   vim.cmd("set winblend=" .. opts.winblend)
 
-  if opts.enter_immediately then
-    -- Close current window when WinLeave event triggers
-    vim.cmd([[autocmd WinLeave <buffer> silent! execute 'hide']])
-    -- Delete border buffer when WinLeave event triggers
-    vim.cmd(
-      string.format(
-        [[autocmd WinLeave <buffer> silent! execute 'silent bdelete! %s']],
-        border_buffer
-      )
-    )
-  else
-    -- Close main window when WinLeave event triggers
-    vim.api.nvim_create_autocmd("WinLeave", {
-      buffer = opts.parent_buffer,
-      callback = function(ctx) vim.api.nvim_win_close(main_win, true) end,
-    })
-    -- Delete border buffer when WinLeave event triggers
-    vim.api.nvim_create_autocmd("WinLeave", {
-      buffer = opts.parent_buffer,
-      callback = function(ctx)
-        vim.api.nvim_buf_delete(border_buffer, { force = true })
-      end,
-    })
-  end
+  -- Delete border buf & close border window when WinLeave event triggers for main buffer
+  vim.api.nvim_create_autocmd("WinClosed", {
+    buffer = main_buffer,
+    callback = function(ctx)
+      vim.api.nvim_buf_delete(border_buffer, { force = true })
+    end,
+  })
 
   return main_win, main_buffer, border_window, border_buffer
 end
 
-return {
-  open_floating_window = open_floating_window,
-}
+-- Create autocmds that close all windows specified in the input list when current window isn't in the list
+M.create_autocmd_close_all_window_when_leave_window_group = function(
+  group,
+  opts
+)
+  opts = vim.tbl_extend("force", {
+    delete_border_buffer = true,
+  }, opts or {})
+  local all_windows = utils.map(group, function(_, g) return g.window end)
+
+  local autocmd_group = vim.api.nvim_create_augroup(
+    "CloseAllWindowWhenLeaveWindowGroup",
+    { clear = true }
+  )
+
+  for _, g in ipairs(group) do
+    vim.api.nvim_create_autocmd("WinClosed", {
+      group = autocmd_group,
+      buffer = g.buffer,
+      callback = function(ctx)
+        if not utils.in_list(vim.api.nvim_get_current_win(), all_windows) then
+          return
+        end
+
+        vim.api.nvim_del_augroup_by_id(autocmd_group)
+
+        for _, gr in ipairs(group) do
+          if g == gr then goto continue end
+          vim.api.nvim_win_close(gr.window, true)
+          if opts.delete_border_buffer then
+            vim.api.nvim_buf_delete(gr.border_buffer, { force = true }) -- Delete manually because autocmd doesn't trigger
+          end
+          ::continue::
+        end
+      end,
+    })
+  end
+end
+
+return M

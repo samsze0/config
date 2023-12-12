@@ -119,6 +119,7 @@ require("lazy").setup({
   {
     -- Indentation markers
     "lukas-reineke/indent-blankline.nvim",
+    enabled = config.indent_guide_plugin,
     config = function()
       require("ibl").setup({
         indent = { char = "▏" },
@@ -140,6 +141,7 @@ require("lazy").setup({
   {
     -- Brackets colorizer
     "HiPhish/rainbow-delimiters.nvim",
+    enabled = config.bracket_colorizer_plugin,
     config = function()
       require("theme").setup({})
       vim.g.rainbow_delimiters =
@@ -153,12 +155,6 @@ require("lazy").setup({
         mappings = false,
       })
     end,
-  },
-  {
-    -- Highlight occurences of word current cursor
-    "RRethy/vim-illuminate",
-    enabled = config.illuminate_plugin,
-    config = function() require("illuminate").configure({}) end,
   },
   {
     -- Formatters interface that calculates minimal diff
@@ -187,25 +183,14 @@ require("lazy").setup({
   {
     -- Scrollbar (+ show signs for git conflicts, diagnostics, search, etc.)
     "dstein64/nvim-scrollview",
-    config = function() require("scrollview").setup({}) end,
+    config = function() require("scrollview").setup({
+      floating_windows = true
+    }) end,
   },
-
   {
     "sindrets/diffview.nvim",
     enabled = config.diffview_plugin,
     config = function() require("config.diffview") end,
-  },
-  {
-    -- Make and resurrect sessions with vim's built-in mksession
-    "folke/persistence.nvim",
-    enabled = config.persist_plugin == "persistence",
-    config = function()
-      require("persistence").setup({
-        options = { "buffers", "curdir", "tabpages", "winsize" },
-        pre_save = function() end,
-        save_empty = false, -- whether to save if there are no open file buffers
-      })
-    end,
   },
   {
     "nvim-treesitter/nvim-treesitter",

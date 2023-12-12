@@ -287,19 +287,46 @@ M.setup = function()
       fzflua = safe_require("fzf-lua").live_grep,
       fzf = nil,
     },
-    [{ mode = "n", lhs = "<f11><f1>" }] = {
+    [{ mode = "n", lhs = "<f11><f5>" }] = {
       fzflua = safe_require("fzf-lua").git_commits,
-      fzf = nil,
+      fzf = safe_require("fzf").git_commits,
     },
-    [{ mode = "n", lhs = "<f11><f2>" }] = {
+    [{ mode = "n", lhs = "<f10><f5>" }] = {
+      fzflua = nil,
+      fzf = function()
+        safe_require("fzf").git_submodules(
+          function(submodule_path)
+            safe_require("fzf").git_commits({
+              git_dir = submodule_path,
+            })
+          end
+        )
+      end,
+    },
+    [{ mode = "n", lhs = "<f11><f4>" }] = {
       fzflua = safe_require("fzf-lua").git_bcommits,
-      fzf = nil,
+      fzf = function()
+        safe_require("fzf").git_commits({ filepaths = vim.fn.expand("%:p") })
+      end,
+    },
+    [{ mode = "n", lhs = "<f10><f4>" }] = {
+      fzflua = nil,
+      fzf = function()
+        safe_require("fzf").git_submodules(
+          function(submodule_path)
+            safe_require("fzf").git_commits({
+              git_dir = submodule_path,
+              filepaths = vim.fn.expand("%:p"),
+            })
+          end
+        )
+      end,
     },
     [{ mode = "n", lhs = "<f11><f3>" }] = {
       fzflua = safe_require("fzf-lua").git_status,
       fzf = safe_require("fzf").git_status,
     },
-    [{ mode = "n", lhs = "<f11><f4>" }] = {
+    [{ mode = "n", lhs = "<f10><f4>" }] = {
       fzflua = nil,
       fzf = function()
         safe_require("fzf").git_submodules(
@@ -526,8 +553,9 @@ M.setup = function()
 
   -- Copilot
   if config.copilot_plugin == "vim" then
-    vim_keymap("n", "<leader>p", "<cmd>Copilot setup<CR>", opts)
+    vim_keymap("n", "<leader>a", "<cmd>Copilot setup<CR>", opts)
   elseif config.copilot_plugin == "lua" then
+    lua_keymap("n", "<leader>a", "<cmd>Copilot enable<CR>", {})
     lua_keymap("i", "<M-a>", safe_require("copilot.suggestion").accept, {})
     lua_keymap("i", "<M-w>", safe_require("copilot.suggestion").accept_line, {})
     lua_keymap("i", "<M-d>", safe_require("copilot.suggestion").next, {})

@@ -204,6 +204,62 @@ EOF]],
   })
 end
 
+M.git_commits = function(opts)
+  opts = vim.tbl_extend("force", {
+    git_dir = fzf_utils.get_git_toplevel(),
+    filepaths = "",
+  }, opts or {})
+
+  local git_format = "%C(blue)%h%Creset" -- Hash. In blue
+    .. utils.nbsp
+    .. "%C(white)%s%Creset" -- Subject
+    -- .. utils.nbsp
+    -- .. "%cr%<|(12)" -- Date. Right-aligned. Truncates-right to 12
+    -- .. utils.nbsp
+    -- .. "%an" -- Author
+    .. utils.nbsp
+    .. "%D" -- Ref names
+
+  local get_entries = function()
+    local commits = vim.fn.systemlist(
+      string.format(
+        "git -C %s log --oneline --color --pretty=format:'%s' %s",
+        opts.git_dir,
+        git_format,
+        opts.filepaths ~= "" and string.format("-- %s", opts.filepaths) or ""
+      )
+    )
+    return commits
+  end
+
+  local entries = get_entries()
+
+  core.fzf(table.concat(entries, "\n"), function(selection)
+    local commit_hash = vim.split(selection[1], utils.nbsp)[1]
+
+    vim.notify(commit_hash)
+  end, {
+    fzf_preview_cmd = string.format(
+      [[git -C %s show --color {1} %s | delta --width=$FZF_PREVIEW_COLUMNS %s]],
+      opts.git_dir,
+      opts.filepaths ~= "" and string.format("-- %s", opts.filepaths) or "",
+      config.delta_default_opts
+    ),
+    fzf_extra_args = "--with-nth=1..",
+    fzf_prompt = "GitCommits",
+    fzf_initial_position = 1,
+    fzf_binds = {
+      ["ctrl-y"] = function()
+        local current_selection = FZF_CURRENT_SELECTION
+        local commit_hash = vim.split(current_selection, utils.nbsp)[1]
+
+        vim.fn.setreg("+", commit_hash)
+        vim.notify(string.format([[Copied to clipboard: %s]], commit_hash))
+      end,
+    },
+  })
+end
+
 M.git_submodules = function(on_submodule)
   local submodules =
     vim.fn.systemlist([[git submodule --quiet foreach 'echo $path']])

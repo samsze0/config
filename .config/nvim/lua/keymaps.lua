@@ -256,7 +256,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f3><f3>" }] = {
       fzflua = safe_require("fzf-lua").git_files,
-      fzf = safe_require("fzf").files,
+      fzf = function() safe_require("fzf").files({ nvim_preview = true }) end,
     },
     [{ mode = "n", lhs = "<f3><f5>" }] = {
       fzflua = safe_require("fzf-lua").files,

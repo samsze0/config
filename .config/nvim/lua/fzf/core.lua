@@ -152,6 +152,8 @@ M.fzf = function(content, on_selection, opts)
   end
 
   if opts.nvim_preview then
+    FZF_PREV_WINDOW = vim.api.nvim_get_current_win()
+
     FZF_PREVIEW_WINDOW, FZF_PREVIEW_BUFFER, _, FZF_PREVIEW_BORDER_BUF =
       window_utils.open_floating_window({
         buffer = FZF_PREVIEW_BUFFER,
@@ -161,7 +163,6 @@ M.fzf = function(content, on_selection, opts)
         main_win_extra_opts = {},
       })
 
-    FZF_PREV_WINDOW = vim.api.nvim_get_current_win()
     FZF_WINDOW, FZF_BUFFER, _, FZF_BORDER_BUFFER =
       window_utils.open_floating_window({
         buffer = FZF_BUFFER,
@@ -169,7 +170,7 @@ M.fzf = function(content, on_selection, opts)
         position = "left",
       })
 
-    window_utils.create_autocmd_close_all_window_when_leave_window_group({
+    window_utils.create_autocmd_close_all_windows_together({
       {
         window = FZF_WINDOW,
         buffer = FZF_BUFFER,
@@ -181,6 +182,16 @@ M.fzf = function(content, on_selection, opts)
         border_buffer = FZF_PREVIEW_BORDER_BUF,
       },
     })
+
+    window_utils.create_float_window_nav_keymaps({
+      is_terminal = true,
+      window = FZF_WINDOW,
+      buffer = FZF_BUFFER,
+    }, {
+      is_terminal = false,
+      window = FZF_PREVIEW_WINDOW,
+      buffer = FZF_PREVIEW_BUFFER,
+    })
   else
     FZF_PREV_WINDOW = vim.api.nvim_get_current_win()
     FZF_WINDOW, FZF_BUFFER, _, FZF_BORDER_BUFFER =
@@ -188,7 +199,7 @@ M.fzf = function(content, on_selection, opts)
         buffer = FZF_BUFFER,
         buffiletype = "fzf",
       })
-    window_utils.create_autocmd_close_all_window_when_leave_window_group({
+    window_utils.create_autocmd_close_all_windows_together({
       {
         window = FZF_WINDOW,
         buffer = FZF_BUFFER,
@@ -197,7 +208,6 @@ M.fzf = function(content, on_selection, opts)
     })
   end
 
-  vim.g.fzf_opened = 1
   if type(content) == "table" then content = table.concat(content, "\n") end
 
   local preview_window_arg = string.format(
@@ -298,15 +308,20 @@ M.fzf = function(content, on_selection, opts)
     {
       on_exit = function(job_id, code, event)
         FZF_BUFFER = nil
-        vim.g.fzf_opened = 0
         vim.cmd("silent! :checktime")
 
-        -- Close Fzf window & restore focus to preview window
+        -- Restore focus to preview window (causes window group to close)
         if vim.api.nvim_win_is_valid(FZF_PREV_WINDOW) then
           vim.api.nvim_win_close(FZF_WINDOW, true)
           vim.api.nvim_set_current_win(FZF_PREV_WINDOW)
-          FZF_PREV_WINDOW = nil
-          FZF_WINDOW = nil
+        else
+          vim.notify(
+            string.format(
+              "Invalid preview window: %s",
+              vim.inspect(FZF_PREV_WINDOW)
+            ),
+            vim.log.levels.ERROR
+          )
         end
 
         if code == 0 then
@@ -329,6 +344,15 @@ M.fzf = function(content, on_selection, opts)
           on_selection(selection)
         elseif code == 130 then
           -- 130 means no selections
+          if config.debug then
+            vim.notify(
+              string.format(
+                "Fzf\nExit code: %s\nEvent: %s",
+                code,
+                vim.inspect(event)
+              )
+            )
+          end
         else
           vim.notify(
             string.format(

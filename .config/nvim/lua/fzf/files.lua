@@ -98,6 +98,7 @@ M.files = function(opts)
               fzf_utils.convert_git_root_filepath_to_fullpath(current_selection)
             )
           )
+          vim.api.nvim_win_close(FZF_WINDOW, true)
         end,
         ["ctrl-t"] = function()
           local current_selection = FZF_CURRENT_SELECTION
@@ -107,6 +108,7 @@ M.files = function(opts)
               fzf_utils.convert_git_root_filepath_to_fullpath(current_selection)
             )
           )
+          vim.api.nvim_win_close(FZF_WINDOW, true)
         end,
       },
       nvim_preview = opts.nvim_preview,

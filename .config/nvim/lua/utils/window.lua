@@ -65,7 +65,7 @@ M.open_floating_window = function(opts)
       width = width + 2,
       height = height + 2,
       zindex = 10,
-      focusable = false
+      focusable = false,
     }, opts.border_win_extra_opts or {})
   )
   vim.api.nvim_set_hl(
@@ -121,33 +121,40 @@ M.open_floating_window = function(opts)
 end
 
 -- Create autocmds that close all windows specified in the input list when current window isn't in the list
-M.create_autocmd_close_all_window_when_leave_window_group = function(
-  group,
-  opts
-)
+M.create_autocmd_close_all_windows_together = function(group, opts)
   opts = vim.tbl_extend("force", {
     delete_border_buffer = true,
+    delete_on_leave = false,
   }, opts or {})
-  local all_windows = utils.map(group, function(_, g) return g.window end)
+  local windows = utils.map(group, function(_, g) return g.window end)
 
   local autocmd_group = vim.api.nvim_create_augroup(
     "CloseAllWindowWhenLeaveWindowGroup",
     { clear = true }
   )
 
+  if opts.delete_on_leave then
+    vim.api.nvim_create_autocmd("WinEnter", {
+      group = autocmd_group,
+      nested = true,
+      callback = function(ctx)
+        local current_win = vim.api.nvim_get_current_win()
+        if utils.in_list(current_win, windows) then return end
+
+        vim.api.nvim_win_close(windows[1], true) -- Close a random window which causes all others to close
+      end,
+    })
+  end
+
   for _, g in ipairs(group) do
     vim.api.nvim_create_autocmd("WinClosed", {
       group = autocmd_group,
       buffer = g.buffer,
       callback = function(ctx)
-        if not utils.in_list(vim.api.nvim_get_current_win(), all_windows) then
-          return
-        end
-
         vim.api.nvim_del_augroup_by_id(autocmd_group)
 
         for _, gr in ipairs(group) do
-          if g == gr then goto continue end
+          if g == gr then goto continue end -- Don't close the closed window again
           vim.api.nvim_win_close(gr.window, true)
           if opts.delete_border_buffer then
             vim.api.nvim_buf_delete(gr.border_buffer, { force = true }) -- Delete manually because autocmd doesn't trigger
@@ -156,6 +163,87 @@ M.create_autocmd_close_all_window_when_leave_window_group = function(
         end
       end,
     })
+  end
+end
+
+M.create_float_window_nav_keymaps = function(left, right, opts)
+  opts = vim.tbl_extend("force", {
+    goto_right_win = "<C-f>",
+    goto_left_win = "<C-s>",
+    scrollup_right_win_from_left_win = "<S-Up>",
+    scrolldown_right_win_from_left_win = "<S-Down>",
+  }, opts or {})
+
+  -- Window navigation
+  vim.keymap.set(
+    left.is_terminal and "t" or "n",
+    opts.goto_right_win,
+    function()
+      vim.api.nvim_set_current_win(right.window)
+      if right.is_terminal then vim.cmd("startinsert") end
+    end,
+    {
+      buffer = left.buffer,
+    }
+  )
+  vim.keymap.set(
+    right.is_terminal and "t" or "n",
+    opts.goto_left_win,
+    function()
+      vim.api.nvim_set_current_win(left.window)
+      if left.is_terminal then vim.cmd("startinsert") end
+    end,
+    {
+      buffer = right.buffer,
+    }
+  )
+
+  -- Scroll up/down right window from left window
+  if not right.is_terminal then
+    vim.keymap.set(
+      left.is_terminal and "t" or "n",
+      opts.scrollup_right_win_from_left_win,
+      function()
+        -- Setting current window to right window will cause scrollbar to refresh as well
+        -- TODO: make mapping generic and support any custom mapping in options
+        vim.api.nvim_set_current_win(right.window)
+        if false then
+          vim.cmd("normal! <S-Up>")
+        else
+          vim.api.nvim_input("<S-Up>")
+        end
+        vim.schedule(function()
+          vim.api.nvim_set_current_win(left.window)
+          if left.is_terminal then vim.cmd("startinsert") end
+        end)
+      end,
+      {
+        buffer = left.buffer,
+      }
+    )
+    vim.keymap.set(
+      left.is_terminal and "t" or "n",
+      opts.scrolldown_right_win_from_left_win,
+      function()
+        -- vim.fn.win_execute(right.window, "normal \\<S-down>")
+
+        vim.api.nvim_set_current_win(right.window)
+        if false then
+          vim.cmd("normal! <S-Down>")
+        else
+          vim.api.nvim_input("<S-Down>")
+          -- vim.api.nvim_feedkeys("<S-Down>", "m", true)
+        end
+        -- Because nvim_input is non-blocking, we need to queue the nvim_set_current_win so that it executes after nvim_input
+        vim.schedule(function()
+          vim.api.nvim_set_current_win(left.window)
+          if left.is_terminal then vim.cmd("startinsert") end
+        end)
+      end,
+      {
+        buffer = left.buffer,
+      }
+    )
   end
 end
 

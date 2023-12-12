@@ -10,16 +10,20 @@ local filetype = require("plenary").filetype
 M.files = function(opts)
   opts = vim.tbl_extend("force", {
     nvim_preview = false,
+    git_dir = fzf_utils.get_git_toplevel(),
   }, opts or {})
 
-  local entries = vim.fn.systemlist(fzf_utils.git_files, nil, false)
+  local git = string.format([[git -C %s]], opts.git_dir)
+
+  local entries = vim.fn.systemlist(fzf_utils.git_files(opts.git_dir), nil, false)
+  entries = utils.filter(entries, function(e) return e ~= "" end)
 
   utils.sort_filepaths(entries, function(e) return e end)
 
   local fzf_preview_cmd = string.format(
     "bat %s %s/{}",
     config.bat_default_opts,
-    fzf_utils.get_git_toplevel()
+    opts.git_dir
   )
   local fallback_to_bat = false
 
@@ -29,7 +33,7 @@ M.files = function(opts)
       vim.cmd(
         string.format(
           [[e %s]],
-          fzf_utils.convert_git_root_filepath_to_fullpath(selection[1])
+          fzf_utils.convert_git_filepath_to_fullpath(selection[1], opts.git_dir)
         )
       )
     end,
@@ -39,7 +43,7 @@ M.files = function(opts)
       fzf_on_focus = opts.nvim_preview
           and function(selection)
             local filepath =
-              fzf_utils.convert_git_root_filepath_to_fullpath(selection)
+              fzf_utils.convert_git_filepath_to_fullpath(selection, opts.git_dir)
 
             local ft = filetype.detect(filepath)
             local is_binary =
@@ -81,12 +85,12 @@ M.files = function(opts)
           local current_selection = FZF_CURRENT_SELECTION
           vim.fn.setreg(
             "+",
-            fzf_utils.convert_git_root_filepath_to_fullpath(current_selection)
+            fzf_utils.convert_git_filepath_to_fullpath(current_selection, opts.git_dir)
           )
           vim.notify(
             string.format(
               [[Copied %s to clipboard]],
-              fzf_utils.convert_git_root_filepath_to_fullpath(current_selection)
+              fzf_utils.convert_git_filepath_to_fullpath(current_selection, opts.git_dir)
             )
           )
         end,
@@ -95,7 +99,7 @@ M.files = function(opts)
           vim.cmd(
             string.format(
               [[vsplit %s]],
-              fzf_utils.convert_git_root_filepath_to_fullpath(current_selection)
+              fzf_utils.convert_git_filepath_to_fullpath(current_selection, opts.git_dir)
             )
           )
           vim.api.nvim_win_close(FZF_WINDOW, true)
@@ -105,7 +109,7 @@ M.files = function(opts)
           vim.cmd(
             string.format(
               [[tabnew %s]],
-              fzf_utils.convert_git_root_filepath_to_fullpath(current_selection)
+              fzf_utils.convert_git_filepath_to_fullpath(current_selection, opts.git_dir)
             )
           )
           vim.api.nvim_win_close(FZF_WINDOW, true)

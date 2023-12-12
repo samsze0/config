@@ -258,6 +258,19 @@ M.setup = function()
       fzflua = safe_require("fzf-lua").git_files,
       fzf = function() safe_require("fzf").files({ nvim_preview = true }) end,
     },
+    [{ mode = "n", lhs = "<f3><f4>" }] = {
+      fzflua = nil,
+      fzf = function()
+        safe_require("fzf").git_submodules(
+          function(submodule_path)
+            safe_require("fzf").files({
+              nvim_preview = true,
+              git_dir = submodule_path,
+            })
+          end
+        )
+      end,
+    },
     [{ mode = "n", lhs = "<f3><f5>" }] = {
       fzflua = safe_require("fzf-lua").files,
       fzf = nil,
@@ -274,17 +287,29 @@ M.setup = function()
       fzflua = safe_require("fzf-lua").live_grep,
       fzf = nil,
     },
-    [{ mode = "n", lhs = "<f11><f5>" }] = {
+    [{ mode = "n", lhs = "<f11><f1>" }] = {
       fzflua = safe_require("fzf-lua").git_commits,
       fzf = nil,
     },
-    [{ mode = "n", lhs = "<f11><f4>" }] = {
+    [{ mode = "n", lhs = "<f11><f2>" }] = {
       fzflua = safe_require("fzf-lua").git_bcommits,
       fzf = nil,
     },
     [{ mode = "n", lhs = "<f11><f3>" }] = {
       fzflua = safe_require("fzf-lua").git_status,
       fzf = safe_require("fzf").git_status,
+    },
+    [{ mode = "n", lhs = "<f11><f4>" }] = {
+      fzflua = nil,
+      fzf = function()
+        safe_require("fzf").git_submodules(
+          function(submodule_path)
+            safe_require("fzf").git_status({
+              git_dir = submodule_path,
+            })
+          end
+        )
+      end,
     },
     [{ mode = "n", lhs = "li" }] = {
       fzflua = safe_require("fzf-lua").lsp_definitions,

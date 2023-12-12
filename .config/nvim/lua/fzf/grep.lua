@@ -24,7 +24,7 @@ M.grep = function()
                 [[rg %s "%s" %s]],
                 config.rg_default_opts,
                 query,
-                fzf_utils.convert_git_root_filepath_to_fullpath(f)
+                fzf_utils.convert_git_filepath_to_fullpath(f)
               )
             ),
             function(e) return string.format("%s%s%s", f, utils.nbsp, e) end
@@ -53,7 +53,7 @@ M.grep = function()
     vim.cmd(
       string.format(
         [[e %s]],
-        fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+        fzf_utils.convert_git_filepath_to_fullpath(filepath)
       )
     )
   end, {
@@ -81,7 +81,7 @@ EOF]],
         local filepath = vim.split(current_selection, utils.nbsp)[1]
         vim.fn.setreg(
           "+",
-          fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+          fzf_utils.convert_git_filepath_to_fullpath(filepath)
         )
       end,
       ["ctrl-w"] = function()
@@ -90,7 +90,7 @@ EOF]],
         vim.cmd(
           string.format(
             [[vsplit %s]],
-            fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+            fzf_utils.convert_git_filepath_to_fullpath(filepath)
           )
         )
       end,
@@ -100,7 +100,7 @@ EOF]],
         vim.cmd(
           string.format(
             [[tabnew %s]],
-            fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+            fzf_utils.convert_git_filepath_to_fullpath(filepath)
           )
         )
       end,

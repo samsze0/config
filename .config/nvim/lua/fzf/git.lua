@@ -5,12 +5,18 @@ local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
 
-M.git_status = function()
+M.git_status = function(opts)
+  opts = vim.tbl_extend("force", {
+    git_dir = fzf_utils.get_git_toplevel(),
+  }, opts or {})
+
+  local git = string.format([[git -C %s]], opts.git_dir)
+
   local function get_entries()
     local entries = vim.fn.systemlist(
       string.format(
         [[%s -c color.status=false status -su]], -- Show in short format and show all untracked files
-        fzf_utils.git_toplevel
+        git
       ),
       nil,
       false
@@ -64,7 +70,7 @@ M.git_status = function()
     vim.cmd(
       string.format(
         [[e %s]],
-        fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+        fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
       )
     )
   end, {
@@ -82,7 +88,7 @@ M.git_status = function()
 
         local cmd = string.format(
           [[git add %s]],
-          fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+          fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
         )
         if config.debug then vim.notify(string.format([[Running: %s]], cmd)) end
         vim.fn.system(cmd)
@@ -107,7 +113,7 @@ EOF]],
 
         local cmd = string.format(
           [[git restore --staged %s]],
-          fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+          fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
         )
         if config.debug then vim.notify(string.format([[Running: %s]], cmd)) end
         vim.fn.system(cmd)
@@ -130,7 +136,8 @@ EOF]],
         local parts = vim.split(filepath, " -> ") -- In case if file is renamed
         if #parts > 1 then filepath = parts[2] end
 
-        filepath = fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+        filepath =
+          fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
 
         vim.fn.setreg("+", filepath)
         vim.notify(string.format([[Copied to clipboard: %s]], filepath))
@@ -167,30 +174,57 @@ EOF]],
           true
               and (not renamed and string.format(
                 "%s diff --color %s %s/%s | delta --width=$FZF_PREVIEW_COLUMNS %s",
-                fzf_utils.git_toplevel,
+                git,
                 is_fully_staged and "--staged"
                   or (
                     (added or is_untracked) and "--no-index /dev/null"
                     or (deleted and "--cached -- " or "")
                   ),
-                fzf_utils.get_git_toplevel(),
+                opts.git_dir,
                 filepath,
                 config.delta_default_opts
               ) or string.format(
                 [[bat %s %s]],
                 config.bat_default_opts,
-                fzf_utils.convert_git_root_filepath_to_fullpath(filepath)
+                fzf_utils.convert_git_filepath_to_fullpath(
+                  filepath,
+                  opts.git_dir
+                )
               ))
             or string.format( -- Much slower due to `script`?
               "%s %s -c core.pager='delta' diff --staged %s/[2]",
               fzf_utils.like_tty,
-              fzf_utils.git_toplevel,
-              fzf_utils.get_git_toplevel(),
+              git,
+              opts.git_dir,
               filepath
             )
         )
       )
     end,
+  })
+end
+
+M.git_submodules = function(on_submodule)
+  local submodules =
+    vim.fn.systemlist([[git submodule --quiet foreach 'echo $path']])
+  submodules = utils.map(submodules, function(_, e) return vim.trim(e) end)
+
+  core.fzf(table.concat(submodules, "\n"), function(selection)
+    local submodule_path = selection[1]
+    on_submodule(fzf_utils.get_git_toplevel() .. "/" .. submodule_path)
+  end, {
+    fzf_preview_cmd = nil,
+    fzf_extra_args = "--with-nth=1..",
+    fzf_prompt = "GitSubmodules",
+    fzf_binds = {
+      ["ctrl-y"] = function()
+        local current_selection = FZF_CURRENT_SELECTION
+        local submodule_path = current_selection
+
+        vim.fn.setreg("+", submodule_path)
+        vim.notify(string.format([[Copied to clipboard: %s]], submodule_path))
+      end,
+    },
   })
 end
 

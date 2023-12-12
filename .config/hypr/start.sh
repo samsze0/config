@@ -26,3 +26,6 @@ fcitx5 &
 
 # XRemap (for some reason needs to be restarted)
 systemctl --user restart xremap
+
+# OpenRGB (require first create a profile named "purple" with GUI)
+openrgb -p purple

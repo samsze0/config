@@ -49,6 +49,7 @@ M.git_status = function()
         == fzf_utils.get_filepath_from_git_root(vim.fn.expand("%"))
     end
   )
+  if fzf_initial_pos == nil then fzf_initial_pos = 0 end
 
   if config.debug then
     vim.notify(string.format([[Fzf initial pos: %d]], fzf_initial_pos))

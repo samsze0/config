@@ -53,7 +53,6 @@ end
 
 local function exec_lf_command(cmd, edit_cmd)
   local function on_exit(job_id, code, event)
-    LF_BUFFER = nil
     vim.cmd("silent! :checktime")
 
     local selection = vim.fn.readfile(selection_path)
@@ -73,8 +72,6 @@ local function exec_lf_command(cmd, edit_cmd)
     if vim.api.nvim_win_is_valid(LF_PREV_WINDOW) then
       vim.api.nvim_win_close(LF_WINDOW, true)
       vim.api.nvim_set_current_win(LF_PREV_WINDOW)
-      LF_PREV_WINDOW = -1
-      LF_WINDOW = -1
     end
 
     edit_selected_files(edit_cmd, selection)

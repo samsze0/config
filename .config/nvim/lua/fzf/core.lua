@@ -307,7 +307,6 @@ M.fzf = function(content, on_selection, opts)
     ),
     {
       on_exit = function(job_id, code, event)
-        FZF_BUFFER = nil
         vim.cmd("silent! :checktime")
 
         -- Restore focus to preview window (causes window group to close)

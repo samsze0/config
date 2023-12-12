@@ -11,7 +11,7 @@ fzf_init() {
 		cat <<EOT | tr -d "\n "
     --color=
       bg+:#2c313c,
-      preview-bg:#101213,
+      preview-bg:#000000,
       bg:#000000,
       border:#535d6c,
       spinner:#549eff,

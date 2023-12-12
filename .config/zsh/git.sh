@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+git_stash_show() {
+  git stash show -u --full-index "$@"
+}
+
 # Git diff helper
 # man git diff
 git_diff() (

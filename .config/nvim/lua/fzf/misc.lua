@@ -4,6 +4,9 @@ local core = require("fzf.core")
 local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local fzf_git = require("fzf.git")
+local fzf_files = require("fzf.files")
+local fzf_jump = require("fzf.jump")
 
 local fn = vim.fn
 
@@ -115,6 +118,48 @@ EOF]],
         )
       end,
     },
+    fzf_on_focus = function(selection) end,
+  })
+end
+
+M.all = function()
+  local config = {
+    ["Tabs"] = M.tabs,
+    ["Buffers"] = M.buffers,
+    ["Files"] = fzf_files.files,
+    ["Git submodule files"] = false,
+    ["Git stash"] = fzf_git.git_stash,
+    ["Git submodule stash"] = false,
+    ["Git status"] = fzf_git.git_status,
+    ["Git submodule status"] = false,
+    ["Git commits"] = fzf_git.git_commits,
+    ["Git submodule commits"] = false,
+    ["Git submodules"] = fzf_git.git_submodules,
+    ["Jumps"] = fzf_jump.jumps,
+    ["Notifications"] = false,
+    ["Undo"] = false,
+    ["Grep"] = false,
+    ["Backups"] = false,
+    ["LSP symbols"] = false,
+    ["LSP references"] = false,
+    ["LSP definitions"] = false,
+    ["LSP implementations"] = false,
+  }
+
+  local entries = utils.keys(config)
+  -- Sort in alphabetical order, in-place
+  table.sort(entries, function(a, b) return a:lower() < b:lower() end)
+
+  core.fzf(table.concat(entries, "\n"), function(selection)
+    local entry = selection[1]
+    local action = config[entry]
+    if action then action() end
+  end, {
+    fzf_preview_cmd = nil,
+    fzf_extra_args = "--with-nth=1..",
+    fzf_prompt = "All",
+    fzf_initial_position = 1,
+    fzf_binds = {},
     fzf_on_focus = function(selection) end,
   })
 end

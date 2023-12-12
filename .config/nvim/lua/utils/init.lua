@@ -332,25 +332,36 @@ M.list_join = function(l1, l2)
   end
 end
 
-M.split_string_n = function(str, count, opts)
-  opts = vim.tbl_extend("force", { include_remaining = true }, opts or {})
+M.split_string_n = function(str, count, sep, opts)
+  sep = sep or " "
+  opts = vim.tbl_extend(
+    "force",
+    { include_remaining = true, trim_parts = true },
+    opts or {}
+  )
   local result = {}
   local remaining = str
-  count = count == nil and 1 or count
 
-  while count > 0 do
-    -- .- means match as short as possible
-    -- + is not greedy in lua. * is
-    -- local match = string.match(remaining, "^(.-[(%s%s*)\n])")
-    local match, whitespace = string.match(remaining, "(%w+)(%s*)")
-    if not match then return nil end
-    remaining = remaining:sub(#match + #whitespace + 1)
-    table.insert(result, match)
-    count = count - 1
+  if false then
+    -- Lua doesn't support multi-char-negative-lookahead
+    while count > 0 do
+      -- .- means match as short as possible
+      -- local match = string.match(remaining, "^(.-[(%s%s*)\n])")
+      local match, whitespace =
+        string.match(remaining, "([^" .. sep .. "]+)(" .. sep .. ")")
+      if not match then return nil end
+      remaining = remaining:sub(#match + #whitespace + 1)
+      table.insert(result, match)
+      count = count - 1
+    end
+
+    if opts.include_remaining then table.insert(result, remaining) end
   end
 
-  if opts.include_remaining then table.insert(result, remaining) end
-
+  str = string.gsub(str, sep, M.nbsp, count)
+  result = vim.split(str, M.nbsp, { trimempty = opts.trim_parts })
+  if not #result == count + 1 then return nil end
+  if not opts.include_remaining then table.remove(result, #result) end
   return result
 end
 
@@ -359,6 +370,14 @@ M.in_list = function(value, list)
     if v == value then return true end
   end
   return false
+end
+
+M.keys = function(tbl)
+  local keys = {}
+  for k, _ in pairs(tbl) do
+    table.insert(keys, k)
+  end
+  return keys
 end
 
 return M

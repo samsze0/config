@@ -260,6 +260,59 @@ M.git_commits = function(opts)
   })
 end
 
+M.git_stash = function(opts)
+  opts = vim.tbl_extend("force", {
+    git_dir = fzf_utils.get_git_toplevel(),
+  }, opts or {})
+
+  local get_entries = function()
+    local stash =
+      vim.fn.systemlist(string.format([[git -C %s stash list]], opts.git_dir))
+    stash = utils.map(stash, function(_, e)
+      local parts = utils.split_string_n(e, 1, ":")
+      if not parts then
+        vim.notify(string.format([[Invalid stash entry: %s]], e))
+        return nil
+      end
+
+      return string.format(
+        "%s%s%s",
+        utils.ansi_codes.blue(parts[1]),
+        utils.nbsp,
+        utils.ansi_codes.white(parts[2])
+      )
+    end)
+    return stash
+  end
+
+  local entries = get_entries()
+  vim.notify(table.concat(entries, "\n"))
+
+  core.fzf(table.concat(entries, "\n"), function(selection)
+    local stash_ref = vim.split(selection[1], utils.nbsp)[1]
+
+    vim.notify(stash_ref)
+  end, {
+    fzf_preview_cmd = string.format(
+      [[git -C %s stash show --full-index --color {1} | delta --width=$FZF_PREVIEW_COLUMNS %s]],
+      opts.git_dir,
+      config.delta_default_opts
+    ),
+    fzf_extra_args = "--with-nth=1..",
+    fzf_prompt = "GitStash",
+    fzf_initial_position = 1,
+    fzf_binds = {
+      ["ctrl-y"] = function()
+        local current_selection = FZF_CURRENT_SELECTION
+        local stash_ref = vim.split(current_selection, utils.nbsp)[1]
+
+        vim.fn.setreg("+", stash_ref)
+        vim.notify(string.format([[Copied to clipboard: %s]], stash_ref))
+      end,
+    },
+  })
+end
+
 M.git_submodules = function(on_submodule)
   local submodules =
     vim.fn.systemlist([[git submodule --quiet foreach 'echo $path']])

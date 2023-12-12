@@ -1,3 +1,5 @@
+-- System dependencies: netcat-openbsd on osx and socat on linux
+
 local M = {}
 
 local config = require("fzf.config")
@@ -5,6 +7,7 @@ local utils = require("utils")
 local window_utils = require("utils.window")
 local fzf_utils = require("fzf.utils")
 local uv_utils = require("utils.uv")
+local os_utils = require("utils.os")
 
 local fzf_on_focus
 local fzf_on_prompt_change
@@ -221,9 +224,9 @@ M.fzf = function(content, on_selection, opts)
     if type(v) == "function" then
       FZF_EVENT_CALLBACK_MAP[k] = v
       opts.fzf_binds[k] = string.format(
-        [[execute-silent(echo "event %s" | nc -U %s)]],
+        [[execute-silent(echo "event %s" | %s)]],
         k,
-        server_socket_path
+        os_utils.get_unix_sock_cmd(server_socket_path)
       )
     elseif type(v) == "string" then
     elseif type(v) == "table" then
@@ -247,8 +250,8 @@ M.fzf = function(content, on_selection, opts)
   end
   opts.fzf_binds.focus = opts.fzf_binds.focus
     .. string.format(
-      [[execute-silent(echo "focus {}" | nc -U %s)]],
-      server_socket_path
+      [[execute-silent(echo "focus {}" | %s)]],
+      os_utils.get_unix_sock_cmd(server_socket_path)
     )
 
   if opts.fzf_binds.start then
@@ -258,8 +261,8 @@ M.fzf = function(content, on_selection, opts)
   end
   opts.fzf_binds.start = opts.fzf_binds.start
     .. string.format(
-      [[execute-silent(echo "port $FZF_PORT" | nc -U %s)]],
-      server_socket_path
+      [[execute-silent(echo "port $FZF_PORT" | %s)]],
+      os_utils.get_unix_sock_cmd(server_socket_path)
     )
 
   if opts.fzf_binds.change then
@@ -269,8 +272,8 @@ M.fzf = function(content, on_selection, opts)
   end
   opts.fzf_binds.change = opts.fzf_binds.change
     .. string.format(
-      [[execute-silent(echo "change {q}" | nc -U %s)]],
-      server_socket_path
+      [[execute-silent(echo "change {q}" | %s)]],
+      os_utils.get_unix_sock_cmd(server_socket_path)
     )
 
   -- Default keybinds

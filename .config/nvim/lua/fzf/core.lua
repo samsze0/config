@@ -17,6 +17,7 @@ FZF_EVENT_CALLBACK_MAP = {}
 
 FZF_INITIAL_POS = nil
 FZF_CURRENT_SELECTION = nil
+FZF_CURRENT_SELECTION_INDEX = nil
 
 FZF_PREV_WINDOW = nil
 FZF_WINDOW = nil
@@ -35,6 +36,7 @@ local reset_state = function()
 
   FZF_INITIAL_POS = nil
   FZF_CURRENT_SELECTION = nil
+  FZF_CURRENT_SELECTION_INDEX = nil
 
   FZF_PREV_WINDOW = -1
   FZF_WINDOW = -1
@@ -61,7 +63,16 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         function() M.send_to_fzf(string.format([[pos(%d)]], FZF_INITIAL_POS)) end
       )
     elseif string.match(message, "^focus") then
-      local selection = string.match(message, "^focus '(.+)'")
+      local index, selection = string.match(message, "^focus (%d+) '(.*)'")
+      if not index or not selection then
+        vim.notify(
+          string.format("Invalid fzf focus message: %s", vim.inspect(message)),
+          vim.log.levels.ERROR
+        )
+        return
+      end
+      FZF_CURRENT_SELECTION_INDEX = selection ~= "" and tonumber(index) + 1
+        or -1
       FZF_CURRENT_SELECTION = selection
       if selection and fzf_on_focus and type(fzf_on_focus) == "function" then
         vim.schedule(function() fzf_on_focus(selection) end)
@@ -250,7 +261,7 @@ M.fzf = function(content, on_selection, opts)
   end
   opts.fzf_binds.focus = opts.fzf_binds.focus
     .. string.format(
-      [[execute-silent(echo "focus {}" | %s)]],
+      [[execute-silent(echo "focus {n} {}" | %s)]],
       os_utils.get_unix_sock_cmd(server_socket_path)
     )
 

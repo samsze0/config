@@ -173,7 +173,7 @@ EOF]],
           [[change-preview:%s]],
           true
               and (not renamed and string.format(
-                "%s diff --color %s %s/%s | delta --width=$FZF_PREVIEW_COLUMNS %s",
+                "%s diff --color %s %s/%s | delta %s",
                 git,
                 is_fully_staged and "--staged"
                   or (
@@ -240,7 +240,7 @@ M.git_commits = function(opts)
     vim.notify(commit_hash)
   end, {
     fzf_preview_cmd = string.format(
-      [[git -C %s show --color {1} %s | delta --width=$FZF_PREVIEW_COLUMNS %s]],
+      [[git -C %s show --color {1} %s | delta %s]],
       opts.git_dir,
       opts.filepaths ~= "" and string.format("-- %s", opts.filepaths) or "",
       config.delta_default_opts
@@ -275,6 +275,8 @@ M.git_stash = function(opts)
         return nil
       end
 
+      parts = utils.map(parts, function(_, p) return vim.trim(p) end)
+
       return string.format(
         "%s%s%s",
         utils.ansi_codes.blue(parts[1]),
@@ -294,7 +296,7 @@ M.git_stash = function(opts)
     vim.notify(stash_ref)
   end, {
     fzf_preview_cmd = string.format(
-      [[git -C %s stash show --full-index --color {1} | delta --width=$FZF_PREVIEW_COLUMNS %s]],
+      [[git -C %s stash show --full-index --color {1} | delta %s]],
       opts.git_dir,
       config.delta_default_opts
     ),

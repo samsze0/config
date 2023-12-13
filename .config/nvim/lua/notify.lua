@@ -7,7 +7,9 @@ _G.notification_meta = {
 vim.notify = function(msg, level)
   level = level or vim.log.levels.OFF
 
-  msg = vim.inspect(msg)
+  if type(msg) ~= "string" then
+    msg = vim.inspect(msg)
+  end
   print(msg)
 
   local t = os.time()

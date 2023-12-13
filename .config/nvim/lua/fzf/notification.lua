@@ -28,7 +28,16 @@ M.notifications = function(opts)
       else
         level = utils.ansi_codes.grey(" ")
       end
-      local brief = vim.split(noti.message, "\n")[1]
+      local brief = vim.fn.systemlist(string.format(
+        [[cat <<EOF
+%s
+EOF
+          ]],
+        noti.message
+      ))[1]
+      if not brief or brief == "" then
+        brief = "<empty>"
+      end
       local brief_max_length = 50
       brief = #brief > brief_max_length
           and brief:sub(1, brief_max_length - 3) .. "..."

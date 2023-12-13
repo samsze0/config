@@ -133,7 +133,9 @@ M.notifications = function()
   _G.notification_meta.unread = {}
 
   require("fzf-lua").fzf_exec(function(fzf_cb)
+    local count = 0
     for i = #notifications, 1, -1 do
+      count = count + 1
       local noti = notifications[i]
       local level = noti.level
       if level == vim.log.levels.INFO then
@@ -154,13 +156,12 @@ M.notifications = function()
         or utils.pad(brief, brief_max_length)
       fzf_cb(
         string.format(
-          "%d %s %s %s %s %s",
+          "%d %s %s %s %s",
           i,
           utils.nbsp,
           level,
-          ansi_codes.blue(timeago(noti.time)),
-          ansi_codes.white(brief),
-          i <= num_unread and "new" or ""
+          count <= num_unread and ansi_codes.blue(timeago(noti.time)) or timeago(noti.time),
+          ansi_codes.white(brief)
         )
       )
     end
@@ -188,7 +189,6 @@ FZFLUAEOM]],
     fzf_opts = {
       ["--delimiter"] = string.format("'%s'", utils.nbsp),
       ["--with-nth"] = "2..", -- from field 2 onwards
-      ["--header"] = "'Level Time Brief New?'",
       ["--no-multi"] = "",
     },
   })

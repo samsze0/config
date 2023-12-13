@@ -12,6 +12,7 @@ M.notifications = function(opts)
   local get_entries = function()
     local notifications = _G.notifications
     local num_unread = utils.sum(_G.notification_meta.unread)
+    _G.notification_meta.unread = {} -- Clear unread
 
     local entries = {}
     for i = #notifications, 1, -1 do
@@ -50,7 +51,7 @@ EOF
           utils.nbsp,
           timeago(noti.time),
           utils.nbsp,
-          i <= num_unread and utils.ansi_codes.white(brief) or brief
+          #entries < num_unread and utils.ansi_codes.white(brief) or brief
           -- utils.nbsp,
           -- noti.message -- Doesn't work if message contains newlines
         )
@@ -78,7 +79,7 @@ EOF
         return
       end
 
-      vim.fn.writefile(
+      vim.fn.writefile( -- TODO
         vim.split(
           notifications[#notifications - selection_index + 1].message,
           "\n"

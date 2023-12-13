@@ -142,6 +142,31 @@ EOF]],
         vim.fn.setreg("+", filepath)
         vim.notify(string.format([[Copied to clipboard: %s]], filepath))
       end,
+      ["ctrl-x"] = function()
+        local current_selection = FZF_CURRENT_SELECTION
+        local filepath = vim.split(current_selection, utils.nbsp)[2]
+
+        local parts = vim.split(filepath, " -> ") -- In case if file is renamed
+        if #parts > 1 then filepath = parts[2] end
+
+        local cmd = string.format(
+          [[git restore %s]],
+          fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
+        )
+        if config.debug then vim.notify(string.format([[Running: %s]], cmd)) end
+        vim.fn.system(cmd)
+        core.send_to_fzf(
+          string.format(
+            "track+reload(%s)",
+            string.format(
+              [[cat <<EOF
+%s
+EOF]],
+              table.concat(get_entries(), "\n")
+            )
+          )
+        )
+      end,
     },
     fzf_on_focus = function(selection)
       local args = vim.split(selection, utils.nbsp, { trimpempty = false })

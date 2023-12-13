@@ -376,7 +376,8 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<space>m" }] = {
       fzflua = safe_require("config.fzflua-custom").notifications,
-      fzf = safe_require("fzf").notifications,
+      -- fzf = safe_require("fzf").notifications,
+      fzf = nil,
     },
     [{ mode = "n", lhs = "<f11><f11>" }] = {
       fzflua = safe_require("config.fzflua-custom").git_reflog,

@@ -36,13 +36,12 @@ EOF
           ]],
         noti.message
       ))[1]
-      if not brief or brief == "" then
-        brief = "<empty>"
-      end
+      if not brief or brief == "" then brief = "<empty>" end
       local brief_max_length = 50
       brief = #brief > brief_max_length
           and brief:sub(1, brief_max_length - 3) .. "..."
         or utils.pad(brief, brief_max_length)
+      brief = "" -- TODO: proper shellescape (for other fzf uses too)
       table.insert(
         entries,
         string.format(
@@ -80,9 +79,14 @@ EOF
       end
 
       vim.fn.writefile( -- TODO
-        vim.split(
-          notifications[#notifications - selection_index + 1].message,
-          "\n"
+        vim.fn.systemlist(
+          string.format(
+            [[cat <<EOF
+%s
+EOF
+          ]],
+            notifications[#notifications - selection_index + 1].message
+          )
         ),
         tmpfile
       )

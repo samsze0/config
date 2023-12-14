@@ -24,10 +24,9 @@ M.grep = function(opts)
   core.fzf({}, {
     fzf_on_select = function()
       local filepath, line = get_info_from_selection()
-      vim.cmd(
-        string.format([[e %s]], fzf_utils.convert_gitpath_to_relpath(filepath))
-      )
+      vim.cmd(string.format([[e %s]], filepath))
       vim.cmd(string.format([[normal! %sG]], line))
+      vim.cmd([[normal! zz]])
     end,
     -- fzf_async = true,
     fzf_preview_cmd = string.format(
@@ -64,6 +63,7 @@ M.grep = function(opts)
         core.abort_and_execute(function()
           vim.cmd(string.format([[vsplit %s]], filepath))
           vim.cmd(string.format([[normal! %sG]], line))
+          vim.cmd([[normal! zz]])
         end)
       end,
       ["ctrl-t"] = function()
@@ -71,6 +71,7 @@ M.grep = function(opts)
         core.abort_and_execute(function()
           vim.cmd(string.format([[tabnew %s]], filepath))
           vim.cmd(string.format([[normal! %sG]], line))
+          vim.cmd([[normal! zz]])
         end)
       end,
     }),

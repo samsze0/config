@@ -4,9 +4,6 @@ local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
-local filetype = require("plenary").filetype
-
-local fallback_to_bat = false
 
 -- TODO: no-git mode
 M.files = function(opts)
@@ -45,15 +42,10 @@ M.files = function(opts)
         and function()
           local path = get_relpath_from_selection()
 
-          local ft = filetype.detect(path)
+          local filename = vim.fn.fnamemodify(path, ":t")
+          local ft = vim.filetype.match({ filename = filename })
           local is_binary =
             vim.fn.system("file --mime " .. path):match("charset=binary")
-
-          if fallback_to_bat and ft == "" then
-            core.send_to_fzf(
-              string.format([[change-preview(%s)]], fzf_preview_cmd)
-            )
-          end
 
           if not is_binary then
             vim.api.nvim_buf_set_lines(

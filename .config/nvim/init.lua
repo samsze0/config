@@ -214,10 +214,7 @@ require("lazy").setup({
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
-  },
-  {
-    "nvim-lua/plenary.nvim",
-  },
+  }
 })
 
 require("keymaps").setup()

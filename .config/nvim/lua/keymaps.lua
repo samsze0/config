@@ -285,7 +285,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f5><f5>" }] = {
       fzflua = safe_require("fzf-lua").live_grep,
-      fzf = nil,
+      fzf = safe_require("fzf").grep,
     },
     [{ mode = "n", lhs = "<f11><f5>" }] = {
       fzflua = safe_require("fzf-lua").git_commits,

@@ -333,10 +333,10 @@ M.list_join = function(l1, l2)
 end
 
 M.split_string_n = function(str, count, sep, opts)
-  sep = sep or " "
+  sep = sep or "%s+"
   opts = vim.tbl_extend(
     "force",
-    { include_remaining = true, trim_parts = true },
+    { include_remaining = true, trimempty = true },
     opts or {}
   )
   local result = {}
@@ -359,7 +359,7 @@ M.split_string_n = function(str, count, sep, opts)
   end
 
   str = string.gsub(str, sep, M.nbsp, count)
-  result = vim.split(str, M.nbsp, { trimempty = opts.trim_parts })
+  result = vim.split(str, M.nbsp, { trimempty = opts.trimempty })
   if not #result == count + 1 then return nil end
   if not opts.include_remaining then table.remove(result, #result) end
   return result

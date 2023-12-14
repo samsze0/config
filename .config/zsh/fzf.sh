@@ -10,7 +10,7 @@ fzf_init() {
 	colors=$(
 		cat <<EOT | tr -d "\n "
     --color=
-      bg+:#2c313c,
+      bg+:#23283c,
       preview-bg:#000000,
       bg:#000000,
       border:#535d6c,
@@ -21,9 +21,9 @@ fzf_init() {
       info:#549eff,
       pointer:#549eff,
       marker:#cbd1da,
-      fg+:#cbd1da,
-      prompt:#cbd1da,
-      hl+:#cbd1da
+      fg+:#95a1b3,
+      prompt:#549eff,
+      hl+:#549eff
 EOT
 	)
 

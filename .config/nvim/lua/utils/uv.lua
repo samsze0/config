@@ -104,4 +104,42 @@ end
 
 M.watch_file = watch_file
 
+M.set_timeout = function(timeout, callback, opts)
+  opts = vim.tbl_extend("force", { callback_in_vim_loop = false }, opts or {})
+
+  local timer, err = uv.new_timer()
+  assert(timer, err)
+  timer:start(timeout, 0, function()
+    timer:stop()
+    timer:close()
+
+    if opts.callback_in_vim_loop then
+      vim.schedule(callback)
+    else
+      callback()
+    end
+  end)
+  return timer
+end
+
+M.set_interval = function(interval, callback, opts)
+  opts = vim.tbl_extend("force", { callback_in_vim_loop = false }, opts or {})
+
+  local timer, err = uv.new_timer()
+  assert(timer, err)
+  timer:start(interval, interval, function()
+    if opts.callback_in_vim_loop then
+      vim.schedule(callback)
+    else
+      callback()
+    end
+  end)
+  return timer
+end
+
+M.clear_interval = function(timer)
+  timer:stop()
+  timer:close()
+end
+
 return M

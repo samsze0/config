@@ -6,7 +6,7 @@
 # The return value should be exported as `FZF_DEFAULT_OPTS`
 fzf_init() {
 	local colors
-  # Remove newlines and spaces
+	# Remove newlines and spaces
 	colors=$(
 		cat <<EOT | tr -d "\n "
     --color=
@@ -42,4 +42,11 @@ EOT
   --bind 'ctrl-a:toggle-all'
   --bind 'ctrl-i:toggle'
 EOT
+}
+
+fzf_git_grep() {
+	git grep --line-number '' |
+		fzf --delimiter : \
+			--preview 'bat --style=full --color=always --highlight-line {2} {1}' \
+			--preview-window '~3,+{2}+3/2'
 }

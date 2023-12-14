@@ -20,8 +20,8 @@ end
 
 reset_state()
 
-local selection_path = os.tmpname()
-local lastdir_path = os.tmpname()
+local selection_path = os.tmpname() .. "lf-selection"
+local lastdir_path = os.tmpname() .. "lf-lastdir"
 local current_selection_path = vim.fn.glob("~/.cache/lf_current_selection")
 
 local nvim_server_path = "~/.cache/nvim/server.pipe"

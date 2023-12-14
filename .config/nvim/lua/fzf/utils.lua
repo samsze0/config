@@ -52,4 +52,18 @@ M.convert_git_filepath_to_fullpath = function(filepath, git_dir)
   return git_dir .. "/" .. filepath
 end
 
+M.fzf_initial_preview_scroll_offset = function(offset, opts)
+  opts = vim.tbl_extend("force", {
+    fixed_header = 0,
+    center = true,
+  }, opts or {})
+  return string.format(
+    [[~%d,+%d+%d%s]],
+    opts.fixed_header,
+    opts.fixed_header,
+    offset,
+    opts.center and "/2" or ""
+  )
+end
+
 return M

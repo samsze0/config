@@ -7,6 +7,7 @@ require("conform").setup({
     -- Sublist: only run the first available formatter
     lua = { "stylua" },
     javascript = { { "prettierd", "prettier" } },
+    json = { { "prettierd", "prettier" } },
     sh = { "shfmt" },
     zsh = { "shfmt" },
     bash = { "shfmt" },

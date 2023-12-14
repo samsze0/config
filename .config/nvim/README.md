@@ -142,6 +142,7 @@ end, {})
 - Git conflicts workflow
 - Performance profiling & optimization
 - LSP import path update
+- LF initial pos
 
 # TODO (low priority)
 

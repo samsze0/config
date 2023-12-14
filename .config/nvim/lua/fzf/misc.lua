@@ -17,9 +17,8 @@ M.tabs = function()
       local tabnr = tab.tabnr
 
       return string.format(
-        "%s%s%s",
+        string.rep("%s", 2, utils.nbsp),
         tabnr,
-        utils.nbsp,
         utils.ansi_codes.blue(
           (true and _G.tabs[tabnr].full or _G.tabs[tabnr].display) or "  "
         )
@@ -30,16 +29,17 @@ M.tabs = function()
 
   local current_tabnr = fn.tabpagenr()
 
-  local get_tabnr_from_selection = function(selection)
-    selection = selection or FZF_STATE.current_selection
+  local get_tabnr_from_selection = function()
+    local selection = FZF_STATE.current_selection
 
     return vim.split(selection, utils.nbsp)[1]
   end
 
-  core.fzf(get_entries(), function(selection)
-    local tabnr = get_tabnr_from_selection(selection[1])
-    vim.cmd(string.format([[tabnext %s]], tabnr))
-  end, {
+  core.fzf(get_entries(), {
+    fzf_on_select = function()
+      local tabnr = get_tabnr_from_selection()
+      vim.cmd(string.format([[tabnext %s]], tabnr))
+    end,
     fzf_preview_cmd = nil,
     fzf_extra_args = "--with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
@@ -77,25 +77,25 @@ M.buffers = function()
       if bufnr == current_bufnr then fzf_initial_pos = i end
 
       return string.format(
-        "%s%s%s",
+        string.rep("%s", 2, utils.nbsp),
         bufnr,
-        utils.nbsp,
         utils.ansi_codes.blue(bufname .. icon)
       )
     end)
     return entries
   end
 
-  local get_bufnr_from_selection = function(selection)
-    selection = selection or FZF_STATE.current_selection
+  local get_bufnr_from_selection = function()
+    local selection = FZF_STATE.current_selection
 
     return vim.split(selection, utils.nbsp)[1]
   end
 
-  core.fzf(get_entries(), function(selection)
-    local bufnr = get_bufnr_from_selection(selection[1])
-    vim.cmd(string.format([[buffer %s]], bufnr))
-  end, {
+  core.fzf(get_entries(), {
+    fzf_on_select = function()
+      local bufnr = get_bufnr_from_selection()
+      vim.cmd(string.format([[buffer %s]], bufnr))
+    end,
     fzf_preview_cmd = nil,
     fzf_extra_args = "--with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
@@ -108,12 +108,12 @@ M.buffers = function()
         core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
     },
-    fzf_on_focus = function(selection) end,
+    fzf_on_focus = function() end,
   })
 end
 
 M.all = function()
-  local config = {
+  local spec = {
     ["Tabs"] = M.tabs,
     ["Buffers"] = M.buffers,
     ["Files"] = fzf_files.files,
@@ -136,22 +136,23 @@ M.all = function()
     ["LSP implementations"] = false,
   }
 
-  local entries = utils.keys(config)
+  local entries = utils.keys(spec)
   -- Sort in alphabetical order, in-place
   table.sort(entries, function(a, b) return a:lower() < b:lower() end)
 
-  core.fzf(entries, function(selection)
-    local entry = selection[1]
-    local action = config[entry]
-    if action then action() end
-  end, {
+  core.fzf(entries, {
+    fzf_on_select = function()
+      local entry = FZF_STATE.current_selection
+      local action = spec[entry]
+      if action then action() end
+    end,
     fzf_preview_cmd = nil,
     fzf_extra_args = "--with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "All",
     fzf_initial_position = 1,
     fzf_binds = {},
-    fzf_on_focus = function(selection) end,
+    fzf_on_focus = function() end,
   })
 end
 

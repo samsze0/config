@@ -15,8 +15,8 @@ M.files = function(opts)
     git_dir = fzf_utils.get_git_toplevel(),
   }, opts or {})
 
-  local get_relpath_from_selection = function(selection)
-    selection = selection or FZF_STATE.current_selection
+  local get_relpath_from_selection = function()
+    local selection = FZF_STATE.current_selection
 
     return fzf_utils.convert_gitpath_to_relpath(selection, opts.git_dir)
   end
@@ -30,12 +30,13 @@ M.files = function(opts)
   local fzf_preview_cmd =
     string.format("bat %s %s/{}", helpers.bat_default_opts, opts.git_dir)
 
-  core.fzf(entries, function(selection)
-    local filepath = get_relpath_from_selection(selection[1])
-    vim.cmd(string.format([[e %s]], filepath))
-  end, {
+  core.fzf(entries, {
     fzf_preview_cmd = not opts.nvim_preview and fzf_preview_cmd or nil,
     fzf_prompt = "Files",
+    fzf_on_select = function()
+      local filepath = get_relpath_from_selection()
+      vim.cmd(string.format([[e %s]], filepath))
+    end,
     before_fzf = function()
       helpers.set_custom_keymaps_for_nvim_preview()
       helpers.set_custom_keymaps_for_fzf_preview()
@@ -91,17 +92,20 @@ M.files = function(opts)
       end,
       ["ctrl-w"] = function()
         local path = get_relpath_from_selection()
-        vim.cmd(string.format([[vsplit %s]], path))
-        vim.api.nvim_win_close(FZF_STATE.window, true)
+        core.abort_and_execute(
+          function() vim.cmd(string.format([[vsplit %s]], path)) end
+        )
       end,
       ["ctrl-t"] = function()
         local path = get_relpath_from_selection()
-        vim.cmd(string.format([[tabnew %s]], path))
-        vim.api.nvim_win_close(FZF_STATE.window, true)
+        core.abort_and_execute(
+          function() vim.cmd(string.format([[tabnew %s]], path)) end
+        )
       end,
     }),
     nvim_preview = opts.nvim_preview,
-    fzf_extra_args = "--preview-window=" .. helpers.fzf_default_preview_window_args
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
   })
 end
 

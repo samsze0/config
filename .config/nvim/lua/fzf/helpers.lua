@@ -1,14 +1,13 @@
 local window_utils = require("utils.window")
 local utils = require("utils")
 
+local rg_colors = false
+
 local M = {
   bat_default_opts = "--color=always --terminal-width $FZF_PREVIEW_COLUMNS",
   delta_default_opts = "--width=$FZF_PREVIEW_COLUMNS",
-  rg_default_opts = "--smart-case --no-ignore --hidden --trim"
-    .. " "
-    .. "--color=never"
-    -- .. "--color=always --colors 'match:fg:blue' --colors 'path:fg:yellow'"
-    .. " "
+  rg_default_opts = "--smart-case --no-ignore --hidden --trim "
+    .. (rg_colors and "--color=always --colors 'match:fg:blue' --colors 'path:fg:yellow' " or "--color=never ")
     .. "--no-column --line-number --no-heading",
   fzf_default_preview_window_args = "right,50%,border-none,wrap,nofollow,nocycle",
 }

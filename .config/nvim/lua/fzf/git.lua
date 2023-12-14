@@ -31,7 +31,6 @@ M.git_status = function(opts)
 
       if status == "??" then status = " ?" end
 
-      -- TODO: status coloring
       local status_first = status:sub(1, 1)
       local status_second = status:sub(2, 2)
       status = string.format(
@@ -58,12 +57,8 @@ M.git_status = function(opts)
   )
   if fzf_initial_pos == nil then fzf_initial_pos = 0 end
 
-  if config.debug then
-    vim.notify(string.format([[Fzf initial pos: %d]], fzf_initial_pos))
-  end
-
-  local get_relpath_and_status_from_selection = function(selection)
-    selection = selection or FZF_STATE.current_selection
+  local get_relpath_and_status_from_selection = function()
+    local selection = FZF_STATE.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     local filepath = args[2]
@@ -74,11 +69,12 @@ M.git_status = function(opts)
     return fzf_utils.convert_gitpath_to_relpath(filepath, opts.git_dir), args[1]
   end
 
-  core.fzf(entries, function(selection)
-    local filepath = get_relpath_and_status_from_selection(selection[1])
+  core.fzf(entries, {
+    fzf_on_select = function()
+      local filepath = get_relpath_and_status_from_selection()
 
-    vim.cmd(string.format([[e %s]], filepath))
-  end, {
+      vim.cmd(string.format([[e %s]], filepath))
+    end,
     fzf_preview_cmd = nil,
     fzf_extra_args = "--with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
@@ -130,30 +126,23 @@ M.git_status = function(opts)
 
       local ignored = status_x == "!" and status_y == "!"
 
+      local renamed_preview_cmd =
+        string.format([[bat %s %s]], helpers.bat_default_opts, filepath)
+
       core.send_to_fzf(
         string.format(
           [[change-preview:%s]],
-          true
-              and (not renamed and string.format(
-                "%s diff --color %s %s | delta %s",
-                git,
-                is_fully_staged and "--staged"
-                  or (
-                    (added or is_untracked) and "--no-index /dev/null"
-                    or (deleted and "--cached -- " or "")
-                  ),
-                filepath,
-                helpers.delta_default_opts
-              ) or string.format(
-                [[bat %s %s]],
-                helpers.bat_default_opts,
-                filepath
-              ))
-            or string.format( -- Much slower due to `script`?
-              "%s %s -c core.pager='delta' diff --staged %s",
-              fzf_utils.like_tty,
+          renamed and renamed_preview_cmd
+            or string.format(
+              "%s diff --color %s %s | delta %s",
               git,
-              filepath
+              is_fully_staged and "--staged"
+                or (
+                  (added or is_untracked) and "--no-index /dev/null"
+                  or (deleted and "--cached -- " or "")
+                ),
+              filepath,
+              helpers.delta_default_opts
             )
         )
       )
@@ -170,10 +159,6 @@ M.git_commits = function(opts)
   local git_format = "%C(blue)%h%Creset" -- Hash. In blue
     .. utils.nbsp
     .. "%C(white)%s%Creset" -- Subject
-    -- .. utils.nbsp
-    -- .. "%cr%<|(12)" -- Date. Right-aligned. Truncates-right to 12
-    -- .. utils.nbsp
-    -- .. "%an" -- Author
     .. utils.nbsp
     .. "%D" -- Ref names
 
@@ -189,8 +174,8 @@ M.git_commits = function(opts)
     return commits
   end
 
-  local get_commit_hash_from_selection = function(selection)
-    selection = selection or FZF_STATE.current_selection
+  local get_commit_hash_from_selection = function()
+    local selection = FZF_STATE.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     local commit_hash = args[1]
@@ -198,11 +183,12 @@ M.git_commits = function(opts)
     return commit_hash
   end
 
-  core.fzf(get_entries(), function(selection)
-    local commit_hash = get_commit_hash_from_selection(selection[1])
+  core.fzf(get_entries(), {
+    fzf_on_select = function()
+      local commit_hash = get_commit_hash_from_selection()
 
-    vim.notify(commit_hash)
-  end, {
+      vim.notify(commit_hash)
+    end,
     fzf_preview_cmd = string.format(
       [[git -C %s show --color {1} %s | delta %s]],
       opts.git_dir,
@@ -251,8 +237,8 @@ M.git_stash = function(opts)
     return stash
   end
 
-  local get_stash_ref_from_selection = function(selection)
-    selection = selection or FZF_STATE.current_selection
+  local get_stash_ref_from_selection = function()
+    local selection = FZF_STATE.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     local stash_ref = args[1]
@@ -260,11 +246,12 @@ M.git_stash = function(opts)
     return stash_ref
   end
 
-  core.fzf(get_entries(), function(selection)
-    local stash_ref = get_stash_ref_from_selection(selection[1])
+  core.fzf(get_entries(), {
+    fzf_on_select = function()
+      local stash_ref = get_stash_ref_from_selection()
 
-    vim.notify(stash_ref)
-  end, {
+      vim.notify(stash_ref)
+    end,
     fzf_preview_cmd = string.format(
       [[git -C %s stash show --full-index --color {1} | delta %s]],
       opts.git_dir,
@@ -290,10 +277,11 @@ M.git_submodules = function(on_submodule)
     vim.fn.systemlist([[git submodule --quiet foreach 'echo $path']])
   submodules = utils.map(submodules, function(_, e) return vim.trim(e) end)
 
-  core.fzf(table.concat(submodules, "\n"), function(selection)
-    local submodule_path = selection[1]
-    on_submodule(fzf_utils.get_git_toplevel() .. "/" .. submodule_path)
-  end, {
+  core.fzf(submodules, {
+    fzf_on_select = function()
+      local submodule_path = FZF_STATE.current_selection
+      on_submodule(fzf_utils.get_git_toplevel() .. "/" .. submodule_path)
+    end,
     fzf_preview_cmd = nil,
     fzf_extra_args = "--with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,

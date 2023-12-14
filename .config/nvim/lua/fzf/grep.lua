@@ -14,18 +14,21 @@ M.grep = function(opts)
     git_dir = fzf_utils.get_git_toplevel(),
   }, opts or {})
 
-  local function get_filepath_from_selection(selection)
-    selection = selection or FZF_STATE.current_selection
+  local function get_info_from_selection()
+    local selection = FZF_STATE.current_selection
 
-    return vim.split(selection, utils.nbsp)[1]
+    local args = vim.split(selection, utils.nbsp)
+    return unpack(args)
   end
 
-  core.fzf({}, function(selection)
-    local filepath = vim.split(selection[1], utils.nbsp)[1]
-    vim.cmd(
-      string.format([[e %s]], fzf_utils.convert_gitpath_to_relpath(filepath))
-    )
-  end, {
+  core.fzf({}, {
+    fzf_on_select = function()
+      local filepath, line = get_info_from_selection()
+      vim.cmd(
+        string.format([[e %s]], fzf_utils.convert_gitpath_to_relpath(filepath))
+      )
+      vim.cmd(string.format([[normal! %sG]], line))
+    end,
     -- fzf_async = true,
     fzf_preview_cmd = string.format(
       "bat %s --highlight-line {2} %s/{1}",
@@ -53,16 +56,22 @@ M.grep = function(opts)
     before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()
-        local filepath = get_filepath_from_selection()
+        local filepath = get_info_from_selection()
         vim.fn.setreg("+", filepath)
       end,
       ["ctrl-w"] = function()
-        local filepath = get_filepath_from_selection()
-        vim.cmd(string.format([[vsplit %s]], filepath))
+        local filepath, line = get_info_from_selection()
+        core.abort_and_execute(function()
+          vim.cmd(string.format([[vsplit %s]], filepath))
+          vim.cmd(string.format([[normal! %sG]], line))
+        end)
       end,
       ["ctrl-t"] = function()
-        local filepath = get_filepath_from_selection()
-        vim.cmd(string.format([[tabnew %s]], filepath))
+        local filepath, line = get_info_from_selection()
+        core.abort_and_execute(function()
+          vim.cmd(string.format([[tabnew %s]], filepath))
+          vim.cmd(string.format([[normal! %sG]], line))
+        end)
       end,
     }),
     fzf_extra_args = "--with-nth=1,3.. " -- Hide line number

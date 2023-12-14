@@ -15,13 +15,6 @@ M.notifications = function(opts)
     max_num_entries = 100,
   }, opts or {})
 
-  local custom_shellescape = function(str)
-    str = string.gsub(str, [[\n]], [[ ]])
-    str = string.gsub(str, [["]], [[“]])
-    str = string.gsub(str, [[']], [[“]])
-    return string.gsub(str, "EOF", "eof")
-  end
-
   local get_entries = function()
     local notifications = _G.notifications
     local num_unread = utils.sum(_G.notification_meta.unread)
@@ -46,7 +39,7 @@ M.notifications = function(opts)
         level = unread and utils.ansi_codes.grey(" ") or " "
       end
       local brief = vim.fn.systemlist(utils.heredoc(noti.message))[1]
-      brief = custom_shellescape(brief)
+      brief = fzf_utils.fzf_heredoc_shellescape(brief)
       if not brief or brief == "" then brief = "<empty>" end
       local brief_max_length = 50
       brief = #brief > brief_max_length
@@ -55,14 +48,10 @@ M.notifications = function(opts)
       table.insert(
         entries,
         string.format(
-          "%s%s%s%s%s",
+          string.rep("%s", 3, utils.nbsp),
           level,
-          utils.nbsp,
           timeago(noti.time),
-          utils.nbsp,
           unread and utils.ansi_codes.white(brief) or brief
-          -- utils.nbsp,
-          -- noti.message -- Doesn't work if message contains newlines
         )
       )
     end
@@ -78,9 +67,11 @@ M.notifications = function(opts)
     return _G.notifications[#_G.notifications - selection_index + 1]
   end
 
-  core.fzf(entries, function(selection) end, {
-    fzf_preview_cmd = "",
-    fzf_extra_args = "--with-nth=1.. --preview-window=" .. helpers.fzf_default_preview_window_args,
+  core.fzf(entries, {
+    fzf_on_select = function() end,
+    fzf_preview_cmd = nil,
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Notifications❯ ",
     fzf_initial_position = 1,
     fzf_on_focus = function()
@@ -89,7 +80,7 @@ M.notifications = function(opts)
       core.send_to_fzf(
         "change-preview:"
           .. utils.heredoc(
-            custom_shellescape(noti.message),
+            fzf_utils.fzf_heredoc_shellescape(noti.message),
             { pipe_to = "bat " .. helpers.bat_default_opts }
           )
       )

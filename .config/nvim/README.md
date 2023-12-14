@@ -144,6 +144,7 @@ end, {})
 - Performance profiling & optimization
 - LSP import path update
 - LF initial pos
+- Fzf custom jumps
 
 # TODO (low priority)
 

@@ -9,6 +9,14 @@ local utils = require("utils")
 local fn = vim.fn
 
 M.jumps = function()
+  -- TODO
+
+  local fzf_initial_pos
+
+  local function get_entries() end
+end
+
+M.builtin_jumps = function()
   local fzf_initial_pos
 
   local function get_entries()
@@ -47,17 +55,18 @@ M.jumps = function()
     end)
   end
 
-  local get_info_from_selection = function(selection)
-    selection = selection or FZF_STATE.current_selection
+  local get_info_from_selection = function()
+    local selection = FZF_STATE.current_selection
     local args = vim.split(selection, utils.nbsp)
     return unpack(args)
   end
 
-  core.fzf(get_entries(), function(selection)
-    local _, bufnr, lnum, col = get_info_from_selection(selection)
-    vim.cmd(string.format([[buffer %s]], bufnr))
-    vim.cmd(string.format([[normal! %sG%s|]], lnum, col))
-  end, {
+  core.fzf(get_entries(), {
+    fzf_on_select = function()
+      local _, bufnr, lnum, col = get_info_from_selection()
+      vim.cmd(string.format([[buffer %s]], bufnr))
+      vim.cmd(string.format([[normal! %sG%s|]], lnum, col))
+    end,
     fzf_preview_cmd = string.format(
       [[bat %s --highlight-line {1} {3}]],
       helpers.bat_default_opts

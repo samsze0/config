@@ -62,4 +62,11 @@ EOF]],
   )
 end
 
+M.fzf_heredoc_shellescape = function(str)
+  str = string.gsub(str, [[\n]], [[ ]])
+  str = string.gsub(str, [["]], [[“]])
+  str = string.gsub(str, [[']], [[“]])
+  return string.gsub(str, "EOF", "eof")
+end
+
 return M

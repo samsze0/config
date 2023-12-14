@@ -71,34 +71,17 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
           and tonumber(index) + 1
         or -1
       FZF_STATE.current_selection = selection
-      if selection and fzf_on_focus and type(fzf_on_focus) == "function" then
-        vim.schedule(fzf_on_focus)
-      end
+      if selection and fzf_on_focus then vim.schedule(fzf_on_focus) end
     elseif string.match(message, "^change") then
       local query = string.match(message, "^change '(.+)'")
-      if
-        query
-        and fzf_on_prompt_change
-        and type(fzf_on_prompt_change) == "function"
-      then
+      if query and fzf_on_prompt_change then
         vim.schedule(function() fzf_on_prompt_change(query) end)
       end
     elseif string.match(message, "^event") then
       local event = string.match(message, "^event ([^\n]+)")
       if event and fzf_event_callback_map[event] then
         local callback = fzf_event_callback_map[event]
-        if type(callback) == "function" then
-          vim.schedule(callback)
-        else
-          vim.notify(
-            string.format(
-              "Invalid fzf event callback for event %s: %s",
-              event,
-              vim.inspect(callback)
-            ),
-            vim.log.levels.ERROR
-          )
-        end
+        vim.schedule(callback)
       else
         vim.notify(
           string.format("Invalid fzf event: %s", event),
@@ -125,15 +108,14 @@ M.send_to_fzf = function(message)
   if config.debug then vim.notify("Sent message to fzf " .. message) end
 end
 
+M.abort_and_execute = function(callback)
+  M.send_to_fzf("abort")
+  fzf_event_callback_map["abort"] = callback
+end
+
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 
-local capture_stdout = false
-local capture_stderr = false
-
-local selection_path = os.tmpname() .. "fzf-selection"
-vim.fn.writefile({}, selection_path) -- Create temp file for fzf to write output to
-
-M.fzf = function(input, on_selection, opts)
+M.fzf = function(input, opts)
   reset_state()
 
   opts = vim.tbl_extend("force", {
@@ -143,6 +125,7 @@ M.fzf = function(input, on_selection, opts)
     fzf_preview_cmd = nil,
     fzf_initial_position = 0,
     fzf_on_focus = nil,
+    fzf_on_select = nil,
     fzf_binds = {},
     nvim_preview = false,
     before_fzf = nil,
@@ -218,27 +201,33 @@ M.fzf = function(input, on_selection, opts)
     })
   end
 
-  for k, v in pairs(opts.fzf_binds) do
-    if type(v) == "function" then
-      fzf_event_callback_map[k] = v
-      opts.fzf_binds[k] = string.format(
+  local function parse_fzf_bind(event, action)
+    if type(action) == "function" then
+      fzf_event_callback_map[event] = action
+      opts.fzf_binds[event] = string.format(
         [[execute-silent(echo "event %s" | %s)]],
-        k,
+        event,
         os_utils.get_unix_sock_cmd(server_socket_path)
       )
-    elseif type(v) == "string" then
-    elseif type(v) == "table" then
-      -- TODO: support list type and recursive parsing
+    elseif type(action) == "string" then
+    elseif type(action) == "table" then
+      for _, v in ipairs(action) do
+        parse_fzf_bind(event, v)
+      end
     else
       vim.notify(
         string.format(
-          "Invalid fzf bind value for key %s: %s",
-          k,
-          vim.inspect(v)
+          "Invalid fzf bind type %s: %s",
+          event,
+          vim.inspect(action)
         ),
         vim.log.levels.ERROR
       )
     end
+  end
+
+  for event, action in pairs(opts.fzf_binds) do
+    parse_fzf_bind(event, action)
   end
 
   if opts.fzf_binds.focus then
@@ -283,9 +272,7 @@ M.fzf = function(input, on_selection, opts)
     ","
   )
 
-  if opts.before_fzf ~= nil and type(opts.before_fzf) == "function" then
-    opts.before_fzf()
-  end
+  if opts.before_fzf then opts.before_fzf() end
 
   if config.debug then
     vim.notify(string.format([[binds_arg\n%s]], vim.inspect(binds_arg)))
@@ -293,7 +280,7 @@ M.fzf = function(input, on_selection, opts)
 
   local channel = vim.fn.termopen(
     string.format(
-      [[cat <<"EOF" | fzf --listen --ansi %s --prompt='%s❯ ' --border=none --height=100%% %s --bind '%s' --delimiter=%s %s > %s
+      [[cat <<"EOF" | fzf --listen --ansi %s --prompt='%s❯ ' --border=none --height=100%% %s --bind '%s' --delimiter=%s %s
 %s
 EOF
         ]],
@@ -305,7 +292,6 @@ EOF
       binds_arg,
       string.format("'%s'", utils.nbsp),
       opts.fzf_extra_args, -- TODO: put in front and throw warning if contains already existing args
-      selection_path,
       table.concat(input, "\n")
     ),
     {
@@ -327,38 +313,15 @@ EOF
         end
 
         if code == 0 then
-          local selection = vim.fn.readfile(selection_path)
-          selection = utils.map(
-            selection,
-            function(_, s) return vim.trim(s) end
-          )
-          selection = utils.filter(selection, function(s) return s ~= "" end)
-          if config.debug then
-            vim.notify(
-              string.format(
-                "Fzf\nExit code: %s\n%s",
-                code,
-                table.concat(selection, "\n")
-              )
-            )
-          end
-
-          on_selection(selection)
+          opts.fzf_on_select()
         elseif code == 130 then
-          -- 130 means no selections
-          if config.debug then
-            vim.notify(
-              string.format(
-                "Fzf\nExit code: %s\nEvent: %s",
-                code,
-                vim.inspect(event)
-              )
-            )
-          end
+          -- On abort
+          local abort_callback = fzf_event_callback_map["abort"]
+          if abort_callback then abort_callback() end
         else
           vim.notify(
             string.format(
-              "Fzf\nExit code: %s\nEvent: %s",
+              "Unexpected exit code on Fzf\nExit code: %s\nEvent: %s",
               code,
               vim.inspect(event)
             ),
@@ -366,19 +329,8 @@ EOF
           )
         end
 
-        if opts.after_fzf and type(opts.after_fzf) == "function" then
-          opts.after_fzf()
-        end
+        if opts.after_fzf then opts.after_fzf() end
       end,
-      stdout_buffered = false,
-      on_stdout = capture_stdout and function(...)
-        local args = table.pack(...)
-        if config.debug then vim.notify(vim.inspect(args)) end
-      end or nil,
-      on_stderr = capture_stderr and function(...)
-        local args = table.pack(...)
-        if config.debug then vim.notify(vim.inspect(args)) end
-      end or nil,
     }
   )
   if channel <= 0 then

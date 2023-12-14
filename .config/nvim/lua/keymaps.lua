@@ -372,7 +372,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<space>u" }] = {
       fzflua = safe_require("config.fzflua-custom").undo_tree,
-      fzf = nil,
+      fzf = safe_require("fzf").undos,
     },
     [{ mode = "n", lhs = "<space>m" }] = {
       fzflua = safe_require("config.fzflua-custom").notifications,

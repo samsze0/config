@@ -1,6 +1,7 @@
 local M = {}
 
 local core = require("fzf.core")
+local helpers = require("fzf.helpers")
 local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
@@ -52,7 +53,7 @@ M.git_status = function(opts)
     entries,
     function(e)
       return vim.split(e, utils.nbsp)[2]
-        == fzf_utils.get_filepath_from_git_root(vim.fn.expand("%"))
+        == fzf_utils.convert_filepath_to_gitpath(vim.fn.expand("%"))
     end
   )
   if fzf_initial_pos == nil then fzf_initial_pos = 0 end
@@ -61,120 +62,56 @@ M.git_status = function(opts)
     vim.notify(string.format([[Fzf initial pos: %d]], fzf_initial_pos))
   end
 
-  core.fzf(table.concat(entries, "\n"), function(selection)
-    local filepath = vim.split(selection[1], utils.nbsp)[2]
+  local get_relpath_and_status_from_selection = function(selection)
+    selection = selection or FZF_STATE.current_selection
+
+    local args = vim.split(selection, utils.nbsp)
+    local filepath = args[2]
 
     local parts = vim.split(filepath, " -> ") -- In case if file is renamed
     if #parts > 1 then filepath = parts[2] end
 
-    vim.cmd(
-      string.format(
-        [[e %s]],
-        fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
-      )
-    )
+    return fzf_utils.convert_gitpath_to_relpath(filepath, opts.git_dir), args[1]
+  end
+
+  core.fzf(entries, function(selection)
+    local filepath = get_relpath_and_status_from_selection(selection[1])
+
+    vim.cmd(string.format([[e %s]], filepath))
   end, {
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1..",
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "GitStatus",
     fzf_initial_position = fzf_initial_pos,
-    fzf_binds = {
+    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["left"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local filepath = vim.split(current_selection, utils.nbsp)[2]
+        local filepath = get_relpath_and_status_from_selection()
 
-        local parts = vim.split(filepath, " -> ") -- In case if file is renamed
-        if #parts > 1 then filepath = parts[2] end
-
-        local cmd = string.format(
-          [[git add %s]],
-          fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
-        )
-        if config.debug then vim.notify(string.format([[Running: %s]], cmd)) end
-        vim.fn.system(cmd)
-        core.send_to_fzf(
-          string.format(
-            "track+reload(%s)",
-            string.format(
-              [[cat <<EOF
-%s
-EOF]],
-              table.concat(get_entries(), "\n")
-            )
-          )
-        )
+        vim.fn.system(string.format([[git add %s]], filepath))
+        core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
       ["right"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local filepath = vim.split(current_selection, utils.nbsp)[2]
+        local filepath = get_relpath_and_status_from_selection()
 
-        local parts = vim.split(filepath, " -> ") -- In case if file is renamed
-        if #parts > 1 then filepath = parts[2] end
-
-        local cmd = string.format(
-          [[git restore --staged %s]],
-          fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
-        )
-        if config.debug then vim.notify(string.format([[Running: %s]], cmd)) end
-        vim.fn.system(cmd)
-        core.send_to_fzf(
-          string.format(
-            "track+reload(%s)",
-            string.format(
-              [[cat <<EOF
-%s
-EOF]],
-              table.concat(get_entries(), "\n")
-            )
-          )
-        )
+        vim.fn.system(string.format([[git restore --staged %s]], filepath))
+        core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
       ["ctrl-y"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local filepath = vim.split(current_selection, utils.nbsp)[2]
-
-        local parts = vim.split(filepath, " -> ") -- In case if file is renamed
-        if #parts > 1 then filepath = parts[2] end
-
-        filepath =
-          fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
+        local filepath = get_relpath_and_status_from_selection()
 
         vim.fn.setreg("+", filepath)
         vim.notify(string.format([[Copied to clipboard: %s]], filepath))
       end,
       ["ctrl-x"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local filepath = vim.split(current_selection, utils.nbsp)[2]
+        local filepath = get_relpath_and_status_from_selection()
 
-        local parts = vim.split(filepath, " -> ") -- In case if file is renamed
-        if #parts > 1 then filepath = parts[2] end
-
-        local cmd = string.format(
-          [[git restore %s]],
-          fzf_utils.convert_git_filepath_to_fullpath(filepath, opts.git_dir)
-        )
-        if config.debug then vim.notify(string.format([[Running: %s]], cmd)) end
-        vim.fn.system(cmd)
-        core.send_to_fzf(
-          string.format(
-            "track+reload(%s)",
-            string.format(
-              [[cat <<EOF
-%s
-EOF]],
-              table.concat(get_entries(), "\n")
-            )
-          )
-        )
+        vim.fn.system(string.format([[git restore %s]], filepath))
+        core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
-    },
-    fzf_on_focus = function(selection)
-      local args = vim.split(selection, utils.nbsp, { trimpempty = false })
-      local status = args[1]
-      local filepath = args[2]
-
-      local parts = vim.split(filepath, " -> ") -- In case if file is renamed
-      if #parts > 1 then filepath = parts[2] end
+    }),
+    fzf_on_focus = function()
+      local filepath, status = get_relpath_and_status_from_selection()
 
       local status_x = status:sub(1, 1)
       local status_y = status:sub(3, 3)
@@ -198,29 +135,24 @@ EOF]],
           [[change-preview:%s]],
           true
               and (not renamed and string.format(
-                "%s diff --color %s %s/%s | delta %s",
+                "%s diff --color %s %s | delta %s",
                 git,
                 is_fully_staged and "--staged"
                   or (
                     (added or is_untracked) and "--no-index /dev/null"
                     or (deleted and "--cached -- " or "")
                   ),
-                opts.git_dir,
                 filepath,
-                config.delta_default_opts
+                helpers.delta_default_opts
               ) or string.format(
                 [[bat %s %s]],
-                config.bat_default_opts,
-                fzf_utils.convert_git_filepath_to_fullpath(
-                  filepath,
-                  opts.git_dir
-                )
+                helpers.bat_default_opts,
+                filepath
               ))
             or string.format( -- Much slower due to `script`?
-              "%s %s -c core.pager='delta' diff --staged %s/[2]",
+              "%s %s -c core.pager='delta' diff --staged %s",
               fzf_utils.like_tty,
               git,
-              opts.git_dir,
               filepath
             )
         )
@@ -257,10 +189,17 @@ M.git_commits = function(opts)
     return commits
   end
 
-  local entries = get_entries()
+  local get_commit_hash_from_selection = function(selection)
+    selection = selection or FZF_STATE.current_selection
 
-  core.fzf(table.concat(entries, "\n"), function(selection)
-    local commit_hash = vim.split(selection[1], utils.nbsp)[1]
+    local args = vim.split(selection, utils.nbsp)
+    local commit_hash = args[1]
+
+    return commit_hash
+  end
+
+  core.fzf(get_entries(), function(selection)
+    local commit_hash = get_commit_hash_from_selection(selection[1])
 
     vim.notify(commit_hash)
   end, {
@@ -268,20 +207,20 @@ M.git_commits = function(opts)
       [[git -C %s show --color {1} %s | delta %s]],
       opts.git_dir,
       opts.filepaths ~= "" and string.format("-- %s", opts.filepaths) or "",
-      config.delta_default_opts
+      helpers.delta_default_opts
     ),
-    fzf_extra_args = "--with-nth=1..",
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "GitCommits",
     fzf_initial_position = 1,
-    fzf_binds = {
+    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local commit_hash = vim.split(current_selection, utils.nbsp)[1]
+        local commit_hash = get_commit_hash_from_selection()
 
         vim.fn.setreg("+", commit_hash)
         vim.notify(string.format([[Copied to clipboard: %s]], commit_hash))
       end,
-    },
+    }),
   })
 end
 
@@ -312,31 +251,37 @@ M.git_stash = function(opts)
     return stash
   end
 
-  local entries = get_entries()
-  vim.notify(table.concat(entries, "\n"))
+  local get_stash_ref_from_selection = function(selection)
+    selection = selection or FZF_STATE.current_selection
 
-  core.fzf(table.concat(entries, "\n"), function(selection)
-    local stash_ref = vim.split(selection[1], utils.nbsp)[1]
+    local args = vim.split(selection, utils.nbsp)
+    local stash_ref = args[1]
+
+    return stash_ref
+  end
+
+  core.fzf(get_entries(), function(selection)
+    local stash_ref = get_stash_ref_from_selection(selection[1])
 
     vim.notify(stash_ref)
   end, {
     fzf_preview_cmd = string.format(
       [[git -C %s stash show --full-index --color {1} | delta %s]],
       opts.git_dir,
-      config.delta_default_opts
+      helpers.delta_default_opts
     ),
-    fzf_extra_args = "--with-nth=1..",
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "GitStash",
     fzf_initial_position = 1,
-    fzf_binds = {
+    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local stash_ref = vim.split(current_selection, utils.nbsp)[1]
+        local stash_ref = get_stash_ref_from_selection()
 
         vim.fn.setreg("+", stash_ref)
         vim.notify(string.format([[Copied to clipboard: %s]], stash_ref))
       end,
-    },
+    }),
   })
 end
 
@@ -350,11 +295,12 @@ M.git_submodules = function(on_submodule)
     on_submodule(fzf_utils.get_git_toplevel() .. "/" .. submodule_path)
   end, {
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1..",
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "GitSubmodules",
     fzf_binds = {
       ["ctrl-y"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
+        local current_selection = FZF_STATE.current_selection
         local submodule_path = current_selection
 
         vim.fn.setreg("+", submodule_path)

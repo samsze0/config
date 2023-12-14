@@ -3,8 +3,6 @@ local M = {}
 local utils = require("utils")
 local config = require("fzf.config")
 
-M.git_toplevel = [[git -C "$(git rev-parse --show-toplevel)"]]
-
 M.git_files = function(git_dir)
   return string.format(
     [[{ echo "$(git -C %s ls-files --full-name --exclude-standard)"; echo "$(git -C %s ls-files --full-name --others --exclude-standard)"; }]],
@@ -12,10 +10,6 @@ M.git_files = function(git_dir)
     git_dir
   )
 end
-
-M.git_files_cwd = string.format(
-  [[{ echo "$(git ls-files --full-name --exclude-standard)"; echo "$(git ls-files --full-name --others --exclude-standard)"; }]]
-)
 
 -- Trick git into thinking it's running in a tty
 -- https://github.com/dandavison/delta/discussions/840
@@ -25,18 +19,7 @@ M.get_git_toplevel = function()
   return vim.trim(vim.fn.system([[git rev-parse --show-toplevel]]))
 end
 
-M.edit_selected_files = function(edit_cmd, selection)
-  -- Filter invalid selection entries and open them
-  selection = utils.filter(selection, function(v) return vim.trim(v) ~= "" end)
-  if #selection > 0 then
-    if config.debug then vim.notify("Fzf: opening selections") end
-    for _, file in ipairs(selection) do
-      vim.cmd(string.format([[%s %s]], edit_cmd, file))
-    end
-  end
-end
-
-M.get_filepath_from_git_root = function(filepath, opts)
+M.convert_filepath_to_gitpath = function(filepath, opts)
   opts = vim.tbl_extend("force", {
     git_root = M.get_git_toplevel(),
     include_git_root = false,
@@ -48,7 +31,7 @@ M.get_filepath_from_git_root = function(filepath, opts)
   return path
 end
 
-M.convert_git_filepath_to_fullpath = function(filepath, git_dir)
+M.convert_gitpath_to_relpath = function(filepath, git_dir)
   return git_dir .. "/" .. filepath
 end
 
@@ -58,11 +41,24 @@ M.fzf_initial_preview_scroll_offset = function(offset, opts)
     center = true,
   }, opts or {})
   return string.format(
-    [[~%d,+%d+%d%s]],
-    opts.fixed_header,
-    opts.fixed_header,
-    offset,
+    [[~%s,+%s%s,+%s%s]],
+    tostring(opts.fixed_header),
+    tostring(opts.fixed_header),
+    opts.center and "/2" or "",
+    tostring(offset),
     opts.center and "/2" or ""
+  )
+end
+
+M.generate_fzf_reload_action = function(input)
+  return string.format(
+    "reload(%s)",
+    string.format(
+      [[cat <<EOF
+%s
+EOF]],
+      table.concat(input, "\n")
+    )
   )
 end
 

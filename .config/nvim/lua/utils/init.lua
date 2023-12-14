@@ -380,4 +380,18 @@ M.keys = function(tbl)
   return keys
 end
 
+M.heredoc = function(str, opts)
+  opts = vim.tbl_extend("force", { pipe_to = nil }, opts or {})
+  local pipe_to = opts.pipe_to
+
+  return string.format(
+    [[cat <<"EOF"%s
+%s
+EOF
+    ]],
+    pipe_to and " | " .. pipe_to or "",
+    str
+  )
+end
+
 return M

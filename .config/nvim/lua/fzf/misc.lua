@@ -3,6 +3,7 @@ local M = {}
 local core = require("fzf.core")
 local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
+local helpers = require("fzf.helpers")
 local utils = require("utils")
 local fzf_git = require("fzf.git")
 local fzf_files = require("fzf.files")
@@ -29,34 +30,29 @@ M.tabs = function()
 
   local current_tabnr = fn.tabpagenr()
 
-  core.fzf(table.concat(get_entries(), "\n"), function(selection)
-    local tabnr = vim.split(selection[1], utils.nbsp)[1]
+  local get_tabnr_from_selection = function(selection)
+    selection = selection or FZF_STATE.current_selection
+
+    return vim.split(selection, utils.nbsp)[1]
+  end
+
+  core.fzf(get_entries(), function(selection)
+    local tabnr = get_tabnr_from_selection(selection[1])
     vim.cmd(string.format([[tabnext %s]], tabnr))
   end, {
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1..",
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Tabs",
     fzf_initial_position = current_tabnr,
     fzf_binds = {
       ["ctrl-x"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-
-        local tabnr = vim.split(current_selection, utils.nbsp)[1]
+        local tabnr = get_tabnr_from_selection()
         vim.cmd(string.format([[tabclose %s]], tabnr))
-        core.send_to_fzf(
-          string.format(
-            "track+reload(%s)",
-            string.format(
-              [[cat <<EOF
-%s
-EOF]],
-              table.concat(get_entries(), "\n")
-            )
-          )
-        )
+        core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
     },
-    fzf_on_focus = function(selection) end,
+    fzf_on_focus = function() end,
   })
 end
 
@@ -90,32 +86,26 @@ M.buffers = function()
     return entries
   end
 
-  core.fzf(table.concat(get_entries(), "\n"), function(selection)
-    local bufnr = vim.split(selection[1], utils.nbsp)[1]
+  local get_bufnr_from_selection = function(selection)
+    selection = selection or FZF_STATE.current_selection
+
+    return vim.split(selection, utils.nbsp)[1]
+  end
+
+  core.fzf(get_entries(), function(selection)
+    local bufnr = get_bufnr_from_selection(selection[1])
     vim.cmd(string.format([[buffer %s]], bufnr))
   end, {
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1..",
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Buffers",
     fzf_initial_position = fzf_initial_pos,
     fzf_binds = {
       ["ctrl-x"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-
-        local tabnr = vim.split(current_selection, utils.nbsp)[1]
-        -- Bufdelete
-        vim.cmd(string.format([[bdelete %s]], tabnr))
-        core.send_to_fzf(
-          string.format(
-            "track+reload(%s)",
-            string.format(
-              [[cat <<EOF
-%s
-EOF]],
-              table.concat(get_entries(), "\n")
-            )
-          )
-        )
+        local bufnr = get_bufnr_from_selection()
+        vim.cmd(string.format([[bdelete %s]], bufnr))
+        core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
     },
     fzf_on_focus = function(selection) end,
@@ -150,13 +140,14 @@ M.all = function()
   -- Sort in alphabetical order, in-place
   table.sort(entries, function(a, b) return a:lower() < b:lower() end)
 
-  core.fzf(table.concat(entries, "\n"), function(selection)
+  core.fzf(entries, function(selection)
     local entry = selection[1]
     local action = config[entry]
     if action then action() end
   end, {
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1..",
+    fzf_extra_args = "--with-nth=1.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "All",
     fzf_initial_position = 1,
     fzf_binds = {},

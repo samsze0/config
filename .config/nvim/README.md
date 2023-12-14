@@ -128,6 +128,7 @@ end, {})
 
 # TODO (high priority)
 
+- Write files when lsp renamed etc
 - Safer tabline and statusline and autocmds (wrap in pcall)
 - SSH lf preview
 - SSH setup

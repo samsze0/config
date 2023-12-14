@@ -8,43 +8,44 @@ local window_utils = require("utils.window")
 local fzf_utils = require("fzf.utils")
 local uv_utils = require("utils.uv")
 local os_utils = require("utils.os")
+local uv = vim.loop
 
+local fzf_port
 local fzf_on_focus
 local fzf_on_prompt_change
+local fzf_event_callback_map = {}
 
-FZF_PORT = nil
-FZF_EVENT_CALLBACK_MAP = {}
-
-FZF_INITIAL_POS = nil
-FZF_CURRENT_SELECTION = nil
-FZF_CURRENT_SELECTION_INDEX = nil
-
-FZF_PREV_WINDOW = nil
-FZF_WINDOW = nil
-FZF_BUFFER = nil
-FZF_BORDER_BUFFER = nil
-FZF_PREVIEW_WINDOW = nil
-FZF_PREVIEW_BUFFER = nil
-FZF_PREVIEW_BORDER_BUF = nil
+FZF_STATE = {
+  event_callback_map = {},
+  current_selection = nil,
+  current_selection_index = nil,
+  prev_window = nil,
+  window = nil,
+  buffer = nil,
+  border_buffer = nil,
+  preview_window = nil,
+  preview_buffer = nil,
+  preview_border_buf = nil,
+  channel = nil,
+}
 
 local reset_state = function()
   fzf_on_focus = nil
   fzf_on_prompt_change = nil
+  fzf_event_callback_map = {}
 
-  FZF_PORT = nil
-  FZF_EVENT_CALLBACK_MAP = {}
-
-  FZF_INITIAL_POS = nil
-  FZF_CURRENT_SELECTION = nil
-  FZF_CURRENT_SELECTION_INDEX = nil
-
-  FZF_PREV_WINDOW = -1
-  FZF_WINDOW = -1
-  FZF_BUFFER = nil
-  FZF_BORDER_BUFFER = nil
-  FZF_PREVIEW_WINDOW = -1
-  FZF_PREVIEW_BUFFER = nil
-  FZF_PREVIEW_BORDER_BUF = nil
+  FZF_STATE = {
+    current_selection = nil,
+    current_selection_index = nil,
+    prev_window = nil,
+    window = nil,
+    buffer = nil,
+    border_buffer = nil,
+    preview_window = nil,
+    preview_buffer = nil,
+    preview_border_buf = nil,
+    channel = nil,
+  }
 end
 
 reset_state()
@@ -56,12 +57,7 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
     end
 
     if string.match(message, "^port") then
-      FZF_PORT = string.match(message, "^port (%d+)")
-      -- Set initial position here rather than binds to `load` event as reload would also trigger `load` event
-      -- `start` event not applicable because input would still be being prepared (async)
-      vim.schedule(
-        function() M.send_to_fzf(string.format([[pos(%d)]], FZF_INITIAL_POS)) end
-      )
+      fzf_port = string.match(message, "^port (%d+)")
     elseif string.match(message, "^focus") then
       local index, selection = string.match(message, "^focus (%d+) '(.*)'")
       if not index or not selection then
@@ -71,11 +67,12 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         )
         return
       end
-      FZF_CURRENT_SELECTION_INDEX = selection ~= "" and tonumber(index) + 1
+      FZF_STATE.current_selection_index = selection ~= ""
+          and tonumber(index) + 1
         or -1
-      FZF_CURRENT_SELECTION = selection
+      FZF_STATE.current_selection = selection
       if selection and fzf_on_focus and type(fzf_on_focus) == "function" then
-        vim.schedule(function() fzf_on_focus(selection) end)
+        vim.schedule(fzf_on_focus)
       end
     elseif string.match(message, "^change") then
       local query = string.match(message, "^change '(.+)'")
@@ -88,8 +85,8 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
       end
     elseif string.match(message, "^event") then
       local event = string.match(message, "^event ([^\n]+)")
-      if event and FZF_EVENT_CALLBACK_MAP[event] then
-        local callback = FZF_EVENT_CALLBACK_MAP[event]
+      if event and fzf_event_callback_map[event] then
+        local callback = fzf_event_callback_map[event]
         if type(callback) == "function" then
           vim.schedule(callback)
         else
@@ -118,12 +115,12 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
 )
 
 M.send_to_fzf = function(message)
-  if not FZF_PORT then
+  if not fzf_port then
     vim.notify("Fzf server not ready", vim.log.levels.ERROR)
     return
   end
   vim.fn.system(
-    string.format([[curl -X POST localhost:%s -d '%s']], FZF_PORT, message)
+    string.format([[curl -X POST localhost:%s -d '%s']], fzf_port, message)
   )
   if config.debug then vim.notify("Sent message to fzf " .. message) end
 end
@@ -133,11 +130,10 @@ M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 local capture_stdout = false
 local capture_stderr = false
 
-local selection_path = vim.fn.glob("~/.cache/lf_current_selection")
+local selection_path = os.tmpname() .. "fzf-selection"
+vim.fn.writefile({}, selection_path) -- Create temp file for fzf to write output to
 
-M.fzf = function(content, on_selection, opts)
-  -- TODO: content can be a function that returns a string. Invoked whenever "reload"
-
+M.fzf = function(input, on_selection, opts)
   reset_state()
 
   opts = vim.tbl_extend("force", {
@@ -145,13 +141,15 @@ M.fzf = function(content, on_selection, opts)
     fzf_prompt = "",
     fzf_preview_window = {},
     fzf_preview_cmd = nil,
-    fzf_initial_position = 1,
+    fzf_initial_position = 0,
     fzf_on_focus = nil,
     fzf_binds = {},
     nvim_preview = false,
+    before_fzf = nil,
+    after_fzf = nil,
+    fzf_async = false, -- Doesn't work well with start:pos
   }, opts or {})
 
-  FZF_INITIAL_POS = opts.fzf_initial_position
   fzf_on_focus = opts.fzf_on_focus
   fzf_on_prompt_change = opts.fzf_on_prompt_change
 
@@ -165,75 +163,64 @@ M.fzf = function(content, on_selection, opts)
     return
   end
 
-  if opts.nvim_preview then
-    FZF_PREV_WINDOW = vim.api.nvim_get_current_win()
+  if not type(input) == "table" then
+    vim.notify(
+      string.format("Invalid input type: %s", vim.inspect(input)),
+      vim.log.levels.ERROR
+    )
+    return
+  end
 
-    FZF_PREVIEW_WINDOW, FZF_PREVIEW_BUFFER, _, FZF_PREVIEW_BORDER_BUF =
+  if opts.nvim_preview then
+    FZF_STATE.prev_window = vim.api.nvim_get_current_win()
+
+    FZF_STATE.preview_window, FZF_STATE.preview_buffer, _, FZF_STATE.preview_border_buf =
       window_utils.open_floating_window({
-        buffer = FZF_PREVIEW_BUFFER,
+        buffer = FZF_STATE.preview_buffer,
         buffiletype = "fzf_preview",
         position = "right",
         style = "code",
         main_win_extra_opts = {},
       })
 
-    FZF_WINDOW, FZF_BUFFER, _, FZF_BORDER_BUFFER =
+    FZF_STATE.window, FZF_STATE.buffer, _, FZF_STATE.border_buffer =
       window_utils.open_floating_window({
-        buffer = FZF_BUFFER,
+        buffer = FZF_STATE.buffer,
         buffiletype = "fzf",
         position = "left",
       })
 
     window_utils.create_autocmd_close_all_windows_together({
       {
-        window = FZF_WINDOW,
-        buffer = FZF_BUFFER,
-        border_buffer = FZF_BORDER_BUFFER,
+        window = FZF_STATE.window,
+        buffer = FZF_STATE.buffer,
+        border_buffer = FZF_STATE.border_buffer,
       },
       {
-        window = FZF_PREVIEW_WINDOW,
-        buffer = FZF_PREVIEW_BUFFER,
-        border_buffer = FZF_PREVIEW_BORDER_BUF,
+        window = FZF_STATE.preview_window,
+        buffer = FZF_STATE.preview_buffer,
+        border_buffer = FZF_STATE.preview_border_buf,
       },
     })
-
-    window_utils.create_float_window_nav_keymaps({
-      is_terminal = true,
-      window = FZF_WINDOW,
-      buffer = FZF_BUFFER,
-    }, {
-      is_terminal = false,
-      window = FZF_PREVIEW_WINDOW,
-      buffer = FZF_PREVIEW_BUFFER,
-    })
   else
-    FZF_PREV_WINDOW = vim.api.nvim_get_current_win()
-    FZF_WINDOW, FZF_BUFFER, _, FZF_BORDER_BUFFER =
+    FZF_STATE.prev_window = vim.api.nvim_get_current_win()
+    FZF_STATE.window, FZF_STATE.buffer, _, FZF_STATE.border_buffer =
       window_utils.open_floating_window({
-        buffer = FZF_BUFFER,
+        buffer = FZF_STATE.buffer,
         buffiletype = "fzf",
       })
     window_utils.create_autocmd_close_all_windows_together({
       {
-        window = FZF_WINDOW,
-        buffer = FZF_BUFFER,
-        border_buffer = FZF_BORDER_BUFFER,
+        window = FZF_STATE.window,
+        buffer = FZF_STATE.buffer,
+        border_buffer = FZF_STATE.border_buffer,
       },
     })
   end
 
-  if type(content) == "table" then content = table.concat(content, "\n") end
-
-  local preview_window_arg = string.format(
-    [[%s,%s,border-none,%s,nofollow,nocycle]],
-    opts.fzf_preview_window.position or "right",
-    opts.fzf_preview_window.size or "50%",
-    opts.fzf_preview_window.wrap and "wrap" or "nowrap"
-  )
-
   for k, v in pairs(opts.fzf_binds) do
     if type(v) == "function" then
-      FZF_EVENT_CALLBACK_MAP[k] = v
+      fzf_event_callback_map[k] = v
       opts.fzf_binds[k] = string.format(
         [[execute-silent(echo "event %s" | %s)]],
         k,
@@ -261,7 +248,7 @@ M.fzf = function(content, on_selection, opts)
   end
   opts.fzf_binds.focus = opts.fzf_binds.focus
     .. string.format(
-      [[execute-silent(echo "focus {n} {}" | %s)]],
+      [[execute-silent(echo "focus {n} {}" | %s)]], -- TODO: support multi with +
       os_utils.get_unix_sock_cmd(server_socket_path)
     )
 
@@ -272,8 +259,9 @@ M.fzf = function(content, on_selection, opts)
   end
   opts.fzf_binds.start = opts.fzf_binds.start
     .. string.format(
-      [[execute-silent(echo "port $FZF_PORT" | %s)]],
-      os_utils.get_unix_sock_cmd(server_socket_path)
+      [[execute-silent(echo "port $FZF_PORT" | %s)+pos(%d)]],
+      os_utils.get_unix_sock_cmd(server_socket_path),
+      opts.fzf_initial_position -- Async can mess with setting pos on start. So make sure --sync is supplied to fzf
     )
 
   if opts.fzf_binds.change then
@@ -287,12 +275,6 @@ M.fzf = function(content, on_selection, opts)
       os_utils.get_unix_sock_cmd(server_socket_path)
     )
 
-  -- Default keybinds
-  opts.fzf_binds["shift-up"] =
-    "preview-up+preview-up+preview-up+preview-up+preview-up"
-  opts.fzf_binds["shift-down"] =
-    "preview-down+preview-down+preview-down+preview-down+preview-down"
-
   local binds_arg = table.concat(
     utils.map(
       opts.fzf_binds,
@@ -301,37 +283,44 @@ M.fzf = function(content, on_selection, opts)
     ","
   )
 
+  if opts.before_fzf ~= nil and type(opts.before_fzf) == "function" then
+    opts.before_fzf()
+  end
+
   if config.debug then
     vim.notify(string.format([[binds_arg\n%s]], vim.inspect(binds_arg)))
   end
 
-  vim.fn.termopen(
+  local channel = vim.fn.termopen(
     string.format(
-      [[echo "%s" | fzf --listen --ansi --prompt='%s❯ ' --border=none --height=100%% --preview-window=%s %s --bind '%s' --delimiter=%s %s > %s]],
-      content,
+      [[cat <<"EOF" | fzf --listen --ansi %s --prompt='%s❯ ' --border=none --height=100%% %s --bind '%s' --delimiter=%s %s > %s
+%s
+EOF
+        ]],
+      opts.fzf_async and "" or "--sync",
       opts.fzf_prompt,
-      preview_window_arg,
       opts.fzf_preview_cmd
           and string.format([[--preview='%s']], opts.fzf_preview_cmd)
         or "",
       binds_arg,
       string.format("'%s'", utils.nbsp),
-      opts.fzf_extra_args,
-      selection_path
+      opts.fzf_extra_args, -- TODO: put in front and throw warning if contains already existing args
+      selection_path,
+      table.concat(input, "\n")
     ),
     {
       on_exit = function(job_id, code, event)
         vim.cmd("silent! :checktime")
 
         -- Restore focus to preview window (causes window group to close)
-        if vim.api.nvim_win_is_valid(FZF_PREV_WINDOW) then
-          vim.api.nvim_win_close(FZF_WINDOW, true)
-          vim.api.nvim_set_current_win(FZF_PREV_WINDOW)
+        if vim.api.nvim_win_is_valid(FZF_STATE.prev_window) then
+          vim.api.nvim_win_close(FZF_STATE.window, true)
+          vim.api.nvim_set_current_win(FZF_STATE.prev_window)
         else
           vim.notify(
             string.format(
               "Invalid preview window: %s",
-              vim.inspect(FZF_PREV_WINDOW)
+              vim.inspect(FZF_STATE.prev_window)
             ),
             vim.log.levels.ERROR
           )
@@ -376,6 +365,10 @@ M.fzf = function(content, on_selection, opts)
             vim.log.levels.ERROR
           )
         end
+
+        if opts.after_fzf and type(opts.after_fzf) == "function" then
+          opts.after_fzf()
+        end
       end,
       stdout_buffered = false,
       on_stdout = capture_stdout and function(...)
@@ -388,6 +381,14 @@ M.fzf = function(content, on_selection, opts)
       end or nil,
     }
   )
+  if channel <= 0 then
+    vim.notify(
+      string.format("Error opening fzf terminal: %s", channel),
+      vim.log.levels.ERROR
+    )
+    return
+  end
+  FZF_STATE.channel = channel
 
   vim.cmd("startinsert")
 end

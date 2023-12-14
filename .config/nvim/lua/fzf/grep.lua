@@ -1,110 +1,76 @@
 local M = {}
 
 local core = require("fzf.core")
+local helpers = require("fzf.helpers")
 local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local uv = vim.loop
+local uv_utils = require("utils.uv")
 
 -- TODO: no-git mode
-M.grep = function()
-  local function get_entries(query)
-    if query == "" then return {} end
+M.grep = function(opts)
+  opts = vim.tbl_extend("force", {
+    git_dir = fzf_utils.get_git_toplevel(),
+  }, opts or {})
 
-    local git_files = vim.fn.systemlist(fzf_utils.git_files, nil, false)
-    utils.sort_filepaths(git_files, function(e) return e end)
+  local function get_filepath_from_selection(selection)
+    selection = selection or FZF_STATE.current_selection
 
-    if false then
-      local entries = {}
-      for f in ipairs(git_files) do
-        utils.list_join(
-          entries,
-          utils.map(
-            vim.fn.systemlist(
-              string.format(
-                [[rg %s "%s" %s]],
-                config.rg_default_opts,
-                query,
-                fzf_utils.convert_git_filepath_to_fullpath(f)
-              )
-            ),
-            function(e) return string.format("%s%s%s", f, utils.nbsp, e) end
-          )
-        )
-      end
-      return entries
-    else
-      local entries = vim.split(
-        vim.fn.system(
-          string.format(
-            "rg %s %s %s",
-            config.rg_default_opts,
-            query,
-            table.concat(git_files, " ")
-          )
-        ),
-        "\n"
-      )
-      return entries
-    end
+    return vim.split(selection, utils.nbsp)[1]
   end
 
-  core.fzf("", function(selection)
+  core.fzf({}, function(selection)
     local filepath = vim.split(selection[1], utils.nbsp)[1]
     vim.cmd(
-      string.format(
-        [[e %s]],
-        fzf_utils.convert_git_filepath_to_fullpath(filepath)
-      )
+      string.format([[e %s]], fzf_utils.convert_gitpath_to_relpath(filepath))
     )
   end, {
+    -- fzf_async = true,
     fzf_preview_cmd = string.format(
-      "bat %s %s/{}",
-      config.bat_default_opts,
-      fzf_utils.get_git_toplevel()
+      "bat %s --highlight-line {2} %s/{1}",
+      helpers.bat_default_opts,
+      opts.git_dir
     ),
     fzf_prompt = "Grep",
-    fzf_on_focus = function(selection) end,
+    fzf_on_focus = function() end,
+
     fzf_on_prompt_change = function(query)
-      core.send_to_fzf(string.format(
-        "reload(%s)",
-        string.format(
-          [[cat <<EOF
-%s
-EOF]],
-          table.concat(get_entries(query), "\n")
-        )
-      ))
+      -- Important: most work should be carried out by the preview function
+      core.send_to_fzf(
+        "reload@"
+          .. string.format(
+            [[rg %s "%s" $(%s) | sed "s/:/%s/; s/:/%s 󰳟  /"]],
+            helpers.rg_default_opts,
+            query,
+            fzf_utils.git_files(opts.git_dir),
+            utils.nbsp,
+            utils.nbsp
+          )
+          .. "@"
+      )
     end,
-    fzf_binds = {
+    before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
+    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local filepath = vim.split(current_selection, utils.nbsp)[1]
-        vim.fn.setreg(
-          "+",
-          fzf_utils.convert_git_filepath_to_fullpath(filepath)
-        )
+        local filepath = get_filepath_from_selection()
+        vim.fn.setreg("+", filepath)
       end,
       ["ctrl-w"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local filepath = vim.split(current_selection, utils.nbsp)[1]
-        vim.cmd(
-          string.format(
-            [[vsplit %s]],
-            fzf_utils.convert_git_filepath_to_fullpath(filepath)
-          )
-        )
+        local filepath = get_filepath_from_selection()
+        vim.cmd(string.format([[vsplit %s]], filepath))
       end,
       ["ctrl-t"] = function()
-        local current_selection = FZF_CURRENT_SELECTION
-        local filepath = vim.split(current_selection, utils.nbsp)[1]
-        vim.cmd(
-          string.format(
-            [[tabnew %s]],
-            fzf_utils.convert_git_filepath_to_fullpath(filepath)
-          )
-        )
+        local filepath = get_filepath_from_selection()
+        vim.cmd(string.format([[tabnew %s]], filepath))
       end,
-    },
+    }),
+    fzf_extra_args = "--with-nth=1,3.. " -- Hide line number
+      .. string.format(
+        "--preview-window='%s,%s'",
+        helpers.fzf_default_preview_window_args,
+        fzf_utils.fzf_initial_preview_scroll_offset("{2}", { fixed_header = 4 })
+      ),
   })
 end
 

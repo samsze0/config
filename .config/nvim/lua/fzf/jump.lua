@@ -1,6 +1,7 @@
 local M = {}
 
 local core = require("fzf.core")
+local helpers = require("fzf.helpers")
 local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
@@ -91,28 +92,29 @@ M.jumps = function()
     return entries
   end
 
-  core.fzf(table.concat(get_entries(), "\n"), function(selection)
-    local bufnr = vim.split(selection[1], utils.nbsp)[2]
-    local lnum = vim.split(selection[1], utils.nbsp)[3]
-    local col = vim.split(selection[1], utils.nbsp)[4]
+  local get_info_from_selection = function(selection)
+    selection = selection or FZF_STATE.current_selection
+    local args = vim.split(selection, utils.nbsp)
+    return unpack(args)
+  end
+
+  core.fzf(get_entries(), function(selection)
+    local _, bufnr, lnum, col = get_info_from_selection(selection)
     vim.cmd(string.format([[buffer %s]], bufnr))
     vim.cmd(string.format([[normal! %sG%s|]], lnum, col))
   end, {
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=3..",
+    fzf_extra_args = "--with-nth=3.. --preview-window="
+      .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Jumps",
     fzf_initial_position = fzf_initial_pos,
     fzf_binds = {},
-    fzf_on_focus = function(selection)
-      local args = vim.split(selection, utils.nbsp)
-      local bufnr = args[2]
-      local lnum = args[3]
-      local col = args[4]
-      local filepath = args[5]
+    fzf_on_focus = function()
+      local _, bufnr, lnum, col, filepath = get_info_from_selection()
       core.send_to_fzf(
         string.format(
           [[change-preview:%s]],
-          string.format([[bat %s %s]], config.bat_default_opts, filepath)
+          string.format([[bat %s %s]], helpers.bat_default_opts, filepath)
         )
       )
     end,

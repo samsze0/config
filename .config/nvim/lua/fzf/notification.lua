@@ -3,11 +3,24 @@ local M = {}
 local core = require("fzf.core")
 local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
+local helpers = require("fzf.helpers")
 local timeago = require("utils.timeago")
 local utils = require("utils")
 
 M.notifications = function(opts)
-  opts = vim.tbl_extend("force", {}, opts or {})
+  local notify = vim.notify -- Restore vim.notify later
+  vim.notify = function(...) end
+
+  opts = vim.tbl_extend("force", {
+    max_num_entries = 100,
+  }, opts or {})
+
+  local custom_shellescape = function(str)
+    str = string.gsub(str, [[\n]], [[ ]])
+    str = string.gsub(str, [["]], [[“]])
+    str = string.gsub(str, [[']], [[“]])
+    return string.gsub(str, "EOF", "eof")
+  end
 
   local get_entries = function()
     local notifications = _G.notifications
@@ -16,32 +29,29 @@ M.notifications = function(opts)
 
     local entries = {}
     for i = #notifications, 1, -1 do
+      if #entries >= opts.max_num_entries then break end
+
       local noti = notifications[i]
       local level = noti.level
+      local unread = #entries < num_unread
       if level == vim.log.levels.INFO then
-        level = utils.ansi_codes.blue("󰋼 ")
+        level = unread and utils.ansi_codes.blue("󰋼 ") or "󰋼 "
       elseif level == vim.log.levels.WARN then
-        level = utils.ansi_codes.yellow(" ")
+        level = unread and utils.ansi_codes.yellow(" ") or " "
       elseif level == vim.log.levels.ERROR then
-        level = utils.ansi_codes.red(" ")
+        level = unread and utils.ansi_codes.red(" ") or " "
       elseif level == vim.log.levels.DEBUG or level == vim.log.levels.TRACE then
-        level = utils.ansi_codes.grey(" ")
+        level = unread and utils.ansi_codes.grey(" ") or " "
       else
-        level = utils.ansi_codes.grey(" ")
+        level = unread and utils.ansi_codes.grey(" ") or " "
       end
-      local brief = vim.fn.systemlist(string.format(
-        [[cat <<EOF
-%s
-EOF
-          ]],
-        noti.message
-      ))[1]
+      local brief = vim.fn.systemlist(utils.heredoc(noti.message))[1]
+      brief = custom_shellescape(brief)
       if not brief or brief == "" then brief = "<empty>" end
       local brief_max_length = 50
       brief = #brief > brief_max_length
           and brief:sub(1, brief_max_length - 3) .. "..."
         or utils.pad(brief, brief_max_length)
-      brief = "" -- TODO: proper shellescape (for other fzf uses too)
       table.insert(
         entries,
         string.format(
@@ -50,7 +60,7 @@ EOF
           utils.nbsp,
           timeago(noti.time),
           utils.nbsp,
-          #entries < num_unread and utils.ansi_codes.white(brief) or brief
+          unread and utils.ansi_codes.white(brief) or brief
           -- utils.nbsp,
           -- noti.message -- Doesn't work if message contains newlines
         )
@@ -60,38 +70,32 @@ EOF
   end
 
   local entries = get_entries()
-  local tmpfile = os.tmpname()
 
-  core.fzf(table.concat(entries, "\n"), function(selection) end, {
-    fzf_preview_cmd = string.format(
-      [[bat %s %s]],
-      config.bat_default_opts,
-      tmpfile
-    ),
-    fzf_extra_args = "--with-nth=1..",
+  local get_notification_from_selection = function(selection)
+    local selection_index = FZF_STATE.current_selection_index
+    selection = selection or FZF_STATE.current_selection
+
+    return _G.notifications[#_G.notifications - selection_index + 1]
+  end
+
+  core.fzf(entries, function(selection) end, {
+    fzf_preview_cmd = "",
+    fzf_extra_args = "--with-nth=1.. --preview-window=" .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Notifications❯ ",
     fzf_initial_position = 1,
     fzf_on_focus = function()
-      local selection_index = FZF_CURRENT_SELECTION_INDEX
-      if selection_index == -1 then
-        vim.fn.writefile({ "No selection" }, tmpfile)
-        return
-      end
+      local noti = get_notification_from_selection()
 
-      vim.fn.writefile( -- TODO
-        vim.fn.systemlist(
-          string.format(
-            [[cat <<EOF
-%s
-EOF
-          ]],
-            notifications[#notifications - selection_index + 1].message
+      core.send_to_fzf(
+        "change-preview:"
+          .. utils.heredoc(
+            custom_shellescape(noti.message),
+            { pipe_to = "bat " .. helpers.bat_default_opts }
           )
-        ),
-        tmpfile
       )
     end,
-    fzf_binds = {},
+    after_fzf = function() vim.notify = notify end, -- Restore vim.notify
+    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
   })
 end
 

@@ -12,7 +12,7 @@ M.lsp_implementations = function(opts)
 
   local function get_entries()
     return utils.map(
-      undolist,
+      {},
       function(i, undo)
         return string.format(
           string.rep("%s", 2, utils.nbsp),

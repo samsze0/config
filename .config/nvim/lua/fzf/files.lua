@@ -42,30 +42,10 @@ M.files = function(opts)
         and function()
           local path = get_relpath_from_selection()
 
-          local filename = vim.fn.fnamemodify(path, ":t")
-          local ft = vim.filetype.match({ filename = filename })
           local is_binary =
             vim.fn.system("file --mime " .. path):match("charset=binary")
 
-          if not is_binary then
-            vim.api.nvim_buf_set_lines(
-              FZF_STATE.preview_buffer,
-              0,
-              -1,
-              false,
-              vim.fn.readfile(path)
-            )
-            vim.api.nvim_buf_set_option(
-              FZF_STATE.preview_buffer,
-              "filetype",
-              ft
-            )
-
-            -- Switch to preview window and back in order to refresh scrollbar
-            -- TODO: Remove this once scrollbar plugin support remote refresh
-            vim.api.nvim_set_current_win(FZF_STATE.preview_window)
-            vim.api.nvim_set_current_win(FZF_STATE.window)
-          else
+          if is_binary then
             vim.api.nvim_buf_set_lines(
               FZF_STATE.preview_buffer,
               0,
@@ -73,7 +53,28 @@ M.files = function(opts)
               false,
               { "No preview available" }
             )
+            return
           end
+
+          local filename = vim.fn.fnamemodify(path, ":t")
+          local ft = vim.filetype.match({
+            filename = filename,
+            contents = vim.fn.readfile(path),
+          })
+
+          vim.api.nvim_buf_set_lines(
+            FZF_STATE.preview_buffer,
+            0,
+            -1,
+            false,
+            vim.fn.readfile(path)
+          )
+          vim.bo[FZF_STATE.preview_buffer].filetype = ft
+
+          -- Switch to preview window and back in order to refresh scrollbar
+          -- TODO: Remove this once scrollbar plugin support remote refresh
+          vim.api.nvim_set_current_win(FZF_STATE.preview_window)
+          vim.api.nvim_set_current_win(FZF_STATE.window)
         end
       or nil,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {

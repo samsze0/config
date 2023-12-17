@@ -9,18 +9,16 @@ local utils = require("utils")
 M.files = function(opts)
   opts = vim.tbl_extend("force", {
     nvim_preview = false,
-    git_dir = fzf_utils.get_git_toplevel(),
+    git_dir = fzf_utils.git_root_dir(),
   }, opts or {})
 
-  local get_relpath_from_selection = function()
+  local get_selection = function()
     local selection = FZF_STATE.current_selection
 
     return fzf_utils.convert_gitpath_to_relpath(selection, opts.git_dir)
   end
 
-  local entries =
-    vim.fn.systemlist(fzf_utils.git_files(opts.git_dir), nil, false)
-  entries = utils.filter(entries, function(e) return e ~= "" end)
+  local entries = fzf_utils.git_files(opts.git_dir)
 
   utils.sort_filepaths(entries, function(e) return e end)
 
@@ -31,7 +29,7 @@ M.files = function(opts)
     fzf_preview_cmd = not opts.nvim_preview and fzf_preview_cmd or nil,
     fzf_prompt = "Files",
     fzf_on_select = function()
-      local filepath = get_relpath_from_selection()
+      local filepath = get_selection()
       vim.cmd(string.format([[e %s]], filepath))
     end,
     before_fzf = function()
@@ -40,7 +38,7 @@ M.files = function(opts)
     end,
     fzf_on_focus = opts.nvim_preview
         and function()
-          local path = get_relpath_from_selection()
+          local path = get_selection()
 
           local is_binary =
             vim.fn.system("file --mime " .. path):match("charset=binary")
@@ -79,18 +77,18 @@ M.files = function(opts)
       or nil,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()
-        local path = get_relpath_from_selection()
+        local path = get_selection()
         vim.fn.setreg("+", path)
         vim.notify(string.format([[Copied %s to clipboard]], path))
       end,
       ["ctrl-w"] = function()
-        local path = get_relpath_from_selection()
+        local path = get_selection()
         core.abort_and_execute(
           function() vim.cmd(string.format([[vsplit %s]], path)) end
         )
       end,
       ["ctrl-t"] = function()
-        local path = get_relpath_from_selection()
+        local path = get_selection()
         core.abort_and_execute(
           function() vim.cmd(string.format([[tabnew %s]], path)) end
         )

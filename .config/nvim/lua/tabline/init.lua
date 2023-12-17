@@ -69,8 +69,7 @@ local function tabline(options)
       return filename_parts[1]
     end
   elseif options.dedup_by == "git_files" then
-    local git_files =
-      vim.fn.systemlist(fzf_utils.git_files(fzf_utils.get_git_toplevel()))
+    local git_files = fzf_utils.git_files()
     local filenames = utils.map(
       git_files,
       function(_, f) return utils.reverse(vim.split(f, "/")) end

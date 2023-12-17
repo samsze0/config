@@ -45,9 +45,10 @@ M.undos = function(opts)
 
       core.send_to_fzf(
         "change-preview:"
-          .. utils.heredoc(
-            fzf_utils.fzf_heredoc_shellescape(undo.diff),
-            { pipe_to = "delta " .. helpers.delta_default_opts }
+          .. string.format(
+            [[cat %s | delta %s --file-style=omit]],
+            fzf_utils.write_to_tmpfile(undo.diff),
+            helpers.delta_default_opts
           )
       )
     end,

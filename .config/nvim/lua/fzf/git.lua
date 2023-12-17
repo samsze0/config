@@ -8,7 +8,7 @@ local utils = require("utils")
 
 M.git_status = function(opts)
   opts = vim.tbl_extend("force", {
-    git_dir = fzf_utils.get_git_toplevel(),
+    git_dir = fzf_utils.git_root_dir(),
   }, opts or {})
 
   local git = string.format([[git -C %s]], opts.git_dir)
@@ -57,7 +57,7 @@ M.git_status = function(opts)
   )
   if fzf_initial_pos == nil then fzf_initial_pos = 0 end
 
-  local get_relpath_and_status_from_selection = function()
+  local get_selection = function()
     local selection = FZF_STATE.current_selection
 
     local args = vim.split(selection, utils.nbsp)
@@ -71,7 +71,7 @@ M.git_status = function(opts)
 
   core.fzf(entries, {
     fzf_on_select = function()
-      local filepath = get_relpath_and_status_from_selection()
+      local filepath = get_selection()
 
       vim.cmd(string.format([[e %s]], filepath))
     end,
@@ -82,32 +82,32 @@ M.git_status = function(opts)
     fzf_initial_position = fzf_initial_pos,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["left"] = function()
-        local filepath = get_relpath_and_status_from_selection()
+        local filepath = get_selection()
 
         vim.fn.system(string.format([[git add %s]], filepath))
         core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
       ["right"] = function()
-        local filepath = get_relpath_and_status_from_selection()
+        local filepath = get_selection()
 
         vim.fn.system(string.format([[git restore --staged %s]], filepath))
         core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
       ["ctrl-y"] = function()
-        local filepath = get_relpath_and_status_from_selection()
+        local filepath = get_selection()
 
         vim.fn.setreg("+", filepath)
         vim.notify(string.format([[Copied to clipboard: %s]], filepath))
       end,
       ["ctrl-x"] = function()
-        local filepath = get_relpath_and_status_from_selection()
+        local filepath = get_selection()
 
         vim.fn.system(string.format([[git restore %s]], filepath))
         core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
     }),
     fzf_on_focus = function()
-      local filepath, status = get_relpath_and_status_from_selection()
+      local filepath, status = get_selection()
 
       local status_x = status:sub(1, 1)
       local status_y = status:sub(3, 3)
@@ -152,7 +152,7 @@ end
 
 M.git_commits = function(opts)
   opts = vim.tbl_extend("force", {
-    git_dir = fzf_utils.get_git_toplevel(),
+    git_dir = fzf_utils.git_root_dir(),
     filepaths = "",
   }, opts or {})
 
@@ -212,7 +212,7 @@ end
 
 M.git_stash = function(opts)
   opts = vim.tbl_extend("force", {
-    git_dir = fzf_utils.get_git_toplevel(),
+    git_dir = fzf_utils.git_root_dir(),
   }, opts or {})
 
   local get_entries = function()
@@ -228,9 +228,8 @@ M.git_stash = function(opts)
       parts = utils.map(parts, function(_, p) return vim.trim(p) end)
 
       return string.format(
-        "%s%s%s",
+        string.rep("%s", 2, utils.nbsp),
         utils.ansi_codes.blue(parts[1]),
-        utils.nbsp,
         utils.ansi_codes.white(parts[2])
       )
     end)
@@ -275,12 +274,25 @@ end
 M.git_submodules = function(on_submodule)
   local submodules =
     vim.fn.systemlist([[git submodule --quiet foreach 'echo $path']])
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Error running git submodule command", vim.log.levels.ERROR)
+    return
+  end
   submodules = utils.map(submodules, function(_, e) return vim.trim(e) end)
+
+  local function get_relpath_from_selection()
+    local selection = FZF_STATE.current_selection
+
+    local submodule_path = selection
+    submodule_path = fzf_utils.convert_gitpath_to_relpath(submodule_path)
+
+    return submodule_path
+  end
 
   core.fzf(submodules, {
     fzf_on_select = function()
-      local submodule_path = FZF_STATE.current_selection
-      on_submodule(fzf_utils.get_git_toplevel() .. "/" .. submodule_path)
+      local submodule_path = get_relpath_from_selection()
+      on_submodule(submodule_path)
     end,
     fzf_preview_cmd = nil,
     fzf_extra_args = "--with-nth=1.. --preview-window="
@@ -288,8 +300,7 @@ M.git_submodules = function(on_submodule)
     fzf_prompt = "GitSubmodules",
     fzf_binds = {
       ["ctrl-y"] = function()
-        local current_selection = FZF_STATE.current_selection
-        local submodule_path = current_selection
+        local submodule_path = get_relpath_from_selection()
 
         vim.fn.setreg("+", submodule_path)
         vim.notify(string.format([[Copied to clipboard: %s]], submodule_path))

@@ -38,8 +38,9 @@ M.notifications = function(opts)
       else
         level = unread and utils.ansi_codes.grey(" ") or " "
       end
-      local brief = vim.fn.systemlist(utils.heredoc(noti.message))[1]
-      brief = fzf_utils.fzf_heredoc_shellescape(brief)
+      local brief = vim.fn.shellescape(noti.message)
+      local parts = vim.split(brief, "\n")
+      if #parts > 1 then brief = parts[1] end
       if not brief or brief == "" then brief = "<empty>" end
       local brief_max_length = 50
       brief = #brief > brief_max_length
@@ -72,16 +73,17 @@ M.notifications = function(opts)
     fzf_preview_cmd = nil,
     fzf_extra_args = "--with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
-    fzf_prompt = "Notifications❯ ",
+    fzf_prompt = "Notifications",
     fzf_initial_position = 1,
     fzf_on_focus = function()
       local noti = get_notification_from_selection()
 
       core.send_to_fzf(
         "change-preview:"
-          .. utils.heredoc(
-            fzf_utils.fzf_heredoc_shellescape(noti.message),
-            { pipe_to = "bat " .. helpers.bat_default_opts }
+          .. string.format(
+            [[bat %s --file-name "none" %s]],
+            helpers.bat_default_opts,
+            fzf_utils.write_to_tmpfile(noti.message)
           )
       )
     end,

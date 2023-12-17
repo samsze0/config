@@ -316,7 +316,7 @@ M.setup = function()
           function(submodule_path)
             safe_require("fzf").git_commits({
               git_dir = submodule_path,
-              filepaths = vim.fn.expand("%:p"),
+              filepaths = vim.fn.expand("%"),
             })
           end
         )
@@ -348,11 +348,11 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f4><f4>" }] = {
       fzflua = safe_require("fzf-lua").lsp_document_symbols,
-      fzf = nil,
+      fzf = safe_require("fzf").lsp_document_symbols,
     },
     [{ mode = "n", lhs = "<f4><f5>" }] = {
       fzflua = safe_require("fzf-lua").lsp_workspace_symbols,
-      fzf = nil,
+      fzf = safe_require("fzf").lsp_workspace_symbols,
     },
     [{ mode = "n", lhs = "ld" }] = {
       fzflua = safe_require("fzf-lua").lsp_document_diagnostics,

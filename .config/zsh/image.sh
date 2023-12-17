@@ -15,3 +15,8 @@ get_video_thumbnail_as_image() {
 	ffmpeg -i "$1" -ss 00:00:05 -vframes 1 -y $CACHE_FFMPEG_IMAGE
 	echo "$CACHE_FFMPEG_IMAGE"
 }
+
+# Convert m3u8 (url or local) to mkv
+convert_m3u8_to_mkv() {
+	ffmpeg -i $1 -c copy $2
+}

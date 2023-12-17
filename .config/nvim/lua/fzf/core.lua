@@ -12,11 +12,12 @@ local uv = vim.loop
 
 local fzf_port
 local fzf_on_focus
-local fzf_on_prompt_change
+local fzf_on_query_change
 local fzf_event_callback_map = {}
 
 FZF_STATE = {
   event_callback_map = {},
+  current_query = nil,
   current_selection = nil,
   current_selection_index = nil,
   prev_window = nil,
@@ -31,7 +32,7 @@ FZF_STATE = {
 
 local reset_state = function()
   fzf_on_focus = nil
-  fzf_on_prompt_change = nil
+  fzf_on_query_change = nil
   fzf_event_callback_map = {}
 
   FZF_STATE = {
@@ -58,6 +59,13 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
 
     if string.match(message, "^port") then
       fzf_port = string.match(message, "^port (%d+)")
+      if not fzf_port then
+        vim.notify(
+          string.format("Invalid fzf port message: %s", message),
+          vim.log.levels.ERROR
+        )
+        return
+      end
     elseif string.match(message, "^focus") then
       local index, selection = string.match(message, "^focus (%d+) '(.*)'")
       if not index or not selection then
@@ -67,26 +75,32 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         )
         return
       end
-      FZF_STATE.current_selection_index = selection ~= ""
-          and tonumber(index) + 1
-        or -1
+      FZF_STATE.current_selection_index = tonumber(index) + 1
       FZF_STATE.current_selection = selection
-      if selection and fzf_on_focus then vim.schedule(fzf_on_focus) end
+      if fzf_on_focus then vim.schedule(fzf_on_focus) end
     elseif string.match(message, "^change") then
-      local query = string.match(message, "^change '(.+)'")
-      if query and fzf_on_prompt_change then
-        vim.schedule(function() fzf_on_prompt_change(query) end)
+      local query = string.match(message, "^change '(.*)'")
+      if not query then
+        vim.notify(
+          string.format("Invalid fzf change message: %s", message),
+          vim.log.levels.ERROR
+        )
+        return
       end
+
+      FZF_STATE.current_query = query
+      if fzf_on_query_change then vim.schedule(fzf_on_query_change) end
     elseif string.match(message, "^event") then
       local event = string.match(message, "^event ([^\n]+)")
-      if event and fzf_event_callback_map[event] then
-        local callback = fzf_event_callback_map[event]
-        vim.schedule(callback)
-      else
+      if not event then
         vim.notify(
           string.format("Invalid fzf event: %s", event),
           vim.log.levels.ERROR
         )
+        return
+      end
+      if fzf_event_callback_map[event] then
+        vim.schedule(fzf_event_callback_map[event])
       end
     else
       vim.notify(
@@ -124,6 +138,7 @@ M.fzf = function(input, opts)
     fzf_preview_window = {},
     fzf_preview_cmd = nil,
     fzf_initial_position = 0,
+    fzf_on_query_change = nil,
     fzf_on_focus = nil,
     fzf_on_select = nil,
     fzf_binds = {},
@@ -134,7 +149,7 @@ M.fzf = function(input, opts)
   }, opts or {})
 
   fzf_on_focus = opts.fzf_on_focus
-  fzf_on_prompt_change = opts.fzf_on_prompt_change
+  fzf_on_query_change = opts.fzf_on_query_change
 
   if config.debug then vim.notify(vim.inspect(opts)) end
 
@@ -205,7 +220,7 @@ M.fzf = function(input, opts)
     if type(action) == "function" then
       fzf_event_callback_map[event] = action
       opts.fzf_binds[event] = string.format(
-        [[execute-silent(echo "event %s" | %s)]],
+        [[execute-silent(printf "event %s" | %s)]],
         event,
         os_utils.get_unix_sock_cmd(server_socket_path)
       )
@@ -237,7 +252,7 @@ M.fzf = function(input, opts)
   end
   opts.fzf_binds.focus = opts.fzf_binds.focus
     .. string.format(
-      [[execute-silent(echo "focus {n} {}" | %s)]], -- TODO: support multi with +
+      [[execute-silent(printf "focus {n} {}" | %s)]], -- TODO: support multi with +
       os_utils.get_unix_sock_cmd(server_socket_path)
     )
 
@@ -248,7 +263,7 @@ M.fzf = function(input, opts)
   end
   opts.fzf_binds.start = opts.fzf_binds.start
     .. string.format(
-      [[execute-silent(echo "port $FZF_PORT" | %s)+pos(%d)]],
+      [[execute-silent(printf "port $FZF_PORT" | %s)+pos(%d)]],
       os_utils.get_unix_sock_cmd(server_socket_path),
       opts.fzf_initial_position -- Async can mess with setting pos on start. So make sure --sync is supplied to fzf
     )
@@ -260,7 +275,7 @@ M.fzf = function(input, opts)
   end
   opts.fzf_binds.change = opts.fzf_binds.change
     .. string.format(
-      [[execute-silent(echo "change {q}" | %s)]],
+      [[execute-silent(printf "change {q}" | %s)]],
       os_utils.get_unix_sock_cmd(server_socket_path)
     )
 
@@ -280,19 +295,19 @@ M.fzf = function(input, opts)
 
   local channel = vim.fn.termopen(
     string.format(
-      [[cat <<"EOF" | fzf --listen --ansi %s --prompt='%s❯ ' --border=none --height=100%% %s --bind '%s' --delimiter=%s %s
+      [[cat <<"EOF" | perl -pe "chomp if eof" | fzf --listen --ansi %s --prompt='%s❯ ' --border=none --height=100%% %s --bind '%s' --delimiter='%s' %s
 %s
 EOF
         ]],
       opts.fzf_async and "" or "--sync",
       opts.fzf_prompt,
       opts.fzf_preview_cmd
-          and string.format([[--preview='%s']], opts.fzf_preview_cmd)
+          and string.format([[--preview="%s"]], opts.fzf_preview_cmd)
         or "",
       binds_arg,
-      string.format("'%s'", utils.nbsp),
-      opts.fzf_extra_args, -- TODO: put in front and throw warning if contains already existing args
-      table.concat(input, "\n")
+      utils.nbsp,
+      opts.fzf_extra_args, -- TODO: throw warning if contains already existing args
+      #input > 0 and table.concat(input, "\n") or ""
     ),
     {
       on_exit = function(job_id, code, event)

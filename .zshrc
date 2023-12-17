@@ -14,6 +14,7 @@ source ~/.config/zsh/git.sh
 source ~/.config/zsh/homebrew.sh
 source ~/.config/zsh/syncthing.sh
 source ~/.config/zsh/osx.sh
+source ~/.config/zsh/bat.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration

@@ -11,7 +11,7 @@ local uv_utils = require("utils.uv")
 -- TODO: no-git mode
 M.grep = function(opts)
   opts = vim.tbl_extend("force", {
-    git_dir = fzf_utils.get_git_toplevel(),
+    git_dir = fzf_utils.git_root_dir(),
   }, opts or {})
 
   local function get_info_from_selection()
@@ -20,6 +20,13 @@ M.grep = function(opts)
     local args = vim.split(selection, utils.nbsp)
     return unpack(args)
   end
+
+  local files = fzf_utils.git_files(
+    opts.git_dir,
+    { return_as_cmd = false, convert_gitpaths_to_relpaths = true }
+  )
+  files = utils.map(files, function(_, e) return [["]] .. e .. [["]] end)
+  local files_str = table.concat(files, " ")
 
   core.fzf({}, {
     fzf_on_select = function()
@@ -30,27 +37,27 @@ M.grep = function(opts)
     end,
     -- fzf_async = true,
     fzf_preview_cmd = string.format(
-      "bat %s --highlight-line {2} %s/{1}",
-      helpers.bat_default_opts,
-      opts.git_dir
+      [[bat %s --highlight-line {2} {1}]],
+      helpers.bat_default_opts
     ),
     fzf_prompt = "Grep",
     fzf_on_focus = function() end,
-
-    fzf_on_prompt_change = function(query)
+    fzf_on_query_change = function()
+      local query = FZF_STATE.current_query
+      if query == "" then
+        core.send_to_fzf("reload()")
+        return
+      end
       -- Important: most work should be carried out by the preview function
-      core.send_to_fzf(
-        "reload@"
-          .. string.format(
-            [[rg %s "%s" $(%s) | sed "s/:/%s/; s/:/%s 󰳟  /"]],
-            helpers.rg_default_opts,
-            query,
-            fzf_utils.git_files(opts.git_dir),
-            utils.nbsp,
-            utils.nbsp
-          )
-          .. "@"
-      )
+      core.send_to_fzf("reload@" .. string.format(
+        -- Custom delimiters & strip out ANSI color codes with sed
+        [[rg %s "%s" %s | sed "s/:/%s/; s/:/%s 󰳟  /; s/\x1b\[[0-9;]*m//g"]],
+        helpers.rg_default_opts,
+        query,
+        files_str,
+        utils.nbsp,
+        utils.nbsp
+      ) .. "@")
     end,
     before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {

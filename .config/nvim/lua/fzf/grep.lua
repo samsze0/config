@@ -144,7 +144,7 @@ M.grep_file = function(opts)
     end,
     -- fzf_async = true,
     fzf_preview_cmd = string.format(
-      [[bat %s --highlight-line %s {1}]],
+      [[bat %s --highlight-line {1} %s]],
       helpers.bat_default_opts,
       current_file
     ),
@@ -161,7 +161,7 @@ M.grep_file = function(opts)
       .. string.format(
         "--preview-window='%s,%s'",
         helpers.fzf_default_preview_window_args,
-        fzf_utils.fzf_initial_preview_scroll_offset("{2}", { fixed_header = 4 })
+        fzf_utils.fzf_initial_preview_scroll_offset("{1}", { fixed_header = 4 })
       ),
   })
 end

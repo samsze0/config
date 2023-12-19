@@ -118,7 +118,7 @@ M.grep_file = function(opts)
   local get_cmd = function(query)
     return string.format(
       -- Custom delimiters & strip out ANSI color codes with sed
-      [[rg %s "%s" "%s" | sed "%s"]],
+      [[rg %s "%s" "%s" | sed "%s"]], -- TODO: order of output is suffled
       helpers.rg_default_opts,
       query,
       current_file,
@@ -135,13 +135,14 @@ M.grep_file = function(opts)
     )
   end
 
-  core.fzf({}, {
+  core.fzf(get_cmd(""), {
     fzf_on_select = function()
       local line = get_info_from_selection()
       vim.cmd(string.format([[e %s]], current_file))
       vim.cmd(string.format([[normal! %sG]], line))
       vim.cmd([[normal! zz]])
     end,
+    fzf_initial_position = vim.fn.line("."), -- Assign to current line number
     -- fzf_async = true,
     fzf_preview_cmd = string.format(
       [[bat %s --highlight-line {1} %s]],

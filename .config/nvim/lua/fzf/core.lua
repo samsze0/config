@@ -161,7 +161,7 @@ M.fzf = function(input, opts)
     return
   end
 
-  if not type(input) == "table" then
+  if not type(input) == "table" and not type(input) == "string" then
     vim.notify(
       string.format("Invalid input type: %s", vim.inspect(input)),
       vim.log.levels.ERROR
@@ -293,22 +293,29 @@ M.fzf = function(input, opts)
     vim.notify(string.format([[binds_arg\n%s]], vim.inspect(binds_arg)))
   end
 
+  local fzf_cmd = string.format(
+    [[fzf --listen --ansi %s --prompt='%s❯ ' --border=none --height=100%% %s --bind '%s' --delimiter='%s' %s]],
+    opts.fzf_async and "" or "--sync",
+    opts.fzf_prompt,
+    opts.fzf_preview_cmd
+        and string.format([[--preview='%s']], opts.fzf_preview_cmd)
+      or "",
+    binds_arg,
+    utils.nbsp,
+    opts.fzf_extra_args -- TODO: throw warning if contains already existing args
+  )
+
   local channel = vim.fn.termopen(
-    string.format(
-      [[cat <<"EOF" | perl -pe "chomp if eof" | fzf --listen --ansi %s --prompt='%s❯ ' --border=none --height=100%% %s --bind '%s' --delimiter='%s' %s
+    type(input) == "table"
+        and string.format(
+          [[cat <<"EOF" | perl -pe "chomp if eof" | %s
 %s
 EOF
-        ]],
-      opts.fzf_async and "" or "--sync",
-      opts.fzf_prompt,
-      opts.fzf_preview_cmd
-          and string.format([[--preview='%s']], opts.fzf_preview_cmd)
-        or "",
-      binds_arg,
-      utils.nbsp,
-      opts.fzf_extra_args, -- TODO: throw warning if contains already existing args
-      #input > 0 and table.concat(input, "\n") or ""
-    ),
+          ]],
+          fzf_cmd,
+          #input > 0 and table.concat(input, "\n") or ""
+        )
+      or string.format([[%s | %s]], input, fzf_cmd),
     {
       on_exit = function(job_id, code, event)
         vim.cmd("silent! :checktime")

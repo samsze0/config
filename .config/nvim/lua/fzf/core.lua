@@ -302,7 +302,7 @@ EOF
       opts.fzf_async and "" or "--sync",
       opts.fzf_prompt,
       opts.fzf_preview_cmd
-          and string.format([[--preview="%s"]], opts.fzf_preview_cmd)
+          and string.format([[--preview='%s']], opts.fzf_preview_cmd)
         or "",
       binds_arg,
       utils.nbsp,

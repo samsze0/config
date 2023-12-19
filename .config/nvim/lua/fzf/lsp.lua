@@ -112,9 +112,7 @@ M.lsp_workspace_symbols = function(opts)
                 entries,
                 string.format(
                   string.rep("%s", 5, utils.nbsp),
-                  utils.ansi_codes.grey(
-                    vim.fn.fnamemodify(s.filename, ":~:.")
-                  ),
+                  utils.ansi_codes.grey(vim.fn.fnamemodify(s.filename, ":~:.")),
                   s.lnum,
                   s.col,
                   utils.ansi_codes.blue(s.kind),
@@ -150,6 +148,66 @@ M.lsp_workspace_symbols = function(opts)
         helpers.fzf_default_preview_window_args,
         fzf_utils.fzf_initial_preview_scroll_offset("{2}", { fixed_header = 3 })
       ),
+  })
+end
+
+M.lsp_references = function(opts)
+  opts = vim.tbl_extend("force", {}, opts or {})
+
+  local handle = vim.lsp.buf.references({
+    includeDeclaration = false,
+  }, {
+    on_list = function(list)
+      vim.notify(list)
+      local refs = list.items
+      local context = list.context
+      local title = list.title
+
+      local entries = {}
+      for _, r in ipairs(refs) do
+        table.insert(
+          entries,
+          string.format(
+            string.rep("%s", 4, utils.nbsp),
+            utils.ansi_codes.grey(vim.fn.fnamemodify(r.filename, ":~:.")),
+            r.lnum,
+            r.col,
+            vim.trim(r.text)
+          )
+        )
+      end
+
+      local function get_selection()
+        local index = FZF_STATE.current_selection_index
+        local symbol = refs[index]
+        return symbol
+      end
+
+      core.fzf(entries, {
+        fzf_on_select = function()
+          local symbol = get_selection()
+
+          vim.cmd("e " .. symbol.filename)
+          vim.fn.cursor({ symbol.lnum, symbol.col })
+          vim.cmd("normal! zz")
+        end,
+        fzf_preview_cmd = string.format(
+          "bat %s --highlight-line {2} {1}",
+          helpers.bat_default_opts
+        ),
+        fzf_prompt = "LSP References",
+        fzf_on_focus = function() end,
+        fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
+        fzf_extra_args = "--with-nth=1,4 " .. string.format(
+          "--preview-window=%s,%s",
+          helpers.fzf_default_preview_window_args,
+          fzf_utils.fzf_initial_preview_scroll_offset(
+            "{2}",
+            { fixed_header = 3 }
+          )
+        ),
+      })
+    end,
   })
 end
 

@@ -344,7 +344,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "lr" }] = {
       fzflua = safe_require("fzf-lua").lsp_references,
-      fzf = nil,
+      fzf = safe_require("fzf").lsp_references,
     },
     [{ mode = "n", lhs = "<f4><f4>" }] = {
       fzflua = safe_require("fzf-lua").lsp_document_symbols,
@@ -368,7 +368,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f5><f4>" }] = {
       fzflua = safe_require("fzf-lua").blines,
-      fzf = nil,
+      fzf = safe_require("fzf").grep_file,
     },
     [{ mode = "n", lhs = "<space>u" }] = {
       fzflua = safe_require("config.fzflua-custom").undo_tree,
@@ -381,10 +381,6 @@ M.setup = function()
     [{ mode = "n", lhs = "<f11><f11>" }] = {
       fzflua = safe_require("config.fzflua-custom").git_reflog,
       fzf = nil,
-    },
-    [{ mode = "n", lhs = "<f6>" }] = {
-      fzflua = nil,
-      fzf = safe_require("fzf").grep,
     },
     [{ mode = "n", lhs = "<space>j" }] = {
       fzflua = safe_require("config.fzflua-custom").jumps,

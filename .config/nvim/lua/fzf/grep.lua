@@ -28,6 +28,26 @@ M.grep = function(opts)
   files = utils.map(files, function(_, e) return [["]] .. e .. [["]] end)
   local files_str = table.concat(files, " ")
 
+  local get_cmd = function(query)
+    return string.format(
+      -- Custom delimiters & strip out ANSI color codes with sed
+      [[rg %s "%s" %s | sed "%s"]],
+      helpers.rg_default_opts,
+      query,
+      files_str,
+      string.format(
+        string.rep("%s", 3, ";"),
+        [[s/\x1b\[[0-9;]*m//g]], -- Strip out ANSI color codes
+        string.format(
+          [[s/^\([^:]*\):/%s\1%s:/]],
+          utils.ansi_escseq.grey,
+          utils.ansi_escseq.clear
+        ), -- Highlight first part with grey
+        string.format("s/:/%s/;s/:/%s/", utils.nbsp, utils.nbsp) -- Replace first two : with nbsp
+      )
+    )
+  end
+
   core.fzf({}, {
     fzf_on_select = function()
       local filepath, line = get_info_from_selection()
@@ -49,15 +69,7 @@ M.grep = function(opts)
         return
       end
       -- Important: most work should be carried out by the preview function
-      core.send_to_fzf("reload@" .. string.format(
-        -- Custom delimiters & strip out ANSI color codes with sed
-        [[rg %s "%s" %s | sed "s/:/%s/; s/:/%s 󰳟  /; s/\x1b\[[0-9;]*m//g"]],
-        helpers.rg_default_opts,
-        query,
-        files_str,
-        utils.nbsp,
-        utils.nbsp
-      ) .. "@")
+      core.send_to_fzf("reload@" .. get_cmd(query) .. "@")
     end,
     before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
@@ -82,7 +94,70 @@ M.grep = function(opts)
         end)
       end,
     }),
-    fzf_extra_args = "--with-nth=1,3.. " -- Hide line number
+    fzf_extra_args = "--with-nth=1,3 "
+      .. string.format(
+        "--preview-window='%s,%s'",
+        helpers.fzf_default_preview_window_args,
+        fzf_utils.fzf_initial_preview_scroll_offset("{2}", { fixed_header = 4 })
+      ),
+  })
+end
+
+M.grep_file = function(opts)
+  opts = vim.tbl_extend("force", {}, opts or {})
+
+  local current_file = vim.fn.expand("%")
+
+  local function get_info_from_selection()
+    local selection = FZF_STATE.current_selection
+
+    local args = vim.split(selection, utils.nbsp)
+    return unpack(args)
+  end
+
+  local get_cmd = function(query)
+    return string.format(
+      -- Custom delimiters & strip out ANSI color codes with sed
+      [[rg %s "%s" "%s" | sed "%s"]],
+      helpers.rg_default_opts,
+      query,
+      current_file,
+      string.format(
+        string.rep("%s", 3, ";"),
+        [[s/\x1b\[[0-9;]*m//g]], -- Strip out ANSI color codes
+        string.format(
+          [[s/^\([^:]*\):/%s\1%s:/]],
+          utils.ansi_escseq.grey,
+          utils.ansi_escseq.clear
+        ), -- Highlight first part with grey
+        string.format("s/:/%s/", utils.nbsp, utils.nbsp) -- Replace first : with nbsp
+      )
+    )
+  end
+
+  core.fzf({}, {
+    fzf_on_select = function()
+      local line = get_info_from_selection()
+      vim.cmd(string.format([[e %s]], current_file))
+      vim.cmd(string.format([[normal! %sG]], line))
+      vim.cmd([[normal! zz]])
+    end,
+    -- fzf_async = true,
+    fzf_preview_cmd = string.format(
+      [[bat %s --highlight-line %s {1}]],
+      helpers.bat_default_opts,
+      current_file
+    ),
+    fzf_prompt = "Grep",
+    fzf_on_focus = function() end,
+    fzf_on_query_change = function()
+      local query = FZF_STATE.current_query
+      -- Important: most work should be carried out by the preview function
+      core.send_to_fzf("reload@" .. get_cmd(query) .. "@")
+    end,
+    before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
+    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
+    fzf_extra_args = "--with-nth=1.. "
       .. string.format(
         "--preview-window='%s,%s'",
         helpers.fzf_default_preview_window_args,

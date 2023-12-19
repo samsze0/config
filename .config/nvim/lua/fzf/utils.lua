@@ -22,7 +22,12 @@ M.git_files = function(git_dir, opts)
     if not opts.convert_gitpaths_to_relpaths then return entries end
     return utils.map(
       entries,
-      function(_, e) return M.convert_gitpath_to_relpath(e, git_dir) end
+      function(_, e)
+        return M.convert_gitpath_to_filepath(
+          e,
+          { git_dir = git_dir, relpath = true }
+        )
+      end
     )
   end
 end
@@ -49,11 +54,18 @@ M.convert_filepath_to_gitpath = function(filepath, opts)
   return path
 end
 
-M.convert_gitpath_to_relpath = function(filepath, git_dir)
-  git_dir = git_dir or M.git_root_dir()
-  -- TODO: relpath causes problems with git
-  -- return vim.fn.fnamemodify(git_dir .. "/" .. filepath, ":~:.")
-  return git_dir .. "/" .. filepath
+M.convert_gitpath_to_filepath = function(filepath, opts)
+  opts = vim.tbl_extend("force", {
+    git_dir = M.git_root_dir(),
+    relpath = true,
+  }, opts or {})
+
+  local fullpath = opts.git_dir .. "/" .. filepath
+  if opts.relpath then
+    return vim.fn.fnamemodify(fullpath, ":~:.")
+  else
+    return fullpath
+  end
 end
 
 M.fzf_initial_preview_scroll_offset = function(offset, opts)

@@ -66,7 +66,11 @@ M.git_status = function(opts)
     local parts = vim.split(filepath, " -> ") -- In case if file is renamed
     if #parts > 1 then filepath = parts[2] end
 
-    return fzf_utils.convert_gitpath_to_relpath(filepath, opts.git_dir), args[1]
+    return fzf_utils.convert_gitpath_to_filepath(
+      filepath,
+      { git_dir = opts.git_dir, relpath = false }
+    ),
+      args[1]
   end
 
   core.fzf(entries, {
@@ -284,7 +288,8 @@ M.git_submodules = function(on_submodule)
     local selection = FZF_STATE.current_selection
 
     local submodule_path = selection
-    submodule_path = fzf_utils.convert_gitpath_to_relpath(submodule_path)
+    submodule_path =
+      fzf_utils.convert_gitpath_to_filepath(submodule_path, { relpath = false })
 
     return submodule_path
   end

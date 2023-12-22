@@ -183,9 +183,11 @@ require("lazy").setup({
   {
     -- Scrollbar (+ show signs for git conflicts, diagnostics, search, etc.)
     "dstein64/nvim-scrollview",
-    config = function() require("scrollview").setup({
-      floating_windows = true
-    }) end,
+    config = function()
+      require("scrollview").setup({
+        floating_windows = true,
+      })
+    end,
   },
   {
     "sindrets/diffview.nvim",
@@ -214,9 +216,10 @@ require("lazy").setup({
     dependencies = {
       "nvim-treesitter/nvim-treesitter",
     },
-  }
+  },
 })
 
+require("jumplist").setup()
 require("keymaps").setup()
 require("winbar").setup() -- i.e. breadcrumbs
 require("commands")

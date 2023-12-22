@@ -48,8 +48,7 @@ M.notifications = function(opts)
         or utils.pad(brief, brief_max_length)
       table.insert(
         entries,
-        string.format(
-          string.rep("%s", 3, utils.nbsp),
+        fzf_utils.create_fzf_entry(
           level,
           timeago(noti.time),
           unread and utils.ansi_codes.white(brief) or brief
@@ -71,7 +70,8 @@ M.notifications = function(opts)
   core.fzf(entries, {
     fzf_on_select = function() end,
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Notifications",
     fzf_initial_position = 1,

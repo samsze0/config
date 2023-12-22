@@ -7,6 +7,7 @@ local fzf_utils = require("fzf.utils")
 local utils = require("utils")
 local uv = vim.loop
 local uv_utils = require("utils.uv")
+local jumplist = require("jumplist")
 
 -- TODO: no-git mode
 M.grep = function(opts)
@@ -48,9 +49,12 @@ M.grep = function(opts)
     )
   end
 
+  local win_id = vim.api.nvim_get_current_win()
+
   core.fzf({}, {
     fzf_on_select = function()
       local filepath, line = get_info_from_selection()
+      jumplist.save(win_id)
       vim.cmd(string.format([[e %s]], filepath))
       vim.cmd(string.format([[normal! %sG]], line))
       vim.cmd([[normal! zz]])
@@ -94,7 +98,8 @@ M.grep = function(opts)
         end)
       end,
     }),
-    fzf_extra_args = "--with-nth=1,3 "
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1,3 "
       .. string.format(
         "--preview-window='%s,%s'",
         helpers.fzf_default_preview_window_args,
@@ -135,10 +140,12 @@ M.grep_file = function(opts)
     )
   end
 
+  local win_id = vim.api.nvim_get_current_win()
+
   core.fzf(get_cmd(""), {
     fzf_on_select = function()
       local line = get_info_from_selection()
-      vim.cmd(string.format([[e %s]], current_file))
+      jumplist.save(win_id)
       vim.cmd(string.format([[normal! %sG]], line))
       vim.cmd([[normal! zz]])
     end,
@@ -158,7 +165,8 @@ M.grep_file = function(opts)
     end,
     before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
-    fzf_extra_args = "--with-nth=1.. "
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. "
       .. string.format(
         "--preview-window='%s,%s'",
         helpers.fzf_default_preview_window_args,

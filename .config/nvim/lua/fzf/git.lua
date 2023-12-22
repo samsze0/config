@@ -5,6 +5,7 @@ local helpers = require("fzf.helpers")
 local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local jumplist = require("jumplist")
 
 M.git_status = function(opts)
   opts = vim.tbl_extend("force", {
@@ -73,14 +74,18 @@ M.git_status = function(opts)
       args[1]
   end
 
+  local win_id = vim.api.nvim_get_current_win()
+
   core.fzf(entries, {
     fzf_on_select = function()
       local filepath = get_selection()
 
+      jumplist.save(win_id)
       vim.cmd(string.format([[e %s]], filepath))
     end,
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "GitStatus",
     fzf_initial_position = fzf_initial_pos,
@@ -199,7 +204,8 @@ M.git_commits = function(opts)
       opts.filepaths ~= "" and string.format("-- %s", opts.filepaths) or "",
       helpers.delta_default_opts
     ),
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "GitCommits",
     fzf_initial_position = 1,
@@ -231,8 +237,7 @@ M.git_stash = function(opts)
 
       parts = utils.map(parts, function(_, p) return vim.trim(p) end)
 
-      return string.format(
-        string.rep("%s", 2, utils.nbsp),
+      return fzf_utils.create_fzf_entry(
         utils.ansi_codes.blue(parts[1]),
         utils.ansi_codes.white(parts[2])
       )
@@ -260,7 +265,8 @@ M.git_stash = function(opts)
       opts.git_dir,
       helpers.delta_default_opts
     ),
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "GitStash",
     fzf_initial_position = 1,
@@ -300,7 +306,8 @@ M.git_submodules = function(on_submodule)
       on_submodule(submodule_path)
     end,
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "GitSubmodules",
     fzf_binds = {

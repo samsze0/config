@@ -103,4 +103,10 @@ M.write_to_tmpfile = function(content)
   return FZF_TMPFILE
 end
 
+M.create_fzf_entry = function(...)
+  local args = { ... }
+  local size = #args
+  return string.format(string.rep("%s", size, utils.nbsp), ...)
+end
+
 return M

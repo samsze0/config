@@ -4,6 +4,7 @@ local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local jumplist = require("jumplist")
 
 -- TODO: no-git mode
 M.files = function(opts)
@@ -21,6 +22,7 @@ M.files = function(opts)
   end
 
   local entries = fzf_utils.git_files(opts.git_dir)
+  local win_id = vim.api.nvim_get_current_win()
 
   utils.sort_filepaths(entries, function(e) return e end)
 
@@ -29,6 +31,7 @@ M.files = function(opts)
     fzf_prompt = "Files",
     fzf_on_select = function()
       local filepath = get_selection()
+      jumplist.save(win_id)
       vim.cmd(string.format([[e %s]], filepath))
     end,
     before_fzf = function() helpers.set_custom_keymaps_for_nvim_preview() end,
@@ -89,7 +92,8 @@ M.files = function(opts)
       end,
     }),
     nvim_preview = true,
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
   })
 end

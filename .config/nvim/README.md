@@ -145,6 +145,7 @@ end, {})
 - LSP import path update
 - LF initial pos
 - Fzf custom jumps
+- Fzf handler on error
 
 # TODO (low priority)
 

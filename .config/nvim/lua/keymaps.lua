@@ -2,6 +2,7 @@ local M = {}
 
 local config = require("config")
 local utils = require("utils")
+local jumplist = require("jumplist")
 local safe_require = function(module)
   return utils.safe_require(module, {
     notify = false,
@@ -245,8 +246,8 @@ M.setup = function()
   vim_keymap("v", "C", '"dC', opts)
 
   -- Jump (jumplist)
-  vim_keymap("n", "<C-u>", "<C-o>", opts)
-  vim_keymap("n", "<C-o>", "<C-i>", opts)
+  lua_keymap("n", "<C-u>", jumplist.jump_back, {})
+  lua_keymap("n", "<C-o>", jumplist.jump_forward, {})
 
   -- Fzf/FzfLua
   local fuzzy_finder_keymaps = {
@@ -340,7 +341,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "li" }] = {
       fzflua = safe_require("fzf-lua").lsp_definitions,
-      fzf = nil,
+      fzf = safe_require("fzf").lsp_definitions,
     },
     [{ mode = "n", lhs = "lr" }] = {
       fzflua = safe_require("fzf-lua").lsp_references,

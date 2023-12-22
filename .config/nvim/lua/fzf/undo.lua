@@ -15,13 +15,7 @@ M.undos = function(opts)
   local function get_entries()
     return utils.map(
       undolist,
-      function(i, undo)
-        return string.format(
-          string.rep("%s", 2, utils.nbsp),
-          undo.seq,
-          undo.time
-        )
-      end
+      function(i, undo) return fzf_utils.create_fzf_entry(undo.seq, undo.time) end
     )
   end
 
@@ -71,7 +65,8 @@ M.undos = function(opts)
         end)
       end,
     }),
-    fzf_extra_args = "--with-nth=2.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=2.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
   })
 end

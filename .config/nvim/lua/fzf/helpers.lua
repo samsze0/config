@@ -4,12 +4,13 @@ local utils = require("utils")
 local rg_colors = false
 
 local M = {
-  bat_default_opts = "--color=always --terminal-width $FZF_PREVIEW_COLUMNS",
+  bat_default_opts = "--color always --wrap never --terminal-width $FZF_PREVIEW_COLUMNS", -- Let fzf handle the wrapping
   delta_default_opts = "--width=$FZF_PREVIEW_COLUMNS",
   rg_default_opts = "--smart-case --no-ignore --hidden --trim "
     .. (rg_colors and "--color=always --colors 'match:fg:blue' --colors 'path:fg:yellow' " or "--color=never ")
     .. "--no-column --line-number --no-heading",
-  fzf_default_preview_window_args = "right,50%,border-none,wrap,nofollow,nocycle",
+  fzf_default_args = "--scroll-off=10",
+  fzf_default_preview_window_args = "right,50%,border-none,nowrap,nofollow,nocycle",
 }
 
 M.set_custom_keymaps_for_nvim_preview = function()

@@ -16,8 +16,7 @@ M.tabs = function()
     local entries = utils.map(fn.gettabinfo(), function(_, tab)
       local tabnr = tab.tabnr
 
-      return string.format(
-        string.rep("%s", 2, utils.nbsp),
+      return fzf_utils.create_fzf_entry(
         tabnr,
         utils.ansi_codes.blue(
           (true and _G.tabs[tabnr].full or _G.tabs[tabnr].display) or "  "
@@ -41,7 +40,8 @@ M.tabs = function()
       vim.cmd(string.format([[tabnext %s]], tabnr))
     end,
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Tabs",
     fzf_initial_position = current_tabnr,
@@ -76,8 +76,7 @@ M.buffers = function()
 
       if bufnr == current_bufnr then fzf_initial_pos = i end
 
-      return string.format(
-        string.rep("%s", 2, utils.nbsp),
+      return fzf_utils.create_fzf_entry(
         bufnr,
         utils.ansi_codes.blue(bufname .. icon)
       )
@@ -97,7 +96,8 @@ M.buffers = function()
       vim.cmd(string.format([[buffer %s]], bufnr))
     end,
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Buffers",
     fzf_initial_position = fzf_initial_pos,
@@ -147,7 +147,8 @@ M.all = function()
       if action then action() end
     end,
     fzf_preview_cmd = nil,
-    fzf_extra_args = "--with-nth=1.. --preview-window="
+    fzf_extra_args = helpers.fzf_default_args
+      .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "All",
     fzf_initial_position = 1,

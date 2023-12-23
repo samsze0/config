@@ -89,8 +89,6 @@ Z-. X->git C-. V-. B-> N-> M-> ,->macro .-. /-.
 - `z` for views and folds
     - `:h z`
     - `zz`/`zt`/`zb` for center/top/bottom cursor against screen
-- Jumplist
-    - (TODO)
 - Quickfix
     - `:h quickfix`
     - In format `File, row, col error message`
@@ -135,21 +133,19 @@ end, {})
 - Git conflict workflow w/ fzflua integration
 - Syncthing clipboard
 - Custom Search n replace
-- Opened buffers file changes workflow. Autowrite?
 - Karabiner command left/right
-- Fzf
 - Fzf TODO comments, backups
-- Tests & refactoring
+- Tests
 - Git conflicts workflow
 - Performance profiling & optimization
 - LSP import path update
 - LF initial pos
-- Fzf custom jumps
 - Fzf handler on error
+- Project specific config w/ exrc https://github.com/klen/nvim-config-local
+- Treesitter textobjects custom
 
 # TODO (low priority)
 
-- Better window_utils (parent - child buffer/window abstraction + start_insert when enter parent win + ctrl-s ctrl-f window nav shortcuts)
 - Custom autopair
 - Custom pair motion
 - Git worktree setup
@@ -157,7 +153,6 @@ end, {})
 - Statusline show line changes since last save
 - Fzf Cumulative mode for undo, git, etc
 - rsync backup
-- Treesitter textobjects custom
 - Copilot
 - Lf create_new multi-layer dir support
 - Tabline dedup by git-files
@@ -165,4 +160,3 @@ end, {})
 - React native setup
 - React dev setup
 - Flash fork
-- Buffer file history

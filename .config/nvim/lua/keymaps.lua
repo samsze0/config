@@ -357,11 +357,15 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "ld" }] = {
       fzflua = safe_require("fzf-lua").lsp_document_diagnostics,
-      fzf = nil,
+      fzf = function()
+        safe_require("fzf").diagnostics({
+          current_buffer_only = true,
+        })
+      end,
     },
     [{ mode = "n", lhs = "lD" }] = {
       fzflua = safe_require("fzf-lua").lsp_workspace_diagnostics,
-      fzf = nil,
+      fzf = safe_require("fzf").diagnostics,
     },
     [{ mode = "n", lhs = "la" }] = {
       fzflua = safe_require("fzf-lua").lsp_code_actions,

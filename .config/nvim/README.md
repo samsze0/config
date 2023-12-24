@@ -130,7 +130,7 @@ end, {})
 - Safer tabline and statusline and autocmds (wrap in pcall)
 - SSH lf preview
 - SSH setup
-- Git conflict workflow w/ fzflua integration
+- Git conflict workflow w/ fzf integration
 - Syncthing clipboard
 - Custom Search n replace
 - Karabiner command left/right

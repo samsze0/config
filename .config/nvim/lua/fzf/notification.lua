@@ -38,7 +38,7 @@ M.notifications = function(opts)
       else
         level = unread and utils.ansi_codes.grey(" ") or " "
       end
-      local brief = vim.fn.shellescape(noti.message)
+      local brief = noti.message
       local parts = vim.split(brief, "\n")
       if #parts > 1 then brief = parts[1] end
       if not brief or brief == "" then brief = "<empty>" end

@@ -2,6 +2,7 @@ local M = {}
 
 FZF_TMPFILE = vim.fn.tempname()
 local utils = require("utils")
+local os_utils = require("utils.os")
 
 M.git_files = function(git_dir, opts)
   git_dir = git_dir or M.git_root_dir()
@@ -87,10 +88,34 @@ M.generate_fzf_reload_action = function(input)
   return string.format(
     "reload(%s)",
     string.format(
-      [[cat <<EOF
+      [[cat <<"EOF"
 %s
-EOF]],
+EOF
+]],
       table.concat(input, "\n")
+    )
+  )
+end
+
+M.generate_fzf_send_to_server_action = function(
+  message,
+  server_socket_path,
+  opts
+)
+  opts = vim.tbl_extend("force", {
+    var_expansion = false,
+  }, opts or {})
+
+  return string.format(
+    [[execute-silent(%s)]],
+    string.format(
+      [[cat <<%s | %s
+%s
+EOF
+]],
+      opts.var_expansion and [[EOF]] or [["EOF"]],
+      os_utils.get_unix_sock_cmd(server_socket_path),
+      message
     )
   )
 end

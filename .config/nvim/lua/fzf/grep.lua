@@ -30,22 +30,29 @@ M.grep = function(opts)
   local files_str = table.concat(files, " ")
 
   local get_cmd = function(query)
+    local sed_cmd = {
+      string.format("s/:/%s/;s/:/%s/", utils.nbsp, utils.nbsp), -- Replace first two : with nbsp
+    }
+
+    if not helpers.use_rg_colors then
+      table.insert(
+        sed_cmd,
+        1,
+        string.format(
+          [[s/^\([^:]*\):/%s\1%s:/]],
+          utils.ansi_escseq.grey,
+          utils.ansi_escseq.clear
+        ) -- Highlight first part with grey
+      )
+    end
+
     return string.format(
       -- Custom delimiters & strip out ANSI color codes with sed
       [[rg %s "%s" %s | sed "%s"]],
       helpers.rg_default_opts,
       query,
       files_str,
-      string.format(
-        string.rep("%s", 3, ";"),
-        [[s/\x1b\[[0-9;]*m//g]], -- Strip out ANSI color codes
-        string.format(
-          [[s/^\([^:]*\):/%s\1%s:/]],
-          utils.ansi_escseq.grey,
-          utils.ansi_escseq.clear
-        ), -- Highlight first part with grey
-        string.format("s/:/%s/;s/:/%s/", utils.nbsp, utils.nbsp) -- Replace first two : with nbsp
-      )
+      table.concat(sed_cmd, ";")
     )
   end
 
@@ -99,7 +106,7 @@ M.grep = function(opts)
       end,
     }),
     fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=1,3 "
+      .. " --with-nth=1,3 --disabled "
       .. string.format(
         "--preview-window='%s,%s'",
         helpers.fzf_default_preview_window_args,

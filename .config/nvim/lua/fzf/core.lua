@@ -11,12 +11,11 @@ local os_utils = require("utils.os")
 local uv = vim.loop
 
 local fzf_port
-local fzf_on_focus
-local fzf_on_query_change
-local fzf_event_callback_map = {}
+local on_focus
+local on_query_change
+local event_callback_map = {}
 
 FZF_STATE = {
-  event_callback_map = {},
   current_query = nil,
   current_selection = nil,
   current_selection_index = nil,
@@ -31,11 +30,12 @@ FZF_STATE = {
 }
 
 local reset_state = function()
-  fzf_on_focus = nil
-  fzf_on_query_change = nil
-  fzf_event_callback_map = {}
+  on_focus = nil
+  on_query_change = nil
+  event_callback_map = {}
 
   FZF_STATE = {
+    current_query = nil,
     current_selection = nil,
     current_selection_index = nil,
     prev_window = nil,
@@ -77,7 +77,7 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
       end
       FZF_STATE.current_selection_index = tonumber(index) + 1
       FZF_STATE.current_selection = selection
-      if fzf_on_focus then vim.schedule(fzf_on_focus) end
+      if on_focus then vim.schedule(on_focus) end
     elseif string.match(message, "^change") then
       local query = string.match(message, "^change '(.*)'")
       if not query then
@@ -89,7 +89,7 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
       end
 
       FZF_STATE.current_query = query
-      if fzf_on_query_change then vim.schedule(fzf_on_query_change) end
+      if on_query_change then vim.schedule(on_query_change) end
     elseif string.match(message, "^event") then
       local event = string.match(message, "^event ([^\n]+)")
       if not event then
@@ -99,8 +99,8 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         )
         return
       end
-      if fzf_event_callback_map[event] then
-        vim.schedule(fzf_event_callback_map[event])
+      if event_callback_map[event] then
+        vim.schedule(event_callback_map[event])
       end
     else
       vim.notify(
@@ -124,7 +124,7 @@ end
 
 M.abort_and_execute = function(callback)
   M.send_to_fzf("abort")
-  fzf_event_callback_map["abort"] = callback
+  event_callback_map["abort"] = callback
 end
 
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
@@ -148,8 +148,8 @@ M.fzf = function(input, opts)
     fzf_async = false, -- Doesn't work well with start:pos
   }, opts or {})
 
-  fzf_on_focus = opts.fzf_on_focus
-  fzf_on_query_change = opts.fzf_on_query_change
+  on_focus = opts.fzf_on_focus
+  on_query_change = opts.fzf_on_query_change
 
   if config.debug then vim.notify(vim.inspect(opts)) end
 
@@ -218,11 +218,10 @@ M.fzf = function(input, opts)
 
   local function parse_fzf_bind(event, action)
     if type(action) == "function" then
-      fzf_event_callback_map[event] = action
-      opts.fzf_binds[event] = string.format(
-        [[execute-silent(printf "event %s" | %s)]],
-        event,
-        os_utils.get_unix_sock_cmd(server_socket_path)
+      event_callback_map[event] = action
+      opts.fzf_binds[event] = fzf_utils.generate_fzf_send_to_server_action(
+        string.format("event %s", event),
+        server_socket_path
       )
     elseif type(action) == "string" then
     elseif type(action) == "table" then
@@ -250,10 +249,11 @@ M.fzf = function(input, opts)
   else
     opts.fzf_binds.focus = ""
   end
+  -- TODO: support multi with +
   opts.fzf_binds.focus = opts.fzf_binds.focus
-    .. string.format(
-      [[execute-silent(printf "focus {n} {}" | %s)]], -- TODO: support multi with +
-      os_utils.get_unix_sock_cmd(server_socket_path)
+    .. fzf_utils.generate_fzf_send_to_server_action(
+      "focus {n} {}",
+      server_socket_path
     )
 
   if opts.fzf_binds.start then
@@ -262,11 +262,13 @@ M.fzf = function(input, opts)
     opts.fzf_binds.start = ""
   end
   opts.fzf_binds.start = opts.fzf_binds.start
-    .. string.format(
-      [[execute-silent(printf "port $FZF_PORT" | %s)+pos(%d)]],
-      os_utils.get_unix_sock_cmd(server_socket_path),
-      opts.fzf_initial_position -- Async can mess with setting pos on start. So make sure --sync is supplied to fzf
+    .. fzf_utils.generate_fzf_send_to_server_action(
+      "port $FZF_PORT",
+      server_socket_path,
+      { var_expansion = true }
     )
+    -- Async can mess with setting pos on start. So make sure --sync is supplied to fzf
+    .. string.format("+pos(%d)", opts.fzf_initial_position)
 
   if opts.fzf_binds.change then
     opts.fzf_binds.change = opts.fzf_binds.change .. "+"
@@ -274,9 +276,9 @@ M.fzf = function(input, opts)
     opts.fzf_binds.change = ""
   end
   opts.fzf_binds.change = opts.fzf_binds.change
-    .. string.format(
-      [[execute-silent(printf "change {q}" | %s)]],
-      os_utils.get_unix_sock_cmd(server_socket_path)
+    .. fzf_utils.generate_fzf_send_to_server_action(
+      "change {q}",
+      server_socket_path
     )
 
   local binds_arg = table.concat(
@@ -338,7 +340,7 @@ EOF
           opts.fzf_on_select()
         elseif code == 130 then
           -- On abort
-          local abort_callback = fzf_event_callback_map["abort"]
+          local abort_callback = event_callback_map["abort"]
           if abort_callback then abort_callback() end
         else
           vim.notify(

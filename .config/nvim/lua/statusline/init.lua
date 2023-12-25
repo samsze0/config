@@ -17,10 +17,26 @@ local function hl(hl_group, text)
 end
 
 local diagnostic_levels = {
-  { id = vim.diagnostic.severity.ERROR, sign = "E", hl = "StatusLineDiagnosticError" },
-  { id = vim.diagnostic.severity.WARN, sign = "W", hl = "StatusLineDiagnosticWarn" },
-  { id = vim.diagnostic.severity.INFO, sign = "I", hl = "StatusLineDiagnosticInfo" },
-  { id = vim.diagnostic.severity.HINT, sign = "H", hl = "StatusLineDiagnosticHint" },
+  {
+    id = vim.diagnostic.severity.ERROR,
+    sign = "E",
+    hl = "StatusLineDiagnosticError",
+  },
+  {
+    id = vim.diagnostic.severity.WARN,
+    sign = "W",
+    hl = "StatusLineDiagnosticWarn",
+  },
+  {
+    id = vim.diagnostic.severity.INFO,
+    sign = "I",
+    hl = "StatusLineDiagnosticInfo",
+  },
+  {
+    id = vim.diagnostic.severity.HINT,
+    sign = "H",
+    hl = "StatusLineDiagnosticHint",
+  },
 }
 
 local function is_normal_buffer()
@@ -28,19 +44,30 @@ local function is_normal_buffer()
   return vim.bo.buftype == ""
 end
 
-local function get_diagnostic_count(id) return #vim.diagnostic.get(0, { severity = id }) end
+local function get_diagnostic_count(id)
+  return #vim.diagnostic.get(0, { severity = id })
+end
 
 M.setup = function(opts)
   _G.Statusline = M
 
   local augroup = vim.api.nvim_create_augroup("Statusline", {})
 
-  local au = function(event, pattern, callback, desc) vim.api.nvim_create_autocmd(event, { group = augroup, pattern = pattern, callback = callback, desc = desc }) end
+  local au = function(event, pattern, callback, desc)
+    vim.api.nvim_create_autocmd(
+      event,
+      { group = augroup, pattern = pattern, callback = callback, desc = desc }
+    )
+  end
 
-  local set_active = function() vim.wo.statusline = "%!v:lua.Statusline.active()" end
+  local set_active = function()
+    vim.wo.statusline = "%!v:lua.Statusline.active()"
+  end
   au({ "WinEnter", "BufEnter" }, "*", set_active, "Set active statusline")
 
-  local set_inactive = function() vim.wo.statusline = "%!v:lua.Statusline.inactive()" end
+  local set_inactive = function()
+    vim.wo.statusline = "%!v:lua.Statusline.inactive()"
+  end
   au({ "WinLeave", "BufLeave" }, "*", set_inactive, "Set inactive statusline")
 
   -- - Disable built-in statusline in Quickfix window
@@ -49,7 +76,9 @@ M.setup = function(opts)
   -- Refresh window if dependencies changes
   _G.notification_subscribers = _G.notification_subscribers or {} -- TODO: properly define dependencies
   table.insert(_G.notification_subscribers, function()
-    if vim.api.nvim_get_current_win() == vim.api.nvim_get_current_win() then set_active() end
+    if vim.api.nvim_get_current_win() == vim.api.nvim_get_current_win() then
+      set_active()
+    end
   end)
 end
 
@@ -74,16 +103,18 @@ end
 M.inactive = function() return " " .. M.section_filename(args) .. " " end
 
 M.is_truncated = function(trunc_width)
-  local cur_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
+  local cur_width = vim.o.laststatus == 3 and vim.o.columns
+    or vim.api.nvim_win_get_width(0)
   return cur_width > trunc_width
 end
 
 M.section_git = function(args)
-  local gitsigns_status = vim.b.gitsigns_status_dict or {
-    added = 0,
-    changed = 0,
-    removed = 0,
-  }
+  local gitsigns_status = vim.b.gitsigns_status_dict
+    or {
+      added = 0,
+      changed = 0,
+      removed = 0,
+    }
 
   if not is_normal_buffer() then return "" end
 
@@ -93,20 +124,46 @@ M.section_git = function(args)
   if head_ref == "-" or head_ref == "" then return "" end
 
   local val = string.format("%s %s", icon, head_ref)
-  if (gitsigns_status.added or 0) > 0 then val = val .. hl("StatusLineDiagnosticInfo", string.format(" +%s", gitsigns_status.added)) end
-  if (gitsigns_status.changed or 0) > 0 then val = val .. hl("StatusLineDiagnosticWarn", string.format(" ~%s", gitsigns_status.changed)) end
-  if (gitsigns_status.removed or 0) > 0 then val = val .. hl("StatusLineDiagnosticError", string.format(" -%s", gitsigns_status.removed)) end
+  if (gitsigns_status.added or 0) > 0 then
+    val = val
+      .. hl(
+        "StatusLineDiagnosticInfo",
+        string.format(" +%s", gitsigns_status.added)
+      )
+  end
+  if (gitsigns_status.changed or 0) > 0 then
+    val = val
+      .. hl(
+        "StatusLineDiagnosticWarn",
+        string.format(" ~%s", gitsigns_status.changed)
+      )
+  end
+  if (gitsigns_status.removed or 0) > 0 then
+    val = val
+      .. hl(
+        "StatusLineDiagnosticError",
+        string.format(" -%s", gitsigns_status.removed)
+      )
+  end
   return val
 end
 
 M.section_diagnostics = function(args)
   local hasnt_attached_client = next(vim.lsp.get_active_clients()) == nil
-  if M.is_truncated(args.trunc_width) or not is_normal_buffer() or hasnt_attached_client then return "" end
+  if
+    M.is_truncated(args.trunc_width)
+    or not is_normal_buffer()
+    or hasnt_attached_client
+  then
+    return ""
+  end
 
   local t = {}
   for _, level in ipairs(diagnostic_levels) do
     local n = get_diagnostic_count(level.id)
-    if n > 0 then table.insert(t, hl(level.hl, string.format("%s%s", level.sign, n))) end
+    if n > 0 then
+      table.insert(t, hl(level.hl, string.format("%s%s", level.sign, n)))
+    end
   end
 
   local icon = ""
@@ -136,7 +193,10 @@ M.section_fileinfo = function(args)
   local encoding = vim.bo.fileencoding or vim.bo.encoding
   local format = vim.bo.fileformat
 
-  return hl("StatusLineMuted", string.format("%s  %s  %s", filetype, encoding, format))
+  return hl(
+    "StatusLineMuted",
+    string.format("%s  %s  %s", filetype, encoding, format)
+  )
 end
 
 local safe_require = require("utils").safe_require
@@ -148,7 +208,10 @@ M.section_copilot = function(args)
   if next(copilot) == nil then return hl("StatusLineMuted", " ") end
 
   local ok, val = pcall(function()
-    if copilot.is_disabled() or not copilot.buf_is_attached(vim.api.nvim_get_current_buf()) then
+    if
+      copilot.is_disabled()
+      or not copilot.buf_is_attached(vim.api.nvim_get_current_buf())
+    then
       return hl("StatusLineMuted", " ")
     else
       return hl(default_hl, " ")
@@ -162,13 +225,34 @@ end
 M.section_notifications = function(args)
   if vim.tbl_isempty(_G.notification_meta.unread) then return "" end
 
-  local count = utils.sum(vim.tbl_values(_G.notification_meta.unread))
-  local severity_hl = _G.notification_meta.unread[vim.log.levels.ERROR] and "StatusLineDiagnosticError"
-    or _G.notification_meta.unread[vim.log.levels.WARN] and "StatusLineDiagnosticWarn"
-    or _G.notification_meta.unread[vim.log.levels.INFO] and "StatusLineDiagnosticInfo"
-    or "StatusLineMuted"
+  local result = {}
 
-  return hl(severity_hl, string.format("󰂚 %d", count))
+  local error_count = _G.notification_meta.unread[vim.log.levels.ERROR] or 0
+  if error_count > 0 then
+    table.insert(
+      result,
+      hl("StatusLineDiagnosticError", string.format("󰂚 %d", error_count))
+    )
+  end
+
+  local warn_count = _G.notification_meta.unread[vim.log.levels.WARN] or 0
+  if warn_count > 0 then
+    table.insert(
+      result,
+      hl("StatusLineDiagnosticWarn", string.format("󰂚 %d", warn_count))
+    )
+  end
+
+  local total_count = utils.sum(vim.tbl_values(_G.notification_meta.unread))
+  local other_count = total_count - error_count - warn_count
+  if other_count > 0 then
+    table.insert(
+      result,
+      hl("StatusLineMuted", string.format("󰂚 %d", other_count))
+    )
+  end
+
+  return table.concat(result, " ")
 end
 
 return M

@@ -257,14 +257,14 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f3><f3>" }] = {
       fzflua = safe_require("fzf-lua").git_files,
-      fzf = function() safe_require("fzf").files({ nvim_preview = true }) end,
+      fzf = function() require("fzf").files({ nvim_preview = true }) end,
     },
     [{ mode = "n", lhs = "<f3><f4>" }] = {
       fzflua = nil,
       fzf = function()
-        safe_require("fzf").git_submodules(
+        require("fzf").git_submodules(
           function(submodule_path)
-            safe_require("fzf").files({
+            require("fzf").files({
               nvim_preview = true,
               git_dir = submodule_path,
             })
@@ -278,26 +278,46 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f3><f2>" }] = {
       fzflua = safe_require("fzf-lua").buffers,
-      fzf = safe_require("fzf").buffers,
+      fzf = require("fzf").buffers,
     },
     [{ mode = "n", lhs = "<f3><f1>" }] = {
       fzflua = safe_require("fzf-lua").tabs,
-      fzf = safe_require("fzf").tabs,
+      fzf = require("fzf").tabs,
+    },
+    [{ mode = "n", lhs = "<f5><f4>" }] = {
+      fzflua = safe_require("fzf-lua").blines,
+      fzf = require("fzf").grep_file,
     },
     [{ mode = "n", lhs = "<f5><f5>" }] = {
       fzflua = safe_require("fzf-lua").live_grep,
-      fzf = safe_require("fzf").grep,
+      fzf = require("fzf").grep,
+    },
+    [{ mode = "v", lhs = "<f5><f4>" }] = {
+      fzflua = nil,
+      fzf = function()
+        require("fzf").grep_file({
+          initial_query = utils.get_visual_selection(),
+        })
+      end,
+    },
+    [{ mode = "v", lhs = "<f5><f5>" }] = {
+      fzflua = nil,
+      fzf = function()
+        require("fzf").grep({
+          initial_query = utils.get_visual_selection(),
+        })
+      end,
     },
     [{ mode = "n", lhs = "<f11><f5>" }] = {
       fzflua = safe_require("fzf-lua").git_commits,
-      fzf = safe_require("fzf").git_commits,
+      fzf = require("fzf").git_commits,
     },
     [{ mode = "n", lhs = "<f10><f5>" }] = {
       fzflua = nil,
       fzf = function()
-        safe_require("fzf").git_submodules(
+        require("fzf").git_submodules(
           function(submodule_path)
-            safe_require("fzf").git_commits({
+            require("fzf").git_commits({
               git_dir = submodule_path,
             })
           end
@@ -307,15 +327,15 @@ M.setup = function()
     [{ mode = "n", lhs = "<f11><f4>" }] = {
       fzflua = safe_require("fzf-lua").git_bcommits,
       fzf = function()
-        safe_require("fzf").git_commits({ filepaths = vim.fn.expand("%:p") })
+        require("fzf").git_commits({ filepaths = vim.fn.expand("%:p") })
       end,
     },
     [{ mode = "n", lhs = "<f10><f4>" }] = {
       fzflua = nil,
       fzf = function()
-        safe_require("fzf").git_submodules(
+        require("fzf").git_submodules(
           function(submodule_path)
-            safe_require("fzf").git_commits({
+            require("fzf").git_commits({
               git_dir = submodule_path,
               filepaths = vim.fn.expand("%"),
             })
@@ -325,14 +345,14 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<f11><f3>" }] = {
       fzflua = safe_require("fzf-lua").git_status,
-      fzf = safe_require("fzf").git_status,
+      fzf = require("fzf").git_status,
     },
     [{ mode = "n", lhs = "<f10><f4>" }] = {
       fzflua = nil,
       fzf = function()
-        safe_require("fzf").git_submodules(
+        require("fzf").git_submodules(
           function(submodule_path)
-            safe_require("fzf").git_status({
+            require("fzf").git_status({
               git_dir = submodule_path,
             })
           end
@@ -341,47 +361,43 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "li" }] = {
       fzflua = safe_require("fzf-lua").lsp_definitions,
-      fzf = safe_require("fzf").lsp_definitions,
+      fzf = require("fzf").lsp_definitions,
     },
     [{ mode = "n", lhs = "lr" }] = {
       fzflua = safe_require("fzf-lua").lsp_references,
-      fzf = safe_require("fzf").lsp_references,
+      fzf = require("fzf").lsp_references,
     },
     [{ mode = "n", lhs = "<f4><f4>" }] = {
       fzflua = safe_require("fzf-lua").lsp_document_symbols,
-      fzf = safe_require("fzf").lsp_document_symbols,
+      fzf = require("fzf").lsp_document_symbols,
     },
     [{ mode = "n", lhs = "<f4><f5>" }] = {
       fzflua = safe_require("fzf-lua").lsp_workspace_symbols,
-      fzf = safe_require("fzf").lsp_workspace_symbols,
+      fzf = require("fzf").lsp_workspace_symbols,
     },
     [{ mode = "n", lhs = "ld" }] = {
       fzflua = safe_require("fzf-lua").lsp_document_diagnostics,
       fzf = function()
-        safe_require("fzf").diagnostics({
+        require("fzf").diagnostics({
           current_buffer_only = true,
         })
       end,
     },
     [{ mode = "n", lhs = "lD" }] = {
       fzflua = safe_require("fzf-lua").lsp_workspace_diagnostics,
-      fzf = safe_require("fzf").diagnostics,
+      fzf = require("fzf").diagnostics,
     },
     [{ mode = "n", lhs = "la" }] = {
       fzflua = safe_require("fzf-lua").lsp_code_actions,
       fzf = nil,
     },
-    [{ mode = "n", lhs = "<f5><f4>" }] = {
-      fzflua = safe_require("fzf-lua").blines,
-      fzf = safe_require("fzf").grep_file,
-    },
     [{ mode = "n", lhs = "<space>u" }] = {
       fzflua = safe_require("config.fzflua-custom").undo_tree,
-      fzf = safe_require("fzf").undos,
+      fzf = require("fzf").undos,
     },
     [{ mode = "n", lhs = "<space>m" }] = {
       fzflua = safe_require("config.fzflua-custom").notifications,
-      fzf = safe_require("fzf").notifications,
+      fzf = require("fzf").notifications,
     },
     [{ mode = "n", lhs = "<f11><f11>" }] = {
       fzflua = safe_require("config.fzflua-custom").git_reflog,
@@ -389,7 +405,7 @@ M.setup = function()
     },
     [{ mode = "n", lhs = "<space>j" }] = {
       fzflua = safe_require("config.fzflua-custom").jumps,
-      fzf = safe_require("fzf").jumps,
+      fzf = require("fzf").jumps,
     },
   }
 
@@ -517,10 +533,7 @@ M.setup = function()
     lua_keymap(
       "n",
       "<Space>r",
-      utils.run_and_notify(
-        safe_require("persist").load_session,
-        "Reloaded session"
-      ),
+      utils.run_and_notify(require("persist").load_session, "Reloaded session"),
       {}
     )
   end
@@ -575,11 +588,11 @@ M.setup = function()
   end
 
   -- File managers
-  lua_keymap("n", "<f2><f2>", safe_require("lf").lf, {})
+  lua_keymap("n", "<f2><f2>", require("lf").lf, {})
   lua_keymap(
     "n",
     "<f2><f3>",
-    function() safe_require("lf").lf({ path = vim.fn.expand("%:p:h") }) end,
+    function() require("lf").lf({ path = vim.fn.expand("%:p:h") }) end,
     {}
   )
 end

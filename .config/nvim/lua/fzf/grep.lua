@@ -13,6 +13,7 @@ local jumplist = require("jumplist")
 M.grep = function(opts)
   opts = vim.tbl_extend("force", {
     git_dir = fzf_utils.git_root_dir(),
+    initial_query = "",
   }, opts or {})
 
   local function get_info_from_selection()
@@ -107,6 +108,7 @@ M.grep = function(opts)
     }),
     fzf_extra_args = helpers.fzf_default_args
       .. " --with-nth=1,3 --disabled "
+      .. string.format("--query='%s' ", opts.initial_query)
       .. string.format(
         "--preview-window='%s,%s'",
         helpers.fzf_default_preview_window_args,
@@ -116,7 +118,7 @@ M.grep = function(opts)
 end
 
 M.grep_file = function(opts)
-  opts = vim.tbl_extend("force", {}, opts or {})
+  opts = vim.tbl_extend("force", { initial_query = "" }, opts or {})
 
   local current_file = vim.fn.expand("%")
 
@@ -174,6 +176,7 @@ M.grep_file = function(opts)
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
     fzf_extra_args = helpers.fzf_default_args
       .. " --with-nth=1.. "
+      .. string.format("--query='%s' ", opts.initial_query)
       .. string.format(
         "--preview-window='%s,%s'",
         helpers.fzf_default_preview_window_args,

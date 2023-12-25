@@ -18,9 +18,8 @@ M.tabs = function()
 
       return fzf_utils.create_fzf_entry(
         tabnr,
-        utils.ansi_codes.blue(
-          (true and _G.tabs[tabnr].full or _G.tabs[tabnr].display) or "  "
-        )
+        _G.tabs[tabnr].full or "  ",
+        utils.ansi_codes.blue(_G.tabs[tabnr].display or "  ")
       )
     end)
     return entries
@@ -39,9 +38,9 @@ M.tabs = function()
       local tabnr = get_tabnr_from_selection()
       vim.cmd(string.format([[tabnext %s]], tabnr))
     end,
-    fzf_preview_cmd = nil,
+    fzf_preview_cmd = string.format([[bat %s {2}]], helpers.bat_default_opts),
     fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=1.. --preview-window="
+      .. " --with-nth=1,3 --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Tabs",
     fzf_initial_position = current_tabnr,
@@ -65,7 +64,8 @@ M.buffers = function()
     -- Get all buffers
     local entries = utils.map(fn.getbufinfo({ buflisted = 1 }), function(i, buf)
       local bufnr = buf.bufnr
-      local bufname = buf.name
+      local full_bufname = buf.name
+      local bufname = vim.fn.fnamemodify(full_bufname, ":~:.")
       local modified = buf.changed == 1
       local readonly = buf.readonly == 1
       local buftype = buf.buftype
@@ -78,6 +78,7 @@ M.buffers = function()
 
       return fzf_utils.create_fzf_entry(
         bufnr,
+        full_bufname,
         utils.ansi_codes.blue(bufname .. icon)
       )
     end)
@@ -95,9 +96,9 @@ M.buffers = function()
       local bufnr = get_bufnr_from_selection()
       vim.cmd(string.format([[buffer %s]], bufnr))
     end,
-    fzf_preview_cmd = nil,
+    fzf_preview_cmd = string.format([[bat %s {2}]], helpers.bat_default_opts),
     fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=1.. --preview-window="
+      .. " --with-nth=1,3 --preview-window="
       .. helpers.fzf_default_preview_window_args,
     fzf_prompt = "Buffers",
     fzf_initial_position = fzf_initial_pos,

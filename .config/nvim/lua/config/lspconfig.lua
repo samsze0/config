@@ -72,6 +72,9 @@ require("lspconfig").html.setup({ -- TODO
 require("lspconfig").cssls.setup({ -- TODO
   capabilities = capabilities,
 })
+require("lspconfig").tsserver.setup({
+  capabilities = capabilities,
+})
 
 -- Docker
 require("lspconfig").docker_compose_language_service.setup({ -- TODO

@@ -1,9 +1,11 @@
-homebrew/cask-versions/firefox-developer-edition
-homebrew/cask-fonts/font-droid-sans-mono-nerd-font
-homebrew/cask-fonts/font-hack-nerd-font
+homebrew/cask/brave-browser
 homebrew/cask/iina
 homebrew/cask/karabiner-elements
 homebrew/cask/kitty
+homebrew/cask/obs
 homebrew/cask/outline-manager
 homebrew/cask/visual-studio-code
 homebrew/cask/warp
+homebrew/cask-fonts/homebrew/cask-fonts/font-droid-sans-mono-nerd-font
+homebrew/cask-fonts/homebrew/cask-fonts/font-hack-nerd-font
+homebrew/cask-versions/homebrew/cask-versions/firefox-developer-edition

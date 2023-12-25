@@ -635,7 +635,7 @@ function M.setup(opts)
     { guifg = c.black, guibg = c.blue, gui = "none", guisp = nil }
 
   hi.NormalFloat =
-    { guifg = c.gray_800, guibg = c.gray_100, gui = nil, guisp = nil }
+    { guifg = c.gray_800, guibg = c.blue_300, gui = nil, guisp = nil }
   hi.FloatBorder =
     { guifg = c.gray_800, guibg = c.black, gui = nil, guisp = nil }
   hi.NormalNC = { guifg = c.gray_800, guibg = nil, gui = nil, guisp = nil }

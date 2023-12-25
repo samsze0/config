@@ -19,15 +19,15 @@ koekeishiya/formulae/skhd
 koekeishiya/formulae/yabai
 less
 lf
-llvm
 lua-language-server
 make
 neovim
 nvm
+openjdk
+pnpm
 prettier
 pyenv
 pyright
-python@3.11
 ripgrep
 rsync
 ruff-lsp
@@ -44,5 +44,6 @@ tldr
 trash
 typescript-language-server
 vscode-langservers-extracted
+watchman
 wget
 zoxide

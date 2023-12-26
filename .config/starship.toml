@@ -14,12 +14,12 @@ disabled = true
 disabled = true
 
 [directory]
-style = 'yellow bold'
+style = 'white bold'
 disabled = false
 
 [git_status]
 format = '([$all_status$ahead_behind]($style) )'
-style = 'bold yellow'
+style = 'bold bright-black'
 ahead = '⇡'
 behind = '⇣'
 stashed = ''
@@ -40,7 +40,7 @@ merge = 'MERGING'
 revert = 'REVERTING'
 cherry_pick = 'CHERRY-PICKING'
 bisect = 'BISECTING'
-style = 'bold yellow'
+style = 'bold bright-black'
 format = '([$state( $progress_current/$progress_total)]($style) )'
 disabled = false
 
@@ -53,7 +53,7 @@ disabled = false
 [python]
 pyenv_version_name = true
 pyenv_prefix = ''
-format = '⋅ [${symbol}${pyenv_prefix}(${version} )]($style)[($virtualenv )](bold yellow)'
+format = '⋅ [${symbol}${pyenv_prefix}(${version} )]($style)[($virtualenv )](bold bright-black)'
 version_format = 'v${raw}'
 style = 'blue bold'
 symbol = 'Python '
@@ -61,7 +61,7 @@ disabled = false
 
 [rust]
 format = '⋅ [$symbol($version )]($style)'
-version_format = '${raw}'
+version_format = 'v${raw}'
 symbol = 'Rust '
 style = 'bold blue'
 detect_extensions = ['rs']
@@ -71,7 +71,7 @@ disabled = false
 
 [c]
 format = '⋅ [($name )($version )]($style)'
-version_format = '${raw}'
+version_format = 'v${raw}'
 style = 'blue bold'
 symbol = 'C '
 detect_extensions = [
@@ -98,7 +98,7 @@ disabled = false
 
 [cmake]
 format = '⋅ [$symbol($version )]($style)'
-version_format = '${raw}'
+version_format = 'v${raw}'
 symbol = 'CMake '
 style = 'bold blue'
 detect_extensions = []
@@ -110,7 +110,7 @@ disabled = false
 
 [golang]
 format = '⋅ [$symbol($version )]($style)'
-version_format = '${raw}'
+version_format = 'v${raw}'
 symbol = 'Go '
 style = 'bold blue'
 detect_extensions = ['go']
@@ -168,7 +168,7 @@ disabled = false
 
 [swift]
 format = '⋅ [$symbol($version )]($style)'
-version_format = '${raw}'
+version_format = 'v${raw}'
 symbol = 'Swift '
 style = 'bold blue'
 detect_extensions = ['swift']
@@ -176,9 +176,26 @@ detect_files = ['Package.swift']
 detect_folders = []
 disabled = false
 
+[ruby]
+format = '⋅ [$symbol($version )]($style)'
+version_format = 'v${raw}'
+symbol = 'Ruby '
+style = 'bold blue'
+disabled = false
+detect_extensions = ['rb']
+detect_files = [
+    'Gemfile',
+    '.ruby-version',
+]
+detect_folders = []
+detect_variables = [
+    'RUBY_VERSION',
+    'RBENV_VERSION',
+]
+
 [zig]
 format = '⋅ [$symbol($version )]($style)'
-version_format = '${raw}'
+version_format = 'v${raw}'
 symbol = 'Zig '
 style = 'bold blue'
 detect_extensions = ['zig']
@@ -186,11 +203,27 @@ detect_files = []
 detect_folders = []
 disabled = false
 
-[custom.arch]
 # https://starship.rs/config/#custom-commands
 # https://github.com/starship/starship/discussions/1252
+
+[custom.osx]
 command = 'echo $(arch)'
 symbol = ' '
 format = '⋅ [$symbol($output )]($style)'
-style = 'bold yellow'
-when = false
+style = 'bold bright-black'
+when = '[[ "$(uname)" == "Darwin" ]]'
+
+[custom.linux]
+command = 'echo $(arch)'
+symbol = ' '
+format = '⋅ [$symbol($output )]($style)'
+style = 'bold bright-black'
+when = '[[ "$(uname)" == "Linux" ]]'
+
+[custom.ssh_remote_conn]
+description = "show number of remote ssh connections"
+command = "w -h | awk '{print $6}' | grep 'sshd' | wc -l"
+when = "w -h | awk '{print $6}' | grep 'sshd' | wc -l | xargs -I{} -- test {} -gt 0"
+symbol = "SSH "
+format = '⋅ [$symbol($output )]($style)'
+style = "bold grey"

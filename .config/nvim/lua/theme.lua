@@ -40,6 +40,9 @@ M.colors = {
   red_100 = "#280f0f",
   blue_100 = "#0e1a27",
   yellow_100 = "#291a0a",
+  red_200 = "#2f1010",
+  blue_200 = "#11203d",
+  yellow_200 = "#3a1f0b",
   red_300 = "#3e1414",
   blue_300 = "#16274b",
   yellow_300 = "#412810",
@@ -635,7 +638,7 @@ function M.setup(opts)
     { guifg = c.black, guibg = c.blue, gui = "none", guisp = nil }
 
   hi.NormalFloat =
-    { guifg = c.gray_800, guibg = c.blue_300, gui = nil, guisp = nil }
+    { guifg = c.gray_800, guibg = c.blue_200, gui = nil, guisp = nil }
   hi.FloatBorder =
     { guifg = c.gray_800, guibg = c.black, gui = nil, guisp = nil }
   hi.NormalNC = { guifg = c.gray_800, guibg = nil, gui = nil, guisp = nil }

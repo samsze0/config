@@ -1,13 +1,18 @@
 local config = require("config")
 
+local prettier = { "prettierd", "prettier" }
+
 -- https://github.com/mfussenegger/nvim-lint#available-linters
 require("conform").setup({
   formatters_by_ft = {
     -- List: multiple formatters sequentially
     -- Sublist: only run the first available formatter
     lua = { "stylua" },
-    javascript = { { "prettierd", "prettier" } },
-    json = { { "prettierd", "prettier" } },
+    javascript = { prettier },
+    javascriptreact = { prettier },
+    typescript = { prettier },
+    typescriptreact = { prettier },
+    json = { prettier },
     sh = { "shfmt" },
     zsh = { "shfmt" },
     bash = { "shfmt" },

@@ -111,6 +111,10 @@ else                           # OSX
 	export IMAGE_VIEWER="open"
 	export VIDEO_PLAYER="iina"
 	export NOTIFIER="osx_notify"
+
+	export ANDROID_HOME="$HOME/Library/Android/sdk"
+	export PATH="$PATH:$ANDROID_HOME/emulator"
+	export PATH="$PATH:$ANDROID_HOME/tools"
 fi
 
 export PATH=$HOME/bin:${PATH}

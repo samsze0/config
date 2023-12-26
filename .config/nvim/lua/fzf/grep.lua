@@ -180,8 +180,9 @@ M.grep = function(opts)
     if #replacement > 0 then
       filecontent_after = vim.fn.systemlist(
         string.format(
-          [[cat "%s" | sed "s/%s/%s/g"]],
+          [[cat "%s" | sed "%ss/%s/%s/g"]],
           filepath,
+          row,
           FZF.current_query,
           replacement
         )
@@ -336,8 +337,9 @@ M.grep_file = function(opts)
     if #replacement > 0 then
       filecontent_after = vim.fn.systemlist(
         string.format(
-          [[cat "%s" | sed "s/%s/%s/g"]],
+          [[cat "%s" | sed "%ss/%s/%s/g"]],
           current_file,
+          row,
           FZF.current_query,
           replacement
         )

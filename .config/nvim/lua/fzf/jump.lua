@@ -48,7 +48,6 @@ M.jumps = function(opts)
   core.fzf(get_entries(), {
     fzf_prompt = "Jumps",
     fzf_initial_position = fzf_initial_pos,
-    before_fzf = helpers.set_keymaps_for_fzf_preview,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
     fzf_on_focus = function() end,
     fzf_on_select = function()

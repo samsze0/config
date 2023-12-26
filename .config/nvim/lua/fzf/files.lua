@@ -39,6 +39,10 @@ M.files = function(opts)
     end,
     before_fzf = function()
       helpers.set_keymaps_for_nvim_preview(popups.main, popups.nvim_preview)
+      helpers.set_keymaps_for_popups_nav({
+        { popup = popups.main, key = "<C-s>", is_terminal = true },
+        { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
+      })
     end,
     fzf_on_focus = function()
       local path = get_selection()

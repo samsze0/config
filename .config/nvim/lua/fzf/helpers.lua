@@ -19,23 +19,26 @@ local M = {
   fzf_default_preview_window_args = "right,50%,border-none,wrap,nofollow,nocycle",
 }
 
+M.set_keymaps_for_popups_nav = function(popup_nav_configs)
+  -- For every permutation of cartesian product of popup_nav_configs where i ~= j,
+  -- map the keybinds to switch to the window of popup j from popup i
+  for i, ci in ipairs(popup_nav_configs) do
+    for j, cj in ipairs(popup_nav_configs) do
+      if j ~= i then
+        cj.popup:map(cj.is_terminal and "t" or "n", ci.key, function()
+          vim.api.nvim_set_current_win(ci.popup.winid)
+          if ci.is_terminal then vim.cmd("startinsert") end
+        end)
+      end
+    end
+  end
+end
+
 M.set_keymaps_for_nvim_preview = function(main_popup, preview_popup, opts)
   opts = vim.tbl_extend("force", {
-    goto_preview_popup = "<C-f>",
-    goto_main_popup = "<C-s>",
     scrollup_preview_from_main_popup = "<S-Up>",
     scrolldown_preview_from_main_popup = "<S-Down>",
   }, opts or {})
-
-  main_popup:map(
-    "t",
-    opts.goto_preview_popup,
-    function() vim.api.nvim_set_current_win(preview_popup.winid) end
-  )
-  preview_popup:map("n", opts.goto_main_popup, function()
-    vim.api.nvim_set_current_win(main_popup.winid)
-    vim.cmd("startinsert")
-  end)
 
   main_popup:map("t", opts.scrollup_preview_from_main_popup, function()
     -- Setting current window to right window will cause scrollbar to refresh as well
@@ -56,6 +59,7 @@ M.set_keymaps_for_nvim_preview = function(main_popup, preview_popup, opts)
   end)
 end
 
+-- FIX
 M.set_keymaps_for_fzf_preview = function(main_popup, opts)
   opts = vim.tbl_extend("force", {
     scrollup_preview_from_main_popup = "<S-Up>",
@@ -101,9 +105,10 @@ M.create_simple_layout = function()
   local layout = Layout(
     {
       position = "50%",
+      relative = "editor",
       size = {
         width = "90%",
-        height = "95%",
+        height = "90%",
       },
     },
     Layout.Box({
@@ -156,9 +161,10 @@ M.create_nvim_preview_layout = function()
   local layout = Layout(
     {
       position = "50%",
+      relative = "editor",
       size = {
         width = "90%",
-        height = "95%",
+        height = "90%",
       },
     },
     Layout.Box({

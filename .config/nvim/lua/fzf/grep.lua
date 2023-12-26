@@ -17,7 +17,7 @@ M.grep = function(opts)
   }, opts or {})
 
   local function get_info_from_selection()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     return unpack(args)
@@ -75,7 +75,7 @@ M.grep = function(opts)
     fzf_prompt = "Grep",
     fzf_on_focus = function() end,
     fzf_on_query_change = function()
-      local query = FZF_STATE.current_query
+      local query = FZF.current_query
       if query == "" then
         core.send_to_fzf("reload()")
         return
@@ -83,7 +83,7 @@ M.grep = function(opts)
       -- Important: most work should be carried out by the preview function
       core.send_to_fzf("reload@" .. get_cmd(query) .. "@")
     end,
-    before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
+    before_fzf = helpers.set_keymaps_for_fzf_preview,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()
         local filepath = get_info_from_selection()
@@ -123,7 +123,7 @@ M.grep_file = function(opts)
   local current_file = vim.fn.expand("%")
 
   local function get_info_from_selection()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     return unpack(args)
@@ -168,11 +168,11 @@ M.grep_file = function(opts)
     fzf_prompt = "Grep",
     fzf_on_focus = function() end,
     fzf_on_query_change = function()
-      local query = FZF_STATE.current_query
+      local query = FZF.current_query
       -- Important: most work should be carried out by the preview function
       core.send_to_fzf("reload@" .. get_cmd(query) .. "@")
     end,
-    before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
+    before_fzf = helpers.set_keymaps_for_fzf_preview,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
     fzf_extra_args = helpers.fzf_default_args
       .. " --with-nth=1.. "

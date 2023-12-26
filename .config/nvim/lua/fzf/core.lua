@@ -4,10 +4,9 @@ local M = {}
 
 local config = require("fzf.config")
 local utils = require("utils")
-local window_utils = require("utils.window")
 local fzf_utils = require("fzf.utils")
 local uv_utils = require("utils.uv")
-local os_utils = require("utils.os")
+local helpers = require("fzf.helpers")
 local uv = vim.loop
 
 local fzf_port
@@ -15,18 +14,12 @@ local on_focus
 local on_query_change
 local event_callback_map = {}
 
-FZF_STATE = {
+FZF = {
   current_query = nil,
   current_selection = nil,
   current_selection_index = nil,
-  prev_window = nil,
-  window = nil,
-  buffer = nil,
-  border_buffer = nil,
-  preview_window = nil,
-  preview_buffer = nil,
-  preview_border_buf = nil,
   channel = nil,
+  popups = nil,
 }
 
 local reset_state = function()
@@ -34,18 +27,12 @@ local reset_state = function()
   on_query_change = nil
   event_callback_map = {}
 
-  FZF_STATE = {
+  FZF = {
     current_query = nil,
     current_selection = nil,
     current_selection_index = nil,
-    prev_window = nil,
-    window = nil,
-    buffer = nil,
-    border_buffer = nil,
-    preview_window = nil,
-    preview_buffer = nil,
-    preview_border_buf = nil,
     channel = nil,
+    popups = nil,
   }
 end
 
@@ -75,8 +62,8 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         )
         return
       end
-      FZF_STATE.current_selection_index = tonumber(index) + 1
-      FZF_STATE.current_selection = selection
+      FZF.current_selection_index = tonumber(index) + 1
+      FZF.current_selection = selection
       if on_focus then vim.schedule(on_focus) end
     elseif string.match(message, "^change") then
       local query = string.match(message, "^change '(.*)'")
@@ -88,7 +75,7 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         return
       end
 
-      FZF_STATE.current_query = query
+      FZF.current_query = query
       if on_query_change then vim.schedule(on_query_change) end
     elseif string.match(message, "^event") then
       local event = string.match(message, "^event ([^\n]+)")
@@ -133,16 +120,15 @@ M.fzf = function(input, opts)
   reset_state()
 
   opts = vim.tbl_extend("force", {
+    layout = nil,
     fzf_extra_args = "",
     fzf_prompt = "",
-    fzf_preview_window = {},
     fzf_preview_cmd = nil,
     fzf_initial_position = 0,
     fzf_on_query_change = nil,
     fzf_on_focus = nil,
     fzf_on_select = nil,
     fzf_binds = {},
-    nvim_preview = false,
     before_fzf = nil,
     after_fzf = nil,
     fzf_async = false, -- Doesn't work well with start:pos
@@ -150,8 +136,6 @@ M.fzf = function(input, opts)
 
   on_focus = opts.fzf_on_focus
   on_query_change = opts.fzf_on_query_change
-
-  if config.debug then vim.notify(vim.inspect(opts)) end
 
   if M.is_fzf_available() ~= true then
     vim.notify(
@@ -169,52 +153,14 @@ M.fzf = function(input, opts)
     return
   end
 
-  if opts.nvim_preview then
-    FZF_STATE.prev_window = vim.api.nvim_get_current_win()
+  local prev_win = vim.api.nvim_get_current_win()
 
-    FZF_STATE.preview_window, FZF_STATE.preview_buffer, _, FZF_STATE.preview_border_buf =
-      window_utils.open_floating_window({
-        buffer = FZF_STATE.preview_buffer,
-        buffiletype = "fzf_preview",
-        position = "right",
-        style = "code",
-        main_win_extra_opts = {},
-      })
-
-    FZF_STATE.window, FZF_STATE.buffer, _, FZF_STATE.border_buffer =
-      window_utils.open_floating_window({
-        buffer = FZF_STATE.buffer,
-        buffiletype = "fzf",
-        position = "left",
-      })
-
-    window_utils.create_autocmd_close_all_windows_together({
-      {
-        window = FZF_STATE.window,
-        buffer = FZF_STATE.buffer,
-        border_buffer = FZF_STATE.border_buffer,
-      },
-      {
-        window = FZF_STATE.preview_window,
-        buffer = FZF_STATE.preview_buffer,
-        border_buffer = FZF_STATE.preview_border_buf,
-      },
-    })
-  else
-    FZF_STATE.prev_window = vim.api.nvim_get_current_win()
-    FZF_STATE.window, FZF_STATE.buffer, _, FZF_STATE.border_buffer =
-      window_utils.open_floating_window({
-        buffer = FZF_STATE.buffer,
-        buffiletype = "fzf",
-      })
-    window_utils.create_autocmd_close_all_windows_together({
-      {
-        window = FZF_STATE.window,
-        buffer = FZF_STATE.buffer,
-        border_buffer = FZF_STATE.border_buffer,
-      },
-    })
+  local layout = opts.layout
+  if not layout then
+    layout, _ = helpers.create_simple_layout()
   end
+
+  layout:mount()
 
   local function parse_fzf_bind(event, action)
     if type(action) == "function" then
@@ -322,16 +268,13 @@ EOF
       on_exit = function(job_id, code, event)
         vim.cmd("silent! :checktime")
 
-        -- Restore focus to preview window (causes window group to close)
-        if vim.api.nvim_win_is_valid(FZF_STATE.prev_window) then
-          vim.api.nvim_win_close(FZF_STATE.window, true)
-          vim.api.nvim_set_current_win(FZF_STATE.prev_window)
+        -- Restore focus to preview window
+        if vim.api.nvim_win_is_valid(prev_win) then
+          layout:unmount()
+          vim.api.nvim_set_current_win(prev_win)
         else
           vim.notify(
-            string.format(
-              "Invalid preview window: %s",
-              vim.inspect(FZF_STATE.prev_window)
-            ),
+            string.format("Invalid preview window: %s", vim.inspect(prev_win)),
             vim.log.levels.ERROR
           )
         end
@@ -364,7 +307,7 @@ EOF
     )
     return
   end
-  FZF_STATE.channel = channel
+  FZF.channel = channel
 
   vim.cmd("startinsert")
 end

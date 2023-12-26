@@ -35,7 +35,7 @@ M.lsp_document_symbols = function(opts)
       end
 
       local function get_selection()
-        local index = FZF_STATE.current_selection_index
+        local index = FZF.current_selection_index
         local symbol = symbols[index]
         return symbol
       end
@@ -101,14 +101,14 @@ M.lsp_workspace_symbols = function(opts)
   local current_symbols
 
   local function get_selection()
-    local index = FZF_STATE.current_selection_index
+    local index = FZF.current_selection_index
     local symbol = current_symbols[index]
     return symbol
   end
 
   core.fzf({}, {
     fzf_on_query_change = function()
-      local query = FZF_STATE.current_query
+      local query = FZF.current_query
 
       if handle then
         handle() -- Cancel ongoing request
@@ -211,7 +211,7 @@ M.lsp_references = function(opts)
       end
 
       local function get_selection()
-        local index = FZF_STATE.current_selection_index
+        local index = FZF.current_selection_index
         local symbol = refs[index]
         return symbol
       end
@@ -313,7 +313,7 @@ M.lsp_definitions = function(opts)
       end
 
       local function get_selection()
-        local index = FZF_STATE.current_selection_index
+        local index = FZF.current_selection_index
         local symbol = defs[index]
         return symbol
       end

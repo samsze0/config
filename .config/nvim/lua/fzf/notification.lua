@@ -61,8 +61,8 @@ M.notifications = function(opts)
   local entries = get_entries()
 
   local get_notification_from_selection = function(selection)
-    local selection_index = FZF_STATE.current_selection_index
-    selection = selection or FZF_STATE.current_selection
+    local selection_index = FZF.current_selection_index
+    selection = selection or FZF.current_selection
 
     return _G.notifications[#_G.notifications - selection_index + 1]
   end

@@ -56,7 +56,7 @@ M.diagnostics = function(opts)
   local entries, diagnostics = get_entries()
 
   local get_selection = function()
-    return diagnostics[FZF_STATE.current_selection_index]
+    return diagnostics[FZF.current_selection_index]
   end
 
   core.fzf(entries, {

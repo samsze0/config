@@ -4,11 +4,12 @@ local M = {}
 
 local utils = require("utils")
 
+-- @Deprecated
+-- Use nui instead
 M.open_floating_window = function(opts)
   opts = vim.tbl_extend("force", {
-    width = 0.9,
-    height = 0.9,
-    position = "center",
+    horizontal_position = "center",
+    vertical_position = "center",
     winblend = 0,
     buffer = nil,
     buffiletype = "floating_window",
@@ -20,20 +21,37 @@ M.open_floating_window = function(opts)
 
   local height, width, row, col
 
-  height = math.floor(vim.o.lines * opts.height)
-  width = math.floor(vim.o.columns * opts.width)
+  height = math.floor(vim.o.lines * 0.9)
+  width = math.floor(vim.o.columns * 0.9)
   -- By default anchor is north-west
   row = math.ceil(vim.o.lines - height) / 2
   col = math.ceil(vim.o.columns - width) / 2
 
-  if opts.position == "center" then
-  elseif opts.position == "left" then
+  if opts.horizontal_position == "center" then
+  elseif opts.horizontal_position == "left" then
     width = math.floor(width * 0.5)
-  elseif opts.position == "right" then
-    width = math.floor(vim.o.columns * opts.width * 0.5)
+  elseif opts.horizontal_position == "right" then
+    width = math.floor(width * 0.5)
     col = vim.o.columns - col - width + 2 -- Add 2 because col was ceiled and width was floored
   else
-    vim.notify("Window utils: invalid position option", vim.log.levels.ERROR)
+    vim.notify(
+      "Window utils: invalid horizontal position option",
+      vim.log.levels.ERROR
+    )
+    return
+  end
+
+  if opts.vertical_position == "center" then
+  elseif opts.vertical_position == "top" then
+    height = math.floor(height * 0.5)
+  elseif opts.vertical_position == "down" then
+    height = math.floor(height * 0.5)
+    row = vim.o.lines - row - height + 2 -- Add 2 because row was ceiled and height was floored
+  else
+    vim.notify(
+      "Window utils: invalid vertical position option",
+      vim.log.levels.ERROR
+    )
     return
   end
 
@@ -95,11 +113,8 @@ M.open_floating_window = function(opts)
       zindex = 20,
     }, opts.main_win_extra_opts or {})
   )
-  if opts.style == "code" then
-    vim.wo[main_win].number = true
-    -- vim.bo[main_buffer].modifiable = false
-    -- vim.bo[main_buffer].readonly = true
-  end
+
+  if opts.style == "code" then vim.wo[main_win].number = true end
 
   vim.bo[main_buffer].filetype = opts.buffiletype
 
@@ -120,6 +135,8 @@ M.open_floating_window = function(opts)
   return main_win, main_buffer, border_window, border_buffer
 end
 
+-- @Deprecated
+-- Use nui instead
 -- Create autocmds that close all windows specified in the input list when current window isn't in the list
 M.create_autocmd_close_all_windows_together = function(group, opts)
   opts = vim.tbl_extend("force", {
@@ -163,87 +180,6 @@ M.create_autocmd_close_all_windows_together = function(group, opts)
         end
       end,
     })
-  end
-end
-
-M.create_float_window_nav_keymaps = function(left, right, opts)
-  opts = vim.tbl_extend("force", {
-    goto_right_win = "<C-f>",
-    goto_left_win = "<C-s>",
-    scrollup_right_win_from_left_win = "<S-Up>",
-    scrolldown_right_win_from_left_win = "<S-Down>",
-  }, opts or {})
-
-  -- Window navigation
-  vim.keymap.set(
-    left.is_terminal and "t" or "n",
-    opts.goto_right_win,
-    function()
-      vim.api.nvim_set_current_win(right.window)
-      if right.is_terminal then vim.cmd("startinsert") end
-    end,
-    {
-      buffer = left.buffer,
-    }
-  )
-  vim.keymap.set(
-    right.is_terminal and "t" or "n",
-    opts.goto_left_win,
-    function()
-      vim.api.nvim_set_current_win(left.window)
-      if left.is_terminal then vim.cmd("startinsert") end
-    end,
-    {
-      buffer = right.buffer,
-    }
-  )
-
-  -- Scroll up/down right window from left window
-  if not right.is_terminal then
-    vim.keymap.set(
-      left.is_terminal and "t" or "n",
-      opts.scrollup_right_win_from_left_win,
-      function()
-        -- Setting current window to right window will cause scrollbar to refresh as well
-        -- TODO: make mapping generic and support any custom mapping in options
-        vim.api.nvim_set_current_win(right.window)
-        if false then
-          vim.cmd("normal! <S-Up>")
-        else
-          vim.api.nvim_input("<S-Up>")
-        end
-        vim.schedule(function()
-          vim.api.nvim_set_current_win(left.window)
-          if left.is_terminal then vim.cmd("startinsert") end
-        end)
-      end,
-      {
-        buffer = left.buffer,
-      }
-    )
-    vim.keymap.set(
-      left.is_terminal and "t" or "n",
-      opts.scrolldown_right_win_from_left_win,
-      function()
-        -- vim.fn.win_execute(right.window, "normal \\<S-down>")
-
-        vim.api.nvim_set_current_win(right.window)
-        if false then
-          vim.cmd("normal! <S-Down>")
-        else
-          vim.api.nvim_input("<S-Down>")
-          -- vim.api.nvim_feedkeys("<S-Down>", "m", true)
-        end
-        -- Because nvim_input is non-blocking, we need to queue the nvim_set_current_win so that it executes after nvim_input
-        vim.schedule(function()
-          vim.api.nvim_set_current_win(left.window)
-          if left.is_terminal then vim.cmd("startinsert") end
-        end)
-      end,
-      {
-        buffer = left.buffer,
-      }
-    )
   end
 end
 

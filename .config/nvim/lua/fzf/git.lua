@@ -59,7 +59,7 @@ M.git_status = function(opts)
   if fzf_initial_pos == nil then fzf_initial_pos = 0 end
 
   local get_selection = function()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     local filepath = args[2]
@@ -184,7 +184,7 @@ M.git_commits = function(opts)
   end
 
   local get_commit_hash_from_selection = function()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     local commit_hash = args[1]
@@ -246,7 +246,7 @@ M.git_stash = function(opts)
   end
 
   local get_stash_ref_from_selection = function()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     local stash_ref = args[1]
@@ -291,7 +291,7 @@ M.git_submodules = function(on_submodule)
   submodules = utils.map(submodules, function(_, e) return vim.trim(e) end)
 
   local function get_relpath_from_selection()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     local submodule_path = selection
     submodule_path =

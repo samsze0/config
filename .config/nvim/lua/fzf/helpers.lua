@@ -1,6 +1,10 @@
 local window_utils = require("utils.window")
 local utils = require("utils")
 
+local Layout = require("nui.layout")
+local Popup = require("nui.popup")
+local event = require("nui.utils.autocmd").event
+
 local use_rg_colors = true
 
 local M = {
@@ -15,32 +19,58 @@ local M = {
   fzf_default_preview_window_args = "right,50%,border-none,wrap,nofollow,nocycle",
 }
 
-M.set_custom_keymaps_for_nvim_preview = function()
-  window_utils.create_float_window_nav_keymaps({
-    is_terminal = true,
-    window = FZF_STATE.window,
-    buffer = FZF_STATE.buffer,
-  }, {
-    is_terminal = false,
-    window = FZF_STATE.preview_window,
-    buffer = FZF_STATE.preview_buffer,
-  })
+M.set_keymaps_for_nvim_preview = function(main_popup, preview_popup, opts)
+  opts = vim.tbl_extend("force", {
+    goto_preview_popup = "<C-f>",
+    goto_main_popup = "<C-s>",
+    scrollup_preview_from_main_popup = "<S-Up>",
+    scrolldown_preview_from_main_popup = "<S-Down>",
+  }, opts or {})
+
+  main_popup:map(
+    "t",
+    opts.goto_preview_popup,
+    function() vim.api.nvim_set_current_win(preview_popup.winid) end
+  )
+  preview_popup:map("n", opts.goto_main_popup, function()
+    vim.api.nvim_set_current_win(main_popup.winid)
+    vim.cmd("startinsert")
+  end)
+
+  main_popup:map("t", opts.scrollup_preview_from_main_popup, function()
+    -- Setting current window to right window will cause scrollbar to refresh as well
+    vim.api.nvim_set_current_win(preview_popup.winid)
+    vim.api.nvim_input("<S-Up>")
+    vim.schedule(function()
+      vim.api.nvim_set_current_win(main_popup.winid)
+      vim.cmd("startinsert")
+    end)
+  end)
+  main_popup:map("t", opts.scrolldown_preview_from_main_popup, function()
+    vim.api.nvim_set_current_win(preview_popup.winid)
+    vim.api.nvim_input("<S-Down>")
+    vim.schedule(function()
+      vim.api.nvim_set_current_win(main_popup.winid)
+      vim.cmd("startinsert")
+    end)
+  end)
 end
 
-M.set_custom_keymaps_for_fzf_preview = function()
-  vim.keymap.set( -- TODO
+M.set_keymaps_for_fzf_preview = function(main_popup, opts)
+  opts = vim.tbl_extend("force", {
+    scrollup_preview_from_main_popup = "<S-Up>",
+    scrolldown_preview_from_main_popup = "<S-Down>",
+  }, opts or {})
+
+  main_popup:map( -- TODO
     "t",
-    "<S-PageUp>",
-    -- function() vim.fn.chansend(FZF_STATE.channel, "hi \x1ba") end,
-    function() vim.api.nvim_input("<M-a>") end,
-    { buffer = FZF_STATE.buffer }
+    opts.scrollup_preview_from_main_popup,
+    function() vim.api.nvim_input("<M-a>") end
   )
   vim.keymap.set(
     "t",
-    "<S-PageDown>",
-    -- function() vim.fn.chansend(FZF_STATE.channel, "hi \x1bb") end,
-    function() vim.api.nvim_input("<M-b>") end,
-    { buffer = FZF_STATE.buffer }
+    opts.scrolldown_preview_from_main_popup,
+    function() vim.api.nvim_input("<M-b>") end
   )
 end
 
@@ -50,5 +80,106 @@ M.custom_fzf_keybinds = {
   ["alt-a"] = "preview-up",
   ["alt-b"] = "preview-down",
 }
+
+M.create_simple_layout = function()
+  local main_popup = Popup({
+    enter = true,
+    focusable = true,
+    border = {
+      style = "rounded",
+    },
+    buf_options = {
+      modifiable = false,
+      filetype = "fzf",
+    },
+    win_options = {
+      winblend = 0,
+      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+    },
+  })
+
+  local layout = Layout(
+    {
+      position = "50%",
+      size = {
+        width = "90%",
+        height = "95%",
+      },
+    },
+    Layout.Box({
+      Layout.Box(main_popup, { size = "100%" }),
+    }, {})
+  )
+
+  main_popup:on("BufLeave", function() layout:unmount() end)
+
+  return layout, {
+    main = main_popup,
+  }
+end
+
+M.create_nvim_preview_layout = function()
+  local main_popup = Popup({
+    enter = true,
+    focusable = true,
+    border = {
+      style = "rounded",
+    },
+    buf_options = {
+      modifiable = false,
+      filetype = "fzf",
+    },
+    win_options = {
+      winblend = 0,
+      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+    },
+  })
+
+  local nvim_preview_popup = Popup({
+    enter = false,
+    focusable = true,
+    border = {
+      style = "rounded",
+    },
+    buf_options = {
+      modifiable = true,
+    },
+    win_options = {
+      winblend = 0,
+      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+      number = true,
+    },
+  })
+
+  local popups = { main = main_popup, nvim_preview = nvim_preview_popup }
+
+  local layout = Layout(
+    {
+      position = "50%",
+      size = {
+        width = "90%",
+        height = "95%",
+      },
+    },
+    Layout.Box({
+      Layout.Box(main_popup, { size = "50%" }),
+      Layout.Box(nvim_preview_popup, { size = "50%" }),
+    }, { dir = "row" })
+  )
+
+  for _, popup in pairs(popups) do
+    popup:on("BufLeave", function()
+      vim.schedule(function()
+        local curr_bufnr = vim.api.nvim_get_current_buf()
+        for _, p in pairs(popups) do
+          if p.bufnr == curr_bufnr then return end
+        end
+        layout:unmount()
+      end)
+    end)
+  end
+
+  return layout, popups
+end
 
 return M

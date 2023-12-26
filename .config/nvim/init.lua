@@ -217,6 +217,9 @@ require("lazy").setup({
       "nvim-treesitter/nvim-treesitter",
     },
   },
+  { -- Required by fzf & lf
+    "MunifTanjim/nui.nvim",
+  },
 })
 
 require("jumplist").setup()

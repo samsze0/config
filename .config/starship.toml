@@ -14,7 +14,7 @@ disabled = true
 disabled = true
 
 [directory]
-style = 'white bold'
+style = 'bright-black bold'
 disabled = false
 
 [git_status]

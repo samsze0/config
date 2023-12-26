@@ -39,16 +39,16 @@ M.jumps = function(opts)
   end
 
   local get_selection = function()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
     local args = vim.split(selection, utils.nbsp)
-    local node = jumps[FZF_STATE.current_selection_index]
+    local node = jumps[FZF.current_selection_index]
     return unpack(args), node
   end
 
   core.fzf(get_entries(), {
     fzf_prompt = "Jumps",
     fzf_initial_position = fzf_initial_pos,
-    before_fzf = helpers.set_custom_keymaps_for_fzf_preview,
+    before_fzf = helpers.set_keymaps_for_fzf_preview,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
     fzf_on_focus = function() end,
     fzf_on_select = function()
@@ -105,7 +105,7 @@ M.builtin_jumps = function()
   end
 
   local get_info_from_selection = function()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
     local args = vim.split(selection, utils.nbsp)
     return unpack(args)
   end

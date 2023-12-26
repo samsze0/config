@@ -28,7 +28,7 @@ M.tabs = function()
   local current_tabnr = fn.tabpagenr()
 
   local get_tabnr_from_selection = function()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     return vim.split(selection, utils.nbsp)[1]
   end
@@ -86,7 +86,7 @@ M.buffers = function()
   end
 
   local get_bufnr_from_selection = function()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     return vim.split(selection, utils.nbsp)[1]
   end
@@ -143,7 +143,7 @@ M.all = function()
 
   core.fzf(entries, {
     fzf_on_select = function()
-      local entry = FZF_STATE.current_selection
+      local entry = FZF.current_selection
       local action = spec[entry]
       if action then action() end
     end,

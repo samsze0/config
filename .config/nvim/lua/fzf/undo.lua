@@ -20,7 +20,7 @@ M.undos = function(opts)
   end
 
   local get_undo_from_selection = function()
-    local selection_index = FZF_STATE.current_selection_index
+    local selection_index = FZF.current_selection_index
 
     return undolist[selection_index]
   end

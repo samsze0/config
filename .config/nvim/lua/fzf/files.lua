@@ -13,7 +13,7 @@ M.files = function(opts)
   }, opts or {})
 
   local get_selection = function()
-    local selection = FZF_STATE.current_selection
+    local selection = FZF.current_selection
 
     return fzf_utils.convert_gitpath_to_filepath(
       selection,
@@ -26,7 +26,10 @@ M.files = function(opts)
 
   utils.sort_filepaths(entries, function(e) return e end)
 
+  local layout, popups = helpers.create_nvim_preview_layout()
+
   core.fzf(entries, {
+    layout = layout,
     fzf_preview_cmd = nil,
     fzf_prompt = "Files",
     fzf_on_select = function()
@@ -34,7 +37,9 @@ M.files = function(opts)
       jumplist.save(win_id)
       vim.cmd(string.format([[e %s]], filepath))
     end,
-    before_fzf = function() helpers.set_custom_keymaps_for_nvim_preview() end,
+    before_fzf = function()
+      helpers.set_keymaps_for_nvim_preview(popups.main, popups.nvim_preview)
+    end,
     fzf_on_focus = function()
       local path = get_selection()
 
@@ -43,7 +48,7 @@ M.files = function(opts)
 
       if is_binary then
         vim.api.nvim_buf_set_lines(
-          FZF_STATE.preview_buffer,
+          popups.nvim_preview.bufnr,
           0,
           -1,
           false,
@@ -59,18 +64,18 @@ M.files = function(opts)
       })
 
       vim.api.nvim_buf_set_lines(
-        FZF_STATE.preview_buffer,
+        popups.nvim_preview.bufnr,
         0,
         -1,
         false,
         vim.fn.readfile(path)
       )
-      vim.bo[FZF_STATE.preview_buffer].filetype = ft
+      vim.bo[popups.nvim_preview.bufnr].filetype = ft
 
       -- Switch to preview window and back in order to refresh scrollbar
       -- TODO: Remove this once scrollbar plugin support remote refresh
-      vim.api.nvim_set_current_win(FZF_STATE.preview_window)
-      vim.api.nvim_set_current_win(FZF_STATE.window)
+      vim.api.nvim_set_current_win(popups.nvim_preview.winid)
+      vim.api.nvim_set_current_win(popups.main.winid)
     end,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()

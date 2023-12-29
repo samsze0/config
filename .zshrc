@@ -64,11 +64,18 @@ function zoxide_init_if_available() {
 	fi
 }
 
+function rbenv_init_if_available() {
+	if check_command_exists rbenv; then
+		eval "$(rbenv init - zsh)"
+	fi
+}
+
 if [ $(arch) = "x86_64" ]; then # Linux / NixOS
 	starship_init_if_available
 	zoxide_init_if_available
 	pyenv_init_if_available
 	pip_init_if_available
+	rbenv_init_if_available
 
 	export PATH="/usr/local/cuda/bin:$PATH"
 
@@ -106,6 +113,7 @@ else                           # OSX
 	zoxide_init_if_available
 	pyenv_init_if_available
 	pip_init_if_available
+	rbenv_init_if_available
 
 	export BROWSER="open -a '/Applications/Firefox Developer Edition.app'"
 	export IMAGE_VIEWER="open"
@@ -113,8 +121,8 @@ else                           # OSX
 	export NOTIFIER="osx_notify"
 
 	export ANDROID_HOME="$HOME/Library/Android/sdk"
-	export PATH="$PATH:$ANDROID_HOME/emulator"
-	export PATH="$PATH:$ANDROID_HOME/tools"
+	export PATH="$ANDROID_HOME/emulator:$PATH"
+	export PATH="$ANDROID_HOME/tools:$PATH"
 fi
 
 export PATH=$HOME/bin:${PATH}

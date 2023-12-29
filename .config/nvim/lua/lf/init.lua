@@ -19,6 +19,7 @@ local popup = Popup({
     style = "rounded",
   },
   position = "50%",
+  relative = "editor",
   size = {
     width = "90%",
     height = "90%",
@@ -44,10 +45,13 @@ local edit_selected_files = function(edit_cmd, selection)
   end
 end
 
+local M = {}
+
 --- :Lf entry point
-local function lf(opts)
+function M.lf(opts)
   opts = vim.tbl_extend("force", {
     edit_cmd = "e",
+    path = vim.fn.getcwd(),
   }, opts or {})
 
   if is_lf_available() ~= true then
@@ -72,6 +76,7 @@ local function lf(opts)
     edit_selected_files("vnew", selection)
   end)
 
+  -- Empty cache files
   vim.fn.writefile({ "" }, selection_path)
   vim.fn.writefile({ "" }, lastdir_path)
 
@@ -79,7 +84,7 @@ local function lf(opts)
     [[PAGER="nvim -RM" lf -last-dir-path="%s" -selection-path="%s" "%s"]],
     lastdir_path,
     selection_path,
-    opts.path or vim.fn.expand("%:p:h")
+    opts.path
   )
 
   vim.fn.termopen(cmd, {
@@ -112,6 +117,4 @@ local function lf(opts)
   vim.cmd("startinsert")
 end
 
-return {
-  lf = lf,
-}
+return M

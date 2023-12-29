@@ -51,7 +51,7 @@ require("lspconfig").golangci_lint_ls.setup({
   capabilities = capabilities,
 })
 
--- C/C++
+-- C/C++/Objective-C
 require("lspconfig").clangd.setup({
   capabilities = capabilities,
 })

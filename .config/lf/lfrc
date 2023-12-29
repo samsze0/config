@@ -16,6 +16,7 @@ cmd trash ${{
   ~/.config/lf/delete.sh $fx --trash
 }}
 map d trash
+map x :cut
 
 cmd open ${{
   ~/.config/lf/open.sh
@@ -29,7 +30,24 @@ map a :push :create_new<space>
 cmd on-select &{{
   echo "$fx" > ~/.cache/lf_current_selection
 }}
+on-select # Run on startup as well
 
+# By default <space> = :toggle:down
 map <space> :toggle
 
-map x :cut
+map <f-1> ${{
+clear
+  cmd=$(
+    lf -remote "query $id history" |
+    # Set separator to tab and skip first record and print last field for each subsequent record
+    # sed is not suitable for column-based tasks as awk or cut is
+    awk -F'\t' 'NR > 1 { print $NF }' |
+    sort -u |
+    fzf --reverse --prompt='History'
+  )
+  lf -remote "send $id $cmd"
+}}
+
+cmd onstartup ${{
+}}
+onstartup

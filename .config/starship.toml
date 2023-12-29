@@ -1,3 +1,5 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
 [aws]
 disabled = true
 
@@ -15,7 +17,6 @@ disabled = true
 
 [directory]
 style = 'bright-black bold'
-disabled = false
 
 [git_status]
 format = '([$all_status$ahead_behind]($style) )'
@@ -32,7 +33,6 @@ modified = '!'
 staged = '+'
 untracked = '?'
 ignore_submodules = true
-disabled = false
 
 [git_state]
 rebase = 'REBASING'
@@ -42,13 +42,11 @@ cherry_pick = 'CHERRY-PICKING'
 bisect = 'BISECTING'
 style = 'bold bright-black'
 format = '([$state( $progress_current/$progress_total)]($style) )'
-disabled = false
 
 [git_branch]
 format = '⋅ [$symbol$branch(:$remote_branch)]($style) '
 symbol = ' '
 style = 'bold blue'
-disabled = false
 
 [python]
 pyenv_version_name = true
@@ -57,7 +55,6 @@ format = '⋅ [${symbol}${pyenv_prefix}(${version} )]($style)[($virtualenv )](bo
 version_format = 'v${raw}'
 style = 'blue bold'
 symbol = 'Python '
-disabled = false
 
 [rust]
 format = '⋅ [$symbol($version )]($style)'
@@ -67,7 +64,57 @@ style = 'bold blue'
 detect_extensions = ['rs']
 detect_files = ['Cargo.toml']
 detect_folders = []
-disabled = false
+
+[java]
+format = '⋅ [$symbol($version )]($style)'
+version_format = 'v${raw}'
+style = 'bold blue'
+symbol = 'Java '
+detect_extensions = [
+    'java',
+    'class',
+    'jar',
+    'gradle',
+    'clj',
+    'cljc',
+]
+detect_files = [
+    'pom.xml',
+    'build.gradle.kts',
+    'build.sbt',
+    '.java-version',
+    'deps.edn',
+    'project.clj',
+    'build.boot',
+]
+detect_folders = []
+
+[kotlin]
+format = '⋅ [$symbol($version )]($style)'
+version_format = 'v${raw}'
+symbol = 'Kotlin '
+style = 'bold blue'
+kotlin_binary = 'kotlin'
+detect_extensions = [
+    'kt',
+    'kts',
+]
+detect_files = []
+detect_folders = []
+
+[gradle]
+format = "⋅ [$symbol($version )]($style)"
+version_format = "v${raw}"
+symbol = "Gradle "
+style = "blue bold"
+recursive = false
+detect_extensions = [
+    "gradle",
+    "gradle.kts",
+]
+detect_files = []
+detect_folders = ["gradle"]
+
 
 [c]
 format = '⋅ [($name )($version )]($style)'
@@ -94,7 +141,6 @@ commands = [
         '--version',
     ],
 ]
-disabled = false
 
 [cmake]
 format = '⋅ [$symbol($version )]($style)'
@@ -106,7 +152,6 @@ detect_files = [
     'CMakeLists.txt',
     'CMakeCache.txt',
 ]
-disabled = false
 
 [golang]
 format = '⋅ [$symbol($version )]($style)'
@@ -124,7 +169,6 @@ detect_files = [
     '.go-version',
 ]
 detect_folders = ['Godeps']
-disabled = false
 
 [nix_shell]
 format = '⋅ [$symbol$state( \($name\))]($style)'
@@ -132,7 +176,6 @@ symbol = 'Nix '
 style = 'bold blue'
 impure_msg = 'impure'
 pure_msg = 'pure'
-disabled = false
 
 [lua]
 format = '⋅ [$symbol($version )]($style)'
@@ -140,7 +183,6 @@ version_format = 'v${raw}'
 symbol = 'Lua '
 style = 'bold blue'
 lua_binary = 'lua'
-disabled = false
 detect_extensions = ['lua']
 detect_files = ['.lua-version']
 detect_folders = ['lua']
@@ -164,7 +206,6 @@ detect_files = [
     '.nvmrc',
 ]
 detect_folders = ['node_modules']
-disabled = false
 
 [swift]
 format = '⋅ [$symbol($version )]($style)'
@@ -174,14 +215,12 @@ style = 'bold blue'
 detect_extensions = ['swift']
 detect_files = ['Package.swift']
 detect_folders = []
-disabled = false
 
 [ruby]
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Ruby '
 style = 'bold blue'
-disabled = false
 detect_extensions = ['rb']
 detect_files = [
     'Gemfile',
@@ -201,7 +240,6 @@ style = 'bold blue'
 detect_extensions = ['zig']
 detect_files = []
 detect_folders = []
-disabled = false
 
 # https://starship.rs/config/#custom-commands
 # https://github.com/starship/starship/discussions/1252

@@ -589,12 +589,11 @@ M.setup = function()
 
   -- File managers
   lua_keymap("n", "<f2><f2>", require("lf").lf, {})
-  lua_keymap(
-    "n",
-    "<f2><f3>",
-    function() require("lf").lf({ path = vim.fn.expand("%:p:h") }) end,
-    {}
-  )
+  lua_keymap("n", "<f2><f3>", function()
+    require("lf").lf({
+      path = vim.fn.expand("%:p"), -- Relative to ~ doesn't work
+    })
+  end, {})
 end
 
 return M

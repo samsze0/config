@@ -13,7 +13,7 @@ local M = {
   delta_default_opts = "--width=$FZF_PREVIEW_COLUMNS",
   use_rg_colors = use_rg_colors,
   rg_default_opts = "--smart-case --no-ignore --hidden --trim "
-    .. (use_rg_colors and "--color=always --colors 'match:fg:blue' --colors 'path:fg:80,130,150' " or "--color=never ")
+    .. (use_rg_colors and "--color=always --colors 'match:fg:blue' --colors 'path:fg:80,130,150' --colors 'line:fg:80,130,150' " or "--color=never ")
     .. "--no-column --line-number --no-heading",
   fzf_default_args = "--scroll-off=10",
   fzf_default_preview_window_args = "right,50%,border-none,wrap,nofollow,nocycle",

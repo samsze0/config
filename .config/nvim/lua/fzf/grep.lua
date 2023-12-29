@@ -161,6 +161,8 @@ M.grep = function(opts)
   local layout, popups = create_layout()
 
   local function reload_preview()
+    if not FZF.current_selection then return end
+
     local filepath, row, _ = get_selection()
     local filename = vim.fn.fnamemodify(filepath, ":t")
     local filecontent = vim.fn.readfile(filepath)
@@ -180,7 +182,7 @@ M.grep = function(opts)
     if #replacement > 0 then
       filecontent_after = vim.fn.systemlist(
         string.format(
-          [[cat "%s" | sed "%ss/%s/%s/g"]],
+          [[cat "%s" | sed -E "%ss/%s/%s/g"]],
           filepath,
           row,
           FZF.current_query,
@@ -294,22 +296,30 @@ M.grep_file = function(opts)
   end
 
   local get_cmd = function(query)
-    return string.format(
-      -- Custom delimiters & strip out ANSI color codes with sed
-      [[rg %s "%s" "%s" | sed "%s"]], -- TODO: order of output is suffled
-      helpers.rg_default_opts,
-      query,
-      current_file,
-      string.format(
-        string.rep("%s", 3, ";"),
-        [[s/\x1b\[[0-9;]*m//g]], -- Strip out ANSI color codes
+    -- FIX: order of output is suffled when query ~= empty
+    local sed_cmd = {
+      string.format("s/:/%s/", utils.nbsp, utils.nbsp), -- Replace first : with nbsp
+    }
+
+    if not helpers.use_rg_colors then
+      table.insert(
+        sed_cmd,
+        1,
         string.format(
           [[s/^\([^:]*\):/%s\1%s:/]],
           utils.ansi_escseq.grey,
           utils.ansi_escseq.clear
-        ), -- Highlight first part with grey
-        string.format("s/:/%s/", utils.nbsp, utils.nbsp) -- Replace first : with nbsp
+        ) -- Highlight first part with grey
       )
+    end
+
+    return string.format(
+      -- Custom delimiters & strip out ANSI color codes with sed
+      [[rg %s "%s" %s | sed "%s"]],
+      helpers.rg_default_opts,
+      query,
+      current_file,
+      table.concat(sed_cmd, ";")
     )
   end
 
@@ -337,7 +347,7 @@ M.grep_file = function(opts)
     if #replacement > 0 then
       filecontent_after = vim.fn.systemlist(
         string.format(
-          [[cat "%s" | sed "%ss/%s/%s/g"]],
+          [[cat "%s" | sed -E "%ss/%s/%s/g"]],
           current_file,
           row,
           FZF.current_query,

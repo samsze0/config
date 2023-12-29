@@ -225,22 +225,19 @@ require("lazy").setup({
 require("jumplist").setup()
 require("keymaps").setup()
 require("winbar").setup() -- i.e. breadcrumbs
-require("commands")
 require("theme").setup(config.theme_opts)
-if config.tabline_plugin == "custom" then
-  -- :h tabbline
-  -- :h tabbar
-  require("tabline").setup({})
-  vim.opt.showtabline = 2 -- 2 = always ; 1 = at least 2 tabs ; 0 = never
-end
-if config.statusline_plugin == "custom" then
-  -- :h statusline
-  require("statusline").setup({})
-  vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
-end
-if config.notify_backend == "custom" then require("notify") end
+
+-- :h tabbline
+require("tabline").setup({})
+vim.opt.showtabline = 2 -- 2 = always ; 1 = at least 2 tabs ; 0 = never
+
+-- :h statusline
+require("statusline").setup({})
+vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
+
+require("notify")
 require("lf")
-if config.persist_plugin == "custom" then require("persist").setup() end
+require("persist").setup()
 require("fzf").setup()
 
 if vim.g.neovide then require("config.neovide") end

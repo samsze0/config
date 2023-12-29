@@ -429,28 +429,22 @@ M.setup = function()
   local conform_over_lsp_format = true
 
   if conform_over_lsp_format then
-    lua_keymap(
-      "n",
-      "ll",
-      utils.run_and_notify(safe_require("conform").format, function(success)
-        if success then
-          return string.format(
-            "Formatted with %s",
-            safe_require("conform").list_formatters()[1].name
-          ) -- TODO: look for first available formatter
-        else
-          return "No available formatters"
-        end
-      end),
-      {}
-    )
+    lua_keymap("n", "ll", function()
+      local success = require("conform").format()
+      if success then
+        return vim.info(
+          "Formatted with",
+          require("conform").list_formatters()[1].name
+        )
+      else
+        vim.info("No available formatters")
+      end
+    end, {})
   else
-    lua_keymap(
-      "n",
-      "ll",
-      utils.run_and_notify(vim.lsp.buf.format, "Formatted"),
-      {}
-    )
+    lua_keymap("n", "ll", function()
+      vim.lsp.buf.format()
+      vim.info("Formatted")
+    end, {})
   end
 
   local lsp_pick_formatter = function()
@@ -530,33 +524,21 @@ M.setup = function()
 
   -- Session restore
   if config.persist_plugin == "custom" then
-    lua_keymap(
-      "n",
-      "<Space>r",
-      utils.run_and_notify(require("persist").load_session, "Reloaded session"),
-      {}
-    )
+    lua_keymap("n", "<Space>r", function()
+      require("persist").load_session()
+      vim.info("Reloaded session")
+    end, {})
   end
 
   -- Colorizer
-  lua_keymap(
-    "n",
-    "<leader>c",
-    utils.run_and_notify(
-      function() vim.cmd([[ColorizerToggle]]) end,
-      "Colorizer toggled"
-    ),
-    {}
-  )
-  lua_keymap(
-    "n",
-    "<leader>C",
-    utils.run_and_notify(
-      function() vim.cmd([[ColorizerReloadAllBuffers]]) end,
-      "Colorizer reloaded"
-    ),
-    {}
-  )
+  lua_keymap("n", "<leader>c", function()
+    vim.cmd([[ColorizerToggle]])
+    vim.info("Colorizer toggled")
+  end, {})
+  lua_keymap("n", "<leader>C", function()
+    vim.cmd([[ColorizerReloadAllBuffers]])
+    vim.info("Colorizer reloaded")
+  end, {})
 
   -- Nvim Cmp
   lua_keymap("i", "<M-r>", function()
@@ -593,6 +575,13 @@ M.setup = function()
     require("lf").lf({
       path = vim.fn.expand("%:p"), -- Relative to ~ doesn't work
     })
+  end, {})
+
+  -- Copy path
+  lua_keymap("n", "<leader>g", function()
+    local path = vim.fn.expand("%:~")
+    vim.fn.setreg("+", path)
+    vim.info("Copied", path)
   end, {})
 end
 

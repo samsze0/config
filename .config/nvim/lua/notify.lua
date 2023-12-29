@@ -112,7 +112,7 @@ local function format(...)
       return arg
     end
   end)
-  return table.concat(tbl, "\n")
+  return table.concat(tbl, " ")
 end
 
 vim.error = function(...) vim.notify(format(...), vim.log.levels.ERROR) end

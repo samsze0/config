@@ -84,13 +84,6 @@ M.get_register_length = function(reg)
   return #content
 end
 
-M.run_and_notify = function(f, msg)
-  return function()
-    local val = f()
-    vim.notify(type(msg) == "function" and msg(val) or msg)
-  end
-end
-
 M.open_diff_in_new_tab = function(buf1_content, buf2_content_or_filepath, opts)
   opts = opts or {}
 

@@ -647,6 +647,19 @@ function M.setup(opts)
   hi.TermCursorNC =
     { guifg = c.black, guibg = c.gray_800, gui = nil, guisp = nil }
 
+  hi.NotifyErrorNormal =
+    { guifg = c.gray_700, guibg = c.red_200, gui = nil, guisp = nil }
+  hi.NotifyWarnNormal =
+    { guifg = c.gray_700, guibg = c.yellow_200, gui = nil, guisp = nil }
+  hi.NotifyInfoNormal =
+    { guifg = c.gray_700, guibg = c.blue_200, gui = nil, guisp = nil }
+  hi.NotifyDebugNormal =
+    { guifg = c.gray_700, guibg = c.gray_200, gui = nil, guisp = nil }
+  hi.NotifyTraceNormal =
+    { guifg = c.gray_700, guibg = c.gray_200, gui = nil, guisp = nil }
+  hi.NotifyUnknownNormal =
+    { guifg = c.gray_700, guibg = c.gray_200, gui = nil, guisp = nil }
+
   hi.User1 = { guifg = c.blue, guibg = c.gray_400, gui = "none", guisp = nil }
   hi.User2 = { guifg = c.blue, guibg = c.gray_400, gui = "none", guisp = nil }
   hi.User3 =

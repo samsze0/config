@@ -18,13 +18,11 @@ local function make_lsp_position_param(win, buf)
   if not line then return { line = 0, character = 0 } end
   col = vim.str_utfindex(line, col)
 
-  return {
-    position = { line = row, character = col },
-  }
+  return { line = row, character = col }
 end
 
 local function make_lsp_text_document_param(buf)
-  return { textDocument = { uri = vim.uri_from_bufnr(buf) } }
+  return { uri = vim.uri_from_bufnr(buf) }
 end
 
 local function uri_to_path(uri)

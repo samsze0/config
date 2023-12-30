@@ -1,10 +1,16 @@
 local M = {}
 
 M.map = function(tbl, func, opts)
-  opts = vim.tbl_extend("force", { skip_nil = true }, opts or {})
+  opts = vim.tbl_extend("force", {
+    skip_nil = true,
+    is_array = nil, -- If nil, auto-detect if tbl is array
+  }, opts or {})
 
   local new_tbl = {}
-  if M.is_array(tbl) then
+  if
+    (opts.is_array ~= nil and opts.is_array)
+    or (opts.is_array == nil and M.is_array(tbl))
+  then
     for i, v in ipairs(tbl) do
       local result = func(i, v)
       if opts.skip_nil and result == nil then
@@ -274,8 +280,14 @@ M.reduce = function(list, fn, init)
   return acc
 end
 
-M.sum = function(list)
-  return M.reduce(list, function(acc, _, v) return acc + v end, 0)
+M.sum = function(list, accessor)
+  return M.reduce(list, function(acc, i, v)
+    if not accessor then
+      return acc + v
+    else
+      return acc + accessor(i, v)
+    end
+  end, 0)
 end
 
 M.filter = function(list, fn)
@@ -405,6 +417,16 @@ M.max = function(tbl, accessor)
     if max == nil or value > max then max = value end
   end
   return max
+end
+
+M.sort = function(tbl, compare_fn, opts)
+  opts = vim.tbl_extend("force", {}, opts or {})
+
+  local keys = M.keys(tbl)
+
+  table.sort(keys, function(a, b) return compare_fn(tbl[a], tbl[b]) end)
+
+  return keys
 end
 
 return M

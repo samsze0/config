@@ -32,6 +32,8 @@ local config = {
   },
 }
 
+local has_error = false
+
 local M = {}
 
 local function hl(hl_group, text)
@@ -86,11 +88,14 @@ local pcall_section = function(section, name)
     return val
   else
     vim.error("Fail to render section:", name)
-    return hl("StatusLineDiagnosticError", "X")
+    has_error = true
+    return ""
   end
 end
 
 M.active = function()
+  if has_error then return hl("StatusLineDiagnosticError", "X") end
+
   return config.margin
     .. table.concat({
       pcall_section(M.section_filename, "filename"),
@@ -105,6 +110,8 @@ M.active = function()
 end
 
 M.inactive = function()
+  if has_error then return hl("StatusLineDiagnosticError", "X") end
+
   return config.margin
     .. pcall_section(M.section_filename, "filename")
     .. config.margin

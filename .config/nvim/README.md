@@ -124,39 +124,35 @@ vim.api.create_user_command("Test", function()
 end, {})
 ```
 
-# TODO (high priority)
+# TODO
 
-- Write files when lsp renamed etc
-- Safer tabline and statusline and autocmds (wrap in pcall)
-- SSH lf preview
-- SSH setup
-- Git conflict workflow w/ fzf integration
+**High priority**
+
+- LSP rename workflow (WorkspaceEdit[])
+- LF image preview over SSH
+- LF preview in nvim
+- SSH line editor ignore delay?
 - Syncthing clipboard
-- Custom Search n replace
-- Karabiner command left/right
-- Fzf TODO comments, backups
+- Karabiner [command + left/right]
+- Fzf TODO comments
+- Fzf backups
 - Tests
 - Git conflicts workflow
-- Performance profiling & optimization
-- LSP import path update
-- LF initial pos
-- Fzf handler on error
+- Performance profiling & optimization (w/ flamegraph)
+- LSP import path update (with watchman and LSP willrename etc...)
+- Fzf core - handler error reporting and handling (at the moment is sliented)
 - Project specific config w/ exrc https://github.com/klen/nvim-config-local
-- Treesitter textobjects custom
+- Custom treesitter textobjects plugin
 
-# TODO (low priority)
+**Low priority**
 
-- Custom autopair
-- Custom pair motion
-- Git worktree setup
-- Real "modified" & integration w/ persist
-- Statusline show line changes since last save
-- Fzf Cumulative mode for undo, git, etc
-- rsync backup
-- Copilot
+- Custom autopair and comment plugin
+- Git worktree workflow
+- Custom copilot plugin (possible to use chat?)
 - Lf create_new multi-layer dir support
 - Tabline dedup by git-files
-- Tabline trunc character
-- React native setup
-- React dev setup
+- Tabline truncation
+- React native dev workflow
+- React dev workflow
+- Node server dev workflow
 - Flash fork

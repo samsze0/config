@@ -47,52 +47,6 @@ end
 M.section_tabs = function()
   _G.tabs = {} -- Reset
 
-  -- TODO: git_files cause cursor to flicker. Probably need to use some filewatch utils
-  -- local git_files = fzf_utils.git_files()
-  -- local filenames = utils.map(
-  --   git_files,
-  --   function(_, f) return utils.reverse(vim.split(f, "/")) end
-  -- )
-  --
-  -- local get_unique_filename = function(index)
-  --   local winnr = fn.tabpagewinnr(index)
-  --   local buflist = fn.tabpagebuflist(index)
-  --   local bufnr = buflist[winnr]
-  --   local bufname = vim.fn.expand("%:~:.")
-  --   local bufbuftype = fn.getbufvar(bufnr, "&buftype")
-  --
-  --   if bufbuftype ~= "" or bufname == "" then return "" end
-  --
-  --   local _, i = utils.find(git_files, function(f) return f == bufname end)
-  --   local bufname_parts = filenames[i]
-  --
-  --   vim.notify(vim.inspect(bufname_parts))
-  --
-  --   local function expand_if_not_unique(bufname_parts)
-  --     local matches = utils.filter(
-  --       filenames,
-  --       function(p) return p[1] == bufname_parts[1] end
-  --     )
-  --     local unique = #matches == 1
-  --     if not unique then
-  --       for _, match in ipairs(matches) do
-  --         if #match > 1 then
-  --           -- "Expand" by joining the first two elements. In the end the first element will become the de-duplicated filename
-  --           utils.join_first_two_elements(
-  --             match,
-  --             function(p1, p2) return p2 .. "/" .. p1 end
-  --           )
-  --         end
-  --       end
-  --       if #bufname_parts > 1 then expand_if_not_unique(bufname_parts) end
-  --     end
-  --   end
-  --
-  --   expand_if_not_unique(bufname_parts)
-  --
-  --   return bufname_parts[1]
-  -- end
-
   for index = 1, fn.tabpagenr("$") do
     local winnr = fn.tabpagewinnr(index)
     local buflist = fn.tabpagebuflist(index)

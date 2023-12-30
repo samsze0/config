@@ -25,6 +25,11 @@ end
 local Popup = require("nui.popup")
 local event = require("nui.utils.autocmd").event
 
+local popup_config = {
+  max_width = 30,
+  max_height = 80,
+}
+
 local popup = Popup({
   enter = false,
   focusable = true,
@@ -40,8 +45,8 @@ local popup = Popup({
   },
   relative = "editor",
   size = {
-    width = 30,
-    height = 5,
+    width = 1,
+    height = 1,
   },
   zindex = 100,
   buf_options = {
@@ -72,11 +77,12 @@ vim.notify = function(msg, level)
 
   vim.schedule(function()
     local lines = vim.split(msg, "\n")
+    local cols = utils.max(lines, function(_, line) return string.len(line) end)
     vim.api.nvim_buf_set_lines(popup.bufnr, 0, -1, false, lines)
     popup:update_layout({
       size = {
-        width = math.max(30),
-        height = math.min(30, #lines),
+        width = math.min(popup_config.max_height, cols),
+        height = math.min(popup_config.max_height, #lines),
       },
     })
     popup:show()

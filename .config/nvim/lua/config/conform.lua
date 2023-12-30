@@ -1,6 +1,5 @@
-local config = require("config")
-
 local prettier = { "prettierd", "prettier" }
+local format_on_save = false
 
 -- https://github.com/mfussenegger/nvim-lint#available-linters
 require("conform").setup({
@@ -17,7 +16,7 @@ require("conform").setup({
     zsh = { "shfmt" },
     bash = { "shfmt" },
   },
-  format_on_save = config.format_on_save and {
+  format_on_save = format_on_save and {
     timeout_ms = 500,
     lsp_fallback = true,
   } or nil,

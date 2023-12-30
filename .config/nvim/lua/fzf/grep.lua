@@ -8,6 +8,7 @@ local utils = require("utils")
 local uv = vim.loop
 local uv_utils = require("utils.uv")
 local jumplist = require("jumplist")
+local fzf_misc = require("fzf.misc")
 
 local Layout = require("nui.layout")
 local Popup = require("nui.popup")
@@ -115,8 +116,8 @@ M.grep = function(opts)
     initial_query = "",
   }, opts or {})
 
-  local function get_selection()
-    local selection = FZF.current_selection
+  local function parse_selection(selection)
+    selection = selection or FZF.current_selection
 
     local args = vim.split(selection, utils.nbsp)
     return unpack(args)
@@ -163,7 +164,7 @@ M.grep = function(opts)
   local function reload_preview()
     if not FZF.current_selection then return end
 
-    local filepath, row, _ = get_selection()
+    local filepath, row, _ = parse_selection()
     local filename = vim.fn.fnamemodify(filepath, ":t")
     local filecontent = vim.fn.readfile(filepath)
     local replacement = table.concat(
@@ -230,7 +231,7 @@ M.grep = function(opts)
       })
     end,
     fzf_on_select = function()
-      local filepath, line = get_selection()
+      local filepath, line = parse_selection()
       jumplist.save(win_id)
       vim.cmd(string.format([[e %s]], filepath))
       vim.cmd(string.format([[normal! %sG]], line))
@@ -252,11 +253,11 @@ M.grep = function(opts)
     end,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()
-        local filepath = get_selection()
+        local filepath = parse_selection()
         vim.fn.setreg("+", filepath)
       end,
       ["ctrl-w"] = function()
-        local filepath, line = get_selection()
+        local filepath, line = parse_selection()
         core.abort_and_execute(function()
           vim.cmd(string.format([[vsplit %s]], filepath))
           vim.cmd(string.format([[normal! %sG]], line))
@@ -264,16 +265,37 @@ M.grep = function(opts)
         end)
       end,
       ["ctrl-t"] = function()
-        local filepath, line = get_selection()
+        local filepath, line = parse_selection()
         core.abort_and_execute(function()
           vim.cmd(string.format([[tabnew %s]], filepath))
           vim.cmd(string.format([[normal! %sG]], line))
           vim.cmd([[normal! zz]])
         end)
       end,
+      ["ctrl-p"] = function()
+        core.get_current_selections(function(indices, selections)
+          local entries = utils.map(selections, function(_, s)
+            local filepath, line, text = parse_selection(s)
+
+            -- :h setqflist
+            return {
+              filename = filepath,
+              lnum = line,
+              col = 0,
+              text = text,
+            }
+          end)
+
+          core.abort_and_execute(function()
+            vim.fn.setloclist(win_id, entries)
+            -- vim.cmd([[ldo]])
+            fzf_misc.loclist()
+          end)
+        end)
+      end,
     }),
     fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=1,3 --disabled "
+      .. " --with-nth=1,3 --disabled --multi "
       .. string.format("--query='%s' ", opts.initial_query)
       .. string.format(
         "--preview-window='%s,%s'",
@@ -288,7 +310,7 @@ M.grep_file = function(opts)
 
   local current_file = vim.fn.expand("%")
 
-  local function get_selection()
+  local function parse_selection()
     local selection = FZF.current_selection
 
     local args = vim.split(selection, utils.nbsp)
@@ -328,7 +350,7 @@ M.grep_file = function(opts)
   local layout, popups = create_layout()
 
   local function reload_preview()
-    local row, _ = get_selection()
+    local row, _ = parse_selection()
     local filename = vim.fn.fnamemodify(current_file, ":t")
     local filecontent = vim.fn.readfile(current_file)
     local replacement = table.concat(
@@ -395,7 +417,7 @@ M.grep_file = function(opts)
       })
     end,
     fzf_on_select = function()
-      local line = get_selection()
+      local line = parse_selection()
       jumplist.save(win_id)
       vim.cmd(string.format([[normal! %sG]], line))
       vim.cmd([[normal! zz]])

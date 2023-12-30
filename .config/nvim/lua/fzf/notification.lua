@@ -60,9 +60,8 @@ M.notifications = function(opts)
 
   local entries = get_entries()
 
-  local get_notification_from_selection = function(selection)
+  local get_selection = function()
     local selection_index = FZF.current_selection_index
-    selection = selection or FZF.current_selection
 
     return _G.notifications[#_G.notifications - selection_index + 1]
   end
@@ -76,7 +75,7 @@ M.notifications = function(opts)
     fzf_prompt = "Notifications",
     fzf_initial_position = 1,
     fzf_on_focus = function()
-      local noti = get_notification_from_selection()
+      local noti = get_selection()
 
       core.send_to_fzf(
         "change-preview:"

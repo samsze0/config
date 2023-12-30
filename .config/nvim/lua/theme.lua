@@ -1,28 +1,16 @@
 -- Tweak from RRethy/nvim-base16
 -- https://github.com/RRethy/nvim-base16/blob/master/lua/base16-colorscheme.lua
 
-local config = require("config")
 local utils = require("utils")
 
 local M = {}
 
-local all_rainbow_colors = false
-M.rainbow_hl_groups = all_rainbow_colors
-    and {
-      "RainbowRed",
-      "RainbowOrange",
-      "RainbowYellow",
-      "RainbowBlue",
-      "RainbowGreen",
-      "RainbowViolet",
-      "RainbowCyan",
-    }
-  or {
-    "RainbowBlue",
-    "RainbowGreen",
-    "RainbowViolet",
-    "RainbowCyan",
-  }
+M.rainbow_hl_groups = {
+  "RainbowBlue",
+  "RainbowGreen",
+  "RainbowViolet",
+  "RainbowCyan",
+}
 
 M.colors = {
   black = "#0c0d0d",
@@ -71,12 +59,6 @@ M.colors = {
   yellow = "#ed9a57",
 }
 local c = M.colors
-
-local reset_non_treesitter_hl = false
-
-local use_existing_colors_for_syntax_hl = true
-
-local github_syntax_hl = {}
 
 local default_syntax_hl = {
   Comment = c.gray_600,
@@ -163,50 +145,8 @@ local default_syntax_hl = {
   RainbowBlue = "#7dabe7",
   RainbowCyan = "#74bddd",
 }
+c = vim.tbl_extend("error", M.colors, default_syntax_hl)
 
-local reset_non_ts_syntax_hl_tbl = {
-  Comment = c.white,
-  Boolean = c.white,
-  Character = c.white,
-  Conditional = c.white,
-  Constant = c.white,
-  Define = c.white,
-  Delimiter = c.white,
-  Float = c.white,
-  Function = c.white,
-  Identifier = c.white,
-  Include = c.white,
-  Keyword = c.white,
-  Label = c.white,
-  Number = c.white,
-  Operator = c.white,
-  Preproc = c.white,
-  Repeat = c.white,
-  Special = c.white,
-  Specialchar = c.white,
-  Statement = c.white,
-  Storageclass = c.white,
-  String = c.white,
-  Structure = c.white,
-  Tag = c.white,
-  Type = c.white,
-  Typedef = c.white,
-}
-
-if use_existing_colors_for_syntax_hl then
-  c = vim.tbl_extend("error", M.colors, default_syntax_hl)
-else
-  c = vim.tbl_extend("error", M.colors, github_syntax_hl)
-end
-
-if reset_non_treesitter_hl then
-  c = vim.tbl_extend("force", M.colors, reset_non_ts_syntax_hl_tbl)
-end
-
-local indent_marker = M.colors.gray_100
-
--- Maintaining another list instead of doing `rawset` of `M.highlight` because
--- populating entries in `M.highlight` will cause `__index` to be invoked instead of `__newindex`
 M.defined_highlight_groups = {}
 
 M.highlight = setmetatable({}, {
@@ -234,17 +174,7 @@ M.highlight = setmetatable({}, {
   end,
 })
 
-function M.setup(opts)
-  local default_opts = {
-    debug = {
-      enabled = false,
-      hide_defined_entries = true,
-      toggle_colorizer = false,
-      show_non_ts_syntax_hl_only = false,
-    },
-  }
-  opts = vim.tbl_deep_extend("keep", opts, default_opts)
-
+function M.setup()
   if vim.fn.exists("syntax_on") then vim.cmd("syntax reset") end
   vim.cmd("set termguicolors")
 
@@ -660,6 +590,9 @@ function M.setup(opts)
   hi.NotifyUnknownNormal =
     { guifg = c.gray_700, guibg = c.gray_200, gui = nil, guisp = nil }
 
+  hi.WinbarPath = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
+  hi.WinbarFile = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
+
   hi.User1 = { guifg = c.blue, guibg = c.gray_400, gui = "none", guisp = nil }
   hi.User2 = { guifg = c.blue, guibg = c.gray_400, gui = "none", guisp = nil }
   hi.User3 =
@@ -698,12 +631,7 @@ function M.setup(opts)
     vim.g.terminal_color_15 = c.white
   end
 
-  -- Copilot
-  if config.copilot_plugin == "vim" then
-    hi.CopilotSuggestion = { guifg = c.gray_400, guibg = nil }
-  end
-
-  -- Fuzzy finder
+  -- FzfLua
   hi.FzfLuaBufFlagCur = { guifg = c.gray_600, guibg = nil }
   hi.FzfLuaTabTitle = { guifg = c.blue, guibg = nil }
   hi.FzfLuaHeaderText = { guifg = c.gray_600, guibg = nil }
@@ -713,11 +641,6 @@ function M.setup(opts)
   hi.FzfLuaHeaderBind = { guifg = c.blue, guibg = nil }
   hi.FzfLuaTabMarker = { guifg = c.blue, guibg = nil }
   hi.FzfLuaBufFlagAlt = { guifg = c.blue, guibg = nil }
-
-  -- indent-blankline
-  hi.IblIndent = { guifg = indent_marker }
-  hi.IblWhitespace = { guifg = indent_marker }
-  hi.IblScope = { guifg = indent_marker }
 
   -- nvim-cmp
   hi.CmpItemAbbr = { guifg = c.gray_700, guibg = nil, gui = nil, guisp = nil } -- Completion items default
@@ -769,122 +692,80 @@ function M.setup(opts)
   hi.CmpItemKindSnippet =
     { guifg = c.white, guibg = nil, gui = nil, guisp = nil }
 
-  -- diffview
-  if config.diffview_plugin then
-    hi.DiffviewDiffDelete = { guifg = c.gray_100, guibg = nil } -- Region of padding to make editors align. fg = color of diff char symbol
-    hi.DiffviewDiffAdd = { guifg = nil, guibg = c.blue_100 } -- Added/changed lines
-    hi.DiffviewDiffChange = { guifg = nil, guibg = c.blue_100 } -- Changed lines (on both editors)
-    hi.DiffviewDiffText = { guifg = nil, guibg = c.blue_300 } -- Actual changed region (within added/changed lines)
-    -- Color of sign in sign column in tree view
-    hi.DiffviewSignColumn = { guifg = c.gray_800, guibg = nil }
-    hi.DiffviewStatusAdded = { guifg = c.blue, guibg = nil }
-    hi.DiffviewStatusUntracked = { guifg = c.blue, guibg = nil }
-    hi.DiffviewStatusRenamed = { guifg = c.yellow, guibg = nil }
-    hi.DiffviewStatusUnmerged = { guifg = c.yellow, guibg = nil }
-    hi.DiffviewStatusIgnored = { guifg = c.gray_600, guibg = nil }
-    hi.DiffviewStatusModified = { guifg = c.yellow, guibg = nil }
-    hi.DiffviewStatusBroken = { guifg = c.red, guibg = nil }
-    hi.DiffviewStatusDeleted = { guifg = c.red, guibg = nil }
-    hi.DiffviewStatusUnknown = { guifg = c.gray_800, guibg = nil }
-    -- Color of the number of added/deleted lines in tree view
-    hi.DiffviewFilePanelDeletions = { guifg = c.gray_600, guibg = nil }
-    hi.DiffviewFilePanelInsertions = { guifg = c.gray_600, guibg = nil }
-    -- Misc
-    hi.DiffviewFilePanelTitle = { gui = "bold", guifg = c.yellow }
-    hi.DiffviewSecondary = { guifg = c.yellow }
-    hi.DiffviewPrimary = { guifg = c.blue }
-    hi.DiffviewDim1 = { guifg = c.blue }
-    hi.DiffviewFilePanelFileName = { guifg = c.white }
-    hi.DiffviewFilePanelCounter = { guifg = c.blue, gui = "bold" }
-    hi.DiffviewDiffAddAsDelete =
-      { gui = "bold", guifg = c.blue, guibg = c.gray_600 }
-  end
-
   -- Git signs
   hi.GitSignsChangeInline = { guifg = nil, guibg = c.blue_300 } -- Current state of the hunk for preview_hunk
   hi.GitSignsDeleteVirtLn = { guifg = nil, guibg = c.red_300 } -- Previous state of the hunk for preview_hunk
 
   -- Flash
   hi.FlashLabel = { guifg = c.true_white, guibg = c.blue_700 }
+end
 
-  if opts.debug.enabled then
-    local log_opts = true
-    if log_opts then vim.notify(vim.inspect(opts)) end
+M.debug = function(opts)
+  opts = vim.tbl_extend("force", {
+    enable_colorizer = true,
+    show_color_names = true,
+    hide_defined_hl = true,
+  }, opts or {})
 
-    local function get_color_name_if_exists(target)
-      for color, value in pairs(M.colors) do
-        if value == target then return color end
-      end
-      return target
+  local function get_color_name_if_exists(target)
+    for color, value in pairs(M.colors) do
+      if value == target then return color end
     end
-
-    local map = utils.map
-    local split_string = utils.split_string
-
-    local buf_lines = nil
-
-    local function join_lines_if_begins_with_links(lines)
-      local i = 1
-      while i < #lines do
-        -- Trim the leading and trailing whitespace and check if first 5 char is "links"
-        if
-          string.sub(lines[i + 1]:gsub("^%s*(.-)%s*$", "%1"), 1, 5) == "links"
-        then
-          lines[i] = lines[i] .. " " .. lines[i + 1]
-          table.remove(lines, i + 1)
-        else
-          i = i + 1
-        end
-      end
-      return lines
-    end
-
-    local hl_raw = vim.api.nvim_exec("highlight", true)
-    local hl_groups = split_string(hl_raw, "\n")
-
-    hl_groups = join_lines_if_begins_with_links(hl_groups)
-
-    buf_lines = map(hl_groups, function(i, g)
-      local parts = split_string(g, " ")
-      local links_to = string.match(g, "links to (%w+)")
-
-      if
-        opts.debug.hide_defined_entries
-        and require("utils").contains(M.defined_highlight_groups, parts[1])
-      then
-        return nil
-      elseif
-        opts.debug.show_non_ts_syntax_hl_only
-        and (
-          reset_non_ts_syntax_hl_tbl[parts[1]] == nil
-          and not (
-            links_to ~= nil and reset_non_ts_syntax_hl_tbl[links_to] ~= nil
-          )
-        )
-      then
-        -- Skip entry if it's not a non-TS syntax hl group and it doesn't link to one
-        return nil
-      end
-
-      return table.concat(
-        map(parts, function(i, part)
-          -- a = letter; x = hexidecimal digit
-          local k, v = string.match(part, "(gui%a+)=(#%x+)")
-          if k and v then
-            return k .. "-" .. get_color_name_if_exists(v)
-          else
-            return part
-          end
-        end),
-        " "
-      )
-    end)
-
-    if not buf_lines then return end
-
-    utils.show_content_as_buf(buf_lines)
-    if opts.debug.toggle_colorizer then vim.cmd("ColorizerToggle") end
+    return target
   end
+
+  local map = utils.map
+  local split_string = utils.split_string
+  local contains = utils.contains
+
+  local function join_lines_if_begins_with_links(lines)
+    local i = 1
+    while i < #lines do
+      -- Trim the leading and trailing whitespace and check if first 5 char is "links"
+      if
+        string.sub(lines[i + 1]:gsub("^%s*(.-)%s*$", "%1"), 1, 5) == "links"
+      then
+        lines[i] = lines[i] .. " " .. lines[i + 1]
+        table.remove(lines, i + 1)
+      else
+        i = i + 1
+      end
+    end
+    return lines
+  end
+
+  local hl_groups = split_string(vim.api.nvim_exec("highlight", true), "\n")
+  hl_groups = join_lines_if_begins_with_links(hl_groups)
+
+  local buf_lines = map(hl_groups, function(i, g)
+    local parts = split_string(g, " ")
+    local links_to = string.match(g, "links to (%w+)")
+
+    if
+      opts.hide_defined_hl
+      and contains(M.defined_highlight_groups, parts[1])
+    then
+      return nil
+    end
+
+    return table.concat(
+      map(parts, function(i, part)
+        -- a = letter; x = hexidecimal digit
+        local k, v = string.match(part, "(gui%a+)=(#%x+)")
+        if k and v then
+          return k
+            .. "-"
+            .. (opts.show_color_names and get_color_name_if_exists(v) or v)
+        else
+          return part
+        end
+      end),
+      " "
+    )
+  end)
+
+  utils.show_content_as_buf(buf_lines)
+  if opts.enable_colorizer then vim.cmd("ColorizerToggle") end
 end
 
 return M

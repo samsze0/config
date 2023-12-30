@@ -1,4 +1,5 @@
--- System dependencies: netcat-openbsd on osx and socat on linux
+-- System dependencies: netcat-openbsd on osx and socat on linux and perl
+-- FIX: opening 1 fzf after another would not startinsert
 
 local M = {}
 
@@ -12,6 +13,7 @@ local uv = vim.loop
 local fzf_port
 local on_focus
 local on_query_change
+local on_selections
 local event_callback_map = {}
 
 FZF = {
@@ -65,6 +67,77 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
       FZF.current_selection_index = tonumber(index) + 1
       FZF.current_selection = selection
       if on_focus then vim.schedule(on_focus) end
+    elseif string.match(message, "^selections") then
+      if not on_selections then
+        vim.notify(
+          string.format(
+            "Received fzf selections message but no callback was provided: %s",
+            vim.inspect(message)
+          ),
+          vim.log.levels.ERROR
+        )
+        return
+      end
+
+      local indices = {}
+      local selections = {}
+      local mode = "protocol"
+      local current_word = nil
+
+      for word in string.gmatch(message, "[^%s]+") do
+        if mode == "protocol" and word == "selections" then
+          mode = "numbers"
+        elseif mode == "numbers" and string.match(word, "^%d+$") then
+          table.insert(indices, tonumber(string.match(word, "^%d+$")) + 1)
+        elseif mode == "numbers" or mode == "strings" then
+          mode = "strings"
+          if current_word then
+            if word:sub(#word, #word) ~= "'" then
+              current_word = current_word .. " " .. word
+            else
+              current_word = current_word .. " " .. word
+              table.insert(selections, string.match(current_word, "^'(.*)'$"))
+              current_word = nil
+            end
+          else
+            if word:sub(1, 1) == "'" and word:sub(#word, #word) == "'" then
+              table.insert(selections, string.match(word, "^'(.*)'$"))
+            elseif word:sub(1, 1) == "'" then
+              current_word = word
+            else
+              vim.error(
+                "Invalid fzf selection message. Unable to parse word:",
+                word,
+                "in message:",
+                message,
+                "Expected word to start with '"
+              )
+              return
+            end
+          end
+        else
+          vim.error(
+            "Invalid fzf selection message. Unable to parse word:",
+            word,
+            "in message:",
+            message
+          )
+          return
+        end
+      end
+
+      if #indices ~= #selections then
+        vim.notify(
+          string.format(
+            "Invalid fzf selection message: %s",
+            vim.inspect(message)
+          ),
+          vim.log.levels.ERROR
+        )
+        return
+      end
+
+      vim.schedule(function() on_selections(indices, selections) end)
     elseif string.match(message, "^change") then
       local query = string.match(message, "^change '(.*)'")
       if not query then
@@ -112,6 +185,16 @@ end
 M.abort_and_execute = function(callback)
   M.send_to_fzf("abort")
   event_callback_map["abort"] = callback
+end
+
+M.get_current_selections = function(callback)
+  on_selections = callback
+  M.send_to_fzf(
+    fzf_utils.generate_fzf_send_to_server_action(
+      "selections {+n} {+}",
+      server_socket_path
+    )
+  )
 end
 
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
@@ -195,7 +278,6 @@ M.fzf = function(input, opts)
   else
     opts.fzf_binds.focus = ""
   end
-  -- TODO: support multi with +
   opts.fzf_binds.focus = opts.fzf_binds.focus
     .. fzf_utils.generate_fzf_send_to_server_action(
       "focus {n} {}",
@@ -274,7 +356,7 @@ EOF
           vim.api.nvim_set_current_win(prev_win)
         else
           vim.notify(
-            string.format("Invalid preview window: %s", vim.inspect(prev_win)),
+            string.format("Invalid previous window: %s", vim.inspect(prev_win)),
             vim.log.levels.ERROR
           )
         end

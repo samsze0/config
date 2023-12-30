@@ -2,17 +2,7 @@
 
 local M = {}
 
-local opts = {
-  colors = {
-    path = "",
-    file_name = "",
-    symbols = "",
-  },
-
-  icons = {
-    seperator = ">",
-  },
-
+local config = {
   exclude_filetype = {
     "help",
     "fzf",
@@ -22,10 +12,11 @@ local opts = {
 
 local function isempty(s) return s == nil or s == "" end
 
-local hl_winbar_path = "WinBarPath"
-local hl_winbar_file = "WinBarFile"
+local section_file = function()
+  local hl_winbar_path = "WinBarPath"
+  local hl_winbar_file = "WinBarFile"
+  local separator = ">"
 
-local winbar_file = function()
   local file_path = vim.fn.expand("%:~:.:h")
   local filename = vim.fn.expand("%:t")
   local value = ""
@@ -37,10 +28,21 @@ local winbar_file = function()
   if not isempty(filename) then
     value = " "
     local file_path_list = {}
-    local _ = string.gsub(file_path, "[^/]+", function(w) table.insert(file_path_list, w) end)
+    local _ = string.gsub(
+      file_path,
+      "[^/]+",
+      function(w) table.insert(file_path_list, w) end
+    )
 
     for i = 1, #file_path_list do
-      value = value .. "%#" .. hl_winbar_path .. "#" .. file_path_list[i] .. " " .. opts.icons.seperator .. " %*"
+      value = value
+        .. "%#"
+        .. hl_winbar_path
+        .. "#"
+        .. file_path_list[i]
+        .. " "
+        .. separator
+        .. " %*"
     end
     value = value .. file_icon
     value = value .. "%#" .. hl_winbar_file .. "#" .. filename .. "%*"
@@ -50,7 +52,7 @@ local winbar_file = function()
 end
 
 local excludes = function()
-  if vim.tbl_contains(opts.exclude_filetype, vim.bo.filetype) then
+  if vim.tbl_contains(config.exclude_filetype, vim.bo.filetype) then
     vim.opt_local.winbar = nil
     return true
   end
@@ -58,33 +60,40 @@ local excludes = function()
   return false
 end
 
-M.init = function()
-  if isempty(opts.colors.path) then
-    hl_winbar_path = "NonText"
-  else
-    vim.api.nvim_set_hl(0, hl_winbar_path, { fg = opts.colors.path })
+local pcall_section = function(section, name)
+  local ok, value = pcall(section)
+  if not ok then
+    vim.error("Failed to render section:", name)
+    return
   end
 
-  if isempty(opts.colors.file_name) then
-    hl_winbar_file = "NonText"
-  else
-    vim.api.nvim_set_hl(0, hl_winbar_file, { fg = opts.colors.file_name })
-  end
+  return value
 end
 
 M.show_winbar = function()
   if excludes() then return end
 
-  local value = winbar_file()
-
-  local status_ok, _ = pcall(vim.api.nvim_set_option_value, "winbar", value, { scope = "local" })
-  if not status_ok then return end
+  local ok, _ = pcall(
+    vim.api.nvim_set_option_value,
+    "winbar",
+    pcall_section(section_file),
+    { scope = "local" }
+  )
+  if not ok then
+    vim.error("Failed to set winbar")
+    return
+  end
 end
 
 function M.setup()
-  M.init()
-
-  vim.api.nvim_create_autocmd({ "DirChanged", "CursorMoved", "BufWinEnter", "BufFilePost", "InsertEnter", "BufWritePost" }, {
+  vim.api.nvim_create_autocmd({
+    "DirChanged",
+    "CursorMoved",
+    "BufWinEnter",
+    "BufFilePost",
+    "InsertEnter",
+    "BufWritePost",
+  }, {
     callback = function() M.show_winbar() end,
   })
 end

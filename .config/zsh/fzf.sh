@@ -20,7 +20,7 @@ fzf_init() {
       header:#7E8E91,
       info:#549eff,
       pointer:#549eff,
-      marker:#cbd1da,
+      marker:#687184,
       fg+:#95a1b3,
       prompt:#549eff,
       hl+:#549eff

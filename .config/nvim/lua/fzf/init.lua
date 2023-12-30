@@ -1,7 +1,5 @@
 local M = {}
 
-M.setup = function(opts) end
-
 M = vim.tbl_extend("error", M, require("fzf.git"))
 M = vim.tbl_extend("error", M, require("fzf.lsp"))
 M = vim.tbl_extend("error", M, require("fzf.grep"))

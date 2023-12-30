@@ -1,6 +1,4 @@
-local config = require("config")
-
-if config.nvim_dev_plugin == "neodev" then require("neodev").setup({}) end
+require("neodev").setup({})
 
 -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
 

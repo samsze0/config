@@ -398,4 +398,13 @@ EOF
   )
 end
 
+M.max = function(tbl, accessor)
+  local max = nil
+  for i, v in ipairs(tbl) do
+    local value = accessor(i, v)
+    if max == nil or value > max then max = value end
+  end
+  return max
+end
+
 return M

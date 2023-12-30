@@ -113,47 +113,57 @@ M.buffers = function()
   })
 end
 
-M.all = function()
-  local spec = {
-    ["Tabs"] = M.tabs,
-    ["Buffers"] = M.buffers,
-    ["Files"] = fzf_files.files,
-    ["Git submodule files"] = false,
-    ["Git stash"] = fzf_git.git_stash,
-    ["Git submodule stash"] = false,
-    ["Git status"] = fzf_git.git_status,
-    ["Git submodule status"] = false,
-    ["Git commits"] = fzf_git.git_commits,
-    ["Git submodule commits"] = false,
-    ["Git submodules"] = fzf_git.git_submodules,
-    ["Jumps"] = fzf_jump.jumps,
-    ["Notifications"] = false,
-    ["Undo"] = false,
-    ["Grep"] = false,
-    ["Backups"] = false,
-    ["LSP symbols"] = false,
-    ["LSP references"] = false,
-    ["LSP definitions"] = false,
-    ["LSP implementations"] = false,
-  }
+M.loclist = function(opts)
+  opts = vim.tbl_extend("force", {}, opts or {})
 
-  local entries = utils.keys(spec)
-  -- Sort in alphabetical order, in-place
-  table.sort(entries, function(a, b) return a:lower() < b:lower() end)
+  local win = vim.api.nvim_get_current_win()
+  local buf = vim.api.nvim_get_current_buf()
+
+  local function get_entries()
+    local ll = vim.fn.getloclist(win)
+
+    return utils.map(
+      ll,
+      function(_, l)
+        return fzf_utils.create_fzf_entry(
+          l.bufnr,
+          utils.ansi_codes.grey(
+            vim.fn.fnamemodify(vim.api.nvim_buf_get_name(l.bufnr), ":~:.")
+          ),
+          l.lnum,
+          l.col,
+          l.text
+        )
+      end
+    )
+  end
+
+  local entries = get_entries()
+
+  local parse_selection = function()
+    local selection = FZF.current_selection
+
+    return unpack(vim.split(selection, utils.nbsp))
+  end
 
   core.fzf(entries, {
     fzf_on_select = function()
-      local entry = FZF.current_selection
-      local action = spec[entry]
-      if action then action() end
+      local bufnr = parse_selection()
+      vim.cmd(string.format([[buffer %s]], bufnr))
     end,
-    fzf_preview_cmd = nil,
+    fzf_preview_cmd = string.format(
+      [[bat %s --highlight-line {3} {2}]],
+      helpers.bat_default_opts
+    ),
     fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=1.. --preview-window="
+      .. " --with-nth=2,5 --preview-window="
       .. helpers.fzf_default_preview_window_args,
-    fzf_prompt = "All",
-    fzf_initial_position = 1,
-    fzf_binds = {},
+    fzf_prompt = "Loclist",
+    fzf_binds = {
+      ["ctrl-w"] = function()
+        -- TODO: write all loclist file
+      end,
+    },
     fzf_on_focus = function() end,
   })
 end

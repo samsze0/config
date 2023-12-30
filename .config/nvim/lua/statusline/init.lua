@@ -1,43 +1,42 @@
 -- Tweak from:
 -- https://github.com/echasnovski/mini.statusline/blob/main/lua/mini/statusline.lua
 
-local M = {}
-
-local padding = "  "
-local args = {
-  trunc_width = 20000, -- i.e. never truncate
-}
-
 local utils = require("utils")
 
-local default_hl = "StatusLine"
-
-local function hl(hl_group, text)
-  return string.format("%%#%s#%s%%#%s#", hl_group, text, default_hl) -- Escaping % w/ %
-end
-
-local diagnostic_levels = {
-  {
-    id = vim.diagnostic.severity.ERROR,
-    sign = "E",
-    hl = "StatusLineDiagnosticError",
-  },
-  {
-    id = vim.diagnostic.severity.WARN,
-    sign = "W",
-    hl = "StatusLineDiagnosticWarn",
-  },
-  {
-    id = vim.diagnostic.severity.INFO,
-    sign = "I",
-    hl = "StatusLineDiagnosticInfo",
-  },
-  {
-    id = vim.diagnostic.severity.HINT,
-    sign = "H",
-    hl = "StatusLineDiagnosticHint",
+local config = {
+  padding = "  ",
+  margin = " ",
+  default_hl = "StatusLine",
+  truncate_width = 5000, -- Never enter truncate mode
+  diagnostic_levels = {
+    {
+      id = vim.diagnostic.severity.ERROR,
+      sign = "E",
+      hl = "StatusLineDiagnosticError",
+    },
+    {
+      id = vim.diagnostic.severity.WARN,
+      sign = "W",
+      hl = "StatusLineDiagnosticWarn",
+    },
+    {
+      id = vim.diagnostic.severity.INFO,
+      sign = "I",
+      hl = "StatusLineDiagnosticInfo",
+    },
+    {
+      id = vim.diagnostic.severity.HINT,
+      sign = "H",
+      hl = "StatusLineDiagnosticHint",
+    },
   },
 }
+
+local M = {}
+
+local function hl(hl_group, text)
+  return string.format("%%#%s#%s%%#%s#", hl_group, text, config.default_hl) -- Escaping % with %
+end
 
 local function is_normal_buffer()
   -- For more information see ":h buftype"
@@ -48,7 +47,7 @@ local function get_diagnostic_count(id)
   return #vim.diagnostic.get(0, { severity = id })
 end
 
-M.setup = function(opts)
+M.setup = function()
   _G.Statusline = M
 
   local augroup = vim.api.nvim_create_augroup("Statusline", {})
@@ -70,45 +69,54 @@ M.setup = function(opts)
   end
   au({ "WinLeave", "BufLeave" }, "*", set_inactive, "Set inactive statusline")
 
-  -- - Disable built-in statusline in Quickfix window
-  vim.g.qf_disable_statusline = 1
+  -- :h statusline
+  vim.g.qf_disable_statusline = 1 -- Disable built-in statusline in Quickfix window
+  vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
 
-  -- Refresh window if dependencies changes
-  _G.notification_subscribers = _G.notification_subscribers or {} -- TODO: properly define dependencies
-  table.insert(_G.notification_subscribers, function()
-    if vim.api.nvim_get_current_win() == vim.api.nvim_get_current_win() then
-      set_active()
-    end
-  end)
+  -- Subscribe to notifications
+  if not _G.notifications then
+    error("Statusline must be loaded after notify backend")
+  end
+  table.insert(_G.notification_subscribers, function() set_active() end)
+end
+
+local pcall_section = function(section, name)
+  local ok, val = pcall(section)
+  if ok then
+    return val
+  else
+    vim.error("Fail to render section:", name)
+    return hl("StatusLineDiagnosticError", "X")
+  end
 end
 
 M.active = function()
-  return " "
-    .. M.section_filename(args)
-    .. padding
-    .. M.section_diagnostics(args)
-    .. padding
-    .. M.section_git(args)
-    .. padding
-    .. M.section_copilot(args)
-    .. padding
-    .. "%=" -- Align the remaining to the right
-    .. padding
-    .. M.section_notifications(args)
-    .. padding
-    .. M.section_fileinfo(args)
-    .. " "
+  return config.margin
+    .. table.concat({
+      pcall_section(M.section_filename, "filename"),
+      pcall_section(M.section_diagnostics, "diagnostics"),
+      pcall_section(M.section_git, "git"),
+      pcall_section(M.section_copilot, "copilot"),
+      "%=",
+      pcall_section(M.section_notifications, "notifications"),
+      pcall_section(M.section_fileinfo, "fileinfo"),
+    }, config.padding)
+    .. config.margin
 end
 
-M.inactive = function() return " " .. M.section_filename(args) .. " " end
+M.inactive = function()
+  return config.margin
+    .. pcall_section(M.section_filename, "filename")
+    .. config.margin
+end
 
-M.is_truncated = function(trunc_width)
+M.is_truncated = function()
   local cur_width = vim.o.laststatus == 3 and vim.o.columns
     or vim.api.nvim_win_get_width(0)
-  return cur_width > trunc_width
+  return cur_width > config.truncate_width
 end
 
-M.section_git = function(args)
+M.section_git = function()
   local gitsigns_status = vim.b.gitsigns_status_dict
     or {
       added = 0,
@@ -148,18 +156,14 @@ M.section_git = function(args)
   return val
 end
 
-M.section_diagnostics = function(args)
+M.section_diagnostics = function()
   local hasnt_attached_client = next(vim.lsp.get_active_clients()) == nil
-  if
-    M.is_truncated(args.trunc_width)
-    or not is_normal_buffer()
-    or hasnt_attached_client
-  then
+  if M.is_truncated() or not is_normal_buffer() or hasnt_attached_client then
     return ""
   end
 
   local t = {}
-  for _, level in ipairs(diagnostic_levels) do
+  for _, level in ipairs(config.diagnostic_levels) do
     local n = get_diagnostic_count(level.id)
     if n > 0 then
       table.insert(t, hl(level.hl, string.format("%s%s", level.sign, n)))
@@ -171,7 +175,7 @@ M.section_diagnostics = function(args)
   return string.format("%s%s", icon, table.concat(t, " "))
 end
 
-M.section_filename = function(args)
+M.section_filename = function()
   if vim.bo.buftype == "terminal" then
     return " %t"
   else
@@ -183,12 +187,12 @@ M.section_filename = function(args)
   end
 end
 
-M.section_fileinfo = function(args)
+M.section_fileinfo = function()
   local filetype = vim.bo.filetype
 
   if (filetype == "") or not is_normal_buffer() then return "" end
 
-  if M.is_truncated(args.trunc_width) then return filetype end
+  if M.is_truncated() then return filetype end
 
   local encoding = vim.bo.fileencoding or vim.bo.encoding
   local format = vim.bo.fileformat
@@ -199,12 +203,10 @@ M.section_fileinfo = function(args)
   )
 end
 
-local safe_require = require("utils").safe_require
-
-M.section_copilot = function(args)
+M.section_copilot = function()
   if (vim.bo.filetype == "") or not is_normal_buffer() then return "" end
 
-  local copilot = safe_require("copilot.client")
+  local copilot = require("copilot.client")
   if next(copilot) == nil then return hl("StatusLineMuted", " ") end
 
   local ok, val = pcall(function()
@@ -214,7 +216,7 @@ M.section_copilot = function(args)
     then
       return hl("StatusLineMuted", " ")
     else
-      return hl(default_hl, " ")
+      return hl(config.default_hl, " ")
     end
   end)
 
@@ -222,7 +224,7 @@ M.section_copilot = function(args)
   return hl("StatusLineDiagnosticWarn", " ")
 end
 
-M.section_notifications = function(args)
+M.section_notifications = function()
   if vim.tbl_isempty(_G.notification_meta.unread) then return "" end
 
   local result = {}

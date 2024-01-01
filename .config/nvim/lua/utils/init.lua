@@ -413,25 +413,8 @@ M.find = function(tbl, fn, opts)
   return nil
 end
 
--- Sort in place
-M.sort_by_files = function(list, fn)
-  table.sort(list, function(e1, e2)
-    local a = fn(e1)
-    local b = fn(e2)
-
-    local a_is_in_dir = string.find(a, "/") ~= nil
-    local b_is_in_dir = string.find(b, "/") ~= nil
-
-    if a_is_in_dir == b_is_in_dir then
-      return a:lower() < b:lower()
-    else
-      return a_is_in_dir
-    end
-  end)
-end
-
 ---@param str string
----@param count number
+---@param count? number
 ---@param sep string
 ---@param opts { include_remaining?: boolean, trimempty?: boolean }
 ---@return string[]
@@ -452,7 +435,7 @@ M.split_string_n = function(str, count, sep, opts)
 
   str = string.gsub(str, sep, M.nbsp, count)
   result = vim.split(str, M.nbsp, { trimempty = opts.trimempty })
-  if not #result == count + 1 then error("Unexpected") end
+  if count ~= nil and #result ~= count + 1 then error("Unexpected") end
   if not opts.include_remaining then table.remove(result, #result) end
   return result
 end
@@ -497,14 +480,54 @@ M.max = function(tbl, accessor, opts)
   return max
 end
 
+-- Sort a table
+--
+-- If the table is an array, the sorted array is returned.
+-- If the table is a map, the sorted keys are returned.
+-- The original table is not modified.
+--
+---@generic T : any
+---@param tbl table<any, T> | T[]
+---@param compare_fn fun(a: T, b: T): boolean
+---@param opts? { is_array?: boolean }
+---@return any[] | T[]
 M.sort = function(tbl, compare_fn, opts)
-  opts = vim.tbl_extend("force", {}, opts or {})
+  opts = vim.tbl_extend("force", {
+    is_array = nil, -- If nil, auto-detect if tbl is array
+  }, opts or {})
 
   local keys = M.keys(tbl)
-
   table.sort(keys, function(a, b) return compare_fn(tbl[a], tbl[b]) end)
+  if
+    (opts.is_array ~= nil and opts.is_array)
+    or (opts.is_array == nil and M.is_array(tbl))
+  then
+    local sorted = {}
+    for _, k in ipairs(keys) do
+      table.insert(sorted, tbl[k])
+    end
+    return sorted
+  else
+    return keys
+  end
+end
 
-  return keys
+---@param paths string[]
+---@param transformer? fun(path: string): string
+---@return string[]
+M.sort_by_files = function(paths, transformer)
+  if not transformer then transformer = function(path) return path end end
+
+  return M.sort(paths, function(a, b)
+    local a_is_in_dir = string.find(a, "/") ~= nil
+    local b_is_in_dir = string.find(b, "/") ~= nil
+
+    if a_is_in_dir == b_is_in_dir then
+      return a:lower() < b:lower()
+    else
+      return a_is_in_dir
+    end
+  end)
 end
 
 return M

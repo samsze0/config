@@ -114,7 +114,8 @@ M.section_tabs = function()
   if config.debug then vim.info(tab_index_to_distance_map) end
   local sorted_keys = utils.sort(
     tab_index_to_distance_map,
-    function(a, b) return a < b end
+    function(a, b) return a < b end,
+    { is_array = false }
   )
   if config.debug then
     for _, k in ipairs(sorted_keys) do

@@ -1,10 +1,11 @@
 local M = {}
 
----@generic T : any[] | table<any, any>
----@param tbl T
----@param func fun(k: any, v: any): any
+---@generic T : any
+---@generic U : any
+---@param tbl table<any, T> | T[]
+---@param func fun(k: any, v: T): U
 ---@param opts? { skip_nil?: boolean, is_array?: boolean | nil }
----@return T
+---@return U[]
 M.map = function(tbl, func, opts)
   opts = vim.tbl_extend("force", {
     skip_nil = true,

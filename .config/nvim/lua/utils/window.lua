@@ -1,11 +1,13 @@
 local api = vim.api
+local utils = require("utils")
 
 local M = {}
 
-local utils = require("utils")
-
--- @Deprecated
--- Use nui instead
+-- Create a floating window with a border
+--
+---@deprecated Use nui instead
+---@param opts? { horizontal_position?: "center" | "left" | "right", vertical_position?: "center" | "top" | "down", winblend?: number, buffer?: number, buffiletype?: string, border_win_extra_opts?: table, main_win_extra_opts?: table, enter_immediately?: boolean, style?: "code" }
+---@return number main_window, number main_buffer, number border_window, number border_buffer
 M.open_floating_window = function(opts)
   opts = vim.tbl_extend("force", {
     horizontal_position = "center",
@@ -34,11 +36,7 @@ M.open_floating_window = function(opts)
     width = math.floor(width * 0.5)
     col = vim.o.columns - col - width + 2 -- Add 2 because col was ceiled and width was floored
   else
-    vim.notify(
-      "Window utils: invalid horizontal position option",
-      vim.log.levels.ERROR
-    )
-    return
+    error("Window utils: invalid horizontal position option")
   end
 
   if opts.vertical_position == "center" then
@@ -48,11 +46,7 @@ M.open_floating_window = function(opts)
     height = math.floor(height * 0.5)
     row = vim.o.lines - row - height + 2 -- Add 2 because row was ceiled and height was floored
   else
-    vim.notify(
-      "Window utils: invalid vertical position option",
-      vim.log.levels.ERROR
-    )
-    return
+    error("Window utils: invalid vertical position option")
   end
 
   local topleft, top, topright, right, botright, bot, botleft, left
@@ -135,9 +129,12 @@ M.open_floating_window = function(opts)
   return main_win, main_buffer, border_window, border_buffer
 end
 
--- @Deprecated
--- Use nui instead
 -- Create autocmds that close all windows specified in the input list when current window isn't in the list
+--
+---@deprecated Use nui instead
+---@param group { window: number, buffer: number, border_buffer: number }[]
+---@param opts? { delete_border_buffer?: boolean, delete_on_leave?: boolean }
+---@return nil
 M.create_autocmd_close_all_windows_together = function(group, opts)
   opts = vim.tbl_extend("force", {
     delete_border_buffer = true,

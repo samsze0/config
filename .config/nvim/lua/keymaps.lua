@@ -26,10 +26,12 @@ vim_keymap("v", "r.", ":&gc<CR>", opts) -- Reset flags & add flags
 vim_keymap("v", "ry", [["ry]], opts) -- Yank it into register "r" for later use with "rp"
 local function rp_rhs(whole_file) -- Use register "r" as the replacement rather than the subject
   return function()
+    local content = vim.fn.getreg("r")
+    local length = #content
     return (
       (whole_file and ":%s" or ":s")
       .. [[//<C-r>r/gc<left><left><left>]]
-      .. string.rep("<left>", utils.get_register_length("r"))
+      .. string.rep("<left>", length)
       .. "<left>"
     )
   end
@@ -229,172 +231,106 @@ lua_keymap("n", "<C-u>", jumplist.jump_back, {})
 lua_keymap("n", "<C-o>", jumplist.jump_forward, {})
 
 -- Fzf/FzfLua
-local fuzzy_finder_keymaps = {
-  [{ mode = "n", lhs = "<f1>" }] = {
-    fzflua = require("fzf-lua").builtin,
-    fzf = nil,
-  },
-  [{ mode = "n", lhs = "<f3><f3>" }] = {
-    fzflua = require("fzf-lua").git_files,
-    fzf = function() require("fzf").files({ nvim_preview = true }) end,
-  },
-  [{ mode = "n", lhs = "<f3><f4>" }] = {
-    fzflua = nil,
-    fzf = function()
-      require("fzf").git_submodules(
-        function(submodule_path)
-          require("fzf").files({
-            nvim_preview = true,
-            git_dir = submodule_path,
-          })
-        end
-      )
-    end,
-  },
-  [{ mode = "n", lhs = "<f3><f5>" }] = {
-    fzflua = require("fzf-lua").files,
-    fzf = nil,
-  },
-  [{ mode = "n", lhs = "<f3><f2>" }] = {
-    fzflua = require("fzf-lua").buffers,
-    fzf = require("fzf").buffers,
-  },
-  [{ mode = "n", lhs = "<f3><f1>" }] = {
-    fzflua = require("fzf-lua").tabs,
-    fzf = require("fzf").tabs,
-  },
-  [{ mode = "n", lhs = "<f5><f4>" }] = {
-    fzflua = require("fzf-lua").blines,
-    fzf = require("fzf").grep_file,
-  },
-  [{ mode = "n", lhs = "<f5><f5>" }] = {
-    fzflua = require("fzf-lua").live_grep,
-    fzf = require("fzf").grep,
-  },
-  [{ mode = "v", lhs = "<f5><f4>" }] = {
-    fzflua = nil,
-    fzf = function()
-      require("fzf").grep_file({
-        initial_query = utils.get_visual_selection(),
-      })
-    end,
-  },
-  [{ mode = "v", lhs = "<f5><f5>" }] = {
-    fzflua = nil,
-    fzf = function()
-      require("fzf").grep({
-        initial_query = utils.get_visual_selection(),
-      })
-    end,
-  },
-  [{ mode = "n", lhs = "<f11><f5>" }] = {
-    fzflua = require("fzf-lua").git_commits,
-    fzf = require("fzf").git_commits,
-  },
-  [{ mode = "n", lhs = "<f10><f5>" }] = {
-    fzflua = nil,
-    fzf = function()
-      require("fzf").git_submodules(
-        function(submodule_path)
-          require("fzf").git_commits({
-            git_dir = submodule_path,
-          })
-        end
-      )
-    end,
-  },
-  [{ mode = "n", lhs = "<f11><f4>" }] = {
-    fzflua = require("fzf-lua").git_bcommits,
-    fzf = function()
-      require("fzf").git_commits({ filepaths = vim.fn.expand("%:p") })
-    end,
-  },
-  [{ mode = "n", lhs = "<f10><f4>" }] = {
-    fzflua = nil,
-    fzf = function()
-      require("fzf").git_submodules(
-        function(submodule_path)
-          require("fzf").git_commits({
-            git_dir = submodule_path,
-            filepaths = vim.fn.expand("%"),
-          })
-        end
-      )
-    end,
-  },
-  [{ mode = "n", lhs = "<f11><f3>" }] = {
-    fzflua = require("fzf-lua").git_status,
-    fzf = require("fzf").git_status,
-  },
-  [{ mode = "n", lhs = "<f10><f4>" }] = {
-    fzflua = nil,
-    fzf = function()
-      require("fzf").git_submodules(
-        function(submodule_path)
-          require("fzf").git_status({
-            git_dir = submodule_path,
-          })
-        end
-      )
-    end,
-  },
-  [{ mode = "n", lhs = "li" }] = {
-    fzflua = require("fzf-lua").lsp_definitions,
-    fzf = require("fzf").lsp_definitions,
-  },
-  [{ mode = "n", lhs = "lr" }] = {
-    fzflua = require("fzf-lua").lsp_references,
-    fzf = require("fzf").lsp_references,
-  },
-  [{ mode = "n", lhs = "<f4><f4>" }] = {
-    fzflua = require("fzf-lua").lsp_document_symbols,
-    fzf = require("fzf").lsp_document_symbols,
-  },
-  [{ mode = "n", lhs = "<f4><f5>" }] = {
-    fzflua = require("fzf-lua").lsp_workspace_symbols,
-    fzf = require("fzf").lsp_workspace_symbols,
-  },
-  [{ mode = "n", lhs = "ld" }] = {
-    fzflua = require("fzf-lua").lsp_document_diagnostics,
-    fzf = function()
-      require("fzf").diagnostics({
-        current_buffer_only = true,
-      })
-    end,
-  },
-  [{ mode = "n", lhs = "lD" }] = {
-    fzflua = require("fzf-lua").lsp_workspace_diagnostics,
-    fzf = require("fzf").diagnostics,
-  },
-  [{ mode = "n", lhs = "la" }] = {
-    fzflua = require("fzf-lua").lsp_code_actions,
-    fzf = nil,
-  },
-  [{ mode = "n", lhs = "<space>u" }] = {
-    fzflua = require("config.fzflua-custom").undo_tree,
-    fzf = require("fzf").undos,
-  },
-  [{ mode = "n", lhs = "<space>m" }] = {
-    fzflua = require("config.fzflua-custom").notifications,
-    fzf = require("fzf").notifications,
-  },
-  [{ mode = "n", lhs = "<f11><f11>" }] = {
-    fzflua = require("config.fzflua-custom").git_reflog,
-    fzf = nil,
-  },
-  [{ mode = "n", lhs = "<space>j" }] = {
-    fzflua = require("config.fzflua-custom").jumps,
-    fzf = require("fzf").jumps,
-  },
-}
 
-for k, v in pairs(fuzzy_finder_keymaps) do
-  if v.fzf ~= nil then
-    lua_keymap(k.mode, k.lhs, v.fzf, {})
-  elseif v.fzflua ~= nil then
-    lua_keymap(k.mode, k.lhs, v.fzflua, {})
-  end
-end
+lua_keymap("n", "<f1>", require("fzf-lua").builtin, {})
+
+lua_keymap("n", "<f3><f3>", require("fzf.files").files, {})
+lua_keymap("n", "<f3><f4>", function()
+  require("fzf.git").git_submodules(
+    function(submodule_path)
+      require("fzf.files").files({
+        git_dir = submodule_path,
+      })
+    end
+  )
+end, {})
+
+lua_keymap("n", "<f3><f2>", require("fzf.misc").buffers, {})
+lua_keymap("n", "<f3><f1>", require("fzf.misc").tabs, {})
+
+lua_keymap("n", "<f5><f4>", require("fzf.grep").grep_file, {})
+lua_keymap("n", "<f5><f5>", require("fzf.grep").grep, {})
+lua_keymap(
+  "v",
+  "<f5><f4>",
+  function()
+    require("fzf.grep").grep_file({
+      initial_query = utils.get_visual_selection(),
+    })
+  end,
+  {}
+)
+lua_keymap(
+  "v",
+  "<f5><f5>",
+  function()
+    require("fzf.grep").grep({
+      initial_query = utils.get_visual_selection(),
+    })
+  end,
+  {}
+)
+
+lua_keymap("n", "<f11><f5>", require("fzf.git").git_commits, {})
+lua_keymap("n", "<f10><f5>", function()
+  require("fzf.git").git_submodules(
+    function(submodule_path)
+      require("fzf.git").git_commits({
+        git_dir = submodule_path,
+      })
+    end
+  )
+end, {})
+lua_keymap(
+  "n",
+  "<f11><f4>",
+  function()
+    require("fzf.git").git_commits({ filepaths = vim.fn.expand("%:p") })
+  end,
+  {}
+)
+lua_keymap("n", "<f10><f4>", function()
+  require("fzf.git").git_submodules(
+    function(submodule_path)
+      require("fzf.git").git_commits({
+        git_dir = submodule_path,
+        filepaths = vim.fn.expand("%"),
+      })
+    end
+  )
+end, {})
+lua_keymap("n", "<f11><f3>", require("fzf.git").git_status, {})
+lua_keymap("n", "<f10><f4>", function()
+  require("fzf.git").git_submodules(
+    function(submodule_path)
+      require("fzf.git").git_status({
+        git_dir = submodule_path,
+      })
+    end
+  )
+end, {})
+lua_keymap("n", "<f11><f11>", nil, {})
+
+lua_keymap("n", "li", require("fzf.lsp").lsp_definitions, {})
+lua_keymap("n", "lr", require("fzf.lsp").lsp_references, {})
+lua_keymap("n", "<f4><f4>", require("fzf.lsp").lsp_document_symbols, {})
+lua_keymap("n", "<f4><f5>", require("fzf.lsp").lsp_workspace_symbols, {})
+lua_keymap(
+  "n",
+  "ld",
+  function()
+    require("fzf.diagnostics").diagnostics({
+      current_buffer_only = true,
+    })
+  end,
+  {}
+)
+lua_keymap("n", "lD", require("fzf.diagnostics").diagnostics, {})
+lua_keymap("n", "la", nil, {})
+
+lua_keymap("n", "<space>u", require("fzf.undo").undos, {})
+lua_keymap("n", "<space>m", require("fzf.notification").notifications, {})
+lua_keymap("n", "<space>j", require("fzf.jump").jumps, {})
 
 -- LSP
 vim_keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
@@ -452,7 +388,7 @@ local conform_pick_formatter = function()
   local formatters = require("conform").list_formatters()
   formatters = utils.filter(
     formatters,
-    function(formatter) return formatter.available end
+    function(_, formatter) return formatter.available end
   )
   vim.ui.select(
     formatters,

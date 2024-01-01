@@ -1,5 +1,10 @@
 local M = {}
 
+---@generic T : any[] | table<any, any>
+---@param tbl T
+---@param func fun(k: any, v: any): any
+---@param opts? { skip_nil?: boolean, is_array?: boolean | nil }
+---@return T
 M.map = function(tbl, func, opts)
   opts = vim.tbl_extend("force", {
     skip_nil = true,
@@ -43,126 +48,135 @@ M.split_string = function(inputstr, sep)
   return t
 end
 
-M.show_content_as_buf = function(buf_lines, opts)
-  opts = opts or {}
-  opts = vim.tbl_deep_extend("keep", opts, {
-    -- Prefer this over "filetype detect"
-    filetype = "text",
+---@param buf_lines string[]
+---@param opts { filetype?: string, buf_listed?: boolean, open_in_current_tab?: boolean }
+---@return number buf_nr Buffer number
+M.show_content_in_buffer = function(buf_lines, opts)
+  opts = vim.tbl_deep_extend("keep", opts or {}, {
+    filetype = "text", -- Better than "filetype detect"
+    buf_listed = false,
+    open_in_current_tab = false,
   })
 
-  local buf_nr = vim.api.nvim_create_buf(false, true)
+  local buf_nr = vim.api.nvim_create_buf(opts.buf_listed, true)
 
   vim.api.nvim_buf_set_lines(buf_nr, 0, -1, false, buf_lines)
+  vim.bo[buf_nr].filetype = opts.filetype
+  if not opts.open_in_current_tab then vim.cmd("tabnew") end
   vim.api.nvim_set_current_buf(buf_nr)
-  vim.api.nvim_buf_call(
-    buf_nr,
-    function() vim.cmd(string.format("set filetype=%s", opts.filetype)) end
-  )
+
+  return buf_nr
 end
 
-M.contains = function(tbl, str)
+---@generic T : any
+---@param tbl table<any, T>
+---@param elem T
+---@return boolean
+M.contains = function(tbl, elem)
   for i, v in ipairs(tbl) do
-    if v == str then return true end
+    if v == elem then return true end
   end
   return false
 end
 
-M.get_keys_as_string = function(tbl)
-  local keys = ""
-  for key, _ in pairs(tbl) do
-    keys = keys .. key .. ", "
-  end
-  -- Remove the last comma and space
-  keys = keys:sub(1, -3)
-  return keys
-end
+---@param lhs string | string[]
+---@param rhs string | string[]
+---@param opts { show_in_current_tab?: boolean, filetype?: string | nil }
+---@return nil
+M.show_diff = function(lhs, rhs, opts)
+  opts = vim.tbl_extend("force", {
+    show_in_current_tab = false,
+    filetype = nil, -- If nil, auto-detect
+  }, opts or {})
 
-M.get_command_history = function()
-  local history = {}
-  for i = 1, vim.fn.histlen(":") do
-    table.insert(history, vim.fn.histget(":", i))
-  end
-  return history
-end
-
-M.get_register_length = function(reg)
-  local content = vim.fn.getreg(reg)
-  return #content
-end
-
-M.open_diff_in_new_tab = function(buf1_content, buf2_content_or_filepath, opts)
-  opts = opts or {}
-
-  vim.api.nvim_command("tabnew")
-
-  -- Create the right window first
-  if type(buf2_content_or_filepath) == "string" then
-    vim.api.nvim_command(string.format("edit %s", buf2_content_or_filepath))
-    opts.filetype = vim.bo.filetype -- Overwrite filetype if existing file was given as buf2
+  if not opts.show_in_current_tab then
+    vim.api.nvim_command("tabnew")
   else
-    M.show_content_as_buf(buf2_content_or_filepath, opts)
+    vim.cmd("only") -- Close all other windows in current tab
   end
-  vim.api.nvim_command("diffthis")
+
+  local filetype = opts.filetype
+  local lhs_buf
+  local rhs_buf
+
+  if type(lhs) == "string" then
+    vim.cmd(string.format("e %s", lhs))
+    filetype = vim.bo.filetype
+  else
+    lhs_buf = M.show_content_in_buffer(lhs, {
+      open_in_current_tab = true,
+    })
+  end
+  vim.cmd("diffthis")
 
   vim.api.nvim_command("vsplit")
-  M.show_content_as_buf(buf1_content, opts)
-  vim.api.nvim_command("diffthis")
 
-  vim.api.nvim_command("wincmd l") -- Move focus to right window
+  if type(rhs) == "string" then
+    vim.cmd(string.format("e %s", rhs))
+    filetype = vim.bo.filetype
+  else
+    rhs_buf = M.show_content_in_buffer(rhs, {
+      open_in_current_tab = true,
+    })
+  end
+  vim.cmd("diffthis")
+
+  if filetype then
+    if lhs_buf then vim.bo[lhs_buf].filetype = filetype end
+    if rhs_buf then vim.bo[rhs_buf].filetype = filetype end
+  end
 end
 
-M.safe_require = function(module_name, opts)
-  -- TODO: type annotations
-  opts = opts or {}
-  opts = vim.tbl_deep_extend("keep", opts, {
-    notify = true,
-    log_level = vim.log.levels.ERROR,
-  })
-  local ok, module = pcall(require, module_name)
-  if not ok then
-    if opts.notify then
-      vim.notify(
-        string.format("Failed to load module %s", module_name),
-        opts.log_level
-      )
+-- Safely require a file by invoking "require" in protected mode
+--
+-- Module LS info can still be obtained by using the "@module" annotation
+-- https://github.com/LuaLS/lua-language-server/wiki/Annotations
+--
+---@param module_name string
+---@param on_error? fun(err: any): nil
+M.safe_require = function(module_name, on_error)
+  on_error = on_error
+    or function(err)
+      vim.error("Failed to load module:", module_name, "Err:", err)
     end
+  local ok, module = xpcall(require, on_error, module_name)
+  if not ok then
+    -- Return nil if we try to index into the result of safe_require.
+    -- We don't support indexing into multiple levels
     return setmetatable({}, {
-      __index = function(_, key)
-        if opts.notify then
-          vim.notify(
-            string.format(
-              "Failed to access key %s in module %s",
-              key,
-              module_name
-            ),
-            opts.log_level
-          )
-        end
-        return nil
-      end,
-    }) -- In case we try to index into the result of safe_require
+      __index = function(_, key) return nil end,
+    })
   end
   return module
 end
 
 -- Tweaked from:
 -- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/utils.lua
-function M.strip_ansi_coloring(str)
-  if not str then return str end
-  -- remove escape sequences of the following formats:
-  -- 1. ^[[34m
-  -- 2. ^[[0;34m
-  -- 3. ^[[m
-  return str:gsub("%[[%d;]-m", "")
-end
+--
+-- Remove escape sequences of the following formats:
+-- 1. ^[[34m
+-- 2. ^[[0;34m
+-- 3. ^[[m
+--
+---@param str string
+---@return string
+function M.strip_ansi_coloring(str) return str:gsub("%[[%d;]-m", "")[1] end
 
 -- Tweaked from:
 -- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/utils.lua
+--
+-- Decorate a string by wrapping it with ANSI escape sequences
+--
+---@alias ansi_color_fn fun(str: string): string
+---@type { clear: ansi_color_fn, bold: ansi_color_fn, italic: ansi_color_fn, underline: ansi_color_fn, black: ansi_color_fn, red: ansi_color_fn, green: ansi_color_fn, yellow: ansi_color_fn, blue: ansi_color_fn, magenta: ansi_color_fn, cyan: ansi_color_fn, white: ansi_color_fn, grey: ansi_color_fn, dark_grey: ansi_color_fn }
 M.ansi_codes = {}
+
+-- Ansi escape sequences
+--
+-- the "\x1b" esc sequence causes issues
+-- with older Lua versions
+-- clear    = "\x1b[0m",
 M.ansi_escseq = {
-  -- the "\x1b" esc sequence causes issues
-  -- with older Lua versions
-  -- clear    = "\x1b[0m",
   clear = "[0m",
   bold = "[1m",
   italic = "[3m",
@@ -180,44 +194,35 @@ M.ansi_escseq = {
 }
 for color, escseq in pairs(M.ansi_escseq) do
   M.ansi_codes[color] = function(string)
-    if string == nil or #string == 0 then return "" end
-    if not escseq or #escseq == 0 then return string end
+    if type(string) ~= "string" then
+      error("Expected string, got " .. type(string))
+    end
+
+    if string:len() == 0 then return "" end
     return escseq .. string .. M.ansi_escseq.clear
   end
 end
 
 -- From:
 -- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/utils.lua
+--
 -- Sets an invisible unicode character as icon separator
 -- the below was reached after many iterations, a short summary of everything
 -- that was tried and why it failed:
+--
 -- nbsp, U+00a0: the original separator, fails with files that contain nbsp
 -- nbsp + zero-width space (U+200b): works only with `sk` (`fzf` shows <200b>)
 -- word joiner (U+2060): display works fine, messes up fuzzy search highlights
 -- line separator (U+2028), paragraph separator (U+2029): created extra space
 -- EN space (U+2002): seems to work well
+--
 -- For more unicode SPACE options see:
 -- http://unicode-search.net/unicode-namesearch.pl?term=SPACE&.submit=Search
 M.nbsp = "\xe2\x80\x82" -- "\u{2002}"
 
--- Tweaked from:
--- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/path.lua
-function M.strip_before_last_occurrence_of(str, sep)
-  local idx = M.last_index_of(str, sep) or 0
-  return str:sub(idx + 1), idx
-end
-
--- Tweaked from:
--- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/path.lua
-function M.last_index_of(haystack, needle)
-  local i = haystack:match(".*" .. needle .. "()")
-  if i == nil then
-    return nil
-  else
-    return i - 1
-  end
-end
-
+---@generic T : any
+---@param iter fun(): T
+---@return T[]
 function M.iter_to_table(iter)
   local tbl = {}
   for v in iter do
@@ -226,6 +231,7 @@ function M.iter_to_table(iter)
   return tbl
 end
 
+---@return string
 function M.get_visual_selection()
   local start_pos, end_pos
   local mode = vim.api.nvim_get_mode().mode
@@ -246,8 +252,6 @@ function M.get_visual_selection()
       end_pos = selection_anchor
     end
   end
-  vim.notify(start_pos)
-  vim.notify(end_pos)
   local lines = vim.fn.getline(start_pos[2], end_pos[2])
   if #lines == 0 then return "" end
   -- Caution: must trim off end first because trim off start will affect the pos
@@ -256,50 +260,100 @@ function M.get_visual_selection()
   return table.concat(lines, "")
 end
 
+---@param t table<any, any> | any[]
+---@return boolean
 M.is_array = function(t) return #t > 0 and t[1] ~= nil end
 
-M.reduce = function(list, fn, init)
+---@generic T : any
+---@generic U: any
+---@param tbl table<any, T> | T[]
+---@param fn fun(acc?: U, k: any, v: T): any
+---@param opts? { is_array?: boolean | nil }
+---param init? U
+M.reduce = function(tbl, fn, init, opts)
+  opts = vim.tbl_extend("force", {
+    is_array = nil, -- If nil, auto-detect if tbl is array
+  }, opts or {})
+
   local acc = init
-  if M.is_array(list) then
-    for i, v in ipairs(list) do
-      if 1 == i and init == nil then
-        acc = v
-      else
-        acc = fn(acc, i, v)
-      end
+  if
+    (opts.is_array ~= nil and opts.is_array)
+    or (opts.is_array == nil and M.is_array(tbl))
+  then
+    for i, v in ipairs(tbl) do
+      acc = fn(acc, i, v)
     end
   else
-    for k, v in pairs(list) do
-      if init == nil then
-        acc = v
-      else
-        acc = fn(acc, k, v)
-      end
+    for k, v in pairs(tbl) do
+      acc = fn(acc, k, v)
     end
   end
   return acc
 end
 
-M.sum = function(list, accessor)
-  return M.reduce(list, function(acc, i, v)
-    if not accessor then
-      return acc + v
-    else
-      return acc + accessor(i, v)
+---@generic T : any
+---@generic V : any
+---@param tbl table<any, T> | T[]
+---@param accessor fun(k: any, v: T): V
+---@param opts? { is_array?: boolean | nil }
+---@return V
+M.sum = function(tbl, accessor, opts)
+  opts = vim.tbl_extend("force", {
+    is_array = nil, -- If nil, auto-detect if tbl is array
+  }, opts or {})
+
+  return M.reduce(
+    tbl,
+    function(acc, i, v)
+      if not accessor then
+        return acc + v
+      else
+        return acc + accessor(i, v)
+      end
+    end,
+    0,
+    {
+      is_array = opts.is_array,
+    }
+  )
+end
+
+---@generic T : any
+---@param tbl T
+---@fn fun(k: any, v: any): boolean
+---@param opts? { is_array?: boolean | nil }
+---@return T
+M.filter = function(tbl, fn, opts)
+  opts = vim.tbl_extend("force", {
+    is_array = nil, -- If nil, auto-detect if tbl is array
+  }, opts or {})
+
+  local result = {}
+  if
+    (opts.is_array ~= nil and opts.is_array)
+    or (opts.is_array == nil and M.is_array(tbl))
+  then
+    for i, v in ipairs(tbl) do
+      if fn(i, v) then table.insert(result, v) end
     end
-  end, 0)
-end
-
-M.filter = function(list, fn)
-  local new_list = {}
-  for _, v in ipairs(list) do
-    if fn(v) then table.insert(new_list, v) end
+  else
+    for k, v in pairs(tbl) do
+      if fn(k, v) then result[k] = v end
+    end
   end
-  return new_list
+  return result
 end
 
-M.pad = function(str, length) return string.format("%-" .. length .. "s", str) end
+---@param str string
+---@param length number
+---@return string
+M.pad_string = function(str, length)
+  return string.format("%-" .. length .. "s", str)
+end
 
+---@generic T: any[]
+---@param list T
+---@return T
 M.reverse = function(list)
   local reversed = {}
   for i = #list, 1, -1 do
@@ -308,8 +362,25 @@ M.reverse = function(list)
   return reversed
 end
 
-M.join_first_two_elements = function(list, join_fn)
-  if #list < 2 then return list end
+---@generic T: any[]
+---@param list T
+---@param join_fn fun(a: any, b: any): any
+---@param opts? { error_if_insufficient_length?: boolean }
+---@return T
+M.join_first_two_elements = function(list, join_fn, opts)
+  opts = vim.tbl_extend(
+    "force",
+    { error_if_insufficient_length = false },
+    opts or {}
+  )
+
+  if #list < 2 then
+    if opts.error_if_insufficient_length then
+      error("Insufficient length")
+    else
+      return list
+    end
+  end
 
   local first = table.remove(list, 1)
   local second = table.remove(list, 1)
@@ -317,15 +388,33 @@ M.join_first_two_elements = function(list, join_fn)
   return list
 end
 
-M.find = function(list, fn)
-  for i, v in ipairs(list) do
-    if fn(v) then return v, i end
+---@generic T : any
+---@param tbl table<any, T> | T[]
+---@param fn fun(k: any, v: T): boolean
+---@param opts? { is_array?: boolean | nil }
+---@return any, T | nil
+M.find = function(tbl, fn, opts)
+  opts = vim.tbl_extend("force", {
+    is_array = nil, -- If nil, auto-detect if tbl is array
+  }, opts or {})
+
+  if
+    (opts.is_array ~= nil and opts.is_array)
+    or (opts.is_array == nil and M.is_array(tbl))
+  then
+    for i, v in ipairs(tbl) do
+      if fn(i, v) then return i, v end
+    end
+  else
+    for k, v in pairs(tbl) do
+      if fn(k, v) then return k, v end
+    end
   end
   return nil
 end
 
 -- Sort in place
-M.sort_filepaths = function(list, fn)
+M.sort_by_files = function(list, fn)
   table.sort(list, function(e1, e2)
     local a = fn(e1)
     local b = fn(e2)
@@ -341,13 +430,11 @@ M.sort_filepaths = function(list, fn)
   end)
 end
 
--- Join l2 into l1 in place
-M.list_join = function(l1, l2)
-  for _, v in ipairs(l2) do
-    table.insert(l1, v)
-  end
-end
-
+---@param str string
+---@param count number
+---@param sep string
+---@param opts { include_remaining?: boolean, trimempty?: boolean }
+---@return string[]
 M.split_string_n = function(str, count, sep, opts)
   sep = sep or "%s+"
   opts = vim.tbl_extend(
@@ -356,38 +443,23 @@ M.split_string_n = function(str, count, sep, opts)
     opts or {}
   )
   local result = {}
-  local remaining = str
 
-  if false then
-    -- Lua doesn't support multi-char-negative-lookahead
-    while count > 0 do
-      -- .- means match as short as possible
-      -- local match = string.match(remaining, "^(.-[(%s%s*)\n])")
-      local match, whitespace =
-        string.match(remaining, "([^" .. sep .. "]+)(" .. sep .. ")")
-      if not match then return nil end
-      remaining = remaining:sub(#match + #whitespace + 1)
-      table.insert(result, match)
-      count = count - 1
-    end
+  -- Lua doesn't support multi-char-negative-lookahead
+  -- So we cannot just use Lua regex (because it won't support multi-char sep)
 
-    if opts.include_remaining then table.insert(result, remaining) end
-  end
+  -- We perform split by first replacing all occurrences of sep with nbsp,
+  -- then we `vim.split` by nbsp
 
   str = string.gsub(str, sep, M.nbsp, count)
   result = vim.split(str, M.nbsp, { trimempty = opts.trimempty })
-  if not #result == count + 1 then return nil end
+  if not #result == count + 1 then error("Unexpected") end
   if not opts.include_remaining then table.remove(result, #result) end
   return result
 end
 
-M.in_list = function(value, list)
-  for _, v in ipairs(list) do
-    if v == value then return true end
-  end
-  return false
-end
-
+---@generic T : any
+---@param tbl table<T, any> | T[]
+---@return T[]
 M.keys = function(tbl)
   local keys = {}
   for k, _ in pairs(tbl) do
@@ -396,26 +468,32 @@ M.keys = function(tbl)
   return keys
 end
 
-M.heredoc = function(str, opts)
-  opts = vim.tbl_extend("force", { pipe_to = nil }, opts or {})
-  local pipe_to = opts.pipe_to
+---@generic T : any
+---@param tbl table<any, T> | T[]
+---@param accessor fun(k: any, v: T): any
+---@param opts? { is_array?: boolean }
+---@return T
+M.max = function(tbl, accessor, opts)
+  opts = vim.tbl_extend("force", {
+    is_array = nil, -- If nil, auto-detect if tbl is array
+  }, opts or {})
 
-  return string.format(
-    [[cat <<"EOF"%s
-%s
-EOF
-    ]],
-    pipe_to and " | " .. pipe_to or "",
-    str
-  )
-end
-
-M.max = function(tbl, accessor)
   local max = nil
-  for i, v in ipairs(tbl) do
-    local value = accessor(i, v)
-    if max == nil or value > max then max = value end
+  if
+    (opts.is_array ~= nil and opts.is_array)
+    or (opts.is_array == nil and M.is_array(tbl))
+  then
+    for i, v in ipairs(tbl) do
+      local value = accessor(i, v)
+      if max == nil or value > max then max = value end
+    end
+  else
+    for k, v in pairs(tbl) do
+      local value = accessor(k, v)
+      if max == nil or value > max then max = value end
+    end
   end
+
   return max
 end
 

@@ -59,7 +59,7 @@ M.undos = function(opts)
         core.abort_and_execute(function()
           local before, after =
             unpack(undo_utils.get_undo_before_and_after(undo.seq))
-          utils.open_diff_in_new_tab(before, after, {
+          utils.show_diff(before, after, {
             filetype = vim.bo.filetype,
           })
         end)

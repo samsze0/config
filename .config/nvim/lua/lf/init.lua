@@ -36,7 +36,7 @@ local popup = Popup({
 
 local edit_selected_files = function(edit_cmd, selection)
   -- Filter invalid selection entries and open them
-  selection = utils.filter(selection, function(v) return vim.trim(v) ~= "" end)
+  selection = utils.filter(selection, function(_, v) return vim.trim(v) ~= "" end)
   if #selection > 0 then
     if debug then vim.notify("LF: opening selections") end
     for _, file in ipairs(selection) do

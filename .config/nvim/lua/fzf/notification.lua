@@ -45,7 +45,7 @@ M.notifications = function(opts)
       local brief_max_length = 50
       brief = #brief > brief_max_length
           and brief:sub(1, brief_max_length - 3) .. "..."
-        or utils.pad(brief, brief_max_length)
+        or utils.pad_string(brief, brief_max_length)
       table.insert(
         entries,
         fzf_utils.create_fzf_entry(

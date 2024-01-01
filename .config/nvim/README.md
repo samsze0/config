@@ -130,28 +130,30 @@ end, {})
 
 - LSP rename workflow (WorkspaceEdit[])
 - LF image preview over SSH
-- LF preview in nvim
 - SSH line editor ignore delay?
 - Syncthing clipboard
 - Karabiner [command + left/right]
 - Fzf TODO comments
 - Fzf backups
+- Undo tree refactor
 - Tests
 - Git conflicts workflow
-- Performance profiling & optimization (w/ flamegraph)
 - LSP import path update (with watchman and LSP willrename etc...)
-- Fzf core - handler error reporting and handling (at the moment is sliented)
 - Project specific config w/ exrc https://github.com/klen/nvim-config-local
 - Custom treesitter textobjects plugin
+- Fzf one after another doesn't enter insert mode
 
 **Low priority**
 
+- Performance profiling & optimization (w/ flamegraph)
+- Fix Fzf somethings hang if actions happen too quick?
+- Fzf core - handler error reporting and handling (at the moment is sliented)
+- LF preview in nvim
 - Custom autopair and comment plugin
 - Git worktree workflow
 - Custom copilot plugin (possible to use chat?)
 - Lf create_new multi-layer dir support
 - Tabline dedup by git-files
-- Tabline truncation
 - React native dev workflow
 - React dev workflow
 - Node server dev workflow

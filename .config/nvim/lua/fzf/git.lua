@@ -24,7 +24,7 @@ M.git_status = function(opts)
       false
     )
 
-    utils.sort_filepaths(entries, function(e) return e:sub(4) end)
+    utils.sort_by_files(entries, function(e) return e:sub(4) end)
 
     entries = utils.map(entries, function(_, e)
       local status = e:sub(1, 2)
@@ -49,9 +49,9 @@ M.git_status = function(opts)
 
   local entries = get_entries()
 
-  local _, fzf_initial_pos = utils.find(
+  local fzf_initial_pos, _ = utils.find(
     entries,
-    function(e)
+    function(_, e)
       return vim.split(e, utils.nbsp)[2]
         == fzf_utils.convert_filepath_to_gitpath(vim.fn.expand("%"))
     end

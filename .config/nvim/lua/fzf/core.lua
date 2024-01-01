@@ -16,13 +16,8 @@ local on_query_change
 local on_selections
 local event_callback_map = {}
 
-FZF = {
-  current_query = nil,
-  current_selection = nil,
-  current_selection_index = nil,
-  channel = nil,
-  popups = nil,
-}
+---@type { current_query: string, current_selection?: string, current_selection_index?: string, channel: integer, popups: NuiPopup[] }
+FZF = nil
 
 local reset_state = function()
   on_focus = nil

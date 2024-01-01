@@ -156,12 +156,16 @@ M.loclist = function(opts)
       helpers.bat_default_opts
     ),
     fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=2,5 --preview-window="
-      .. helpers.fzf_default_preview_window_args,
+      .. " --with-nth=2,5 "
+      .. string.format(
+        "--preview-window='%s,%s'",
+        helpers.fzf_default_preview_window_args,
+        fzf_utils.fzf_initial_preview_scroll_offset("{3}", { fixed_header = 3 })
+      ),
     fzf_prompt = "Loclist",
     fzf_binds = {
       ["ctrl-w"] = function()
-        -- TODO: write all loclist file
+        vim.cmd([[ldo update]]) -- Write all changes
       end,
     },
     fzf_on_focus = function() end,

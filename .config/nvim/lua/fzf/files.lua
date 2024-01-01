@@ -24,7 +24,7 @@ M.files = function(opts)
   local entries = fzf_utils.git_files(opts.git_dir)
   local win_id = vim.api.nvim_get_current_win()
 
-  utils.sort_filepaths(entries, function(e) return e end)
+  utils.sort_by_files(entries, function(e) return e end)
 
   local layout, popups = helpers.create_nvim_preview_layout()
 

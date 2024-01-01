@@ -156,7 +156,7 @@ M.create_autocmd_close_all_windows_together = function(group, opts)
       nested = true,
       callback = function(ctx)
         local current_win = vim.api.nvim_get_current_win()
-        if utils.in_list(current_win, windows) then return end
+        if utils.contains(windows, current_win) then return end
 
         vim.api.nvim_win_close(windows[1], true) -- Close a random window which causes all others to close
       end,

@@ -190,7 +190,7 @@ function M.save_session()
 
   local hidden_bufs = utils.filter(
     vim.api.nvim_list_bufs(),
-    function(buf) return vim.api.nvim_buf_get_option(buf, "bufhidden") ~= "" end
+    function(_, buf) return vim.api.nvim_buf_get_option(buf, "bufhidden") ~= "" end
   )
 
   if false and #hidden_bufs > 0 then

@@ -61,22 +61,6 @@ M.setup = function()
         ["ctrl-l"] = actions.file_sel_to_ll, -- send to loclist
         ["ctrl-w"] = actions.file_vsplit,
         ["ctrl-t"] = actions.file_tabedit,
-        ["ctrl-y"] = {
-          function(selected)
-            -- Expect entry to be in the either formats:
-            -- ((.*) nbsp*) relpath
-            -- ((.*) nbsp*) relpath:(.*)*
-            local s = utils.strip_ansi_coloring(selected[1])
-            s = utils.strip_before_last_occurrence_of(s, utils.nbsp)
-            local parts = vim.split(s, ":")
-            if #parts > 0 then s = parts[1] end
-            local relpath = s
-            vim.fn.setreg("+", relpath)
-            vim.notify(string.format("Copied %s", relpath))
-          end,
-          -- https://github.com/ibhagwan/fzf-lua/wiki/Advanced#fzf-exec-act-resume
-          actions.resume,
-        },
       },
       buffers = {
         -- providers that inherit these actions:

@@ -764,7 +764,7 @@ M.debug = function(opts)
     )
   end)
 
-  utils.show_content_as_buf(buf_lines)
+  utils.show_content_in_buffer(buf_lines)
   if opts.enable_colorizer then vim.cmd("ColorizerToggle") end
 end
 

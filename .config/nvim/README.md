@@ -142,6 +142,8 @@ end, {})
 - Project specific config w/ exrc https://github.com/klen/nvim-config-local
 - Custom treesitter textobjects plugin
 - Fzf one after another doesn't enter insert mode
+- Remove all usage of global var
+- Fzf pass state to callback args
 
 **Low priority**
 

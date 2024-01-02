@@ -4,29 +4,46 @@ local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local git_utils = require("utils.git")
 local jumplist = require("jumplist")
 
--- TODO: no-git mode
+-- Fzf all git files in the given git directory.
+-- If no git_dir is given, then fzf all files in the current directory.
+--
+---@param opts? { git_dir?: string, fd_extra_args?: string }
 M.files = function(opts)
   opts = vim.tbl_extend("force", {
-    git_dir = fzf_utils.git_root_dir(),
+    git_dir = git_utils.current_git_dir(),
+    fd_extra_args = "--hidden --follow --exclude .git",
   }, opts or {})
 
   local get_selection = function()
     local selection = FZF.current_selection
 
-    return fzf_utils.convert_gitpath_to_filepath(
-      selection,
-      { git_dir = opts.git_dir }
-    )
+    if opts.git_dir then
+      return vim.fn.fnamemodify(opts.git_dir .. "/" .. selection, ":.")
+    else
+      return selection
+    end
   end
 
-  local entries = fzf_utils.git_files(opts.git_dir)
-  local win_id = vim.api.nvim_get_current_win()
+  local entries
+  if opts.git_dir then
+    entries = git_utils.git_files(opts.git_dir)
+  else
+    if vim.fn.executable("fd") ~= 1 then error("fd is not installed") end
+    entries = vim.fn.systemlist(
+      string.format([[fd --type f --no-ignore %s]], opts.fd_extra_args)
+    )
+  end
+  ---@cast entries string[]
 
-  utils.sort_by_files(entries, function(e) return e end)
+  local win = vim.api.nvim_get_current_win()
 
-  local layout, popups = helpers.create_nvim_preview_layout()
+  entries = utils.sort_by_files(entries)
+
+  local layout, popups, set_preview_content =
+    helpers.create_nvim_preview_layout()
 
   core.fzf(entries, {
     layout = layout,
@@ -34,7 +51,7 @@ M.files = function(opts)
     fzf_prompt = "Files",
     fzf_on_select = function()
       local filepath = get_selection()
-      jumplist.save(win_id)
+      jumplist.save(win)
       vim.cmd(string.format([[e %s]], filepath))
     end,
     before_fzf = function()
@@ -50,14 +67,12 @@ M.files = function(opts)
       local is_binary =
         vim.fn.system("file --mime " .. path):match("charset=binary")
 
+      if vim.v.shell_error ~= 0 then
+        error("Failed to determine if file is binary using file command")
+      end
+
       if is_binary then
-        vim.api.nvim_buf_set_lines(
-          popups.nvim_preview.bufnr,
-          0,
-          -1,
-          false,
-          { "No preview available" }
-        )
+        set_preview_content({ "No preview available" })
         return
       end
 
@@ -67,14 +82,8 @@ M.files = function(opts)
         contents = vim.fn.readfile(path),
       })
 
-      vim.api.nvim_buf_set_lines(
-        popups.nvim_preview.bufnr,
-        0,
-        -1,
-        false,
-        vim.fn.readfile(path)
-      )
-      vim.bo[popups.nvim_preview.bufnr].filetype = ft
+      set_preview_content(vim.fn.readfile(path))
+      if ft then vim.bo[popups.nvim_preview.bufnr].filetype = ft end
 
       -- Switch to preview window and back in order to refresh scrollbar
       -- TODO: Remove this once scrollbar plugin support remote refresh

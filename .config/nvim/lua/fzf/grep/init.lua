@@ -3,6 +3,7 @@ local M = {}
 local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
+local git_utils = require("utils.git")
 local utils = require("utils")
 local jumplist = require("jumplist")
 local fzf_grep_utils = require("fzf.grep.utils")
@@ -12,7 +13,7 @@ local event = require("nui.utils.autocmd").event
 -- TODO: no-git mode
 M.grep = function(opts)
   opts = vim.tbl_extend("force", {
-    git_dir = fzf_utils.git_root_dir(),
+    git_dir = git_utils.current_git_dir(),
     initial_query = "",
   }, opts or {})
 
@@ -23,14 +24,9 @@ M.grep = function(opts)
     return unpack(args)
   end
 
-  local files = fzf_utils.git_files(
-    opts.git_dir,
-    { return_as_cmd = false, convert_gitpaths_to_relpaths = true }
-  )
-  files = utils.map(files, function(_, e) return [["]] .. e .. [["]] end)
-  local files_str = table.concat(files, " ")
-
   local get_cmd = function(query)
+    local files_cmd = git_utils.git_files(opts.git_dir, { return_as_cmd = true })
+
     local sed_cmd = {
       string.format("s/:/%s/;s/:/%s/", utils.nbsp, utils.nbsp), -- Replace first two : with nbsp
     }
@@ -49,10 +45,11 @@ M.grep = function(opts)
 
     return string.format(
       -- Custom delimiters & strip out ANSI color codes with sed
-      [[rg %s "%s" %s | sed -E "%s"]],
+      -- TODO: only support when pwd == git_dir
+      [[rg %s "%s" $(%s) | sed -E "%s"]],
       helpers.rg_default_opts,
       query,
-      files_str,
+      files_cmd,
       table.concat(sed_cmd, ";")
     )
   end

@@ -123,6 +123,7 @@ M.create_simple_layout = function()
   }
 end
 
+---@return NuiLayout layout, { main: NuiPopup, nvim_preview: NuiPopup } popups, fun(content: string[]): nil set_preview_content
 M.create_nvim_preview_layout = function()
   local main_popup = Popup({
     enter = true,
@@ -185,7 +186,17 @@ M.create_nvim_preview_layout = function()
     end)
   end
 
-  return layout, popups
+  return layout,
+    popups,
+    function(content)
+      return vim.api.nvim_buf_set_lines(
+        popups.nvim_preview.bufnr,
+        0,
+        -1,
+        false,
+        content
+      )
+    end
 end
 
 return M

@@ -35,7 +35,7 @@ local git_submodules = function(on_submodule)
     fzf_extra_args = helpers.fzf_default_args
       .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
-    fzf_prompt = "GitSubmodules",
+    fzf_prompt = "Git-Submodules",
     fzf_binds = {
       ["ctrl-y"] = function()
         local submodule_path = get_relpath_from_selection()

@@ -94,7 +94,7 @@ M.lsp_document_symbols = function(opts)
         helpers.bat_default_opts,
         current_file
       ),
-      fzf_prompt = "LSP Document Symbols",
+      fzf_prompt = "LSP-Document-Symbols",
       fzf_on_focus = function() end,
       fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
         ["ctrl-w"] = function()
@@ -213,7 +213,7 @@ M.lsp_workspace_symbols = function(opts)
       "bat %s --highlight-line {2} {1}",
       helpers.bat_default_opts
     ),
-    fzf_prompt = "LSP Workspace Symbols",
+    fzf_prompt = "LSP-Workspace-Symbols",
     fzf_on_focus = function() end,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-w"] = function()
@@ -288,7 +288,7 @@ M.lsp_references = function(opts)
           "bat %s --highlight-line {2} {1}",
           helpers.bat_default_opts
         ),
-        fzf_prompt = "LSP References",
+        fzf_prompt = "LSP-References",
         fzf_on_focus = function() end,
         fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
           ["ctrl-w"] = function()
@@ -390,7 +390,7 @@ M.lsp_definitions = function(opts)
           "bat %s --highlight-line {2} {1}",
           helpers.bat_default_opts
         ),
-        fzf_prompt = "LSP Definitions",
+        fzf_prompt = "LSP-Definitions",
         fzf_on_focus = function() end,
         fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
           ["ctrl-w"] = function()

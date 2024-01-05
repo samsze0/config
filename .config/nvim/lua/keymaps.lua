@@ -332,6 +332,9 @@ lua_keymap("n", "<space>u", require("fzf.undo").undos, {})
 lua_keymap("n", "<space>m", require("fzf.notification").notifications, {})
 lua_keymap("n", "<space>j", require("fzf.jump").jumps, {})
 
+lua_keymap("n", "<f9><f1>", require("fzf.docker").docker_images, {})
+lua_keymap("n", "<f9><f2>", require("fzf.docker").docker_containers, {})
+
 -- LSP
 vim_keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 vim_keymap("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
@@ -461,15 +464,17 @@ lua_keymap("i", "<M-r>", function()
 end, {})
 
 -- Copilot
-lua_keymap("n", "<leader>a", "<cmd>Copilot enable<CR>", {})
-lua_keymap("i", "<M-a>", require("copilot.suggestion").accept, {})
-lua_keymap("i", "<M-w>", require("copilot.suggestion").accept_line, {})
-lua_keymap("i", "<M-d>", require("copilot.suggestion").next, {})
-lua_keymap("i", "<M-e>", require("copilot.suggestion").prev, {})
-lua_keymap("i", "<M-q>", require("copilot.panel").open, {})
-lua_keymap("n", "<M-e>", require("copilot.panel").jump_prev, {})
-lua_keymap("n", "<M-d>", require("copilot.panel").jump_next, {})
-lua_keymap("n", "<M-a>", require("copilot.panel").accept, {})
+if not vim.g.vi_mode then
+  lua_keymap("n", "<leader>a", "<cmd>Copilot enable<CR>", {})
+  lua_keymap("i", "<M-a>", require("copilot.suggestion").accept, {})
+  lua_keymap("i", "<M-w>", require("copilot.suggestion").accept_line, {})
+  lua_keymap("i", "<M-d>", require("copilot.suggestion").next, {})
+  lua_keymap("i", "<M-e>", require("copilot.suggestion").prev, {})
+  lua_keymap("i", "<M-q>", require("copilot.panel").open, {})
+  lua_keymap("n", "<M-e>", require("copilot.panel").jump_prev, {})
+  lua_keymap("n", "<M-d>", require("copilot.panel").jump_next, {})
+  lua_keymap("n", "<M-a>", require("copilot.panel").accept, {})
+end
 
 -- File managers
 lua_keymap("n", "<f2><f2>", require("lf").lf, {})

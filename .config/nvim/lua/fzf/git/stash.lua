@@ -54,7 +54,7 @@ local git_stash = function(opts)
     fzf_extra_args = helpers.fzf_default_args
       .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
-    fzf_prompt = "GitStash",
+    fzf_prompt = "Git-Stash",
     fzf_initial_position = 1,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["ctrl-y"] = function()

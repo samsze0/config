@@ -40,7 +40,7 @@ local git_status = function(opts)
           or utils.ansi_codes.yellow(status_second)
       )
 
-      return string.format("%s%s%s", status, utils.nbsp, filename)
+      return fzf_utils.create_fzf_entry(status, filename)
     end)
 
     return entries
@@ -84,7 +84,7 @@ local git_status = function(opts)
     fzf_extra_args = helpers.fzf_default_args
       .. " --with-nth=1.. --preview-window="
       .. helpers.fzf_default_preview_window_args,
-    fzf_prompt = "GitStatus",
+    fzf_prompt = "Git-Status",
     fzf_initial_position = fzf_initial_pos,
     fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
       ["left"] = function()

@@ -25,7 +25,10 @@ M.grep = function(opts)
   end
 
   local get_cmd = function(query)
-    local files_cmd = git_utils.git_files(opts.git_dir, { return_as_cmd = true })
+    local files_cmd = git_utils.git_files(
+      opts.git_dir,
+      { return_as_cmd = true, filter_directories = false }
+    ) -- FIX: filter_directories
 
     local sed_cmd = {
       string.format("s/:/%s/;s/:/%s/", utils.nbsp, utils.nbsp), -- Replace first two : with nbsp

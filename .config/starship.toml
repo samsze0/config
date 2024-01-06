@@ -7,7 +7,13 @@ disabled = true
 disabled = true
 
 [cmd_duration]
-disabled = true
+disabled = false
+min_time = 0
+format = '⋅ [$duration]($style) '
+style = 'bright-black bold'
+show_milliseconds = false
+show_notifications = false
+min_time_to_notify = 45000
 
 [package]
 disabled = true
@@ -15,10 +21,26 @@ disabled = true
 [battery]
 disabled = true
 
+[docker_context]
+disabled = false
+symbol = '󰡨 '
+style = 'blue bold'
+format = '⋅ [$symbol$context]($style) '
+only_with_files = true
+detect_extensions = []
+detect_files = [
+    'docker-compose.yml',
+    'docker-compose.yaml',
+    'Dockerfile',
+]
+detect_folders = []
+
 [directory]
+disabled = false
 style = 'bright-black bold'
 
 [git_status]
+disabled = false
 format = '([$all_status$ahead_behind]($style) )'
 style = 'bold bright-black'
 ahead = '⇡'
@@ -35,6 +57,7 @@ untracked = '?'
 ignore_submodules = true
 
 [git_state]
+disabled = false
 rebase = 'REBASING'
 merge = 'MERGING'
 revert = 'REVERTING'
@@ -44,11 +67,21 @@ style = 'bold bright-black'
 format = '([$state( $progress_current/$progress_total)]($style) )'
 
 [git_branch]
+disabled = false
 format = '⋅ [$symbol$branch(:$remote_branch)]($style) '
 symbol = ' '
 style = 'bold blue'
 
+[custom.kubernetes]
+# This over the default k8s module
+command = 'kubectl config current-context'
+symbol = '󱃾 '
+format = '⋅ [$symbol($output )]($style)'
+style = 'bold blue'
+when = 'command -v kubectl'
+
 [python]
+disabled = false
 pyenv_version_name = true
 pyenv_prefix = ''
 format = '⋅ [${symbol}${pyenv_prefix}(${version} )]($style)[($virtualenv )](bold bright-black)'
@@ -57,6 +90,7 @@ style = 'blue bold'
 symbol = 'Python '
 
 [rust]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Rust '
@@ -66,6 +100,7 @@ detect_files = ['Cargo.toml']
 detect_folders = []
 
 [java]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 style = 'bold blue'
@@ -90,6 +125,7 @@ detect_files = [
 detect_folders = []
 
 [kotlin]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Kotlin '
@@ -103,6 +139,7 @@ detect_files = []
 detect_folders = []
 
 [gradle]
+disabled = false
 format = "⋅ [$symbol($version )]($style)"
 version_format = "v${raw}"
 symbol = "Gradle "
@@ -117,6 +154,7 @@ detect_folders = ["gradle"]
 
 
 [c]
+disabled = false
 format = '⋅ [($name )($version )]($style)'
 version_format = 'v${raw}'
 style = 'blue bold'
@@ -143,6 +181,7 @@ commands = [
 ]
 
 [cmake]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'CMake '
@@ -154,6 +193,7 @@ detect_files = [
 ]
 
 [golang]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Go '
@@ -171,6 +211,7 @@ detect_files = [
 detect_folders = ['Godeps']
 
 [nix_shell]
+disabled = false
 format = '⋅ [$symbol$state( \($name\))]($style)'
 symbol = 'Nix '
 style = 'bold blue'
@@ -178,6 +219,7 @@ impure_msg = 'impure'
 pure_msg = 'pure'
 
 [lua]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Lua '
@@ -188,6 +230,7 @@ detect_files = ['.lua-version']
 detect_folders = ['lua']
 
 [nodejs]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Node '
@@ -208,6 +251,7 @@ detect_files = [
 detect_folders = ['node_modules']
 
 [swift]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Swift '
@@ -217,6 +261,7 @@ detect_files = ['Package.swift']
 detect_folders = []
 
 [ruby]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Ruby '
@@ -233,6 +278,7 @@ detect_variables = [
 ]
 
 [zig]
+disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Zig '
@@ -245,14 +291,14 @@ detect_folders = []
 # https://github.com/starship/starship/discussions/1252
 
 [custom.osx]
-command = 'echo $(arch)'
+command = 'arch'
 symbol = ' '
 format = '⋅ [$symbol($output )]($style)'
 style = 'bold bright-black'
 when = '[[ "$(uname)" == "Darwin" ]]'
 
 [custom.linux]
-command = 'echo $(arch)'
+command = 'arch'
 symbol = ' '
 format = '⋅ [$symbol($output )]($style)'
 style = 'bold bright-black'

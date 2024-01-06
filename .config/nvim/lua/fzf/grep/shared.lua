@@ -8,6 +8,7 @@ local event = require("nui.utils.autocmd").event
 
 local M = {}
 
+---@return NuiLayout, { main: NuiPopup, nvim_preview: NuiPopup, replace_str: NuiPopup }, fun(): string
 function M.create_layout()
   local main_popup = Popup({
     enter = true,
@@ -103,7 +104,7 @@ function M.create_layout()
   local function get_replacement()
     return table.concat(
       -- Retrieve all lines (possibly modified)
-      vim.fn.getbufline(popups.replace_str.bufnr, 1, "$"),
+      vim.fn.getbufline(popups.replace_str.bufnr, 1, "$"), ---@diagnostic disable-line: param-type-mismatch
       "\r"
     )
   end
@@ -111,11 +112,24 @@ function M.create_layout()
   return layout, popups, get_replacement
 end
 
+---@param popups { nvim_preview: NuiPopup, replace_str: NuiPopup }
+---@param replacement string
+---@param parse_entry fun(entry: string): string, number
+---@param focused_entry string
+---@param query string
+function M.reload_preview(
+  popups,
+  replacement,
+  parse_entry,
+  focused_entry,
+  query
+)
+  if focused_entry == nil or focused_entry == "" then
+    vim.api.nvim_buf_set_lines(popups.nvim_preview.bufnr, 0, -1, false, {})
+    return
+  end
 
-function M.reload_preview(popups, replacement, parse_selection)
-  if not FZF.current_selection then return end
-
-  local filepath, row = parse_selection()
+  local filepath, row = parse_entry(focused_entry)
   local filename = vim.fn.fnamemodify(filepath, ":t")
   local filecontent = vim.fn.readfile(filepath)
   local current_win = vim.api.nvim_get_current_win()
@@ -132,7 +146,7 @@ function M.reload_preview(popups, replacement, parse_selection)
         [[cat "%s" | sed -E "%ss/%s/%s/g"]],
         filepath,
         row,
-        FZF.current_query,
+        query,
         replacement
       )
     )
@@ -152,7 +166,7 @@ function M.reload_preview(popups, replacement, parse_selection)
     false,
     #replacement > 0 and filecontent_after or filecontent
   )
-  vim.bo[popups.nvim_preview.bufnr].filetype = ft
+  if ft then vim.bo[popups.nvim_preview.bufnr].filetype = ft end
 
   -- Switch to preview window and back in order to refresh scrollbar
   vim.api.nvim_set_current_win(popups.nvim_preview.winid)
@@ -163,7 +177,14 @@ end
 
 M.actions = {}
 
-function M.actions.send_selections_to_loclist(parse_selection, win, callback)
+---@param parse_selection fun(selection: string): string, integer, string
+---@param win integer
+---@param callback? fun()
+function M.actions.send_current_selections_to_loclist(
+  parse_selection,
+  win,
+  callback
+)
   core.get_current_selections(function(indices, selections)
     local entries = utils.map(selections, function(_, s)
       local filepath, line, text = parse_selection(s)

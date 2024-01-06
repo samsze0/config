@@ -80,11 +80,12 @@ M.contains = function(tbl, elem)
   return false
 end
 
----@param lhs string | string[]
----@param rhs string | string[]
----@param opts { show_in_current_tab?: boolean, filetype?: string | nil }
----@return nil
-M.show_diff = function(lhs, rhs, opts)
+---@param opts { show_in_current_tab?: boolean, filetype?: string | nil, cursor_at?: number | nil }
+---@vararg { filepath_or_content: string | string[], readonly?: boolean }
+---@return integer[] buffers
+M.show_diff = function(opts, ...)
+  local entries = { ... }
+
   opts = vim.tbl_extend("force", {
     show_in_current_tab = false,
     filetype = nil, -- If nil, auto-detect
@@ -96,36 +97,43 @@ M.show_diff = function(lhs, rhs, opts)
     vim.cmd("only") -- Close all other windows in current tab
   end
 
-  local filetype = opts.filetype
-  local lhs_buf
-  local rhs_buf
+  local filetype = nil
 
-  if type(lhs) == "string" then
-    vim.cmd(string.format("e %s", lhs))
-    filetype = vim.bo.filetype
-  else
-    lhs_buf = M.show_content_in_buffer(lhs, {
-      open_in_current_tab = true,
-    })
+  local buffers = {}
+  for i, e in ipairs(entries) do
+    if i > 1 then vim.cmd("vsplit") end
+
+    if type(e.filepath_or_content) == "string" then
+      vim.cmd(string.format("e %s", e.filepath_or_content))
+      filetype = vim.bo.filetype
+    else
+      local content = e.filepath_or_content
+      ---@cast content string[]
+      local buf = M.show_content_in_buffer(content, {
+        open_in_current_tab = true,
+      })
+      vim.bo[buf].readonly = e.readonly
+    end
+    table.insert(buffers, vim.api.nvim_get_current_buf())
+    vim.cmd("diffthis")
   end
-  vim.cmd("diffthis")
 
-  vim.api.nvim_command("vsplit")
-
-  if type(rhs) == "string" then
-    vim.cmd(string.format("e %s", rhs))
-    filetype = vim.bo.filetype
-  else
-    rhs_buf = M.show_content_in_buffer(rhs, {
-      open_in_current_tab = true,
-    })
-  end
-  vim.cmd("diffthis")
+  if opts.filetype then filetype = opts.filetype end
 
   if filetype then
-    if lhs_buf then vim.bo[lhs_buf].filetype = filetype end
-    if rhs_buf then vim.bo[rhs_buf].filetype = filetype end
+    for _, buf in ipairs(buffers) do
+      vim.bo[buf].filetype = filetype
+    end
   end
+
+  -- Goto the window specified by `opts.window`
+  if opts.cursor_at then
+    for _ = 1, (#entries - opts.cursor_at) do
+      vim.cmd("wincmd W")
+    end
+  end
+
+  return buffers
 end
 
 -- Safely require a file by invoking "require" in protected mode
@@ -295,7 +303,7 @@ end
 ---@generic T : any
 ---@generic V : any
 ---@param tbl table<any, T> | T[]
----@param accessor fun(k: any, v: T): V
+---@param accessor? fun(k: any, v: T): V
 ---@param opts? { is_array?: boolean | nil }
 ---@return V
 M.sum = function(tbl, accessor, opts)
@@ -416,8 +424,8 @@ end
 
 ---@param str string
 ---@param count? number
----@param sep string
----@param opts { include_remaining?: boolean, trimempty?: boolean }
+---@param sep? string
+---@param opts? { include_remaining?: boolean, trimempty?: boolean }
 ---@return string[]
 M.split_string_n = function(str, count, sep, opts)
   sep = sep or "%s+"
@@ -520,6 +528,9 @@ M.sort_by_files = function(paths, transformer)
   if not transformer then transformer = function(path) return path end end
 
   return M.sort(paths, function(a, b)
+    a = transformer(a)
+    b = transformer(b)
+
     local a_is_in_dir = string.find(a, "/") ~= nil
     local b_is_in_dir = string.find(b, "/") ~= nil
 

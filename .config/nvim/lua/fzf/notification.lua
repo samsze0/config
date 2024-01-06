@@ -1,15 +1,17 @@
 local M = {}
 
 local core = require("fzf.core")
-local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local helpers = require("fzf.helpers")
 local timeago = require("utils.timeago")
 local utils = require("utils")
 
+-- Fzf all notifications
+--
+---@param opts? { max_num_enxtires?: integer }
 M.notifications = function(opts)
   local notify = vim.notify -- Restore vim.notify later
-  vim.notify = function(...) end
+  vim.notify = function(...) end ---@diagnostic disable-line: duplicate-set-field
 
   opts = vim.tbl_extend("force", {
     max_num_entries = 100,
@@ -48,7 +50,7 @@ M.notifications = function(opts)
         or utils.pad_string(brief, brief_max_length)
       table.insert(
         entries,
-        fzf_utils.create_fzf_entry(
+        fzf_utils.join_by_delim(
           level,
           timeago(noti.time),
           unread and utils.ansi_codes.white(brief) or brief
@@ -58,36 +60,32 @@ M.notifications = function(opts)
     return entries
   end
 
-  local entries = get_entries()
-
-  local get_selection = function()
-    local selection_index = FZF.current_selection_index
-
-    return _G.notifications[#_G.notifications - selection_index + 1]
+  local get_notification = function(index)
+    return _G.notifications[#_G.notifications - index + 1]
   end
 
-  core.fzf(entries, {
-    fzf_on_select = function() end,
-    fzf_preview_cmd = nil,
-    fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=1.. --preview-window="
-      .. helpers.fzf_default_preview_window_args,
-    fzf_prompt = "Notifications",
-    fzf_initial_position = 1,
-    fzf_on_focus = function()
-      local noti = get_selection()
+  core.fzf(get_entries(), {
+    prompt = "Notifications",
+    initial_position = 1,
+    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+      ["focus"] = function(state)
+        local noti = get_notification(state.focused_entry_index)
 
-      core.send_to_fzf(
-        "change-preview:"
-          .. string.format(
-            [[bat %s --file-name "none" %s]],
-            helpers.bat_default_opts,
-            fzf_utils.write_to_tmpfile(noti.message)
-          )
-      )
-    end,
-    after_fzf = function() vim.notify = notify end, -- Restore vim.notify
-    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {}),
+        core.send_to_fzf(
+          "change-preview:"
+            .. string.format(
+              [[bat %s --file-name "none" %s]],
+              helpers.bat_default_opts,
+              fzf_utils.write_to_tmpfile(noti.message)
+            )
+        )
+      end,
+      ["+after-exit"] = function(state) vim.notify = notify end, -- Restore vim.notify
+    }),
+    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
+      ["--with-nth"] = "1..",
+      ["--preview-window"] = helpers.fzf_default_preview_window_args,
+    }),
   })
 end
 

@@ -1,11 +1,17 @@
 homebrew/cask/altserver
 homebrew/cask/android-studio
 homebrew/cask/brave-browser
+homebrew/cask/docker
 homebrew/cask/iina
 homebrew/cask/karabiner-elements
 homebrew/cask/kitty
+homebrew/cask/microsoft-auto-update
+homebrew/cask/microsoft-teams
+homebrew/cask/mysqlworkbench
 homebrew/cask/obs
 homebrew/cask/outline-manager
+homebrew/cask/postman
+homebrew/cask/spotify
 homebrew/cask/visual-studio-code
 homebrew/cask/warp
 homebrew/cask-fonts/homebrew/cask-fonts/font-droid-sans-mono-nerd-font

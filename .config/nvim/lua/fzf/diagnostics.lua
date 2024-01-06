@@ -2,35 +2,35 @@ local M = {}
 
 local core = require("fzf.core")
 local helpers = require("fzf.helpers")
-local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
-local uv = vim.loop
-local uv_utils = require("utils.uv")
 local jumplist = require("jumplist")
 
+-- Fzf diagnostics
+--
+---@param opts? { severity?: { min?: DiagnosticSeverity }, current_buffer_only?: boolean }
 M.diagnostics = function(opts)
   opts = vim.tbl_extend("force", {
     severity = { min = vim.diagnostic.severity.WARN },
     current_buffer_only = false,
   }, opts or {})
 
-  local bufnr = vim.api.nvim_get_current_buf()
-  local current_file = vim.api.nvim_buf_get_name(bufnr)
+  local win = vim.api.nvim_get_current_win()
+  local buf = vim.api.nvim_get_current_buf()
+  local current_file = vim.api.nvim_buf_get_name(buf)
   current_file = vim.fn.fnamemodify(current_file, ":~:.")
-  local win_id = vim.api.nvim_get_current_win()
 
   local function get_entries()
     local diagnostics = vim.diagnostic.get(
-      opts.current_buffer_only and bufnr or nil,
+      opts.current_buffer_only and buf or nil,
       { severity = opts.severity }
     )
     return utils.map(diagnostics, function(i, e)
       local filename = opts.current_buffer_only and current_file
-        or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(e.bufnr), ":~:.")
-      diagnostics[i].filename = filename
+        or vim.fn.fnamemodify(vim.api.nvim_buf_get_name(e.bufnr), ":~:.") ---@diagnostic disable-line: undefined-field
+      diagnostics[i].filename = filename ---@diagnostic disable-line: inject-field
 
-      return fzf_utils.create_fzf_entry(
+      return fzf_utils.join_by_delim(
         e.severity == vim.diagnostic.severity.HINT
             and utils.ansi_codes.blue("H")
           or e.severity == vim.diagnostic.severity.INFO and utils.ansi_codes.blue(
@@ -55,39 +55,16 @@ M.diagnostics = function(opts)
 
   local entries, diagnostics = get_entries()
 
-  local get_selection = function()
-    return diagnostics[FZF.current_selection_index]
-  end
-
   core.fzf(entries, {
-    fzf_on_select = function()
-      local symbol = get_selection()
-
-      jumplist.save(win_id)
-      if not opts.current_buffer_only then
-        vim.cmd(string.format([[e %s]], symbol.filename))
-      end
-      vim.fn.cursor({ symbol.lnum + 1, symbol.col })
-      vim.cmd("normal! zz")
-    end,
-    fzf_preview_cmd = string.format(
+    prompt = "Diagnostics",
+    preview_cmd = string.format(
       "bat %s --highlight-line {4} {3}",
       helpers.bat_default_opts
     ),
-    fzf_extra_args = helpers.fzf_default_args
-      .. string.format(
-        " --with-nth=%s ",
-        opts.current_buffer_only and "1,2,6.." or "1,2,6.."
-      )
-      .. string.format(
-        "--preview-window=%s,%s",
-        helpers.fzf_default_preview_window_args,
-        fzf_utils.fzf_initial_preview_scroll_offset("{4}", { fixed_header = 3 })
-      ),
-    fzf_prompt = "Diagnostics",
-    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
-      ["ctrl-w"] = function()
-        local symbol = get_selection()
+    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+      ["ctrl-w"] = function(state)
+        local symbol = diagnostics[state.focused_entry_index]
+
         core.abort_and_execute(function()
           vim.cmd(string.format([[vsplit %s]], current_file))
           vim.cmd(
@@ -96,8 +73,9 @@ M.diagnostics = function(opts)
           vim.cmd([[normal! zz]])
         end)
       end,
-      ["ctrl-t"] = function()
-        local symbol = get_selection()
+      ["ctrl-t"] = function(state)
+        local symbol = diagnostics[state.focused_entry_index]
+
         core.abort_and_execute(function()
           vim.cmd(string.format([[tabnew %s]], current_file))
           vim.cmd(
@@ -106,8 +84,25 @@ M.diagnostics = function(opts)
           vim.cmd([[normal! zz]])
         end)
       end,
+      ["+select"] = function(state)
+        local symbol = diagnostics[state.focused_entry_index]
+
+        jumplist.save(win)
+        if not opts.current_buffer_only then
+          vim.cmd(string.format([[e %s]], symbol.filename)) --- @diagnostic disable-line: undefined-field
+        end
+        vim.fn.cursor({ symbol.lnum + 1, symbol.col })
+        vim.cmd("normal! zz")
+      end,
     }),
-    fzf_on_focus = function() end,
+    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
+      ["--with-nth"] = "1,2,6..",
+      ["--preview-window"] = string.format(
+        [['%s,%s']],
+        helpers.fzf_default_preview_window_args,
+        fzf_utils.preview_offset("{4}", { fixed_header = 3 })
+      ),
+    }),
   })
 end
 

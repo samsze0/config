@@ -1,11 +1,12 @@
 local core = require("fzf.core")
 local helpers = require("fzf.helpers")
-local config = require("fzf.config")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
 local git_utils = require("utils.git")
-local jumplist = require("jumplist")
 
+-- Fzf git stash
+--
+---@param opts? { git_dir?: string }
 local git_stash = function(opts)
   opts = vim.tbl_extend("force", {
     git_dir = git_utils.current_git_dir(),
@@ -14,16 +15,18 @@ local git_stash = function(opts)
   local get_entries = function()
     local stash =
       vim.fn.systemlist(string.format([[git -C %s stash list]], opts.git_dir))
+
+    if vim.v.shell_error ~= 0 then
+      vim.error("Error getting git stash")
+      return {}
+    end
+
     stash = utils.map(stash, function(_, e)
       local parts = utils.split_string_n(e, 1, ":")
-      if not parts then
-        vim.notify(string.format([[Invalid stash entry: %s]], e))
-        return nil
-      end
 
       parts = utils.map(parts, function(_, p) return vim.trim(p) end)
 
-      return fzf_utils.create_fzf_entry(
+      return fzf_utils.join_by_delim(
         utils.ansi_codes.blue(parts[1]),
         utils.ansi_codes.white(parts[2])
       )
@@ -31,38 +34,35 @@ local git_stash = function(opts)
     return stash
   end
 
-  local get_stash_ref_from_selection = function()
-    local selection = FZF.current_selection
-
-    local args = vim.split(selection, utils.nbsp)
-    local stash_ref = args[1]
-
-    return stash_ref
+  local parse_entry = function(entry)
+    local args = vim.split(entry, utils.nbsp)
+    return unpack(args)
   end
 
   core.fzf(get_entries(), {
-    fzf_on_select = function()
-      local stash_ref = get_stash_ref_from_selection()
-
-      vim.notify(stash_ref)
-    end,
-    fzf_preview_cmd = string.format(
+    prompt = "Git-Stash",
+    initial_position = 1,
+    preview_cmd = string.format(
       [[git -C %s stash show --full-index --color {1} | delta %s]],
       opts.git_dir,
       helpers.delta_default_opts
     ),
-    fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=1.. --preview-window="
-      .. helpers.fzf_default_preview_window_args,
-    fzf_prompt = "Git-Stash",
-    fzf_initial_position = 1,
-    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
-      ["ctrl-y"] = function()
-        local stash_ref = get_stash_ref_from_selection()
+    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+      ["+select"] = function(state)
+        local stash_ref = parse_entry(state.focused_entry)
+
+        vim.info(stash_ref)
+      end,
+      ["ctrl-y"] = function(state)
+        local stash_ref = parse_entry(state.focused_entry)
 
         vim.fn.setreg("+", stash_ref)
-        vim.notify(string.format([[Copied to clipboard: %s]], stash_ref))
+        vim.info(string.format([[Copied to clipboard: %s]], stash_ref))
       end,
+    }),
+    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
+      ["--with-nth"] = "1..",
+      ["--preview-window"] = helpers.fzf_default_preview_window_args,
     }),
   })
 end

@@ -42,6 +42,45 @@ vim_keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts) -- Paste se
 vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
 vim_keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but forward direction only
 
+-- Diff
+local function get_diff_buffers()
+  local buffers
+  local ok = pcall(
+    function() buffers = vim.api.nvim_tabpage_get_var(0, "diff_buffers") end
+  )
+  if not ok then return nil end
+
+  return buffers
+end
+lua_keymap("n", "sj", function()
+  local diff_buffers = get_diff_buffers()
+  if not diff_buffers then
+    vim.error("Not in diff mode")
+    return
+  end
+  if vim.api.nvim_get_current_buf() == diff_buffers[2] then
+    vim.cmd(string.format([[diffget %s]], diff_buffers[1]))
+  elseif vim.api.nvim_get_current_buf() == diff_buffers[3] then
+    vim.cmd(string.format([[diffput %s]], diff_buffers[2]))
+  else
+    return
+  end
+end, {})
+lua_keymap("n", "sl", function()
+  local diff_buffers = get_diff_buffers()
+  if not diff_buffers then
+    vim.error("Not in diff mode")
+    return
+  end
+  if vim.api.nvim_get_current_buf() == diff_buffers[2] then
+    vim.cmd(string.format([[diffget %s]], diff_buffers[3]))
+  elseif vim.api.nvim_get_current_buf() == diff_buffers[1] then
+    vim.cmd(string.format([[diffput %s]], diff_buffers[2]))
+  else
+    return
+  end
+end, {})
+
 -- Find and replace (global)
 
 -- Move by word
@@ -309,6 +348,7 @@ lua_keymap("n", "<f10><f4>", function()
     end
   )
 end, {})
+lua_keymap("n", "<f11><f6>", require("fzf.git").git_stash, {})
 lua_keymap("n", "<f11><f11>", nil, {})
 
 lua_keymap("n", "li", require("fzf.lsp").lsp_definitions, {})
@@ -422,11 +462,27 @@ end
 
 -- GitSigns
 vim_keymap("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>", opts)
-vim_keymap("n", "si", "<cmd>Gitsigns prev_hunk<CR>", opts)
-vim_keymap("n", "sk", "<cmd>Gitsigns next_hunk<CR>", opts)
+lua_keymap("n", "si", function()
+  local buffers = get_diff_buffers()
+  if not buffers then
+    vim.cmd([[Gitsigns prev_hunk]])
+  else
+    vim.cmd("normal! [c")
+  end
+end, {})
+lua_keymap("n", "sk", function()
+  local buffers = get_diff_buffers()
+  if not buffers then
+    vim.cmd([[Gitsigns next_hunk]])
+  else
+    vim.cmd("normal! ]c")
+  end
+end, {})
 vim_keymap("n", "sb", "<cmd>Gitsigns blame_line<CR>", opts)
-vim_keymap("n", "sj", "<cmd>Gitsigns stage_hunk<CR>", opts)
-vim_keymap("n", "sl", "<cmd>Gitsigns undo_stage_hunk<CR>", opts)
+if false then
+  vim_keymap("n", "sj", "<cmd>Gitsigns stage_hunk<CR>", opts)
+  vim_keymap("n", "sl", "<cmd>Gitsigns undo_stage_hunk<CR>", opts)
+end
 vim_keymap("n", "s;", "<cmd>Gitsigns reset_hunk<CR>", opts)
 
 -- :qa, :q!, :wq

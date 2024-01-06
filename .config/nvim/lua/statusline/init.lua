@@ -188,8 +188,8 @@ M.section_filename = function()
   else
     -- See :h statusline for all available fields
     local buf = vim.api.nvim_get_current_buf()
-    local modified = vim.bo[buf].modified
-    local readonly = vim.bo[buf].readonly
+    local modified = vim.bo.modified
+    local readonly = vim.bo.readonly
     return "%f" .. (modified and "  " or "") .. (readonly and "  " or "")
   end
 end

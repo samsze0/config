@@ -62,7 +62,7 @@ popup:hide()
 
 local timer = vim.loop.new_timer()
 
-vim.notify = function(msg, level)
+vim.notify = function(msg, level) ---@diagnostic disable-line: duplicate-set-field
   level = level or vim.log.levels.OFF
 
   if type(msg) ~= "string" then msg = vim.inspect(msg) end
@@ -105,7 +105,7 @@ vim.notify = function(msg, level)
     + 1
 
   for _, sub in ipairs(_G.notification_subscribers) do
-    sub(message)
+    vim.schedule(function() sub(message) end)
   end
 end
 

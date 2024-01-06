@@ -13,6 +13,7 @@ require("conform").setup({
     typescriptreact = { prettier },
     json = { prettier },
     yaml = { prettier },
+    jsonc = { prettier },
     sh = { "shfmt" },
     zsh = { "shfmt" },
     bash = { "shfmt" },

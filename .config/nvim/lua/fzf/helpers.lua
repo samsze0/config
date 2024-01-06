@@ -1,4 +1,3 @@
-local window_utils = require("utils.window")
 local utils = require("utils")
 
 local Layout = require("nui.layout")
@@ -15,10 +14,16 @@ local M = {
   rg_default_opts = "--smart-case --no-ignore --hidden --trim "
     .. (use_rg_colors and "--color=always --colors 'match:fg:blue' --colors 'path:fg:80,130,150' --colors 'line:fg:80,130,150' " or "--color=never ")
     .. "--no-column --line-number --no-heading",
-  fzf_default_args = "--scroll-off=10",
+  fzf_default_args = {
+    ["--scroll-off"] = "10",
+  },
   fzf_default_preview_window_args = "right,50%,border-none,wrap,nofollow,nocycle",
 }
 
+-- Set keymaps for navigating between popups
+--
+---@param popup_nav_configs { popup: NuiPopup, key: string, is_terminal: boolean }[]
+---@return nil
 M.set_keymaps_for_popups_nav = function(popup_nav_configs)
   -- For every permutation of cartesian product of popup_nav_configs where i ~= j,
   -- map the keybinds to switch to the window of popup j from popup i
@@ -34,13 +39,20 @@ M.set_keymaps_for_popups_nav = function(popup_nav_configs)
   end
 end
 
-M.set_keymaps_for_nvim_preview = function(main_popup, preview_popup, opts)
+-- Set default keymaps for remotely navigating the preview window
+-- This includes:
+-- - <S-Up> and <S-Down> to scroll the preview window up and down
+--
+---@param main_popup NuiPopup
+---@param preview_popup NuiPopup
+---@param opts? { scrollup_key: string, scrolldown_key: string }
+M.set_keymaps_for_preview_remote_nav = function(main_popup, preview_popup, opts)
   opts = vim.tbl_extend("force", {
-    scrollup_preview_from_main_popup = "<S-Up>",
-    scrolldown_preview_from_main_popup = "<S-Down>",
+    scrollup_key = "<S-Up>",
+    scrolldown_key = "<S-Down>",
   }, opts or {})
 
-  main_popup:map("t", opts.scrollup_preview_from_main_popup, function()
+  main_popup:map("t", opts.scrollup_key, function()
     -- Setting current window to right window will cause scrollbar to refresh as well
     vim.api.nvim_set_current_win(preview_popup.winid)
     vim.api.nvim_input("<S-Up>")
@@ -49,7 +61,7 @@ M.set_keymaps_for_nvim_preview = function(main_popup, preview_popup, opts)
       vim.cmd("startinsert")
     end)
   end)
-  main_popup:map("t", opts.scrolldown_preview_from_main_popup, function()
+  main_popup:map("t", opts.scrolldown_key, function()
     vim.api.nvim_set_current_win(preview_popup.winid)
     vim.api.nvim_input("<S-Down>")
     vim.schedule(function()
@@ -60,31 +72,34 @@ M.set_keymaps_for_nvim_preview = function(main_popup, preview_popup, opts)
 end
 
 -- FIX
-M.set_keymaps_for_fzf_preview = function(main_popup, opts)
-  opts = vim.tbl_extend("force", {
-    scrollup_preview_from_main_popup = "<S-Up>",
-    scrolldown_preview_from_main_popup = "<S-Down>",
-  }, opts or {})
+-- M.set_keymaps_for_fzf_preview = function(main_popup, opts)
+--   opts = vim.tbl_extend("force", {
+--     scrollup_preview_from_main_popup = "<S-Up>",
+--     scrolldown_preview_from_main_popup = "<S-Down>",
+--   }, opts or {})
+--
+--   main_popup:map( -- TODO
+--     "t",
+--     opts.scrollup_preview_from_main_popup,
+--     function() vim.api.nvim_input("<M-a>") end
+--   )
+--   vim.keymap.set(
+--     "t",
+--     opts.scrolldown_preview_from_main_popup,
+--     function() vim.api.nvim_input("<M-b>") end
+--   )
+-- end
 
-  main_popup:map( -- TODO
-    "t",
-    opts.scrollup_preview_from_main_popup,
-    function() vim.api.nvim_input("<M-a>") end
-  )
-  vim.keymap.set(
-    "t",
-    opts.scrolldown_preview_from_main_popup,
-    function() vim.api.nvim_input("<M-b>") end
-  )
-end
-
-M.custom_fzf_keybinds = {
+M.default_fzf_keybinds = {
   ["shift-up"] = "preview-up+preview-up+preview-up+preview-up+preview-up",
   ["shift-down"] = "preview-down+preview-down+preview-down+preview-down+preview-down",
-  ["alt-a"] = "preview-up",
-  ["alt-b"] = "preview-down",
+  -- ["alt-a"] = "preview-up",
+  -- ["alt-b"] = "preview-down",
 }
 
+-- Create a simple window layout for Fzf that includes only a main window
+--
+---@return NuiLayout, { main: NuiPopup }
 M.create_simple_layout = function()
   local main_popup = Popup({
     enter = true,
@@ -123,6 +138,10 @@ M.create_simple_layout = function()
   }
 end
 
+-- Create a window layout for Fzf that includes:
+-- - a main window
+-- - a preview window
+--
 ---@return NuiLayout layout, { main: NuiPopup, nvim_preview: NuiPopup } popups, fun(content: string[]): nil set_preview_content
 M.create_nvim_preview_layout = function()
   local main_popup = Popup({

@@ -34,17 +34,6 @@ local popup = Popup({
   },
 })
 
-local edit_selected_files = function(edit_cmd, selection)
-  -- Filter invalid selection entries and open them
-  selection = utils.filter(selection, function(_, v) return vim.trim(v) ~= "" end)
-  if #selection > 0 then
-    if debug then vim.notify("LF: opening selections") end
-    for _, file in ipairs(selection) do
-      vim.cmd(string.format([[%s %s]], edit_cmd, file))
-    end
-  end
-end
-
 local M = {}
 
 --- :Lf entry point
@@ -67,13 +56,34 @@ function M.lf(opts)
   popup:mount()
   popup:on(event.BufLeave, function() popup:unmount() end)
 
+  local close_popup_and_edit_selected_files = function(edit_cmd, selection)
+    popup:unmount()
+
+    -- Close LF window & restore focus to preview window
+    if vim.api.nvim_win_is_valid(prev_win) then
+      vim.cmd(string.format([[silent! %s wincmd w]], prev_win))
+    end
+
+    -- Filter invalid selection entries and open them
+    selection = utils.filter(
+      selection,
+      function(_, v) return vim.trim(v) ~= "" end
+    )
+    if #selection > 0 then
+      if debug then vim.notify("LF: opening selections") end
+      for _, file in ipairs(selection) do
+        vim.cmd(string.format([[%s %s]], edit_cmd, file))
+      end
+    end
+  end
+
   popup:map("t", "<C-t>", function()
     local selection = vim.fn.readfile(current_selection_path)
-    edit_selected_files("tabnew", selection)
+    close_popup_and_edit_selected_files("tabnew", selection)
   end)
   popup:map("t", "<C-w>", function()
     local selection = vim.fn.readfile(current_selection_path)
-    edit_selected_files("vnew", selection)
+    close_popup_and_edit_selected_files("vnew", selection)
   end)
 
   -- Empty cache files
@@ -104,13 +114,7 @@ function M.lf(opts)
         )
       end
 
-      -- Close LF window & restore focus to preview window
-      if vim.api.nvim_win_is_valid(prev_win) then
-        popup:unmount()
-        vim.api.nvim_set_current_win(prev_win)
-      end
-
-      edit_selected_files(opts.edit_cmd, selection)
+      close_popup_and_edit_selected_files(opts.edit_cmd, selection)
     end,
   })
 

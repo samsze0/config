@@ -9,18 +9,14 @@ local json = require("utils.json")
 
 -- TODO: listen to / watch image changes
 
+-- Fzf all docker images
+--
 ---@param opts? {  }
 M.docker_images = function(opts)
   opts = vim.tbl_extend("force", {}, opts or {})
 
   ---@type { Containers: string, CreatedAt: string, CreatedSince: string, Digest: string, ID: string, Repository: string, SharedSize: string, Size: string, Tag: string, UniqueSize: string, VirtualSize: string }[]
   local images
-
-  local get_selection = function()
-    local index = FZF.current_selection_index
-
-    return images[index]
-  end
 
   local function get_entries()
     if vim.fn.executable("docker") ~= 1 then
@@ -42,7 +38,7 @@ M.docker_images = function(opts)
     return utils.map(
       images,
       function(_, c)
-        return fzf_utils.create_fzf_entry(
+        return fzf_utils.join_by_delim(
           utils.ansi_codes.blue(c.Repository),
           utils.ansi_codes.grey(c.Tag)
         )
@@ -58,34 +54,37 @@ M.docker_images = function(opts)
     helpers.create_nvim_preview_layout()
 
   core.fzf(entries, {
+    prompt = "Docker-Images",
     layout = layout,
-    fzf_preview_cmd = nil,
-    fzf_prompt = "Docker-Images",
-    fzf_on_select = nil,
-    before_fzf = function()
-      helpers.set_keymaps_for_nvim_preview(popups.main, popups.nvim_preview)
-      helpers.set_keymaps_for_popups_nav({
-        { popup = popups.main, key = "<C-s>", is_terminal = true },
-        { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
-      })
-    end,
-    fzf_on_focus = function()
-      set_preview_content(vim.split(vim.inspect(get_selection()), "\n"))
-      vim.bo[popups.nvim_preview.bufnr].filetype = "lua"
+    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+      ["+before-start"] = function(state)
+        helpers.set_keymaps_for_preview_remote_nav(
+          popups.main,
+          popups.nvim_preview
+        )
+        helpers.set_keymaps_for_popups_nav({
+          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
+        })
+      end,
+      ["focus"] = function(state)
+        set_preview_content(
+          vim.split(vim.inspect(images[state.focused_entry_index]), "\n")
+        )
+        vim.bo[popups.nvim_preview.bufnr].filetype = "lua"
 
-      -- Switch to preview window and back in order to refresh scrollbar
-      -- TODO: Remove this once scrollbar plugin support remote refresh
-      vim.api.nvim_set_current_win(popups.nvim_preview.winid)
-      vim.api.nvim_set_current_win(popups.main.winid)
-    end,
-    fzf_binds = vim.tbl_extend("force", helpers.custom_fzf_keybinds, {
-      ["ctrl-y"] = function()
-        local image = get_selection()
+        -- Switch to preview window and back in order to refresh scrollbar
+        -- TODO: Remove this once scrollbar plugin support remote refresh
+        vim.api.nvim_set_current_win(popups.nvim_preview.winid)
+        vim.api.nvim_set_current_win(popups.main.winid)
+      end,
+      ["ctrl-y"] = function(state)
+        local image = images[state.focused_entry_index]
         vim.fn.setreg("+", image.ID)
         vim.notify(string.format([[Copied %s to clipboard]], image.ID))
       end,
-      ["ctrl-x"] = function()
-        local image = get_selection()
+      ["ctrl-x"] = function(state)
+        local image = images[state.focused_entry_index]
 
         vim.fn.system(string.format([[docker image rm %s]], image.ID))
         if vim.v.shell_error ~= 0 then
@@ -95,10 +94,10 @@ M.docker_images = function(opts)
         core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
       end,
     }),
-    nvim_preview = true,
-    fzf_extra_args = helpers.fzf_default_args
-      .. " --with-nth=1.. --preview-window="
-      .. helpers.fzf_default_preview_window_args,
+    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
+      ["--with-nth"] = "1..",
+      ["--preview-window"] = helpers.fzf_default_preview_window_args,
+    }),
   })
 end
 

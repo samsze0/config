@@ -128,22 +128,21 @@ end, {})
 
 **High priority**
 
-- LSP rename workflow (WorkspaceEdit[])
+- LSP rename workflow (WorkspaceEdit[]). Perhaps have a watchman daemon running and a local socket server that takes a list of subscribers?
+- Fzf grep (fzf disabled) focus entry not updating when query changed
+- Fzf "watch mode" that runs the command in the background and hashes it to see if it output changes? Require idempotent command
 - LF image preview over SSH
 - SSH line editor ignore delay?
 - Syncthing clipboard
 - Karabiner [command + left/right]
 - Fzf TODO comments
 - Fzf backups
-- Undo tree refactor
 - Tests
-- Git conflicts workflow
 - LSP import path update (with watchman and LSP willrename etc...)
 - Project specific config w/ exrc https://github.com/klen/nvim-config-local
 - Custom treesitter textobjects plugin
 - Fzf one after another doesn't enter insert mode
 - Remove all usage of global var
-- Fzf pass state to callback args
 
 **Low priority**
 
@@ -156,7 +155,5 @@ end, {})
 - Custom copilot plugin (possible to use chat?)
 - Lf create_new multi-layer dir support
 - Tabline dedup by git-files
-- React native dev workflow
 - React dev workflow
-- Node server dev workflow
 - Flash fork

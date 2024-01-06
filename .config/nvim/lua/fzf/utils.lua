@@ -1,10 +1,15 @@
 local M = {}
 
-FZF_TMPFILE = vim.fn.tempname()
+local tempfile = vim.fn.tempname()
 local utils = require("utils")
 local os_utils = require("utils.os")
 
-M.fzf_initial_preview_scroll_offset = function(offset, opts)
+-- Generate a preview window offset string for fzf
+--
+---@param offset integer | string
+---@param opts? { fixed_header?: number, center?: boolean }
+---@return string
+M.preview_offset = function(offset, opts)
   opts = vim.tbl_extend("force", {
     fixed_header = 0,
     center = true,
@@ -19,7 +24,11 @@ M.fzf_initial_preview_scroll_offset = function(offset, opts)
   )
 end
 
-M.generate_fzf_reload_action = function(input)
+-- Generate a reload action string for fzf
+--
+---@param entries string[]
+---@return string
+M.reload_action = function(entries)
   return string.format(
     "reload(%s)",
     string.format(
@@ -27,16 +36,18 @@ M.generate_fzf_reload_action = function(input)
 %s
 EOF
 ]],
-      table.concat(input, "\n")
+      table.concat(entries, "\n")
     )
   )
 end
 
-M.generate_fzf_send_to_server_action = function(
-  message,
-  server_socket_path,
-  opts
-)
+-- Generate a send to lua server action string for fzf
+--
+---@param message string
+---@param server_socket_path string
+---@param opts? { var_expansion?: boolean }
+---@return string
+M.send_to_lua_action = function(message, server_socket_path, opts)
   opts = vim.tbl_extend("force", {
     var_expansion = false,
   }, opts or {})
@@ -55,15 +66,23 @@ EOF
   )
 end
 
+-- Write the given content to a temporary file and return the path to the file
+--
+---@param content string|string[]
+---@return string
 M.write_to_tmpfile = function(content)
   vim.fn.writefile(
     type(content) == "string" and vim.split(content, "\n") or content,
-    FZF_TMPFILE
+    tempfile
   )
-  return FZF_TMPFILE
+  return tempfile
 end
 
-M.create_fzf_entry = function(...)
+-- Generate a fzf entry by joining the given arguments with the nbsp character as delimiter
+--
+---@vararg string
+---@return string
+M.join_by_delim = function(...)
   local args = { ... }
   local size = #args
   return string.format(string.rep("%s", size, utils.nbsp), ...)

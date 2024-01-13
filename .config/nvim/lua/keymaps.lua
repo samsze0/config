@@ -355,7 +355,8 @@ if conform_over_lsp_format then
         require("conform").list_formatters()[1].name
       )
     else
-      vim.info("No available formatters")
+      vim.lsp.buf.format()
+      vim.info("Formatted with LSP formatter")
     end
   end, {})
 else

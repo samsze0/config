@@ -176,7 +176,7 @@ detect_files = [
 detect_folders = []
 
 [container]
-disabled = false
+disabled = true
 symbol = '⬢ '
 format = '[$symbol \[$name\]]($style) '
 style = 'bold blue'
@@ -225,22 +225,49 @@ only_nonzero_diffs = true
 format = '([+$added]($added_style) )([-$deleted]($deleted_style) )'
 disabled = true
 
+[helm]
+format = '⋅ [$symbol($version )]($style) '
+version_format = 'v${raw}'
+symbol = 'Helm '
+style = 'bold blue'
+disabled = false
+detect_extensions = []
+detect_files = [
+    'helmfile.yaml',
+    'Chart.yaml',
+]
+detect_folders = []
+
 [kubernetes]
 symbol = '󱃾 '
-format = '[$symbol$context( \($namespace\))]($style)'
+format = '⋅ [$symbol$context( \($namespace\))]($style) '
 style = 'bold blue'
-disabled = true
+disabled = false
 detect_extensions = []
 detect_files = []
 detect_folders = []
 
 [custom.kubernetes]
-# This over the built-in k8s module
+disabled = true
 command = 'kubectl config current-context'
 symbol = '󱃾 '
-format = '⋅ [$symbol($output )]($style)'
+format = '⋅ [$symbol($output )]($style) '
 style = 'bold blue'
 when = 'command -v kubectl'
+
+[terraform]
+format = '⋅ [$symbol$workspace]($style) '
+version_format = 'v${raw}'
+symbol = 'Terraform '
+style = 'bold blue'
+disabled = false
+detect_extensions = [
+    'tf',
+    'tfplan',
+    'tfstate',
+]
+detect_files = []
+detect_folders = ['.terraform']
 
 [python]
 disabled = false

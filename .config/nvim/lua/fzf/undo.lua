@@ -58,8 +58,7 @@ M.undos = function(opts)
   ---@param entry string
   ---@return integer undo_nr, string alt_indent, string time
   local parse_entry = function(entry)
-    local undo_nr_str, alt_indent, time =
-        unpack(vim.split(entry, utils.nbsp))
+    local undo_nr_str, alt_indent, time = unpack(vim.split(entry, utils.nbsp))
     local undo_nr = tonumber(undo_nr_str)
     ---@cast undo_nr integer
     return undo_nr, alt_indent, time
@@ -79,7 +78,7 @@ M.undos = function(opts)
 
         core.abort_and_execute(function()
           local before, after =
-              undo_utils.get_undo_before_and_after(buf, undo_nr)
+            undo_utils.get_undo_before_and_after(buf, undo_nr)
           utils.show_diff(
             {
               filetype = vim.bo.filetype,
@@ -92,15 +91,15 @@ M.undos = function(opts)
       ["focus"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)
         local delta_str, brief, additions, deletions =
-            undo_utils.show_undo_diff_with_delta(buf, undo_nr)
+          undo_utils.show_undo_diff_with_delta(buf, undo_nr)
 
         core.send_to_fzf(
           "change-preview:"
-          .. string.format(
-            [[cat %s | delta %s --file-style=omit]],
-            fzf_utils.write_to_tmpfile(delta_str),
-            helpers.delta_default_opts
-          )
+            .. string.format(
+              [[cat %s | delta %s --file-style=omit]],
+              fzf_utils.write_to_tmpfile(delta_str),
+              helpers.delta_default_opts
+            )
         )
       end,
       ["+select"] = function(state)
@@ -108,7 +107,7 @@ M.undos = function(opts)
 
         vim.cmd(string.format("undo %s", undo_nr))
         vim.notify(string.format("Restored to %s", undo_nr))
-      end
+      end,
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "2..",

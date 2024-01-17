@@ -123,7 +123,14 @@ local git_status = function(opts)
   core.fzf(entries, {
     prompt = "Git-Status",
     initial_position = pos,
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    binds = fzf_utils.bind_extend(helpers.default_fzf_keybinds, {
+      ["+before-start"] = function(state)
+        state.popups.main:map(
+          "t",
+          "<C-r>",
+          function() core.send_to_fzf(fzf_utils.reload_action(get_entries())) end
+        )
+      end,
       ["focus"] = function(state)
         local filepath, status = parse_entry(state.focused_entry)
 

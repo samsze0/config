@@ -180,7 +180,7 @@ M.create_nvim_preview_layout = function()
     end
 end
 
---
+-- Binds for auto reload
 --
 ---@param get_entries fun(): string[]
 ---@param opts? { get_entries_in_vim_loop?: boolean, interval?: number }

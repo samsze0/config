@@ -14,7 +14,7 @@ local running -- There can at most be one fzf session running
 local event_callback_map = {}
 local response_callback_map = {}
 
----@alias state { port: string, query: string, focused_entry?: string, focused_entry_index?: integer, popups: NuiPopup[] }
+---@alias state { port: string, query: string, focused_entry?: string, focused_entry_index?: integer, popups: table<string, NuiPopup>, layout: NuiLayout }
 ---@type state
 local state = nil
 
@@ -28,6 +28,7 @@ local reset_state = function()
     focused_entry = nil, ---@diagnostic disable-line: assign-type-mismatch
     focused_entry_index = nil, ---@diagnostic disable-line: assign-type-mismatch
     popups = nil, ---@diagnostic disable-line: assign-type-mismatch
+    layout = nil, ---@diagnostic disable-line: assign-type-mismatch
   }
 end
 
@@ -272,9 +273,12 @@ M.fzf = function(input, opts)
   local prev_win = vim.api.nvim_get_current_win()
 
   local layout = opts.layout
+  local popups = nil
   if not layout then
-    layout, _ = fzf_utils.create_simple_layout()
+    layout, popups = fzf_utils.create_simple_layout()
   end
+  state.layout = layout
+  state.popups = popups
 
   layout:mount()
 

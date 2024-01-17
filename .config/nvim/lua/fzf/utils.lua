@@ -92,28 +92,22 @@ M.join_by_delim = function(...)
   return string.format(string.rep("%s", size, utils.nbsp), ...)
 end
 
----@param binds table<string, bind_type>
----@param new_binds table<string, bind_type>
+---@vararg table<string, bind_type>
 ---@return table<string, bind_type>
-function M.bind_extend(binds, new_binds)
+function M.bind_extend(...)
+  local binds_list = { ... }
+
   local result = {} ---@type table<string, bind_type>
 
-  for ev, actions in pairs(binds) do
-    M.add_actions_to_binds(
-      ev,
-      result,
-      false,
-      type(actions) == "table" and unpack(actions) or actions
-    )
-  end
-
-  for ev, actions in pairs(new_binds) do
-    M.add_actions_to_binds(
-      ev,
-      result,
-      false,
-      type(actions) == "table" and unpack(actions) or actions
-    )
+  for _, binds in pairs(binds_list) do
+    for ev, actions in pairs(binds) do
+      M.add_actions_to_binds(
+        ev,
+        result,
+        false,
+        type(actions) == "table" and unpack(actions) or actions
+      )
+    end
   end
 
   return result

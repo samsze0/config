@@ -28,8 +28,6 @@ local entries = {
   fzf_utils.join_by_delim("grapes", "purple"),
 }
 
-local layout, popups = fzf_helpers.create_simple_layout()
-
 fzf_core.fzf(entries, {
   prompt = "Fruits",
   preview_cmd = "echo {1}",

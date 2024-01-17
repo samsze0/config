@@ -1,4 +1,7 @@
 local utils = require("utils")
+local uv_utils = require("utils.uv")
+local fzf_utils = require("fzf.utils")
+local core = require("fzf.core")
 
 local Layout = require("nui.layout")
 local Popup = require("nui.popup")
@@ -97,47 +100,6 @@ M.default_fzf_keybinds = {
   -- ["alt-b"] = "preview-down",
 }
 
--- Create a simple window layout for Fzf that includes only a main window
---
----@return NuiLayout, { main: NuiPopup }
-M.create_simple_layout = function()
-  local main_popup = Popup({
-    enter = true,
-    focusable = true,
-    border = {
-      style = "rounded",
-    },
-    buf_options = {
-      modifiable = false,
-      filetype = "fzf",
-    },
-    win_options = {
-      winblend = 0,
-      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-    },
-  })
-
-  local layout = Layout(
-    {
-      position = "50%",
-      relative = "editor",
-      size = {
-        width = "90%",
-        height = "90%",
-      },
-    },
-    Layout.Box({
-      Layout.Box(main_popup, { size = "100%" }),
-    }, {})
-  )
-
-  main_popup:on("BufLeave", function() layout:unmount() end)
-
-  return layout, {
-    main = main_popup,
-  }
-end
-
 -- Create a window layout for Fzf that includes:
 -- - a main window
 -- - a preview window
@@ -216,6 +178,38 @@ M.create_nvim_preview_layout = function()
         content
       )
     end
+end
+
+--
+--
+---@param get_entries fun(): string[]
+---@param opts? { get_entries_in_vim_loop?: boolean, interval?: number }
+M.auto_reload_binds = function(get_entries, opts)
+  opts = vim.tbl_extend("force", {
+    get_entries_in_vim_loop = true,
+    interval = 1000,
+  }, opts or {})
+
+  local timer = nil ---@type uv_timer_t?
+
+  return {
+    ["start"] = function(state)
+      -- Using set_timeout rather than set_interval in order to avoid scheduling too many reload actions to the event loop
+      local function reload()
+        if timer then
+          core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+          uv_utils.set_timeout(opts.interval, reload, {
+            callback_in_vim_loop = opts.get_entries_in_vim_loop,
+          })
+        end
+      end
+
+      timer = uv_utils.set_timeout(opts.interval, reload, {
+        callback_in_vim_loop = opts.get_entries_in_vim_loop,
+      })
+    end,
+    ["+after-exit"] = function(state) timer = nil end,
+  }
 end
 
 return M

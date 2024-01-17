@@ -4,6 +4,10 @@ local tempfile = vim.fn.tempname()
 local utils = require("utils")
 local os_utils = require("utils.os")
 
+local Layout = require("nui.layout")
+local Popup = require("nui.popup")
+local event = require("nui.utils.autocmd").event
+
 -- Generate a preview window offset string for fzf
 --
 ---@param offset integer | string
@@ -86,6 +90,109 @@ M.join_by_delim = function(...)
   local args = { ... }
   local size = #args
   return string.format(string.rep("%s", size, utils.nbsp), ...)
+end
+
+---@param binds table<string, bind_type>
+---@param new_binds table<string, bind_type>
+---@return table<string, bind_type>
+function M.bind_extend(binds, new_binds)
+  local result = {} ---@type table<string, bind_type>
+
+  for ev, actions in pairs(binds) do
+    M.add_actions_to_binds(
+      ev,
+      result,
+      false,
+      type(actions) == "table" and unpack(actions) or actions
+    )
+  end
+
+  for ev, actions in pairs(new_binds) do
+    M.add_actions_to_binds(
+      ev,
+      result,
+      false,
+      type(actions) == "table" and unpack(actions) or actions
+    )
+  end
+
+  return result
+end
+
+---@param event string
+---@param binds table<string, bind_type>
+---@param prepend boolean
+---@vararg bind_type
+function M.add_actions_to_binds(event, binds, prepend, ...)
+  local new_actions = { ... }
+
+  local action_type = type(binds[event])
+  if action_type == "nil" then
+    binds[event] = new_actions
+  elseif action_type == "string" or action_type == "function" then
+    if prepend then
+      binds[event] = {
+        unpack(new_actions), ---@diagnostic disable-line: assign-type-mismatch
+        binds[event], ---@diagnostic disable-line: assign-type-mismatch
+      }
+    else
+      binds[event] = {
+        binds[event], ---@diagnostic disable-line: assign-type-mismatch
+        unpack(new_actions), ---@diagnostic disable-line: assign-type-mismatch
+      }
+    end
+  elseif action_type == "table" then
+    for i, a in pairs(new_actions) do
+      if prepend then
+        table.insert(binds[event], i, a) ---@diagnostic disable-line: param-type-mismatch
+      else
+        table.insert(binds[event], a) ---@diagnostic disable-line: param-type-mismatch
+      end
+    end
+  else
+    error("Invalid fzf bind action type " .. action_type)
+  end
+end
+
+-- Create a simple window layout for Fzf that includes only a main window
+--
+---@return NuiLayout, { main: NuiPopup }
+M.create_simple_layout = function()
+  local main_popup = Popup({
+    enter = true,
+    focusable = true,
+    border = {
+      style = "rounded",
+    },
+    buf_options = {
+      modifiable = false,
+      filetype = "fzf",
+    },
+    win_options = {
+      winblend = 0,
+      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+    },
+  })
+
+  local layout = Layout(
+    {
+      position = "50%",
+      relative = "editor",
+      size = {
+        width = "90%",
+        height = "90%",
+      },
+    },
+    Layout.Box({
+      Layout.Box(main_popup, { size = "100%" }),
+    }, {})
+  )
+
+  main_popup:on("BufLeave", function() layout:unmount() end)
+
+  return layout, {
+    main = main_popup,
+  }
 end
 
 return M

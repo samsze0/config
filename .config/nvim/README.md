@@ -143,6 +143,7 @@ end, {})
 - Custom treesitter textobjects plugin
 - Fzf one after another doesn't enter insert mode
 - Remove all usage of global var
+- Output bat stuff into scratch buffer for easy copy
 
 **Low priority**
 

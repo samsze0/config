@@ -7,7 +7,6 @@ local config = require("fzf.config")
 local utils = require("utils")
 local fzf_utils = require("fzf.utils")
 local uv_utils = require("utils.uv")
-local helpers = require("fzf.helpers")
 
 local request_number = 1 -- For generating unique ID for requests to fzf
 
@@ -274,60 +273,32 @@ M.fzf = function(input, opts)
 
   local layout = opts.layout
   if not layout then
-    layout, _ = helpers.create_simple_layout()
+    layout, _ = fzf_utils.create_simple_layout()
   end
 
   layout:mount()
 
-  local function prepend_actions_to_fzf_binds(event, ...)
-    local new_actions = { ... }
-
-    local action_type = type(opts.binds[event])
-    if action_type == "nil" then
-      opts.binds[event] = new_actions
-    elseif action_type == "string" or action_type == "function" then
-      opts.binds[event] = {
-        unpack(new_actions),
-        opts.binds[event], ---@diagnostic disable-line: assign-type-mismatch
-      }
-    elseif action_type == "table" then
-      for i, a in pairs(new_actions) do
-        table.insert(opts.binds[event], i, a) ---@diagnostic disable-line: param-type-mismatch
-      end
-    else
-      error("Invalid fzf bind action type " .. action_type)
-    end
-  end
-
-  prepend_actions_to_fzf_binds(
-    "focus",
-    fzf_utils.send_to_lua_action("focus {n} {}", server_socket_path)
-  )
-  prepend_actions_to_fzf_binds(
-    "start",
-    fzf_utils.send_to_lua_action(
+  local extended_binds = fzf_utils.bind_extend({
+    focus = fzf_utils.send_to_lua_action("focus {n} {}", server_socket_path),
+    start = fzf_utils.send_to_lua_action(
       "port $FZF_PORT",
       server_socket_path,
       { var_expansion = true }
     ),
-    string.format("pos(%d)", opts.initial_position)
-  )
-  prepend_actions_to_fzf_binds(
-    "change",
-    fzf_utils.send_to_lua_action("query {q}", server_socket_path)
-  )
+    change = fzf_utils.send_to_lua_action("query {q}", server_socket_path),
+  }, opts.binds)
 
-  local fzf_binds = {}
+  local processed_binds = {}
 
   local function parse_fzf_bind(event, action)
     if type(action) == "function" then
       event_callback_map[event] = action
-      fzf_binds[event] = fzf_utils.send_to_lua_action(
+      processed_binds[event] = fzf_utils.send_to_lua_action(
         string.format("event %s", event),
         server_socket_path
       )
     elseif type(action) == "string" then
-      fzf_binds[event] = action
+      processed_binds[event] = action
     elseif type(action) == "table" then
       local actions = {}
       local event_callback_action_added = false
@@ -351,29 +322,29 @@ M.fzf = function(input, opts)
           error("Invalid fzf bind type: " .. type(v) .. " for event " .. event)
         end
       end
-      fzf_binds[event] = table.concat(actions, "+")
+      processed_binds[event] = table.concat(actions, "+")
     else
       error("Invalid fzf bind type: " .. type(action) .. " for event " .. event)
     end
   end
 
-  if config.debug then vim.info(opts.binds) end
-  for event, action in pairs(opts.binds) do
+  if config.debug then vim.info(extended_binds) end
+  for event, action in pairs(extended_binds) do
     parse_fzf_bind(event, action)
   end
   if config.debug then vim.info(event_callback_map) end
 
-  local binds_arg = table.concat(
+  local binds_fzf_arg = table.concat(
     utils.map(
       utils.filter(
-        fzf_binds,
+        processed_binds,
         function(k, v) return string.sub(k, 1, 1) ~= "+" end
       ),
       function(k, v) return string.format([[%s:%s]], k, v) end
     ),
     ","
   )
-  if config.debug then vim.info(binds_arg) end
+  if config.debug then vim.info(binds_fzf_arg) end
 
   local extra_args = table.concat(
     utils.map(opts.extra_args, function(k, v)
@@ -397,7 +368,7 @@ M.fzf = function(input, opts)
     opts.prompt, -- Async will mess up the "start:pos" trigger
     opts.preview_cmd and string.format([[--preview='%s']], opts.preview_cmd)
       or "",
-    binds_arg,
+    binds_fzf_arg,
     utils.nbsp,
     extra_args -- TODO: throw warning if contains already existing args
   )

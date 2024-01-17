@@ -2,6 +2,7 @@ local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local uv_utils = require("utils.uv")
 local git_utils = require("utils.git")
 local jumplist = require("jumplist")
 
@@ -117,6 +118,7 @@ local git_status = function(opts)
   end
 
   local win = vim.api.nvim_get_current_win()
+  local timer ---@type uv_timer_t?
 
   core.fzf(entries, {
     prompt = "Git-Status",

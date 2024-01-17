@@ -101,8 +101,10 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         return
       end
       if response_callback_map[req] then
-        vim.schedule(function() response_callback_map[req](content) end)
-        response_callback_map[req] = nil
+        vim.schedule(function()
+          response_callback_map[req](content)
+          response_callback_map[req] = nil
+        end)
       else
         vim.error("Received fzf request but no callback was provided", message)
         return
@@ -145,9 +147,15 @@ end
 
 -- Request content from current Fzf instance
 --
----@param content string
+---@param to_fzf? string
+---@param to_lua? string
 ---@param callback fun(response: string): ...any
-M.request_fzf = function(content, callback)
+M.request_fzf = function(to_fzf, to_lua, callback)
+  if not to_fzf and not to_lua then
+    vim.error("Either to_fzf or to_lua must be provided")
+    return
+  end
+
   if not running then
     vim.error("Fzf is not running")
     return
@@ -157,11 +165,17 @@ M.request_fzf = function(content, callback)
     return
   end
   response_callback_map[tostring(request_number)] = callback
-  M.send_to_fzf(
+
+  local tbl = {}
+  if to_fzf then table.insert(tbl, to_fzf) end
+  table.insert(
+    tbl,
     M.send_to_lua_action(
-      string.format([[request %d %s]], request_number, content)
+      string.format([[request %d %s]], request_number, to_lua or "")
     )
   )
+
+  M.send_to_fzf(table.concat(tbl, "+"))
   request_number = request_number + 1
 end
 
@@ -170,7 +184,7 @@ end
 ---@param callback fun(indices: integer[], selections: string[]): nil
 ---@return nil
 M.get_current_selections = function(callback)
-  M.request_fzf(M.send_to_lua_action("{+n} {+}"), function(response)
+  M.request_fzf(nil, "{+n} {+}", function(response)
     local indices = {}
     local selections = {}
     local mode = "numbers"

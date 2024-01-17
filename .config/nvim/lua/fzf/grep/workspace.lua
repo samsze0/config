@@ -98,20 +98,25 @@ local grep = function(opts)
         vim.cmd(string.format([[normal! %sG]], line))
         vim.cmd([[normal! zz]])
       end,
-      ["focus"] = function(state) reload_preview(state) end,
-      ["change"] = {
-        core.send_to_lua_action("focus {n} {}"),
-        function(state)
-          local query = state.query
-          if query == "" then
-            core.send_to_fzf("reload()")
-            return
+      ["focus"] = function(state)
+        vim.info(string.format([[Focusing %s]], state.focused_entry))
+        reload_preview(state)
+      end,
+      ["change"] = function(state)
+        local query = state.query
+        if query == "" then
+          core.send_to_fzf("reload()")
+          return
+        end
+        -- Important: most work should be carried out by the preview function
+        core.request_fzf(
+          "reload@" .. get_cmd(query) .. "@",
+          nil,
+          function(response)
+            core.send_to_fzf(core.send_to_lua_action("focus {n} {}"))
           end
-          -- Important: most work should be carried out by the preview function
-          core.send_to_fzf("reload@" .. get_cmd(query) .. "@")
-          reload_preview(state)
-        end,
-      },
+        )
+      end,
       ["ctrl-y"] = function(state)
         local filepath = parse_entry(state.focused_entry)
         vim.fn.setreg("+", filepath)

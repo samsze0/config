@@ -51,7 +51,7 @@ end
 ---@param server_socket_path string
 ---@param opts? { var_expansion?: boolean }
 ---@return string
-M.send_to_lua_action = function(message, server_socket_path, opts)
+M._send_to_lua_action = function(message, server_socket_path, opts)
   opts = vim.tbl_extend("force", {
     var_expansion = false,
   }, opts or {})
@@ -101,12 +101,11 @@ function M.bind_extend(...)
 
   for _, binds in pairs(binds_list) do
     for ev, actions in pairs(binds) do
-      M.add_actions_to_binds(
-        ev,
-        result,
-        false,
-        type(actions) == "table" and unpack(actions) or actions
-      )
+      if type(actions) == "table" then
+        M.add_actions_to_binds(ev, result, false, unpack(actions))
+      else
+        M.add_actions_to_binds(ev, result, false, actions)
+      end
     end
   end
 
@@ -120,10 +119,10 @@ end
 function M.add_actions_to_binds(event, binds, prepend, ...)
   local new_actions = { ... }
 
-  local action_type = type(binds[event])
-  if action_type == "nil" then
+  local current_type = type(binds[event])
+  if current_type == "nil" then
     binds[event] = new_actions
-  elseif action_type == "string" or action_type == "function" then
+  elseif current_type == "string" or current_type == "function" then
     if prepend then
       binds[event] = {
         unpack(new_actions), ---@diagnostic disable-line: assign-type-mismatch
@@ -135,7 +134,7 @@ function M.add_actions_to_binds(event, binds, prepend, ...)
         unpack(new_actions), ---@diagnostic disable-line: assign-type-mismatch
       }
     end
-  elseif action_type == "table" then
+  elseif current_type == "table" then
     for i, a in pairs(new_actions) do
       if prepend then
         table.insert(binds[event], i, a) ---@diagnostic disable-line: param-type-mismatch
@@ -144,7 +143,7 @@ function M.add_actions_to_binds(event, binds, prepend, ...)
       end
     end
   else
-    error("Invalid fzf bind action type " .. action_type)
+    error("Invalid fzf bind action type " .. current_type)
   end
 end
 

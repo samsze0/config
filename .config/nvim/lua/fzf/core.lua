@@ -68,13 +68,13 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
       end
       state.port = port
     elseif string.match(message, "^focus") then
-      local index, selection = string.match(message, "^focus (%d+) '(.*)'")
-      if not index or not selection then
+      local index, entry = string.match(message, "^focus (%d+) '(.*)'")
+      if not index or not entry then
         vim.error("Invalid fzf focus message", message)
         return
       end
       state.focused_entry_index = tonumber(index) + 1
-      state.focused_entry = selection
+      state.focused_entry = entry
     elseif string.match(message, "^query") then
       local query = string.match(message, "^query '(.*)'")
       if not query then
@@ -114,6 +114,15 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
   end
 )
 
+-- Generate a send to lua server action string for fzf
+--
+---@param message string
+---@param opts? { var_expansion?: boolean }
+---@return string
+M.send_to_lua_action = function(message, opts)
+  return fzf_utils._send_to_lua_action(message, server_socket_path, opts)
+end
+
 -- Send message to current Fzf instance
 --
 ---@param message string
@@ -137,7 +146,7 @@ end
 -- Request content from current Fzf instance
 --
 ---@param content string
----@param callback fun(response: string): nil
+---@param callback fun(response: string): ...any
 M.request_fzf = function(content, callback)
   if not running then
     vim.error("Fzf is not running")
@@ -149,9 +158,8 @@ M.request_fzf = function(content, callback)
   end
   response_callback_map[tostring(request_number)] = callback
   M.send_to_fzf(
-    fzf_utils.send_to_lua_action(
-      string.format([[request %d %s]], request_number, content),
-      server_socket_path
+    M.send_to_lua_action(
+      string.format([[request %d %s]], request_number, content)
     )
   )
   request_number = request_number + 1
@@ -162,12 +170,7 @@ end
 ---@param callback fun(indices: integer[], selections: string[]): nil
 ---@return nil
 M.get_current_selections = function(callback)
-  M.request_to_fzf(fzf_utils.send_to_lua("{+n} {+}"), function(response)
-    if not response then
-      vim.error("Received empty fzf selections message")
-      return
-    end
-
+  M.request_fzf(M.send_to_lua_action("{+n} {+}"), function(response)
     local indices = {}
     local selections = {}
     local mode = "numbers"
@@ -283,24 +286,23 @@ M.fzf = function(input, opts)
   layout:mount()
 
   local extended_binds = fzf_utils.bind_extend({
-    focus = fzf_utils.send_to_lua_action("focus {n} {}", server_socket_path),
-    start = fzf_utils.send_to_lua_action(
-      "port $FZF_PORT",
-      server_socket_path,
-      { var_expansion = true }
-    ),
-    change = fzf_utils.send_to_lua_action("query {q}", server_socket_path),
+    focus = M.send_to_lua_action("focus {n} {}"),
+    start = M.send_to_lua_action("port $FZF_PORT", { var_expansion = true }),
+    change = M.send_to_lua_action("query {q}"),
   }, opts.binds)
+
+  if config.debug then
+    vim.info(opts.binds)
+    vim.info(extended_binds)
+  end
 
   local processed_binds = {}
 
   local function parse_fzf_bind(event, action)
     if type(action) == "function" then
       event_callback_map[event] = action
-      processed_binds[event] = fzf_utils.send_to_lua_action(
-        string.format("event %s", event),
-        server_socket_path
-      )
+      processed_binds[event] =
+        M.send_to_lua_action(string.format("event %s", event))
     elseif type(action) == "string" then
       processed_binds[event] = action
     elseif type(action) == "table" then
@@ -313,10 +315,7 @@ M.fzf = function(input, opts)
           if not event_callback_action_added then
             table.insert(
               actions,
-              fzf_utils.send_to_lua_action(
-                string.format("event %s", event),
-                server_socket_path
-              )
+              M.send_to_lua_action(string.format("event %s", event))
             )
             event_callback_action_added = true
           end
@@ -332,7 +331,6 @@ M.fzf = function(input, opts)
     end
   end
 
-  if config.debug then vim.info(extended_binds) end
   for event, action in pairs(extended_binds) do
     parse_fzf_bind(event, action)
   end

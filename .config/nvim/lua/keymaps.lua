@@ -227,7 +227,7 @@ vim_keymap("n", "wx", "<C-W>=", opts)
 vim_keymap("n", "tj", "<cmd>tabp<CR>", opts)
 vim_keymap("n", "tl", "<cmd>tabn<CR>", opts)
 vim_keymap("n", "tt", "<cmd>tabnew<CR>", opts)
-local close_tab_and_left = function()
+local close_tab = function()
   local is_only_tab = vim.fn.tabpagenr("$") == 1
   if is_only_tab then
     vim.cmd([[tabnew]])
@@ -242,7 +242,8 @@ local close_tab_and_left = function()
     vim.cmd([[tabprevious]])
   end
 end
-lua_keymap("n", "tw", close_tab_and_left, {})
+lua_keymap("n", "tw", close_tab, {})
+vim_keymap("n", "tq", "<cmd>tabonly<CR>", opts)
 vim_keymap("n", "<C-j>", "<cmd>tabp<CR>", opts)
 vim_keymap("n", "<C-l>", "<cmd>tabn<CR>", opts)
 
@@ -349,7 +350,7 @@ lua_keymap("n", "<f10><f4>", function()
   )
 end, {})
 lua_keymap("n", "<f11><f6>", require("fzf.git").git_stash, {})
-lua_keymap("n", "<f11><f11>", nil, {})
+lua_keymap("n", "<f11><f11>", require("fzf.git").git_reflog, {})
 
 lua_keymap("n", "li", require("fzf.lsp").lsp_definitions, {})
 lua_keymap("n", "lr", require("fzf.lsp").lsp_references, {})

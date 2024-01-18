@@ -106,7 +106,8 @@ else                           # OSX
 		eval "$($HOME/homebrew-x86/bin/brew shellenv)"
 	else # M1
 		eval "$($HOME/homebrew/bin/brew shellenv)"
-		export PATH="$PATH:/usr/local/bin" # Node brew not working
+    export PATH="$HOME/homebrew/opt/openjdk/bin:$PATH"
+    export JAVA_HOME="$HOME/homebrew/opt/openjdk"
 	fi
 
 	starship_init_if_available

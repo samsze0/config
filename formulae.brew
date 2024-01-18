@@ -21,9 +21,12 @@ git
 git-delta
 gnu-sed
 gojq
+gradle
 grafana
 helm
 imagemagick
+jdtls
+joshuto
 kind
 koekeishiya/formulae/skhd
 koekeishiya/formulae/yabai
@@ -33,10 +36,10 @@ lf
 loki
 lua-language-server
 make
+maven
 mysql
 neovim
 nvm
-openjdk
 pnpm
 prettier
 prometheus
@@ -52,6 +55,7 @@ ruff-lsp
 rustup-init
 shellcheck
 shfmt
+spring-io/tap/spring-boot
 starship
 stylua
 syncthing

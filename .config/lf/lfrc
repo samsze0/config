@@ -48,6 +48,10 @@ clear
   lf -remote "send $id $cmd"
 }}
 
+map z &{{
+  unzip "$fx"
+}}
+
 cmd onstartup ${{
 }}
 onstartup

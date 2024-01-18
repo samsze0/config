@@ -96,3 +96,8 @@ require("lspconfig").postgres_lsp.setup({
 require("lspconfig").glsl_analyzer.setup({
   capabilities = capabilities,
 })
+
+-- Java
+require("lspconfig").jdtls.setup({
+  capabilities = capabilities,
+})

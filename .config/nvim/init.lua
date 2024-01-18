@@ -107,7 +107,7 @@ require("lazy").setup({
   {
     "numToStr/Comment.nvim",
     config = function()
-      require("Comment").setup({
+      require("Comment").setup({ ---@diagnostic disable-line: missing-fields
         mappings = false,
       })
     end,
@@ -167,8 +167,16 @@ require("lazy").setup({
       "nvim-treesitter/nvim-treesitter",
     },
   },
-  { -- Required by fzf & lf
+  { -- Required by fzf & lf & nvim-dbee
     "MunifTanjim/nui.nvim",
+  },
+  {
+    "kndndrj/nvim-dbee",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    build = function() require("dbee").install() end,
+    config = function() require("config.dbee") end,
   },
 })
 

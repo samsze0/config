@@ -14,7 +14,7 @@ M.rainbow_hl_groups = {
 }
 
 M.colors = {
-  black = os_utils.IS_LINUX and "#090a0d" or "#0c0d10",
+  black = os_utils.IS_LINUX and "#090a0d" or "#0f1118",
   gray_100 = "#17191f",
   gray_200 = "#1a1c24",
   gray_300 = "#2c313c",

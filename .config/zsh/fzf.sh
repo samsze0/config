@@ -14,7 +14,11 @@ fzf_init() {
 	local colors
 	# If is linux, use 090a0d, else use 000000
 	local black
-	black="$(if [ -z "$is_linux" ]; then echo "#0c0d10"; else echo "#090a0d"; fi)"
+	if $is_linux; then
+		black="#090a0d"
+	else
+		black="#0f1118"
+	fi
 	# Remove newlines and spaces
 	colors=$(
 		cat <<EOT | tr -d "\n "

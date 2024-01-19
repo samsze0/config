@@ -167,16 +167,8 @@ require("lazy").setup({
       "nvim-treesitter/nvim-treesitter",
     },
   },
-  { -- Required by fzf & lf & nvim-dbee
+  { -- Required by fzf & lf
     "MunifTanjim/nui.nvim",
-  },
-  {
-    "kndndrj/nvim-dbee",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-    },
-    build = function() require("dbee").install() end,
-    config = function() require("config.dbee") end,
   },
 })
 

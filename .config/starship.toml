@@ -88,7 +88,7 @@ disabled = true
 [memory_usage]
 threshold = 50
 format = '[$symbol$ram]($style) '
-style = 'bright-black bold'
+style = 'bright-black '
 symbol = 'Mem '
 disabled = false
 
@@ -96,8 +96,8 @@ disabled = false
 # Show if current user is root/admin or connected as SSH
 # https://starship.rs/config/#username
 format = '[$user]($style) '
-style_root = 'bright-black bold'
-style_user = 'bright-black bold'
+style_root = 'bright-black '
+style_user = 'bright-black '
 show_always = false
 disabled = false
 
@@ -107,13 +107,13 @@ ssh_only = true
 ssh_symbol = '⋅ '
 trim_at = '.'
 format = '[$ssh_symbol$hostname]($style) '
-style = 'bright-black bold'
+style = 'bright-black '
 disabled = false
 
 [localip]
 ssh_only = true
 format = '[$localipv4]($style) '
-style = 'bright-black bold'
+style = 'bright-black '
 disabled = false
 
 [character]
@@ -132,7 +132,7 @@ symbol_threshold = 1
 number_threshold = 1
 format = '[$symbol$number]($style) '
 symbol = '✦'
-style = 'bold blue'
+style = ' blue'
 disabled = false
 
 [aws]
@@ -145,7 +145,7 @@ disabled = true
 disabled = false
 min_time = 0
 format = '⋅ [$duration]($style) '
-style = 'bright-black bold'
+style = 'bright-black '
 show_milliseconds = false
 show_notifications = false
 min_time_to_notify = 45000
@@ -154,7 +154,7 @@ min_time_to_notify = 45000
 disabled = false
 format = '⋅ [$symbol$state( \($name\))]($style)'
 symbol = 'Nix '
-style = 'bold blue'
+style = ' blue'
 impure_msg = 'impure'
 pure_msg = 'pure'
 
@@ -164,31 +164,27 @@ disabled = true
 [docker_context]
 disabled = false
 symbol = '󰡨 '
-style = 'blue bold'
+style = 'blue '
 format = '⋅ [$symbol$context]($style) '
 only_with_files = true
 detect_extensions = []
-detect_files = [
-    'docker-compose.yml',
-    'docker-compose.yaml',
-    'Dockerfile',
-]
+detect_files = ['docker-compose.yml', 'docker-compose.yaml', 'Dockerfile']
 detect_folders = []
 
 [container]
 disabled = true
 symbol = '⬢ '
 format = '[$symbol \[$name\]]($style) '
-style = 'bold blue'
+style = ' blue'
 
 [directory]
 disabled = false
-style = 'bright-black bold'
+style = 'bright-black '
 
 [git_status]
 disabled = false
 format = '([$all_status$ahead_behind]($style) )'
-style = 'bold bright-black'
+style = ' bright-black'
 ahead = '⇡'
 behind = '⇣'
 stashed = ''
@@ -209,18 +205,18 @@ merge = 'MERGING'
 revert = 'REVERTING'
 cherry_pick = 'CHERRY-PICKING'
 bisect = 'BISECTING'
-style = 'bold bright-black'
+style = ' bright-black'
 format = '([$state( $progress_current/$progress_total)]($style) )'
 
 [git_branch]
 disabled = false
 format = '⋅ [$symbol$branch(:$remote_branch)]($style) '
 symbol = ' '
-style = 'bold blue'
+style = ' blue'
 
 [git_metrics]
-added_style = 'bold blue'
-deleted_style = 'bold red'
+added_style = ' blue'
+deleted_style = ' red'
 only_nonzero_diffs = true
 format = '([+$added]($added_style) )([-$deleted]($deleted_style) )'
 disabled = true
@@ -229,19 +225,16 @@ disabled = true
 format = '⋅ [$symbol($version )]($style) '
 version_format = 'v${raw}'
 symbol = 'Helm '
-style = 'bold blue'
+style = ' blue'
 disabled = false
 detect_extensions = []
-detect_files = [
-    'helmfile.yaml',
-    'Chart.yaml',
-]
+detect_files = ['helmfile.yaml', 'Chart.yaml']
 detect_folders = []
 
 [kubernetes]
 symbol = '󱃾 '
 format = '⋅ [$symbol$context( \($namespace\))]($style) '
-style = 'bold blue'
+style = ' blue'
 disabled = false
 detect_extensions = []
 detect_files = []
@@ -252,20 +245,16 @@ disabled = true
 command = 'kubectl config current-context'
 symbol = '󱃾 '
 format = '⋅ [$symbol($output )]($style) '
-style = 'bold blue'
+style = ' blue'
 when = 'command -v kubectl'
 
 [terraform]
 format = '⋅ [$symbol$workspace]($style) '
 version_format = 'v${raw}'
 symbol = 'Terraform '
-style = 'bold blue'
+style = ' blue'
 disabled = false
-detect_extensions = [
-    'tf',
-    'tfplan',
-    'tfstate',
-]
+detect_extensions = ['tf', 'tfplan', 'tfstate']
 detect_files = []
 detect_folders = ['.terraform']
 
@@ -273,9 +262,9 @@ detect_folders = ['.terraform']
 disabled = false
 pyenv_version_name = true
 pyenv_prefix = ''
-format = '⋅ [${symbol}${pyenv_prefix}(${version} )]($style)[($virtualenv )](bold bright-black)'
+format = '⋅ [${symbol}${pyenv_prefix}(${version} )]($style)[($virtualenv )]( bright-black)'
 version_format = 'v${raw}'
-style = 'blue bold'
+style = 'blue '
 symbol = 'Python '
 
 [rust]
@@ -283,7 +272,7 @@ disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Rust '
-style = 'bold blue'
+style = ' blue'
 detect_extensions = ['rs']
 detect_files = ['Cargo.toml']
 detect_folders = []
@@ -292,24 +281,17 @@ detect_folders = []
 disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
-style = 'bold blue'
+style = ' blue'
 symbol = 'Java '
-detect_extensions = [
-    'java',
-    'class',
-    'jar',
-    'gradle',
-    'clj',
-    'cljc',
-]
+detect_extensions = ['java', 'class', 'jar', 'gradle', 'clj', 'cljc']
 detect_files = [
-    'pom.xml',
-    'build.gradle.kts',
-    'build.sbt',
-    '.java-version',
-    'deps.edn',
-    'project.clj',
-    'build.boot',
+  'pom.xml',
+  'build.gradle.kts',
+  'build.sbt',
+  '.java-version',
+  'deps.edn',
+  'project.clj',
+  'build.boot',
 ]
 detect_folders = []
 
@@ -318,12 +300,9 @@ disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Kotlin '
-style = 'bold blue'
+style = ' blue'
 kotlin_binary = 'kotlin'
-detect_extensions = [
-    'kt',
-    'kts',
-]
+detect_extensions = ['kt', 'kts']
 detect_files = []
 detect_folders = []
 
@@ -332,12 +311,9 @@ disabled = false
 format = "⋅ [$symbol($version )]($style)"
 version_format = "v${raw}"
 symbol = "Gradle "
-style = "blue bold"
+style = "blue "
 recursive = false
-detect_extensions = [
-    "gradle",
-    "gradle.kts",
-]
+detect_extensions = ["gradle", "gradle.kts"]
 detect_files = []
 detect_folders = ["gradle"]
 
@@ -346,56 +322,37 @@ detect_folders = ["gradle"]
 disabled = false
 format = '⋅ [($name )($version )]($style)'
 version_format = 'v${raw}'
-style = 'blue bold'
+style = 'blue '
 symbol = 'C '
-detect_extensions = [
-    'c',
-    'h',
-]
+detect_extensions = ['c', 'h']
 detect_files = []
 detect_folders = []
-commands = [
-    [
-        'cc',
-        '--version',
-    ],
-    [
-        'gcc',
-        '--version',
-    ],
-    [
-        'clang',
-        '--version',
-    ],
-]
+commands = [['cc', '--version'], ['gcc', '--version'], ['clang', '--version']]
 
 [cmake]
 disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'CMake '
-style = 'bold blue'
+style = ' blue'
 detect_extensions = []
-detect_files = [
-    'CMakeLists.txt',
-    'CMakeCache.txt',
-]
+detect_files = ['CMakeLists.txt', 'CMakeCache.txt']
 
 [golang]
 disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Go '
-style = 'bold blue'
+style = ' blue'
 detect_extensions = ['go']
 detect_files = [
-    'go.mod',
-    'go.sum',
-    'go.work',
-    'glide.yaml',
-    'Gopkg.yml',
-    'Gopkg.lock',
-    '.go-version',
+  'go.mod',
+  'go.sum',
+  'go.work',
+  'glide.yaml',
+  'Gopkg.yml',
+  'Gopkg.lock',
+  '.go-version',
 ]
 detect_folders = ['Godeps']
 
@@ -404,7 +361,7 @@ disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Lua '
-style = 'bold blue'
+style = ' blue'
 lua_binary = 'lua'
 detect_extensions = ['lua']
 detect_files = ['.lua-version']
@@ -415,20 +372,9 @@ disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Node '
-style = 'bold blue'
-detect_extensions = [
-    'js',
-    'mjs',
-    'cjs',
-    'ts',
-    'mts',
-    'cts',
-]
-detect_files = [
-    'package.json',
-    '.node-version',
-    '.nvmrc',
-]
+style = ' blue'
+detect_extensions = ['js', 'mjs', 'cjs', 'ts', 'mts', 'cts']
+detect_files = ['package.json', '.node-version', '.nvmrc']
 detect_folders = ['node_modules']
 
 [swift]
@@ -436,7 +382,7 @@ disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Swift '
-style = 'bold blue'
+style = ' blue'
 detect_extensions = ['swift']
 detect_files = ['Package.swift']
 detect_folders = []
@@ -446,24 +392,18 @@ disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Ruby '
-style = 'bold blue'
+style = ' blue'
 detect_extensions = ['rb']
-detect_files = [
-    'Gemfile',
-    '.ruby-version',
-]
+detect_files = ['Gemfile', '.ruby-version']
 detect_folders = []
-detect_variables = [
-    'RUBY_VERSION',
-    'RBENV_VERSION',
-]
+detect_variables = ['RUBY_VERSION', 'RBENV_VERSION']
 
 [zig]
 disabled = false
 format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Zig '
-style = 'bold blue'
+style = ' blue'
 detect_extensions = ['zig']
 detect_files = []
 detect_folders = []
@@ -477,14 +417,14 @@ detect_folders = []
 command = 'arch'
 symbol = ' '
 format = '⋅ [$symbol($output )]($style)'
-style = 'bold bright-black'
+style = ' bright-black'
 when = '[[ "$(uname)" == "Darwin" ]]'
 
 [custom.linux]
 command = 'arch'
 symbol = ' '
 format = '⋅ [$symbol($output )]($style)'
-style = 'bold bright-black'
+style = ' bright-black'
 when = '[[ "$(uname)" == "Linux" ]]'
 
 [custom.ssh_remote_conn]
@@ -493,4 +433,4 @@ command = "w -h | awk '{print $6}' | grep 'sshd' | wc -l"
 when = "w -h | awk '{print $6}' | grep 'sshd' | wc -l | xargs -I{} -- test {} -gt 0"
 symbol = "SSH "
 format = '⋅ [$symbol($output )]($style)'
-style = "bold grey"
+style = " grey"

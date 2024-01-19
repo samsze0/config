@@ -14,6 +14,7 @@ M.rainbow_hl_groups = {
 
 M.colors = {
   black = "#0c0d0d",
+  -- black = "#071017",
   gray_100 = "#17191f",
   gray_200 = "#1a1c24",
   gray_300 = "#2c313c",
@@ -181,7 +182,7 @@ function M.setup()
   local hi = M.highlight
 
   -- Vim editor colors
-  hi.Normal = { guifg = c.gray_800, guibg = nil, gui = nil, guisp = nil }
+  hi.Normal = { guifg = c.gray_800, guibg = c.black, gui = nil, guisp = nil }
   hi.Bold = { guifg = nil, guibg = nil, gui = "bold", guisp = nil }
   hi.Debug = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
   hi.Directory = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }

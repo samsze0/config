@@ -17,10 +17,10 @@
   "nui.nvim": { "branch": "main", "commit": "c9b4de623d19a85b353ff70d2ae9c77143abe69c" },
   "nvim-cmp": { "branch": "main", "commit": "0b751f6beef40fd47375eaf53d3057e0bfa317e4" },
   "nvim-colorizer.lua": { "branch": "master", "commit": "36c610a9717cc9ec426a07c8e6bf3b3abcb139d6" },
-  "nvim-dbee": { "branch": "master", "commit": "2f8e14e8dcd397f5da45fcd73d9576692906a4e3" },
   "nvim-lint": { "branch": "master", "commit": "849ccb610de3f6ce1a239ea1e68568ef1a53d5df" },
   "nvim-lspconfig": { "branch": "master", "commit": "511609ae0311abfcfaed3c398429a147e895ce2c" },
   "nvim-scrollview": { "branch": "main", "commit": "7eb9030662fad8bfbc1df2c6cfc165aa4a8904b2" },
   "nvim-treesitter": { "branch": "master", "commit": "1b5bbb54b385c4eae217113f72df5284bc3cc94b" },
-  "playground": { "branch": "master", "commit": "ba48c6a62a280eefb7c85725b0915e021a1a0749" }
+  "playground": { "branch": "master", "commit": "ba48c6a62a280eefb7c85725b0915e021a1a0749" },
+  "schemastore.nvim": { "branch": "main", "commit": "5012a4758f1ab35f9d2ed5b017a75e9bb67b7e63" }
 }

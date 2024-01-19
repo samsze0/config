@@ -41,6 +41,7 @@ mysql
 neovim
 nvm
 pnpm
+postgresql@16
 prettier
 prometheus
 promtail
@@ -72,4 +73,5 @@ vscode-langservers-extracted
 watch
 watchman
 wget
+yaml-language-server
 zoxide

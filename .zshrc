@@ -15,6 +15,7 @@ source ~/.config/zsh/homebrew.sh
 source ~/.config/zsh/syncthing.sh
 source ~/.config/zsh/osx.sh
 source ~/.config/zsh/bat.sh
+source ~/.config/zsh/lemminx.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
@@ -106,8 +107,11 @@ else                           # OSX
 		eval "$($HOME/homebrew-x86/bin/brew shellenv)"
 	else # M1
 		eval "$($HOME/homebrew/bin/brew shellenv)"
-    export PATH="$HOME/homebrew/opt/openjdk/bin:$PATH"
-    export JAVA_HOME="$HOME/homebrew/opt/openjdk"
+
+		export PATH="$HOME/homebrew/opt/openjdk/bin:$PATH"
+		export JAVA_HOME="$HOME/homebrew/opt/openjdk"
+
+		export PATH="$HOME/homebrew/opt/postgresql@16/bin:$PATH"
 	fi
 
 	starship_init_if_available
@@ -126,6 +130,7 @@ else                           # OSX
 	export PATH="$ANDROID_HOME/tools:$PATH"
 fi
 
+mkdir -p "$HOME/bin"
 export PATH=$HOME/bin:${PATH}
 
 # ZLE (line editor) bindings

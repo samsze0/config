@@ -2,6 +2,7 @@
 -- https://github.com/RRethy/nvim-base16/blob/master/lua/base16-colorscheme.lua
 
 local utils = require("utils")
+local os_utils = require("utils.os")
 
 local M = {}
 
@@ -13,7 +14,7 @@ M.rainbow_hl_groups = {
 }
 
 M.colors = {
-  black = "#0c0d10",
+  black = os_utils.IS_LINUX and "#090a0d" or "#0c0d10",
   gray_100 = "#17191f",
   gray_200 = "#1a1c24",
   gray_300 = "#2c313c",

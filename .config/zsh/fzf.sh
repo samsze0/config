@@ -5,14 +5,23 @@
 # Return the command line args containing fzf's keybindings, colors and other config
 # The return value should be exported as `FZF_DEFAULT_OPTS`
 fzf_init() {
+	local is_linux
+	is_linux=false
+	if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+		is_linux=true
+	fi
+
 	local colors
+	# If is linux, use 090a0d, else use 000000
+	local black
+	black="$(if [ -z "$is_linux" ]; then echo "#0c0d10"; else echo "#090a0d"; fi)"
 	# Remove newlines and spaces
 	colors=$(
 		cat <<EOT | tr -d "\n "
     --color=
       bg+:#23283c,
-      preview-bg:#000000,
-      bg:#000000,
+      preview-bg:$black,
+      bg:$black,
       border:#535d6c,
       spinner:#549eff,
       hl:#549eff,

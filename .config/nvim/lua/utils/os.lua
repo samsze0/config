@@ -1,17 +1,17 @@
 local M = {}
 
-OS = vim.loop.os_uname().sysname
-IS_MAC = OS == "Darwin"
-IS_LINUX = OS == "Linux"
+M.OS = vim.loop.os_uname().sysname
+M.IS_MAC = M.OS == "Darwin"
+M.IS_LINUX = M.OS == "Linux"
 
 -- Return the shell command to connect to a unix socket
 --
 ---@param addr string
 ---@return string
 M.get_unix_sock_cmd = function(addr)
-  if IS_MAC then
+  if M.IS_MAC then
     return string.format("nc -U %s", addr)
-  elseif IS_LINUX then
+  elseif M.IS_LINUX then
     return string.format("socat - UNIX-CONNECT:%s", addr)
   else
     error("Unsupported OS")

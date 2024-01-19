@@ -13,8 +13,7 @@ M.rainbow_hl_groups = {
 }
 
 M.colors = {
-  black = "#0c0d0d",
-  -- black = "#071017",
+  black = "#0c0d10",
   gray_100 = "#17191f",
   gray_200 = "#1a1c24",
   gray_300 = "#2c313c",

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 git_stash_show() {
-  git stash show -u --full-index "$@"
+	git stash show -u --full-index "$@"
 }
 
 # Git diff helper
@@ -189,3 +189,13 @@ git_worktree_select() (
 	read -r path rest <<<"$choice"
 	echo "$path"
 )
+
+git_config_personal() {
+	git config --local user.name "Sam Sze"
+	git config --local user.email "mingsum.sam@gmail.com"
+}
+
+git_config_work() {
+	git config --local user.name "Sam Sze"
+	git config --local user.email "sam.m.sze@accenture.com"
+}

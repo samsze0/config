@@ -373,6 +373,7 @@ format = '⋅ [$symbol($version )]($style)'
 version_format = 'v${raw}'
 symbol = 'Node '
 style = ' blue'
+not_capable_style = ' red'
 detect_extensions = ['js', 'mjs', 'cjs', 'ts', 'mts', 'cts']
 detect_files = ['package.json', '.node-version', '.nvmrc']
 detect_folders = ['node_modules']

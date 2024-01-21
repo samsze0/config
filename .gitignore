@@ -68,12 +68,6 @@
 .config/misc/blender/config/bookmarks.txt
 .config/misc/blender/config/platform_support.txt
 
-# Blender
-!.config/blender/
-!.config/blender/**
-.config/blender/config/bookmarks.txt
-.config/blender/config/platform_support.txt
-
 # Kitty
 !.config/kitty/
 !.config/kitty/**

@@ -19,3 +19,13 @@ add_setgid_bit() {
 add_setsticky_bit() {
 	chmod +t "$@"
 }
+
+# Show partition table
+partition_info() {
+  sfdisk -l
+}
+
+# Show block devices info
+block_devices_info() {
+  lsblk
+}

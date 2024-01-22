@@ -22,10 +22,15 @@ add_setsticky_bit() {
 
 # Show partition table
 partition_info() {
-  sfdisk -l
+	sfdisk -l
 }
 
 # Show block devices info
 block_devices_info() {
-  lsblk
+	lsblk
+}
+
+# Format disk
+format_disk() {
+	mkfs -t ext4 "$@"
 }

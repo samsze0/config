@@ -696,9 +696,6 @@ function M.setup()
   -- Git signs
   hi.GitSignsChangeInline = { guifg = nil, guibg = c.blue_300 } -- Current state of the hunk for preview_hunk
   hi.GitSignsDeleteVirtLn = { guifg = nil, guibg = c.red_300 } -- Previous state of the hunk for preview_hunk
-
-  -- Flash
-  hi.FlashLabel = { guifg = c.true_white, guibg = c.blue_700 }
 end
 
 M.debug = function(opts)

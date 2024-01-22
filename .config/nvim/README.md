@@ -158,4 +158,3 @@ end, {})
 - Lf create_new multi-layer dir support
 - Tabline dedup by git-files
 - React dev workflow
-- Flash fork

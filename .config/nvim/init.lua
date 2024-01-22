@@ -91,11 +91,6 @@ require("lazy").setup({
     config = function() require("config.lspconfig") end,
   },
   {
-    -- Hop. Hijack search and f/t
-    "folke/flash.nvim",
-    config = function() require("config.flash") end,
-  },
-  {
     -- Configure lua-language-server for neovim config by lsp-config and add type annotations
     -- for vim/nvim builtin functions and api
     "folke/neodev.nvim",

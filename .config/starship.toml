@@ -258,6 +258,14 @@ detect_extensions = ['tf', 'tfplan', 'tfstate']
 detect_files = []
 detect_folders = ['.terraform']
 
+[pulumi]
+format = '⋅ [$symbol($username@)$stack]($style) '
+version_format = 'v${raw}'
+symbol = 'Pulumi '
+style = 'blue'
+disabled = false
+search_upwards = true
+
 [python]
 disabled = false
 pyenv_version_name = true

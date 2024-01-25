@@ -23,6 +23,13 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   end,
 })
 
+-- Markdown settings
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+  group = vim.api.nvim_create_augroup("markdown_settings", { clear = true }),
+  pattern = { "*.md" },
+  callback = function(ctx) vim.opt.wrap = true end,
+})
+
 -- Mouse
 vim.opt.mousescroll = "ver:10" -- Multiplier
 

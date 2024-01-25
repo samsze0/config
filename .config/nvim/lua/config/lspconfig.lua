@@ -68,9 +68,6 @@ require("lspconfig").lua_ls.setup({
 require("lspconfig").gopls.setup({
   capabilities = capabilities,
 })
-require("lspconfig").golangci_lint_ls.setup({
-  capabilities = capabilities,
-})
 
 -- C/C++/Objective-C
 require("lspconfig").clangd.setup({

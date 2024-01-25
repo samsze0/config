@@ -66,7 +66,11 @@ M.files = function(opts)
           vim.fn.system("file --mime " .. path):match("charset=binary")
 
         if vim.v.shell_error ~= 0 then
-          error("Failed to determine if file is binary using file command")
+          vim.error("Failed to determine if file is binary using file command")
+          set_preview_content({
+            "Cannot determine if file is binary",
+          })
+          return
         end
 
         if is_binary then

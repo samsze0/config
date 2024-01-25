@@ -42,6 +42,7 @@ compaudit || (compaudit | xargs chmod go-w) # Remove group & other write permiss
 function pyenv_init_if_available() {
 	if check_command_exists pyenv; then
 		export PYENV_ROOT="$HOME/.pyenv"
+		mkdir -p "$PYENV_ROOT"
 		export PATH="$PYENV_ROOT/bin:$PATH"
 		eval "$(pyenv init -)"
 	fi
@@ -49,7 +50,7 @@ function pyenv_init_if_available() {
 
 function pip_init_if_available() {
 	if check_command_exists pip; then
-		eval "$(pip completion --zsh)"
+		# eval "$(pip completion --zsh)"
 	fi
 }
 
@@ -112,6 +113,8 @@ else                           # OSX
 		export JAVA_HOME="$HOME/homebrew/opt/openjdk"
 
 		export PATH="$HOME/homebrew/opt/postgresql@16/bin:$PATH"
+
+		export PATH="$HOME/homebrew/opt/mysql@8.0/bin:$PATH"
 	fi
 
 	starship_init_if_available
@@ -132,6 +135,7 @@ fi
 
 mkdir -p "$HOME/bin"
 export PATH=$HOME/bin:${PATH}
+export PATH=/usr/local/bin:${PATH}
 
 # ZLE (line editor) bindings
 bindkey "^[[H" beginning-of-line

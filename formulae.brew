@@ -21,6 +21,8 @@ git
 git-delta
 gnu-sed
 gojq
+golangci-lint
+gopls
 gradle
 grafana
 helm
@@ -38,6 +40,7 @@ lua-language-server
 make
 maven
 mysql
+mysql@8.0
 neovim
 nvm
 pnpm
@@ -45,6 +48,7 @@ postgresql@16
 prettier
 prometheus
 promtail
+pulumi
 pyenv
 pyright
 qpdf

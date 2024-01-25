@@ -145,6 +145,13 @@ end, {})
 - Remove all usage of global var
 - Output bat stuff into scratch buffer for easy copy
 - Backup filename collision + auto cleanup
+- Lf show git status (pico-lf?)
+- Lf flatten dir (for Java)
+- Markdown syntax highlighting
+- Fzf Pulumi
+- Fzf brew services and formulae?
+- Fzf terraform
+- Fzf k8s
 
 **Low priority**
 

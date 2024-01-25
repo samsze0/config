@@ -8,11 +8,10 @@ homebrew/cask/iina
 homebrew/cask/insomnia
 homebrew/cask/karabiner-elements
 homebrew/cask/kitty
-homebrew/cask/microsoft-auto-update
-homebrew/cask/microsoft-teams
 homebrew/cask/obs
 homebrew/cask/outline-manager
 homebrew/cask/postman
+homebrew/cask/raspberry-pi-imager
 homebrew/cask/spotify
 homebrew/cask/visual-studio-code
 homebrew/cask/warp

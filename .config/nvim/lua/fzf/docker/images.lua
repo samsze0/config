@@ -91,7 +91,7 @@ M.docker_images = function(opts)
           vim.error("Fail to delete image")
           return
         end
-        core.send_to_fzf(fzf_utils.generate_fzf_reload_action(get_entries()))
+        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
       end,
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

@@ -1,9 +1,6 @@
-# RawAccel
+# Apex
 
-- Create two symbolic links inside `~/Saved Games/Respawn/Apex/local/` that points to `settings.cfg` and `videoconfig.txt`
-- Create a symbolic link inside `~/Saved Games/Respawn/Apex/profile/` that points to `profile.cfg`
-
-```shell
+```powershell
 # Required installation of ln and sudo from scoop's main
 
 cd "~/Saved Games/Respawn/Apex/local/"
@@ -19,3 +16,5 @@ rm profile.cfg
 
 sudo ln -s ~/.config/misc/apex/profile.cfg<tab> profile.cfg
 ```
+
+Note: `userpref.blend` is not complatible between macOS and Windows

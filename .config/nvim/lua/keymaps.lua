@@ -349,6 +349,7 @@ lua_keymap("n", "<f10><f4>", function()
     end
   )
 end, {})
+lua_keymap("n", "<f11><f2>", require("fzf.git").git_branch, {})
 lua_keymap("n", "<f11><f6>", require("fzf.git").git_stash, {})
 lua_keymap("n", "<f11><f11>", require("fzf.git").git_reflog, {})
 

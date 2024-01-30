@@ -11,6 +11,7 @@ cmctl
 cocoapods
 croc
 curl
+eslint
 eza
 fd
 ffmpeg
@@ -39,7 +40,6 @@ loki
 lua-language-server
 make
 maven
-mysql
 mysql@8.0
 neovim
 nvm

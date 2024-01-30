@@ -8,15 +8,17 @@ local git_utils = require("utils.git")
 local jumplist = require("jumplist")
 
 -- TODO: remove delete files and git submodules from entries
+-- TODO: make this async because it doesn't need initial pos
 
 -- Fzf all git files in the given git directory.
 -- If git_dir is nil, then fzf all files in the current directory.
 --
----@param opts? { git_dir?: string, fd_extra_args?: string }
+---@param opts? { git_dir?: string, fd_extra_args?: string, max_num_files?: number }
 M.files = function(opts)
   opts = vim.tbl_extend("force", {
     git_dir = git_utils.current_git_dir(),
     fd_extra_args = "--hidden --follow --exclude .git",
+    max_num_files = 1000,
   }, opts or {})
 
   local parse_entry = function(entry)
@@ -35,6 +37,10 @@ M.files = function(opts)
     entries = vim.fn.systemlist(
       string.format([[fd --type f --no-ignore %s]], opts.fd_extra_args)
     )
+  end
+  if #entries > opts.max_num_files then
+    vim.error("Too many git files")
+    return
   end
   ---@cast entries string[]
   entries = utils.sort_by_files(entries)

@@ -8,10 +8,11 @@ local jumplist = require("jumplist")
 
 -- Fzf git status
 --
----@param opts? { git_dir?: string }
+---@param opts? { git_dir?: string, max_num_files?: number }
 local git_status = function(opts)
   opts = vim.tbl_extend("force", {
     git_dir = git_utils.current_git_dir(),
+    max_num_files = 1000,
   }, opts or {})
 
   local git = string.format([[git -C %s]], opts.git_dir)
@@ -28,6 +29,11 @@ local git_status = function(opts)
 
     if vim.v.shell_error ~= 0 then
       vim.error("Error getting git status")
+      return {}
+    end
+
+    if #entries > opts.max_num_files then
+      vim.error("Too many files to show in git status")
       return {}
     end
 

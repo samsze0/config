@@ -152,6 +152,10 @@ end, {})
 - Fzf brew services and formulae?
 - Fzf terraform
 - Fzf k8s
+- Fzf pulumi stack and env
+- Tree hierarchy (a header window + multi-stage fzf; tree is useful for git)
+- Fzf move away from native preview
+- Fzf initial pos not working
 
 **Low priority**
 

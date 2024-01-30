@@ -1,6 +1,8 @@
 -- https://github.com/mfussenegger/nvim-lint#available-linters
 require("lint").linters_by_ft = {
-  lua = { "luacheck" },
+  lua = {
+    -- "luacheck"
+  },
   go = { "golangcilint" },
   cpp = { "cppcheck", "cpplint" },
   javascript = { "eslint" },

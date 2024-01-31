@@ -13,9 +13,9 @@ return function(opts)
     git_dir = git_utils.current_git_dir(),
   }, opts or {})
 
-  vim.fn.system(string.format("git -C %s fetch", opts.git_dir))
+  local result = vim.fn.system(string.format("git -C %s fetch", opts.git_dir))
   if vim.v.shell_error ~= 0 then
-    vim.error("Error fetching git commits")
+    vim.error("Error fetching git commits", result)
     return
   end
 
@@ -26,7 +26,7 @@ return function(opts)
     local branches =
       vim.fn.systemlist(string.format("git -C %s branch --all", opts.git_dir))
     if vim.v.shell_error ~= 0 then
-      vim.error("Error getting git branches")
+      vim.error("Error getting git branches", table.concat(branches, "\n"))
       return {}
     end
 
@@ -57,11 +57,41 @@ return function(opts)
     return unpack(args)
   end
 
+  local layout, popups, set_preview_content =
+    helpers.create_nvim_preview_layout({ preview_in_terminal = false })
+
   core.fzf(get_entries(), {
     prompt = "Git-Branches",
-    preview_cmd = string.format([[git -C %s log {1}]], opts.git_dir),
+    layout = layout,
     initial_position = initial_pos,
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    binds = fzf_utils.bind_extend(helpers.default_fzf_keybinds, {
+      ["+before-start"] = function(state)
+        helpers.set_keymaps_for_preview_remote_nav(
+          popups.main,
+          popups.nvim_preview
+        )
+        helpers.set_keymaps_for_popups_nav({
+          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
+        })
+      end,
+      ["focus"] = function(state)
+        local branch = parse_entry(state.focused_entry)
+
+        local output = vim.fn.systemlist(
+          string.format("git -C %s log %s", opts.git_dir, branch)
+        )
+        if vim.v.shell_error ~= 0 then
+          vim.error(
+            "Error getting git commits for branch",
+            branch,
+            table.concat(output, "\n")
+          )
+          return
+        end
+
+        set_preview_content(output)
+      end,
       ["+select"] = function(state)
         local branch = parse_entry(state.focused_entry)
 
@@ -84,7 +114,6 @@ return function(opts)
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
-      ["--preview-window"] = helpers.fzf_default_preview_window_args,
     }),
   })
 end

@@ -27,7 +27,8 @@ M.docker_containers = function(opts)
     -- end
     local result = vim.fn.system("docker container ls -a --format json")
     if vim.v.shell_error ~= 0 then
-      vim.error("Fail to retrieve docker containers")
+      vim.error("Fail to retrieve docker containers", result)
+      return {}
     end
 
     result = vim.trim(result)

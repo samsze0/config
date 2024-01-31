@@ -301,7 +301,10 @@ M.fzf = function(input, opts)
 
   local extended_binds = fzf_utils.bind_extend({
     focus = M.send_to_lua_action("focus {n} {}"),
-    start = M.send_to_lua_action("port $FZF_PORT", { var_expansion = true }),
+    start = {
+      M.send_to_lua_action("port $FZF_PORT", { var_expansion = true }),
+      string.format("pos(%d)", opts.initial_position),
+    },
     change = M.send_to_lua_action("query {q}"),
   }, opts.binds)
 

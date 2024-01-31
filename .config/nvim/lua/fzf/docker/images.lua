@@ -27,7 +27,8 @@ M.docker_images = function(opts)
     -- end
     local result = vim.fn.system("docker image ls -a --format json")
     if vim.v.shell_error ~= 0 then
-      vim.error("Fail to retrieve docker images")
+      vim.error("Fail to retrieve docker images", result)
+      return {}
     end
 
     result = vim.trim(result)

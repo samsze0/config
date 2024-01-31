@@ -103,9 +103,14 @@ M.default_fzf_keybinds = {
 -- Create a window layout for Fzf that includes:
 -- - a main window
 -- - a preview window
+---@param opts? { preview_in_terminal?: boolean }
 --
 ---@return NuiLayout layout, { main: NuiPopup, nvim_preview: NuiPopup } popups, fun(content: string[]): nil set_preview_content
-M.create_nvim_preview_layout = function()
+M.create_nvim_preview_layout = function(opts)
+  opts = vim.tbl_extend("force", {
+    preview_in_terminal = false,
+  }, opts or {})
+
   local main_popup = Popup({
     enter = true,
     focusable = true,
@@ -130,6 +135,7 @@ M.create_nvim_preview_layout = function()
     },
     buf_options = {
       modifiable = true,
+      readonly = true,
     },
     win_options = {
       winblend = 0,
@@ -167,9 +173,17 @@ M.create_nvim_preview_layout = function()
     end)
   end
 
+  local channel
+  if opts.preview_in_terminal then
+    channel = vim.api.nvim_open_term(popups.nvim_preview.bufnr, {})
+  end
+
   return layout,
     popups,
-    function(content)
+    opts.preview_in_terminal and function(content)
+      vim.api.nvim_buf_set_lines(popups.nvim_preview.bufnr, 0, -1, false, {})
+      vim.api.nvim_chan_send(channel, table.concat(content, "\r\n"))
+    end or function(content)
       return vim.api.nvim_buf_set_lines(
         popups.nvim_preview.bufnr,
         0,

@@ -7,16 +7,19 @@ local jumplist = require("jumplist")
 
 -- Fzf all git branches
 --
----@param opts? { git_dir?: string }
+---@param opts? { git_dir?: string, fetch_in_advance?: boolean }
 return function(opts)
   opts = vim.tbl_extend("force", {
     git_dir = git_utils.current_git_dir(),
+    fetch_in_advance = false,
   }, opts or {})
 
-  local result = vim.fn.system(string.format("git -C %s fetch", opts.git_dir))
-  if vim.v.shell_error ~= 0 then
-    vim.error("Error fetching git commits", result)
-    return
+  if opts.fetch_in_advance then
+    local result = vim.fn.system(string.format("git -C %s fetch", opts.git_dir))
+    if vim.v.shell_error ~= 0 then
+      vim.error("Error fetching git commits", result)
+      return
+    end
   end
 
   local initial_pos
@@ -58,7 +61,7 @@ return function(opts)
   end
 
   local layout, popups, set_preview_content =
-    helpers.create_nvim_preview_layout({ preview_in_terminal = false })
+    helpers.create_nvim_preview_layout({ preview_in_terminal_mode = true })
 
   core.fzf(get_entries(), {
     prompt = "Git-Branches",
@@ -79,7 +82,11 @@ return function(opts)
         local branch = parse_entry(state.focused_entry)
 
         local output = vim.fn.systemlist(
-          string.format("git -C %s log %s", opts.git_dir, branch)
+          string.format(
+            "git -C %s log --color --decorate %s",
+            opts.git_dir,
+            branch
+          )
         )
         if vim.v.shell_error ~= 0 then
           vim.error(

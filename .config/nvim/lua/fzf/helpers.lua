@@ -103,12 +103,12 @@ M.default_fzf_keybinds = {
 -- Create a window layout for Fzf that includes:
 -- - a main window
 -- - a preview window
----@param opts? { preview_in_terminal?: boolean }
+---@param opts? { preview_in_terminal_mode?: boolean }
 --
 ---@return NuiLayout layout, { main: NuiPopup, nvim_preview: NuiPopup } popups, fun(content: string[]): nil set_preview_content
 M.create_nvim_preview_layout = function(opts)
   opts = vim.tbl_extend("force", {
-    preview_in_terminal = false,
+    preview_in_terminal_mode = false,
   }, opts or {})
 
   local main_popup = Popup({
@@ -134,13 +134,14 @@ M.create_nvim_preview_layout = function(opts)
       style = "rounded",
     },
     buf_options = {
+      filetype = opts.preview_in_terminal_mode and "terminal" or "",
       modifiable = true,
-      readonly = true,
     },
     win_options = {
       winblend = 0,
       winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
       number = true,
+      conceallevel = opts.preview_in_terminal_mode and 3 or 0,
     },
   })
 
@@ -173,12 +174,15 @@ M.create_nvim_preview_layout = function(opts)
     end)
   end
 
+  -- Performance issues with creating channels
+  -- local set_preview = function(content)
+  --   local channel = vim.api.nvim_open_term(popups.nvim_preview.bufnr, {})
+  --   vim.api.nvim_chan_send(channel, table.concat(content, "\r\n"))
+  -- end
+
   return layout,
     popups,
-    opts.preview_in_terminal and function(content)
-      local channel = vim.api.nvim_open_term(popups.nvim_preview.bufnr, {})
-      vim.api.nvim_chan_send(channel, table.concat(content, "\r\n"))
-    end or function(content)
+    function(content)
       return vim.api.nvim_buf_set_lines(
         popups.nvim_preview.bufnr,
         0,

@@ -183,5 +183,6 @@ require("theme").setup()
 require("statusline").setup()
 require("tabline").setup()
 require("persist").setup()
+require("terminal-filetype").setup()
 
 if vim.g.neovide then require("config.neovide") end

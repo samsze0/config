@@ -18,13 +18,18 @@ local M = {}
 ---@param current_attributes attributes
 ---@return attributes
 local function process_color(rgb_color_table, code, current_attributes)
+  if debug then
+    vim.info(
+      "Processing color",
+      { code = code, current_attributes = current_attributes }
+    )
+  end
+
   current_attributes = current_attributes or {}
 
   ---@type number
   local c = type(code) ~= "number" and tonumber(code) or code ---@diagnostic disable-line: assign-type-mismatch
   if c == nil then error("Invalid code: " .. vim.inspect(c)) end
-
-  if debug then vim.info("Parsing color code", current_attributes, code) end
 
   if c >= 30 and c <= 37 then
     -- Foreground color
@@ -54,6 +59,9 @@ local function process_color(rgb_color_table, code, current_attributes)
     current_attributes = {}
   end
 
+  if debug then
+    vim.info("Processed color", { current_attributes = current_attributes })
+  end
   return current_attributes
 end
 
@@ -80,11 +88,13 @@ local function make_unique_hlgroup_name(attributes)
   return table.concat(result, "_")
 end
 
-local highlight_cache = {}
-
 local function table_is_empty(t) return next(t) == nil end
 
-local function create_highlight_group(attributes)
+local function create_highlight_group(buf, attributes)
+  if debug then
+    vim.info("Creating highlight group", { attributes = attributes })
+  end
+
   if table_is_empty(attributes) then return "Normal" end
   local hl_group = make_unique_hlgroup_name(attributes)
 
@@ -98,10 +108,8 @@ local function create_highlight_group(attributes)
     end
   end
 
-  if not highlight_cache[hl_group] then
-    vim.api.nvim_set_hl(0, hl_group, val)
-    highlight_cache[hl_group] = true
-  end
+  vim.api.nvim_set_hl(buf, hl_group, val)
+
   return hl_group
 end
 
@@ -124,7 +132,7 @@ local function create_highlight(
     })
   end
 
-  local highlight_name = create_highlight_group(current_attributes)
+  local highlight_name = create_highlight_group(buf, current_attributes)
   if region_line_start == region_line_end then
     vim.api.nvim_buf_add_highlight(
       buf,
@@ -173,7 +181,7 @@ end
 local function process_code(rgb_color_table, code, current_attributes)
   if debug then
     vim.info(
-      "Parsing code",
+      "Processing code",
       { code = code, current_attributes = current_attributes }
     )
   end
@@ -186,57 +194,64 @@ local function process_code(rgb_color_table, code, current_attributes)
     local match_start, match_end = code:find(";", find_start, true)
     local segment = code:sub(find_start, match_start and match_start - 1)
     if not match_start then
+      if debug then
+        vim.info("Processing only segment", { segment = segment })
+      end
       process_color(rgb_color_table, segment, current_attributes)
+      return current_attributes
     end
 
-    if segment == "38" or segment == "48" then
-      local is_foreground = segment == "38"
-      -- Verify the segment start. The only possibilities are 2, 5
-      segment = code:sub(find_start + #"38", find_start + #"38;2;" - 1)
-      if segment == ";5;" or segment == ":5:" then
-        local color_segment = code:sub(find_start + #"38;2;"):match("^(%d+)")
-        if not color_segment then
-          vim.error("Invalid color code: " .. code:sub(find_start))
-          return
-        end
-        local color_code = tonumber(color_segment)
-        find_start = find_start + #"38;2;" + #color_segment + 1
-        if not color_code or color_code > 255 then
-          vim.error("Invalid color code: " .. color_code)
-          return
-        elseif is_foreground then
-          current_attributes.guifg = rgb_color_table[color_code]
-        else
-          current_attributes.guibg = rgb_color_table[color_code]
-        end
-      elseif segment == ";2;" or segment == ":2:" then
-        local separator = segment:sub(1, 1)
-        local r, g, b, len = code:sub(find_start + #"38;2;"):match(
-          "^(%d+)" .. separator .. "(%d+)" .. separator .. "(%d+)()"
-        )
-        if not r then
-          vim.error("Invalid color code: " .. code:sub(find_start))
-          return
-        end
-        r, g, b = tonumber(r), tonumber(g), tonumber(b)
-        find_start = find_start + #"38;2;" + len
-        if not r or not g or not b or r > 255 or g > 255 or b > 255 then
-          vim.error("Invalid color code: " .. r .. ", " .. g .. ", " .. b)
-          return
-        else
-          current_attributes[is_foreground and "guifg" or "guibg"] =
-            color_utils.rgb_to_hex(r, g, b)
-        end
-      else
+    if segment ~= "38" or segment ~= "48" then
+      vim.error("Invalid color code: " .. segment)
+      return
+    end
+
+    local is_foreground = segment == "38"
+    -- Verify the segment start. The only possibilities are 2, 5
+    segment = code:sub(find_start + #"38", find_start + #"38;2;" - 1)
+    if segment == ";5;" or segment == ":5:" then
+      local color_segment = code:sub(find_start + #"38;2;"):match("^(%d+)")
+      if not color_segment then
         vim.error("Invalid color code: " .. code:sub(find_start))
         return
       end
+      local color_code = tonumber(color_segment)
+      find_start = find_start + #"38;2;" + #color_segment + 1
+      if not color_code or color_code > 255 then
+        vim.error("Invalid color code: " .. color_code)
+        return
+      elseif is_foreground then
+        current_attributes.guifg = rgb_color_table[color_code]
+      else
+        current_attributes.guibg = rgb_color_table[color_code]
+      end
+    elseif segment == ";2;" or segment == ":2:" then
+      local separator = segment:sub(1, 1)
+      local r, g, b, len = code:sub(find_start + #"38;2;"):match(
+        "^(%d+)" .. separator .. "(%d+)" .. separator .. "(%d+)()"
+      )
+      if not r then
+        vim.error("Invalid color code: " .. code:sub(find_start))
+        return
+      end
+      r, g, b = tonumber(r), tonumber(g), tonumber(b)
+      find_start = find_start + #"38;2;" + len
+      if not r or not g or not b or r > 255 or g > 255 or b > 255 then
+        vim.error("Invalid color code: " .. r .. ", " .. g .. ", " .. b)
+        return
+      else
+        current_attributes[is_foreground and "guifg" or "guibg"] =
+          color_utils.rgb_to_hex(r, g, b)
+      end
     else
-      find_start = match_end + 1
-      process_color(rgb_color_table, segment, current_attributes)
+      vim.error("Invalid color code: " .. code:sub(find_start))
+      return
     end
   end
 
+  if debug then
+    vim.info("Processed code", { current_attributes = current_attributes })
+  end
   return current_attributes
 end
 
@@ -269,7 +284,6 @@ local function highlight_buffer(buf, lines, rgb_color_table)
       ---@diagnostic disable-next-line: cast-local-type
       current_attributes =
         process_code(rgb_color_table, code, current_attributes)
-      if debug then vim.info("Parsed code") end
       if not current_attributes then return end
     end
   end
@@ -286,7 +300,10 @@ local function highlight_buffer(buf, lines, rgb_color_table)
 end
 
 M.setup = function()
-  local rgb_color_table = {}
+  local colors = require("theme").colors
+  local rgb_color_table = {
+    [3] = colors.yellow,
+  }
 
   vim.api.nvim_create_autocmd({
     "FileType",

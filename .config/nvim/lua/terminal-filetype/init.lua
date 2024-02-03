@@ -266,33 +266,32 @@ local function highlight_buffer(buf, lines, rgb_color_table)
     vim.info("Highlighting buffer", { buf = buf, lines = lines })
   end
 
-  local current_region_start, current_attributes = nil, {}
-  for current_linenum, line in ipairs(lines) do
-    current_linenum = current_linenum - 1
+  local current_region, current_attributes = nil, {}
+  for i, line in ipairs(lines) do
     for match_start, code, match_end in line:gmatch("()%[([%d;:]*)m()") do
-      if current_region_start then
+      if current_region then
         create_highlight(
           buf,
           current_attributes,
-          current_region_start[1],
-          current_region_start[2],
-          current_linenum,
+          current_region.line,
+          current_region.col,
+          i,
           match_start
         )
       end
-      current_region_start = { current_linenum, match_start }
+      current_region = { line = i, col = match_start }
       ---@diagnostic disable-next-line: cast-local-type
       current_attributes =
         process_code(rgb_color_table, code, current_attributes)
       if not current_attributes then return end
     end
   end
-  if current_region_start then
+  if current_region then
     create_highlight(
       buf,
       current_attributes,
-      current_region_start[1],
-      current_region_start[2],
+      current_region.line,
+      current_region.col,
       #lines,
       -1
     )

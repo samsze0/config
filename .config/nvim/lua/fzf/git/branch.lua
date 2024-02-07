@@ -67,7 +67,7 @@ return function(opts)
     prompt = "Git-Branches",
     layout = layout,
     initial_position = initial_pos,
-    binds = fzf_utils.bind_extend(helpers.default_fzf_keybinds, {
+    binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(
           popups.main,
@@ -118,7 +118,7 @@ return function(opts)
         vim.fn.setreg("+", branch)
         vim.info(string.format([[Copied to clipboard: %s]], branch))
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
     }),

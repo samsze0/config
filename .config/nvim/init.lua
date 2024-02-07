@@ -53,6 +53,9 @@ vim.opt.smartcase = true
 vim.opt.ignorecase = true
 vim.opt.hlsearch = true -- Highlight all matches. Pair with keymap :noh to clear highlights
 
+-- Conceal
+vim.opt.conceallevel = 2
+
 vim.opt.fillchars:append({ diff = "╱" })
 
 vim.opt.pumblend = 0 -- Transparency for popup-menu; 0 = opaque; 100 = transparent

@@ -142,6 +142,7 @@ M.create_nvim_preview_layout = function(opts)
       winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
       number = true,
       conceallevel = opts.preview_in_terminal_mode and 3 or 0,
+      concealcursor = "nvic",
     },
   })
 
@@ -183,13 +184,17 @@ M.create_nvim_preview_layout = function(opts)
   return layout,
     popups,
     function(content)
-      return vim.api.nvim_buf_set_lines(
+      vim.api.nvim_buf_set_lines(
         popups.nvim_preview.bufnr,
         0,
         -1,
         false,
         content
       )
+
+      if opts.preview_in_terminal_mode then
+        vim.bo[popups.nvim_preview.bufnr].filetype = "terminal"
+      end
     end
 end
 

@@ -549,3 +549,15 @@ lua_keymap("n", "<leader>g", function()
   vim.fn.setreg("+", path)
   vim.info("Copied", path)
 end, {})
+vim.api.nvim_create_user_command("CopyRelativePath", function()
+  local path = vim.fn.expand("%:~")
+  vim.fn.setreg("+", path)
+  vim.info("Copied", path)
+end, {})
+
+-- Misc
+vim.api.nvim_create_user_command(
+  "LogCurrentBuf",
+  function() vim.info(vim.api.nvim_get_current_buf()) end,
+  {}
+)

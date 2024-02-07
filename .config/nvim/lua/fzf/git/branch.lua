@@ -98,6 +98,7 @@ return function(opts)
         end
 
         set_preview_content(output)
+        vim.bo[popups.nvim_preview.bufnr].filetype = "terminal"
       end,
       ["+select"] = function(state)
         local branch = parse_entry(state.focused_entry)

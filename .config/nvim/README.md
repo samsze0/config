@@ -155,6 +155,7 @@ end, {})
 - Fzf pulumi stack and env
 - Tree hierarchy (a header window + multi-stage fzf; tree is useful for git)
 - Fzf move away from native preview
+- Fzf go back, fzf info window/bar
 
 **Low priority**
 

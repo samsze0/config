@@ -131,7 +131,6 @@ M.files = function(opts)
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
-      ["--preview-window"] = helpers.fzf_default_preview_window_args,
     }),
   })
 end

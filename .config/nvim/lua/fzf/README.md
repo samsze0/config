@@ -165,7 +165,6 @@ M.files = function(opts)
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
-      ["--preview-window"] = helpers.fzf_default_preview_window_args,
     }),
   })
 end
@@ -256,6 +255,80 @@ The following command line args should not be included in `extra_args` as they a
 - `--height`
 - `--bind`
 - `--delimiter`
+
+## Preview options
+
+The following 3 preview options come built-in with this plugin:
+
+- Fzf preview: preview by using fzf's built-in preview window.
+- Nvim preview: preview by dumping content to a neovim window.
+- Nvim preview (terminal mode): preview by dumping content to a neovim window, and then setting the preview buffer's filetype to `terminal`. This plugin will process the ANSI escape sequences and mimic the way the preview content is presented in the terminal.
+
+## Built-in selectors
+
+The following selectors come built-in with this plugin:
+
+General:
+
+- `files`
+- `buffers`
+- `tabs`
+- `grep` (workspace / single-buffer)
+- `loclist`
+- `backups`
+- `jumplist` (for the custom jumplist implementation that comes with this plugin)
+- `notifications` (for the custom `vim.notify` backend that comes with this plugin)
+- `undo tree`
+- `todo comments` (TODO)
+
+Git:
+
+- `git status`
+- `git commits` (git log)
+- `git branches`
+- `git reflog`
+- `git stash`
+- `git submodules`
+
+Diagnostics:
+
+- `diagnostics` (workspace / single-buffer)
+
+Lsp:
+
+- `lsp references`
+- `lsp definitions`
+- `lsp document symbols`
+- `lsp workspace symbols`
+- `lsp type definitions` (TODO)
+- `lsp implementations` (TODO)
+- `lsp code actions` (TODO)
+- `lsp declarations` (TODO)
+
+Docker:
+
+- `docker containers`
+- `docker images`
+
+Kubernetes:
+
+- `k8s pods`
+
+Terraform:
+
+(TODO)
+
+Pulumi:
+
+(TODO)
+
+## Workspace edits
+
+Workspace edits are edits that are applied to multiple files across the current workspace. Examples of workspace edits are `rename` and `find-and-replace`. This plugin provides a way to perform workspace edits by leveraging Vim's quickfix list.
+
+## Multi-stage selector
+
+(TODO)
 
 ## License
 

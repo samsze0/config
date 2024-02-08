@@ -53,7 +53,7 @@ local git_commits = function(opts)
       helpers.delta_default_opts
     ),
     initial_position = 1,
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    binds = fzf_utils.bind_extend(helpers.default_fzf_keybinds, {
       ["+select"] = function(state)
         local commit_hash = parse_entry(state.focused_entry)
 

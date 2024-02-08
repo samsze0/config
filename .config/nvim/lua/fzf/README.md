@@ -2,6 +2,84 @@
 
 An unopinionated thin-wrapper around fzf. Basic knowledge of fzf is required to use this plugin.
 
+## Tldr
+
+## Built-in selectors
+
+The following selectors come built-in with this plugin:
+
+General:
+
+- `files`
+- `buffers`
+- `tabs`
+- `grep` (workspace / single-buffer)
+- `loclist`
+- `backups`
+- `jumplist` (for the custom jumplist implementation that comes with this plugin)
+- `notifications` (for the custom `vim.notify` backend that comes with this plugin)
+- `undo tree`
+- `todo comments` (TODO)
+
+Git:
+
+- `git status`
+- `git commits` (git log)
+- `git branches`
+- `git reflog`
+- `git stash`
+- `git submodules`
+
+Diagnostics:
+
+- `diagnostics` (workspace / single-buffer)
+
+Lsp:
+
+- `lsp references`
+- `lsp definitions`
+- `lsp document symbols`
+- `lsp workspace symbols`
+- `lsp type definitions` (TODO)
+- `lsp implementations` (TODO)
+- `lsp code actions` (TODO)
+- `lsp declarations` (TODO)
+
+Docker:
+
+- `docker containers`
+- `docker images`
+
+Kubernetes:
+
+- `k8s pods`
+
+Terraform:
+
+(TODO)
+
+Pulumi:
+
+(TODO)
+
+## Features
+
+### Workspace edits
+
+Workspace edits are edits that are applied to multiple files across the current workspace. Examples of workspace edits are `rename` and `find-and-replace`. This plugin provides a way to perform workspace edits by leveraging Vim's quickfix list.
+
+### Multi-stage selector
+
+(TODO)
+
+### Info bar
+
+(TODO)
+
+### Watch for changes
+
+(TODO)
+
 ## Usage
 
 This plugin by default comes with many built-in "selectors" (e.g. `files`, `buffers`, `grep`, `docker containers`, `git status`, etc.), however, the true power of this plugin lies in its ability to create custom tailored selectors with ease.
@@ -170,7 +248,61 @@ M.files = function(opts)
 end
 ```
 
-## IPC w/ Fzf
+### Special events
+
+Aside from the events that fzf provides (e.g. ""), this plugin also provides these extra events:
+
+- `+select`: triggered when the user selects an entry (i.e. pressing `enter`)
+- `+abort`: triggered when the user aborts the fzf process
+- `+after-exit`: triggered when the fzf process exits. This event is triggered after `+abort` and `+select`.
+- `+before-start`: triggered before the fzf process starts
+
+These extra events are triggered on the lua side and can only accept lua functions as handlers.
+
+### Built-in event handlers
+
+A number of event handlers are built-in to this plugin. They are injected to the `opts.binds` table when you invoke `fzf.core.fzf`. They are responsible for updating variable fields of the `state` object (see below).
+
+### State
+
+Fzf events callbacks (lua) are passed a `state` object which contains the following fields:
+
+- `port`: the port on which the fzf server is listening on
+- `query`: the current query
+- `focused_entry`: the currently focused entry
+- `focused_entry_index`: the index of the currently focused entry (1-indexed)
+- `popups`: the Nui popup windows that forms the UI
+
+Extra events are prefixed with `+`.
+
+`state` is also the only argument that the callbacks would receive. If you want to get the selected entry from the `+select` event, you should use `state.focused_entry` or `state.focused_entry_index`. If there are multiple selected entries, you should use the `fzf.core.get_current_selections` helper function.
+
+### Fzf command line args
+
+The following command line args should not be included in `extra_args` as they are already handled by this plugin:
+
+- `--listen`
+- `--ansi`
+- `--async`
+- `--propmt`
+- `--border`
+- `--height`
+- `--bind`
+- `--delimiter`
+
+### Layout & windows
+
+### Preview options
+
+The following 3 preview options come built-in with this plugin:
+
+- Fzf preview: preview by using fzf's built-in preview window.
+- Nvim preview: preview by dumping content to a neovim window.
+- Nvim preview (terminal mode): preview by dumping content to a neovim window, and then setting the preview buffer's filetype to `terminal`. This plugin will process the ANSI escape sequences and mimic the way the preview content is presented in the terminal.
+
+## Technical details
+
+### IPC w/ Fzf
 
 By default, Fzf itself listens for HTTP requests on some port. This makes it convenient to execute Fzf actions from remote. However, to achieve bi-directional communication w/ Fzf, we would also need to setup a server to which Fzf can send messages to.
 
@@ -213,122 +345,6 @@ fzf_core.fzf(entries, {
   -- ...
 })
 ```
-
-## Special events
-
-Aside from the events that fzf provides (e.g. ""), this plugin also provides these extra events:
-
-- `+select`: triggered when the user selects an entry (i.e. pressing `enter`)
-- `+abort`: triggered when the user aborts the fzf process
-- `+after-exit`: triggered when the fzf process exits. This event is triggered after `+abort` and `+select`.
-- `+before-start`: triggered before the fzf process starts
-
-These extra events are triggered on the lua side and can only accept lua functions as handlers.
-
-## Built-in event handlers
-
-A number of event handlers are built-in to this plugin. They are injected to the `opts.binds` table when you invoke `fzf.core.fzf`. They are responsible for updating variable fields of the `state` object (see below).
-
-## State
-
-Fzf events callbacks (lua) are passed a `state` object which contains the following fields:
-
-- `port`: the port on which the fzf server is listening on
-- `query`: the current query
-- `focused_entry`: the currently focused entry
-- `focused_entry_index`: the index of the currently focused entry (1-indexed)
-- `popups`: the Nui popup windows that forms the UI
-
-Extra events are prefixed with `+`.
-
-`state` is also the only argument that the callbacks would receive. If you want to get the selected entry from the `+select` event, you should use `state.focused_entry` or `state.focused_entry_index`. If there are multiple selected entries, you should use the `fzf.core.get_current_selections` helper function.
-
-## Fzf command line args
-
-The following command line args should not be included in `extra_args` as they are already handled by this plugin:
-
-- `--listen`
-- `--ansi`
-- `--async`
-- `--propmt`
-- `--border`
-- `--height`
-- `--bind`
-- `--delimiter`
-
-## Preview options
-
-The following 3 preview options come built-in with this plugin:
-
-- Fzf preview: preview by using fzf's built-in preview window.
-- Nvim preview: preview by dumping content to a neovim window.
-- Nvim preview (terminal mode): preview by dumping content to a neovim window, and then setting the preview buffer's filetype to `terminal`. This plugin will process the ANSI escape sequences and mimic the way the preview content is presented in the terminal.
-
-## Built-in selectors
-
-The following selectors come built-in with this plugin:
-
-General:
-
-- `files`
-- `buffers`
-- `tabs`
-- `grep` (workspace / single-buffer)
-- `loclist`
-- `backups`
-- `jumplist` (for the custom jumplist implementation that comes with this plugin)
-- `notifications` (for the custom `vim.notify` backend that comes with this plugin)
-- `undo tree`
-- `todo comments` (TODO)
-
-Git:
-
-- `git status`
-- `git commits` (git log)
-- `git branches`
-- `git reflog`
-- `git stash`
-- `git submodules`
-
-Diagnostics:
-
-- `diagnostics` (workspace / single-buffer)
-
-Lsp:
-
-- `lsp references`
-- `lsp definitions`
-- `lsp document symbols`
-- `lsp workspace symbols`
-- `lsp type definitions` (TODO)
-- `lsp implementations` (TODO)
-- `lsp code actions` (TODO)
-- `lsp declarations` (TODO)
-
-Docker:
-
-- `docker containers`
-- `docker images`
-
-Kubernetes:
-
-- `k8s pods`
-
-Terraform:
-
-(TODO)
-
-Pulumi:
-
-(TODO)
-
-## Workspace edits
-
-Workspace edits are edits that are applied to multiple files across the current workspace. Examples of workspace edits are `rename` and `find-and-replace`. This plugin provides a way to perform workspace edits by leveraging Vim's quickfix list.
-
-## Multi-stage selector
-
-(TODO)
 
 ## License
 

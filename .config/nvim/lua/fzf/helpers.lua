@@ -103,12 +103,14 @@ M.default_fzf_keybinds = {
 -- Create a window layout for Fzf that includes:
 -- - a main window
 -- - a preview window
----@param opts? { preview_in_terminal_mode?: boolean }
+---@param opts? { preview_in_terminal_mode?: boolean, preview_popup_win_options?: table<string, any>, preview_popup_buf_options?: table<string, any> }
 --
 ---@return NuiLayout layout, { main: NuiPopup, nvim_preview: NuiPopup } popups, fun(content: string[]): nil set_preview_content
 M.create_nvim_preview_layout = function(opts)
   opts = vim.tbl_extend("force", {
     preview_in_terminal_mode = false,
+    preview_popup_win_options = {},
+    preview_popup_buf_options = {},
   }, opts or {})
 
   local main_popup = Popup({
@@ -133,17 +135,18 @@ M.create_nvim_preview_layout = function(opts)
     border = {
       style = "rounded",
     },
-    buf_options = {
+    buf_options = vim.tbl_extend("force", {
       filetype = opts.preview_in_terminal_mode and "terminal" or "",
       modifiable = true,
-    },
-    win_options = {
+      synmaxcol = 0,
+    }, opts.preview_popup_buf_options),
+    win_options = vim.tbl_extend("force", {
       winblend = 0,
       winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
       number = true,
       conceallevel = opts.preview_in_terminal_mode and 3 or 0,
       concealcursor = "nvic",
-    },
+    }, opts.preview_popup_win_options),
   })
 
   local popups = { main = main_popup, nvim_preview = nvim_preview_popup }

@@ -8,9 +8,12 @@ local autocmd_group =
 local debug = false -- hinder performance
 local maximum_lines = 2000
 
+-- TODO: support more escope codes
+-- https://github.com/norcalli/nvim-terminal.lua/issues/8
+
 local M = {}
 
----@alias attributes { gui?: string, guifg?: string, guibg?: string, guisp?: string }
+---@alias attributes { gui?: table<string, boolean>, guifg?: string, guibg?: string, guisp?: string }
 
 -- Process a color code and mutate the existing attributes
 --
@@ -44,17 +47,37 @@ local function process_color(rgb_color_table, code, current_attributes)
   elseif c >= 100 and c <= 107 then
     -- Bright colors. Background
     current_attributes.guibg = rgb_color_table[c - 100 + 8]
-  elseif c == 22 then
-    current_attributes.gui = "NONE"
   elseif c == 39 then
     -- Reset to normal color for foreground
     current_attributes.guifg = "fg"
   elseif c == 49 then
     -- Reset to normal color for background
     current_attributes.guibg = "bg"
-  elseif c == 1 then
-    -- Bold
-    current_attributes.gui = "bold"
+  elseif c >= 1 and c <= 29 then
+    -- Gui
+    current_attributes.gui = current_attributes.gui or {}
+
+    if c == 9 then
+      current_attributes.gui.strikethrough = true
+    elseif c == 29 then
+      current_attributes.gui.strikethrough = false
+    elseif c == 7 then
+      current_attributes.gui.reverse = true
+    elseif c == 27 then
+      current_attributes.gui.reverse = false
+    elseif c == 4 then
+      current_attributes.gui.underline = true
+    elseif c == 24 then
+      current_attributes.gui.underline = false
+    elseif c == 3 then
+      current_attributes.gui.italic = true
+    elseif c == 23 then
+      current_attributes.gui.italic = false
+    elseif c == 1 then
+      current_attributes.gui.bold = true
+    elseif c == 22 then
+      current_attributes.gui.bold = false
+    end
   elseif c == 0 then
     -- RESET
     current_attributes = {}
@@ -66,31 +89,51 @@ local function process_color(rgb_color_table, code, current_attributes)
   return current_attributes
 end
 
--- Process a code and mutate the existing attributes
+-- Format the gui attributes as string by concatenating active attributes
+--
+---@param gui_attributes table<string, boolean>
+---@param delimiter? string
+---@return string
+local function format_gui_attribute(gui_attributes, delimiter)
+  delimiter = delimiter or ","
+
+  local result = table.concat(
+    utils.filter(gui_attributes, function(k, v) return v end),
+    delimiter
+  )
+
+  if result == "" then result = "NONE" end
+
+  return result
+end
+
+-- Process a code sequence and mutate the existing attributes
 --
 ---@param rgb_color_table table<number, string>
----@param code string
+---@param code_seq string
 ---@param current_attributes attributes
 ---@return attributes | nil
-local function process_code(rgb_color_table, code, current_attributes)
+local function process_code_seq(rgb_color_table, code_seq, current_attributes)
   if debug and false then
     vim.info(
       "Processing code",
-      { code = code, current_attributes = current_attributes }
+      { code = code_seq, current_attributes = current_attributes }
     )
   end
 
-  -- CSI m is equivalent to CSI 0 m, which is Reset, which means null the attributes
-  if #code == 0 then return {} end
+  -- CSI "m" is equivalent to CSI "0m", which is Reset, which means null the attributes
+  if #code_seq == 0 then return {} end
+
+  local matches = code_seq:find(";")
+  if not matches then
+    return process_color(rgb_color_table, code_seq, current_attributes)
+  end
 
   local find_start = 1
-  while find_start <= #code do
-    local match_start, match_end = code:find(";", find_start, true)
-    local segment = code:sub(find_start, match_start and match_start - 1)
+  while find_start <= #code_seq do
+    local match_start, match_end = code_seq:find(";", find_start)
+    local segment = code_seq:sub(find_start, match_start and match_start - 1)
     if not match_start then
-      if debug and false then
-        vim.info("Processing last segment", { segment = segment })
-      end
       process_color(rgb_color_table, segment, current_attributes)
       return current_attributes
     end
@@ -103,11 +146,11 @@ local function process_code(rgb_color_table, code, current_attributes)
 
     local is_foreground = segment == "38"
     -- Verify the segment start. The only possibilities are 2, 5
-    segment = code:sub(find_start + #"38", find_start + #"38;2;" - 1)
+    segment = code_seq:sub(find_start + #"38", find_start + #"38;2;" - 1)
     if segment == ";5;" or segment == ":5:" then
-      local color_segment = code:sub(find_start + #"38;2;"):match("^(%d+)")
+      local color_segment = code_seq:sub(find_start + #"38;2;"):match("^(%d+)")
       if not color_segment then
-        vim.error("Invalid color code: " .. code:sub(find_start))
+        vim.error("Invalid color code: " .. code_seq:sub(find_start))
         return
       end
       local color_code = tonumber(color_segment)
@@ -122,11 +165,11 @@ local function process_code(rgb_color_table, code, current_attributes)
       end
     elseif segment == ";2;" or segment == ":2:" then
       local separator = segment:sub(1, 1)
-      local r, g, b, len = code:sub(find_start + #"38;2;"):match(
+      local r, g, b, len = code_seq:sub(find_start + #"38;2;"):match(
         "^(%d+)" .. separator .. "(%d+)" .. separator .. "(%d+)()"
       )
       if not r then
-        vim.error("Invalid color code: " .. code:sub(find_start))
+        vim.error("Invalid color code: " .. code_seq:sub(find_start))
         return
       end
       r, g, b = tonumber(r), tonumber(g), tonumber(b)
@@ -139,7 +182,7 @@ local function process_code(rgb_color_table, code, current_attributes)
           color_utils.rgb_to_hex(r, g, b)
       end
     else
-      vim.error("Invalid color code: " .. code:sub(find_start))
+      vim.error("Invalid color code: " .. code_seq:sub(find_start))
       return
     end
     ::continue::
@@ -157,7 +200,7 @@ local function make_unique_hlgroup_name(attributes)
   local result = { HIGHLIGHT_NAME_PREFIX }
   if attributes.gui then
     table.insert(result, "g")
-    table.insert(result, attributes.gui)
+    table.insert(result, format_gui_attribute(attributes.gui, "_"))
   end
   if attributes.guifg then
     table.insert(result, "gfg")
@@ -174,8 +217,13 @@ local function make_unique_hlgroup_name(attributes)
   return table.concat(result, "_")
 end
 
+---@param t table
+---@return boolean
 local function table_is_empty(t) return next(t) == nil end
 
+---@param buf number
+---@param attributes attributes
+---@return string
 local function create_highlight_group(buf, attributes)
   if debug and false then
     vim.info("Creating highlight group", { attributes = attributes })
@@ -189,8 +237,8 @@ local function create_highlight_group(buf, attributes)
   val.bg = attributes.guibg
   val.sp = attributes.guisp
   if attributes.gui then
-    for x in string.gmatch(attributes.gui, "([^,]+)") do
-      if x ~= "none" then val[x] = true end
+    for k, v in pairs(attributes.gui) do
+      val[k] = v
     end
   end
 
@@ -199,6 +247,12 @@ local function create_highlight_group(buf, attributes)
   return hl_group
 end
 
+---@param buf number
+---@param current_attributes attributes
+---@param region_line_start number
+---@param region_byte_start number
+---@param region_line_end number
+---@param region_byte_end number
 local function create_highlight(
   buf,
   current_attributes,
@@ -271,7 +325,7 @@ local function highlight_buffer(buf, rgb_color_table)
   local current_region, current_attributes = nil, {}
   for i, line in ipairs(lines) do
     if i > maximum_lines then break end
-    for match_start, code, match_end in line:gmatch("()%[([%d;:]*)m()") do
+    for match_start, code_seq, match_end in line:gmatch("()%[([%d;:]*[mK])()") do
       if current_region then
         create_highlight(
           buf,
@@ -283,10 +337,18 @@ local function highlight_buffer(buf, rgb_color_table)
         )
       end
       current_region = { line = i, col = match_start }
-      ---@diagnostic disable-next-line: cast-local-type
-      current_attributes =
-        process_code(rgb_color_table, code, current_attributes)
-      if not current_attributes then error("Fail to parse code") end
+
+      -- Check the last character of the code sequence to see if it's a "m" or "K"
+      ---@cast code_seq string
+      if code_seq:sub(-1) == "m" then
+        code_seq = code_seq:sub(1, -2) -- Remove the last character
+        ---@diagnostic disable-next-line: cast-local-type
+        current_attributes =
+          process_code_seq(rgb_color_table, code_seq, current_attributes)
+        if not current_attributes then error("Fail to parse code sequence") end
+      else
+        current_attributes = {}
+      end
     end
   end
   if current_region then

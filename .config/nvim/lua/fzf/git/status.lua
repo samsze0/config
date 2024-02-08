@@ -126,12 +126,28 @@ local git_status = function(opts)
   local win = vim.api.nvim_get_current_win()
   local timer ---@type uv_timer_t?
 
+  local layout, popups, set_preview_content =
+    helpers.create_nvim_preview_layout({
+      preview_in_terminal_mode = true,
+      preview_popup_win_options = { number = false, wrap = false },
+    })
+
   core.fzf(entries, {
     prompt = "Git-Status",
+    layout = layout,
     initial_position = pos,
-    binds = fzf_utils.bind_extend(helpers.default_fzf_keybinds, {
+    binds = {
       ["+before-start"] = function(state)
-        state.popups.main:map(
+        helpers.set_keymaps_for_preview_remote_nav(
+          popups.main,
+          popups.nvim_preview
+        )
+        helpers.set_keymaps_for_popups_nav({
+          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
+        })
+
+        popups.main:map(
           "t",
           "<C-r>",
           function() core.send_to_fzf(fzf_utils.reload_action(get_entries())) end
@@ -140,32 +156,36 @@ local git_status = function(opts)
       ["focus"] = function(state)
         local filepath, status = parse_entry(state.focused_entry)
 
+        ---@type string
+        local command
         if status.renamed then
-          core.send_to_fzf(
-            string.format(
-              [[change-preview:%s]],
-              string.format([[bat %s %s]], helpers.bat_default_opts, filepath)
-            )
-          )
+          command =
+            string.format([[bat %s %s]], helpers.bat_default_opts, filepath)
         else
-          core.send_to_fzf(
-            string.format(
-              [[change-preview:%s]],
-              string.format(
-                "%s diff --color %s %s | delta %s",
-                git,
-                status.is_fully_staged and "--staged"
-                  or (
-                    (status.added or status.is_untracked)
-                      and "--no-index /dev/null"
-                    or (status.deleted and "--cached -- " or "")
-                  ),
-                filepath,
-                helpers.delta_default_opts
-              )
-            )
+          command = string.format(
+            "%s diff --color %s %s | delta",
+            git,
+            status.is_fully_staged and "--staged"
+              or (
+                (status.added or status.is_untracked)
+                  and "--no-index /dev/null"
+                or (status.deleted and "--cached -- " or "")
+              ),
+            filepath
           )
         end
+
+        local output = vim.fn.systemlist(command)
+        if vim.v.shell_error ~= 0 then
+          vim.error(
+            "Error getting git file diff content for",
+            filepath,
+            table.concat(output, "\n")
+          )
+          return
+        end
+
+        set_preview_content(output)
       end,
       ["+select"] = function(state)
         local filepath, status, gitpath = parse_entry(state.focused_entry)
@@ -178,7 +198,8 @@ local git_status = function(opts)
             vim.error(
               string.format(
                 [[Error getting ours version of file: %s]],
-                filepath
+                filepath,
+                table.concat(ours, "\n")
               )
             )
             return
@@ -190,7 +211,8 @@ local git_status = function(opts)
             vim.error(
               string.format(
                 [[Error getting theirs version of file: %s]],
-                filepath
+                filepath,
+                table.concat(theirs, "\n")
               )
             )
             return
@@ -225,13 +247,20 @@ local git_status = function(opts)
       ["left"] = function(state)
         local filepath = parse_entry(state.focused_entry)
 
-        vim.fn.system(string.format([[git add %s]], filepath))
+        local output = vim.fn.system(string.format([[git add %s]], filepath))
+        if vim.v.shell_error ~= 0 then
+          vim.error("Error staging file", filepath, output)
+        end
         core.send_to_fzf(fzf_utils.reload_action(get_entries()))
       end,
       ["right"] = function(state)
         local filepath = parse_entry(state.focused_entry)
 
-        vim.fn.system(string.format([[git restore --staged %s]], filepath))
+        local output =
+          vim.fn.system(string.format([[git restore --staged %s]], filepath))
+        if vim.v.shell_error ~= 0 then
+          vim.error("Error restoring staged file", filepath, output)
+        end
         core.send_to_fzf(fzf_utils.reload_action(get_entries()))
       end,
       ["ctrl-y"] = function(state)
@@ -244,30 +273,22 @@ local git_status = function(opts)
         local filepath, status = parse_entry(state.focused_entry)
 
         if status.has_merge_conflicts then
-          vim.error(
-            string.format(
-              [[Cannot restore/delete file with merge conflicts: %s]],
-              filepath
-            )
-          )
+          vim.error("Cannot restore/delete file with merge conflicts", filepath)
           return
         end
 
         vim.fn.system(string.format([[git restore %s]], filepath))
         if vim.v.shell_error ~= 0 then
-          vim.fn.system(string.format([[rm %s]], filepath))
+          local output = vim.fn.system(string.format([[rm %s]], filepath))
           if vim.v.shell_error ~= 0 then
-            vim.error(
-              string.format([[Error restoring/deleting file: %s]], filepath)
-            )
+            vim.error("Error restoring/deleting file", filepath, output)
           end
         end
         core.send_to_fzf(fzf_utils.reload_action(get_entries()))
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
-      ["--preview-window"] = helpers.fzf_default_preview_window_args,
     }),
   })
 end

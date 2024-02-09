@@ -218,7 +218,7 @@ M.auto_reload_binds = function(get_entries, opts)
       -- Using set_timeout rather than set_interval in order to avoid scheduling too many reload actions to the event loop
       local function reload()
         if timer then
-          core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+          core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
           uv_utils.set_timeout(opts.interval, reload, {
             callback_in_vim_loop = opts.get_entries_in_vim_loop,
           })

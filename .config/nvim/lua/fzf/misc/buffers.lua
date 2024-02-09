@@ -49,7 +49,7 @@ return function()
         local bufnr = parse_entry(state.focused_entry)
 
         vim.cmd(string.format([[bdelete %s]], bufnr))
-        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["+select"] = function(state)
         local bufnr = parse_entry(state.focused_entry)

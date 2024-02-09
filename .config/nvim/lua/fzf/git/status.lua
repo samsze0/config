@@ -150,7 +150,9 @@ local git_status = function(opts)
         popups.main:map(
           "t",
           "<C-r>",
-          function() core.send_to_fzf(fzf_utils.reload_action(get_entries())) end
+          function()
+            core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
+          end
         )
       end,
       ["focus"] = function(state)
@@ -251,7 +253,7 @@ local git_status = function(opts)
         if vim.v.shell_error ~= 0 then
           vim.error("Error staging file", filepath, output)
         end
-        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["right"] = function(state)
         local filepath = parse_entry(state.focused_entry)
@@ -261,7 +263,7 @@ local git_status = function(opts)
         if vim.v.shell_error ~= 0 then
           vim.error("Error restoring staged file", filepath, output)
         end
-        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["ctrl-y"] = function(state)
         local filepath = parse_entry(state.focused_entry)
@@ -284,7 +286,7 @@ local git_status = function(opts)
             vim.error("Error restoring/deleting file", filepath, output)
           end
         end
-        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

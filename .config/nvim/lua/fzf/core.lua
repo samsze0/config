@@ -8,45 +8,62 @@ local utils = require("utils")
 local fzf_utils = require("fzf.utils")
 local uv_utils = require("utils.uv")
 
-local request_number = 1 -- For generating unique ID for requests to fzf
+---@alias state { id: string, parent?: string, port: string, query: string, focused_entry?: string, focused_entry_index?: integer, popups?: table<string, NuiPopup>, layout: NuiLayout, _event_callback_map: table, _response_callback_map: table, _request_count: number }
+---@type table<string, state>
+local states = {}
 
-local running -- There can at most be one fzf session running
-local event_callback_map = {}
-local response_callback_map = {}
-
----@alias state { port: string, query: string, focused_entry?: string, focused_entry_index?: integer, popups: table<string, NuiPopup>, layout: NuiLayout }
----@type state
-local state = nil
-
-local reset_state = function()
-  event_callback_map = {}
-  response_callback_map = {}
-
-  state = {
+-- Create state
+--
+---@param parent_state_id? string
+---@return string stateId, state
+local create_state = function(parent_state_id)
+  local state_id = utils.uuid()
+  local state = {
+    id = state_id,
+    parent = parent_state_id,
     port = nil, ---@diagnostic disable-line: assign-type-mismatch
     query = nil, ---@diagnostic disable-line: assign-type-mismatch
     focused_entry = nil, ---@diagnostic disable-line: assign-type-mismatch
     focused_entry_index = nil, ---@diagnostic disable-line: assign-type-mismatch
     popups = nil, ---@diagnostic disable-line: assign-type-mismatch
     layout = nil, ---@diagnostic disable-line: assign-type-mismatch
+    _event_callback_map = {},
+    _response_callback_map = {},
+    _request_count = 0, -- For generating unique ID for requests to fzf
   }
+  states[state_id] = state
+  return state_id, state
 end
 
----@return state?
-M.get_state = function()
-  if not running then
-    vim.error("Fzf is not running")
-    return
-  end
+-- Destroy state
+--
+---@param state_id string
+local destroy_state = function(state_id)
+  if not states[state_id] then error("State doesn't exist") end
+  states[state_id] = nil
+end
+
+-- Get state
+--
+---@return state
+local get_state = function(state_id)
+  local state = states[state_id]
+  if not state then error("State doesn't exist") end
   return state
 end
 
-local call_event_callback = function(event)
-  local action = event_callback_map[event]
+-- Invoke event callback
+--
+---@param state_id string
+---@param event string
+local invoke_event_callback = function(state_id, event)
+  local state = get_state(state_id)
+
+  local action = state._event_callback_map[event]
   if not action then error("Event doesn't exist in map") end
 
   if type(action) == "function" then
-    vim.schedule(function() event_callback_map[event](state) end)
+    vim.schedule(function() action(state) end)
   elseif type(action) == "table" then
     for _, a in ipairs(action) do
       vim.schedule(function() a(state) end)
@@ -57,8 +74,15 @@ local call_event_callback = function(event)
 end
 
 local server_socket, server_socket_path, close_server = uv_utils.create_server(
-  function(message)
-    if config.debug then vim.info("Fzf server received", message) end
+  function(full_message)
+    if config.debug then vim.info("Fzf server received", full_message) end
+
+    local state_id, message = string.match(full_message, "^([%w-]+) (.*)$")
+    if not state_id or not message then
+      vim.error("Invalid fzf message", full_message)
+      return
+    end
+    local state = get_state(state_id)
 
     if string.match(message, "^port") then
       local port = string.match(message, "^port (%d+)")
@@ -88,8 +112,8 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         vim.error("Invalid fzf event", event)
         return
       end
-      if event_callback_map[event] then
-        call_event_callback(event)
+      if state._event_callback_map[event] then
+        invoke_event_callback(state_id, event)
       else
         vim.error("Received fzf event but no callback was provided", event)
         return
@@ -100,10 +124,10 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         vim.error("Invalid fzf request message", message)
         return
       end
-      if response_callback_map[req] then
+      if state._response_callback_map[req] then
         vim.schedule(function()
-          response_callback_map[req](content)
-          response_callback_map[req] = nil
+          state._response_callback_map[req](content)
+          state._response_callback_map[req] = nil
         end)
       else
         vim.error("Received fzf request but no callback was provided", message)
@@ -118,73 +142,80 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
 
 -- Generate a send to lua server action string for fzf
 --
+---@param state_id string
 ---@param message string
 ---@param opts? { var_expansion?: boolean }
 ---@return string
-M.send_to_lua_action = function(message, opts)
-  return fzf_utils._send_to_lua_action(message, server_socket_path, opts)
+M.send_to_lua_action = function(state_id, message, opts)
+  return fzf_utils._send_to_lua_action(
+    string.format("%s %s", state_id, message),
+    server_socket_path,
+    opts ---@diagnostic disable-line: param-type-mismatch
+  )
 end
 
 -- Send message to current Fzf instance
 --
+---@param state_id string
 ---@param message string
 ---@return nil
-M.send_to_fzf = function(message)
-  if not running then
-    vim.error("Fzf is not running")
-    return
-  end
+M.send_to_fzf = function(state_id, message)
+  local state = get_state(state_id)
+
   if not state.port then
     vim.error("Fzf server not ready")
     return
   end
-  vim.fn.system(
+  local output = vim.fn.system(
     string.format([[curl -X POST localhost:%s -d '%s']], state.port, message)
   )
-  if vim.v.shell_error ~= 0 then error("Fail to send message to fzf") end
+  if vim.v.shell_error ~= 0 then
+    error("Fail to send message to fzf" .. output)
+  end
   if config.debug then vim.info("Sent message to fzf", message) end
 end
 
 -- Request content from current Fzf instance
 --
+---@param state_id string
 ---@param to_fzf? string
 ---@param to_lua? string
 ---@param callback fun(response: string): ...any
-M.request_fzf = function(to_fzf, to_lua, callback)
+M.request_fzf = function(state_id, to_fzf, to_lua, callback)
+  local state = get_state(state_id)
+
   if not to_fzf and not to_lua then
     vim.error("Either to_fzf or to_lua must be provided")
     return
   end
 
-  if not running then
-    vim.error("Fzf is not running")
-    return
-  end
   if not state.port then
     vim.error("Fzf server not ready")
     return
   end
-  response_callback_map[tostring(request_number)] = callback
+  state._request_count = state._request_count + 1
+  state._response_callback_map[tostring(state._request_count)] = callback
 
   local tbl = {}
   if to_fzf then table.insert(tbl, to_fzf) end
   table.insert(
     tbl,
     M.send_to_lua_action(
-      string.format([[request %d %s]], request_number, to_lua or "")
+      state_id,
+      string.format([[request %d %s]], state._request_count, to_lua or "")
     )
   )
 
-  M.send_to_fzf(table.concat(tbl, "+"))
-  request_number = request_number + 1
+  M.send_to_fzf(state_id, table.concat(tbl, "+"))
 end
 
 -- Get current selected entries
 --
+---@param state_id string
 ---@param callback fun(indices: integer[], selections: string[]): nil
 ---@return nil
-M.get_current_selections = function(callback)
-  M.request_fzf(nil, "{+n} {+}", function(response)
+M.get_current_selections = function(state_id, callback)
+  M.request_fzf(state_id, nil, "{+n} {+}", function(response)
     local indices = {}
     local selections = {}
     local mode = "numbers"
@@ -241,10 +272,15 @@ end
 
 -- Abort current fzf instance and execute callback
 --
+---@param state_id string
 ---@param callback function
 ---@return nil
-M.abort_and_execute = function(callback)
-  M.send_to_fzf("abort")
+M.abort_and_execute = function(state_id, callback)
+  local state = get_state(state_id)
+
+  M.send_to_fzf(state_id, "abort")
+
+  local event_callback_map = state._event_callback_map
   if type(event_callback_map["+abort"]) == "nil" then
     event_callback_map["+abort"] = callback
   elseif type(event_callback_map["+abort"]) == "function" then
@@ -262,14 +298,10 @@ M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 ---@alias event_callback fun(state: state): nil
 ---@alias bind_type string | event_callback | (string | event_callback)[]
 ---@param input string[] | string
----@param opts? { layout?: NuiLayout, extra_args?: table<string, string>, prompt?: string, preview_cmd?: string, initial_position?: integer, binds?: table<string, bind_type> }
-M.fzf = function(input, opts)
-  if running then
-    vim.error("Fzf is already running")
-    return
-  end
-
-  reset_state()
+---@param opts { layout?: NuiLayout, extra_args?: table<string, string>, prompt?: string, preview_cmd?: string, initial_position?: integer, binds?: table<string, bind_type> }
+---@param parent_state_id? string
+M.fzf = function(input, opts, parent_state_id)
+  local state_id, state = create_state(parent_state_id)
 
   opts = vim.tbl_extend("force", {
     layout = nil,
@@ -297,15 +329,24 @@ M.fzf = function(input, opts)
   state.layout = layout
   state.popups = popups
 
+  if parent_state_id then
+    local parent_state = get_state(parent_state_id)
+    parent_state.layout:hide()
+  end
+
   layout:mount()
 
   local extended_binds = fzf_utils.bind_extend({
-    focus = M.send_to_lua_action("focus {n} {}"),
+    focus = M.send_to_lua_action(state_id, "focus {n} {}"),
     start = {
-      M.send_to_lua_action("port $FZF_PORT", { var_expansion = true }),
+      M.send_to_lua_action(
+        state_id,
+        "port $FZF_PORT",
+        { var_expansion = true }
+      ),
       string.format("pos(%d)", opts.initial_position),
     },
-    change = M.send_to_lua_action("query {q}"),
+    change = M.send_to_lua_action(state_id, "query {q}"),
   }, opts.binds)
 
   if config.debug then
@@ -314,12 +355,13 @@ M.fzf = function(input, opts)
   end
 
   local processed_binds = {}
+  local event_callback_map = state._event_callback_map
 
   local function parse_fzf_bind(event, action)
     if type(action) == "function" then
       event_callback_map[event] = action
       processed_binds[event] =
-        M.send_to_lua_action(string.format("event %s", event))
+        M.send_to_lua_action(state_id, string.format("event %s", event))
     elseif type(action) == "string" then
       processed_binds[event] = action
     elseif type(action) == "table" then
@@ -332,7 +374,7 @@ M.fzf = function(input, opts)
           if not event_callback_action_added then
             table.insert(
               actions,
-              M.send_to_lua_action(string.format("event %s", event))
+              M.send_to_lua_action(state_id, string.format("event %s", event))
             )
             event_callback_action_added = true
           end
@@ -379,7 +421,7 @@ M.fzf = function(input, opts)
   )
 
   if event_callback_map["+before-start"] then
-    call_event_callback("+before-start")
+    invoke_event_callback(state_id, "+before-start")
   end
 
   local fzf_cmd = string.format(
@@ -391,8 +433,6 @@ M.fzf = function(input, opts)
     utils.nbsp,
     extra_args -- TODO: throw warning if contains already existing args
   )
-
-  running = true
 
   vim.fn.termopen(
     type(input) == "table"
@@ -407,25 +447,34 @@ EOF
       or string.format([[%s | %s]], input, fzf_cmd),
     {
       on_exit = function(job_id, code, event)
-        running = false
-
         vim.cmd("silent! :checktime")
+
+        local finally = function()
+          if parent_state_id then
+            local parent_state = get_state(parent_state_id)
+            parent_state.layout:show()
+          end
+          destroy_state(state_id)
+        end
 
         -- Restore focus to preview window
         if vim.api.nvim_win_is_valid(prev_win) then
           layout:unmount()
           vim.api.nvim_set_current_win(prev_win)
         else
-          error("Invalid previous window " .. prev_win)
+          vim.error("Invalid previous window", prev_win)
+          finally()
         end
 
         if code == 0 then
           if event_callback_map["+select"] then
-            call_event_callback("+select")
+            invoke_event_callback(state_id, "+select")
           end
         elseif code == 130 then
           -- On abort
-          if event_callback_map["+abort"] then call_event_callback("+abort") end
+          if event_callback_map["+abort"] then
+            invoke_event_callback(state_id, "+abort")
+          end
         else
           vim.error(
             "Unexpected exit code on Fzf",
@@ -434,11 +483,14 @@ EOF
             "Event:",
             event
           )
+          finally()
         end
 
         if event_callback_map["+after-exit"] then
-          call_event_callback("+after-exit")
+          invoke_event_callback(state_id, "+after-exit")
         end
+
+        finally()
       end,
     }
   )

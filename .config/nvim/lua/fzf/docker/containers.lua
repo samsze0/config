@@ -104,7 +104,7 @@ M.docker_containers = function(opts)
           vim.error("Fail to start container")
           return
         end
-        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["right"] = function(state)
         local container = containers[state.focused_entry_index]
@@ -119,7 +119,7 @@ M.docker_containers = function(opts)
           vim.error("Fail to stop container")
           return
         end
-        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["ctrl-x"] = function(state)
         local container = containers[state.focused_entry_index]
@@ -134,7 +134,7 @@ M.docker_containers = function(opts)
           vim.error("Fail to delete container")
           return
         end
-        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

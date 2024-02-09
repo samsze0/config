@@ -63,7 +63,7 @@ return function(opts)
         ["ctrl-w"] = function(state)
           local symbol = symbols[state.focused_entry_index]
 
-          core.abort_and_execute(function()
+          core.abort_and_execute(state.id, function()
             vim.cmd(string.format([[vsplit %s]], current_file))
             vim.cmd(
               string.format(
@@ -78,7 +78,7 @@ return function(opts)
         ["ctrl-t"] = function(state)
           local symbol = symbols[state.focused_entry_index]
 
-          core.abort_and_execute(function()
+          core.abort_and_execute(state.id, function()
             vim.cmd(string.format([[tabnew %s]], current_file))
             vim.cmd(
               string.format(

@@ -177,15 +177,17 @@ end
 
 M.actions = {}
 
+---@param state_id string
 ---@param parse_selection fun(selection: string): string, integer, string
 ---@param win integer
 ---@param callback? fun()
 function M.actions.send_current_selections_to_loclist(
+  state_id,
   parse_selection,
   win,
   callback
 )
-  core.get_current_selections(function(indices, selections)
+  core.get_current_selections(state_id, function(indices, selections)
     local entries = utils.map(selections, function(_, s)
       local filepath, line, text = parse_selection(s)
 
@@ -198,7 +200,7 @@ function M.actions.send_current_selections_to_loclist(
       }
     end)
 
-    core.abort_and_execute(function()
+    core.abort_and_execute(state_id, function()
       vim.fn.setloclist(win, entries)
       if callback then callback() end
       fzf_misc.loclist()

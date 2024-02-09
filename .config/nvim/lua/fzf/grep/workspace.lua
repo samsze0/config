@@ -105,15 +105,19 @@ local grep = function(opts)
       ["change"] = function(state)
         local query = state.query
         if query == "" then
-          core.send_to_fzf("reload()")
+          core.send_to_fzf(state.id, "reload()")
           return
         end
         -- Important: most work should be carried out by the preview function
         core.request_fzf(
+          state.id,
           "reload@" .. get_cmd(query) .. "@",
           nil,
           function(response)
-            core.send_to_fzf(core.send_to_lua_action("focus {n} {}"))
+            core.send_to_fzf(
+              state.id,
+              core.send_to_lua_action(state.id, "focus {n} {}")
+            )
           end
         )
       end,
@@ -124,7 +128,7 @@ local grep = function(opts)
       end,
       ["ctrl-w"] = function(state)
         local filepath, line = parse_entry(state.focused_entry)
-        core.abort_and_execute(function()
+        core.abort_and_execute(state.id, function()
           vim.cmd(string.format([[vsplit %s]], filepath))
           vim.cmd(string.format([[normal! %sG]], line))
           vim.cmd([[normal! zz]])
@@ -132,7 +136,7 @@ local grep = function(opts)
       end,
       ["ctrl-t"] = function(state)
         local filepath, line = parse_entry(state.focused_entry)
-        core.abort_and_execute(function()
+        core.abort_and_execute(state.id, function()
           vim.cmd(string.format([[tabnew %s]], filepath))
           vim.cmd(string.format([[normal! %sG]], line))
           vim.cmd([[normal! zz]])

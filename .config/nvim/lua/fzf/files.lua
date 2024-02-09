@@ -53,7 +53,7 @@ M.files = function(opts)
   core.fzf(entries, {
     prompt = "Files",
     layout = layout,
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(
           popups.main,
@@ -110,6 +110,7 @@ M.files = function(opts)
         local path = parse_entry(entry)
 
         core.abort_and_execute(
+          state.id,
           function() vim.cmd(string.format([[vsplit %s]], path)) end
         )
       end,
@@ -118,6 +119,7 @@ M.files = function(opts)
         local path = parse_entry(entry)
 
         core.abort_and_execute(
+          state.id,
           function() vim.cmd(string.format([[tabnew %s]], path)) end
         )
       end,
@@ -128,7 +130,7 @@ M.files = function(opts)
         jumplist.save(win)
         vim.cmd(string.format([[e %s]], path))
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
     }),

@@ -29,6 +29,8 @@ Git:
 - `git reflog`
 - `git stash`
 - `git submodules`
+- `git tags` (TODO)
+- `git worktree` (TODO)
 
 Diagnostics:
 

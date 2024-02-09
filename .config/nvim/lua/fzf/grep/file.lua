@@ -93,16 +93,21 @@ local grep_file = function(opts)
       ["change"] = function(state)
         local query = state.query
         -- Important: most work should be carried out by the preview function
-        core.send_to_fzf("reload@" .. get_cmd(query) .. "@")
+        core.send_to_fzf(state.id, "reload@" .. get_cmd(query) .. "@")
         reload_preview(state)
       end,
       ["ctrl-l"] = function(state)
-        shared.actions.send_current_selections_to_loclist(parse_entry, win)
+        shared.actions.send_current_selections_to_loclist(
+          state.id,
+          parse_entry,
+          win
+        )
       end,
       ["ctrl-p"] = function(state)
         local search = state.query
         local replacement = get_replacement()
         shared.actions.send_current_selections_to_loclist(
+          state.id,
           parse_entry,
           win,
           function()

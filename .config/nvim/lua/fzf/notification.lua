@@ -72,6 +72,7 @@ M.notifications = function(opts)
         local noti = get_notification(state.focused_entry_index)
 
         core.send_to_fzf(
+          state.id,
           "change-preview:"
             .. string.format(
               [[bat %s --file-name "none" %s]],

@@ -40,7 +40,7 @@ return function()
         local tabnr = parse_entry(state.focused_entry)
 
         vim.cmd(string.format([[tabclose %s]], tabnr))
-        core.send_to_fzf(fzf_utils.reload_action(get_entries()))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

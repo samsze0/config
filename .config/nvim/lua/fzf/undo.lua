@@ -76,7 +76,7 @@ M.undos = function(opts)
       ["ctrl-o"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)
 
-        core.abort_and_execute(function()
+        core.abort_and_execute(state.id, function()
           local before, after =
             undo_utils.get_undo_before_and_after(buf, undo_nr)
           utils.show_diff(
@@ -94,6 +94,7 @@ M.undos = function(opts)
           undo_utils.show_undo_diff_with_delta(buf, undo_nr)
 
         core.send_to_fzf(
+          state.id,
           "change-preview:"
             .. string.format(
               [[cat %s | delta %s --file-style=omit]],

@@ -68,6 +68,8 @@ M.files = function(opts)
         local entry = state.focused_entry
         local path = parse_entry(entry)
 
+        popups.nvim_preview.border:set_text("top", " " .. path .. " ")
+
         local is_binary =
           vim.fn.system("file --mime " .. path):match("charset=binary")
 

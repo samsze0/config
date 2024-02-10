@@ -74,9 +74,14 @@ M.docker_containers = function(opts)
         })
       end,
       ["focus"] = function(state)
-        set_preview_content(
-          vim.split(vim.inspect(containers[state.focused_entry_index]), "\n")
+        local container = containers[state.focused_entry_index]
+
+        popups.nvim_preview.border:set_text(
+          "top",
+          " " .. container.Names .. " "
         )
+
+        set_preview_content(vim.split(vim.inspect(container), "\n"))
         vim.bo[popups.nvim_preview.bufnr].filetype = "lua"
 
         -- Switch to preview window and back in order to refresh scrollbar
@@ -139,7 +144,6 @@ M.docker_containers = function(opts)
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
-      ["--preview-window"] = helpers.fzf_default_preview_window_args,
     }),
   })
 end

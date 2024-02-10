@@ -81,6 +81,8 @@ return function(opts)
       ["focus"] = function(state)
         local branch = parse_entry(state.focused_entry)
 
+        popups.nvim_preview.border:set_text("top", " " .. branch .. " ")
+
         local output = vim.fn.systemlist(
           string.format(
             "git -C %s log --color --decorate %s",

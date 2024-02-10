@@ -158,6 +158,11 @@ local git_status = function(opts)
       ["focus"] = function(state)
         local filepath, status = parse_entry(state.focused_entry)
 
+        popups.nvim_preview.border:set_text(
+          "top",
+          " " .. git_utils.convert_filepath_to_gitpath(filepath) .. " "
+        )
+
         if status.renamed then
           local filename = vim.fn.fnamemodify(filepath, ":t")
           local ft = vim.filetype.match({

@@ -47,6 +47,11 @@ local git_submodules = function(on_submodule)
       ["focus"] = function(state)
         local submodule_path = parse_entry(state.focused_entry)
 
+        popups.nvim_preview.border:set_text(
+          "top",
+          " " .. git_utils.convert_filepath_to_gitpath(submodule_path) .. " "
+        )
+
         local output = vim.fn.systemlist(
           string.format("git -C %s log --color --decorate", submodule_path)
         )

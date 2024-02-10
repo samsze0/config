@@ -66,7 +66,9 @@ local git_commits = function(opts)
         })
       end,
       ["focus"] = function(state)
-        local commit_hash = parse_entry(state.focused_entry)
+        local commit_hash, commit_subject = parse_entry(state.focused_entry)
+
+        popups.nvim_preview.border:set_text("top", " " .. commit_subject .. " ")
 
         local command = string.format(
           [[git -C %s show --color %s %s | delta %s]],

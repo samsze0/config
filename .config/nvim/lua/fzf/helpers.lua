@@ -119,6 +119,12 @@ M.create_nvim_preview_layout = function(opts)
     focusable = true,
     border = {
       style = "rounded",
+      text = {
+        top = "", -- FIX: border text not showing if undefined
+        bottom = "",
+        top_align = "center",
+        bottom_align = "center",
+      },
     },
     buf_options = {
       modifiable = false,
@@ -135,6 +141,12 @@ M.create_nvim_preview_layout = function(opts)
     focusable = true,
     border = {
       style = "rounded",
+      text = {
+        top = "", -- FIX: border text not showing if undefined
+        bottom = "",
+        top_align = "center",
+        bottom_align = "center",
+      },
     },
     buf_options = vim.tbl_extend("force", {
       filetype = opts.preview_in_terminal_mode and "terminal" or "",

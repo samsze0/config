@@ -19,6 +19,8 @@ local M = {
     .. (use_rg_colors and "--color=always --colors 'match:fg:blue' --colors 'path:fg:80,130,150' --colors 'line:fg:80,130,150' " or "--color=never ")
     .. "--no-column --line-number --no-heading",
   fzf_default_args = {
+    ["--padding"] = "0,1",
+    ["--margin"] = "0",
     ["--scroll-off"] = "10",
   },
   fzf_default_preview_window_args = "right,50%,border-none,wrap,nofollow,nocycle",
@@ -101,10 +103,12 @@ M.default_fzf_keybinds = {
   -- ["alt-b"] = "preview-down",
 }
 
+-- TODO: cleanup layout code
+
 -- Create a simple window layout for Fzf that includes only a main window
 --
 ---@return NuiLayout, { main: NuiPopup }
-M.create_simple_layout = function()
+M.create_fzf_preview_layout = function()
   local main_popup = Popup({
     enter = true,
     focusable = true,
@@ -258,6 +262,181 @@ M.create_nvim_preview_layout = function(opts)
       -- Switch to preview window and back in order to refresh scrollbar
       -- TODO: Remove this once scrollbar plugin support remote refresh
       vim.api.nvim_set_current_win(popups.nvim_preview.winid)
+      vim.api.nvim_set_current_win(current_win)
+    end
+end
+
+-- Create a window layout for Fzf that includes:
+-- - a main window
+-- - two preview windows. One for before and one for after
+---@param opts? { preview_popups_win_options?: table<string, any>, preview_popups_buf_options?: table<string, any> }
+--
+---@return NuiLayout layout, { main: NuiPopup, nvim_previews: { before: NuiPopup, after: NuiPopup } } popups, fun(before: string[], after: string[], opts?: {}): nil set_preview_content
+M.create_nvim_diff_preview_layout = function(opts)
+  opts = vim.tbl_extend("force", {
+    preview_popups_win_options = {},
+    preview_popups_buf_options = {},
+  }, opts or {})
+
+  local main_popup = Popup({
+    enter = true,
+    focusable = true,
+    border = {
+      style = "rounded",
+      text = {
+        top = "", -- FIX: border text not showing if undefined
+        bottom = "",
+        top_align = "center",
+        bottom_align = "center",
+      },
+    },
+    buf_options = {
+      modifiable = false,
+      filetype = "fzf",
+    },
+    win_options = {
+      winblend = 0,
+      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+    },
+  })
+
+  local nvim_preview_popups = {
+    before = Popup({
+      enter = false,
+      focusable = true,
+      border = {
+        style = "rounded",
+        text = {
+          top = "", -- FIX: border text not showing if undefined
+          bottom = "",
+          top_align = "center",
+          bottom_align = "center",
+        },
+      },
+      buf_options = vim.tbl_extend("force", {
+        modifiable = true,
+      }, opts.preview_popups_buf_options),
+      win_options = vim.tbl_extend("force", {
+        winblend = 0,
+        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+        number = true,
+      }, opts.preview_popups_win_options),
+    }),
+    after = Popup({
+      enter = false,
+      focusable = true,
+      border = {
+        style = "rounded",
+        text = {
+          top = "", -- FIX: border text not showing if undefined
+          bottom = "",
+          top_align = "center",
+          bottom_align = "center",
+        },
+      },
+      buf_options = vim.tbl_extend("force", {
+        modifiable = true,
+      }, opts.preview_popups_buf_options),
+      win_options = vim.tbl_extend("force", {
+        winblend = 0,
+        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+        number = true,
+      }, opts.preview_popups_win_options),
+    }),
+  }
+
+  local popups = { main = main_popup, nvim_previews = nvim_preview_popups }
+
+  local layout = Layout(
+    {
+      position = "50%",
+      relative = "editor",
+      size = {
+        width = "90%",
+        height = "90%",
+      },
+    },
+    Layout.Box({
+      Layout.Box(main_popup, { size = "40%" }),
+      Layout.Box({
+        Layout.Box(nvim_preview_popups.before, { size = "50%" }),
+        Layout.Box(nvim_preview_popups.after, { size = "50%" }),
+      }, { dir = "row", size = "60%" }),
+    }, { dir = "col" })
+  )
+
+  for _, popup in pairs({
+    main_popup,
+    nvim_preview_popups.before,
+    nvim_preview_popups.after,
+  }) do
+    popup:on("BufLeave", function()
+      vim.schedule(function()
+        local curr_bufnr = vim.api.nvim_get_current_buf()
+        for _, p in pairs({
+          main_popup,
+          nvim_preview_popups.before,
+          nvim_preview_popups.after,
+        }) do
+          if p.bufnr == curr_bufnr then return end
+        end
+        layout:unmount()
+      end)
+    end)
+  end
+
+  return layout,
+    popups,
+    function(before, after, opts)
+      opts = vim.tbl_extend("force", {}, opts or {})
+
+      local ft = opts.filetype
+      if not ft then
+        ft = vim.filetype.match({
+          contents = before,
+        })
+        if not ft then
+          ft = vim.filetype.match({
+            contents = after,
+          })
+        end
+        if not ft then vim.warn("Unable to autodetect filetype") end
+      end
+
+      vim.api.nvim_buf_set_lines(
+        popups.nvim_previews.before.bufnr,
+        0,
+        -1,
+        false,
+        before
+      )
+      vim.api.nvim_win_call(
+        popups.nvim_previews.before.winid,
+        function() vim.cmd("diffthis") end
+      )
+
+      vim.api.nvim_buf_set_lines(
+        popups.nvim_previews.after.bufnr,
+        0,
+        -1,
+        false,
+        after
+      )
+      vim.api.nvim_win_call(
+        popups.nvim_previews.after.winid,
+        function() vim.cmd("diffthis") end
+      )
+
+      ---@cast ft string
+      vim.bo[popups.nvim_previews.before.bufnr].filetype = ft
+      vim.bo[popups.nvim_previews.after.bufnr].filetype = ft
+
+      local current_win = vim.api.nvim_get_current_win()
+
+      -- Switch to preview window and back in order to refresh scrollbar
+      -- TODO: Remove this once scrollbar plugin support remote refresh
+      vim.api.nvim_set_current_win(popups.nvim_previews.before.winid)
+      vim.api.nvim_set_current_win(popups.nvim_previews.after.winid)
       vim.api.nvim_set_current_win(current_win)
     end
 end

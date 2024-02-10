@@ -8,6 +8,8 @@ local event = require("nui.utils.autocmd").event
 
 local M = {}
 
+-- TODO: cleanup
+
 ---@return NuiLayout, { main: NuiPopup, nvim_preview: NuiPopup, replace_str: NuiPopup }, fun(): string
 function M.create_layout()
   local main_popup = Popup({

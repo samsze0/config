@@ -65,9 +65,8 @@ M.undos = function(opts)
   end
 
   local layout, popups, set_preview_content =
-    helpers.create_nvim_preview_layout({
-      preview_in_terminal_mode = true,
-      preview_popup_win_options = { number = false },
+    helpers.create_nvim_diff_preview_layout({
+      preview_popups_win_options = {},
     })
 
   core.fzf(entries, {
@@ -78,12 +77,17 @@ M.undos = function(opts)
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(
           popups.main,
-          popups.nvim_preview
+          popups.nvim_previews.after
         )
         helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          { popup = popups.main, key = "<C-e>", is_terminal = true },
           {
-            popup = popups.nvim_preview,
+            popup = popups.nvim_previews.before,
+            key = "<C-s>",
+            is_terminal = false,
+          },
+          {
+            popup = popups.nvim_previews.after,
             key = "<C-f>",
             is_terminal = false,
           },
@@ -111,26 +115,9 @@ M.undos = function(opts)
       end,
       ["focus"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)
-        local delta_str, brief, additions, deletions =
-          undo_utils.show_undo_diff_with_delta(buf, undo_nr)
+        local before, after = undo_utils.get_undo_before_and_after(buf, undo_nr)
 
-        local command = string.format(
-          [[cat %s | delta %s --file-style=omit]],
-          fzf_utils.write_to_tmpfile(delta_str),
-          helpers.delta_nvim_default_opts
-        )
-
-        local output = vim.fn.systemlist(command)
-        if vim.v.shell_error ~= 0 then
-          vim.error(
-            "Error previewing undo diff",
-            undo_nr,
-            table.concat(output, "\n")
-          )
-          return
-        end
-
-        set_preview_content(output)
+        set_preview_content(before, after, { filetype = vim.bo[buf].filetype })
       end,
       ["+select"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)
@@ -141,6 +128,7 @@ M.undos = function(opts)
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "2..",
+      ["--scroll-off"] = "2",
     }),
   })
 end

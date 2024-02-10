@@ -62,11 +62,6 @@ local grep_file = function(opts)
     )
   end
 
-  popups.replace_str:on(
-    { event.TextChanged, event.TextChangedI },
-    function() reload_preview(core.get_state()) end
-  )
-
   core.fzf(get_cmd(""), {
     prompt = "Grep-File",
     layout = layout,
@@ -82,6 +77,11 @@ local grep_file = function(opts)
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
           { popup = popups.replace_str, key = "<C-r>", is_terminal = false },
         })
+
+        popups.replace_str:on(
+          { event.TextChanged, event.TextChangedI },
+          function() reload_preview(state) end
+        )
       end,
       ["+select"] = function(state)
         local line = parse_entry(state.focused_entry)

@@ -71,15 +71,10 @@ local grep = function(opts)
     )
   end
 
-  popups.replace_str:on(
-    { event.TextChanged, event.TextChangedI },
-    function() reload_preview(core.get_state()) end
-  )
-
   core.fzf({}, {
     prompt = "Grep",
     layout = layout,
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(
           popups.main,
@@ -90,6 +85,11 @@ local grep = function(opts)
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
           { popup = popups.replace_str, key = "<C-r>", is_terminal = false },
         })
+
+        popups.replace_str:on(
+          { event.TextChanged, event.TextChangedI },
+          function() reload_preview(state) end
+        )
       end,
       ["+select"] = function(state)
         local filepath, line = parse_entry(state.focused_entry)
@@ -152,17 +152,12 @@ local grep = function(opts)
           vim.cmd(string.format([[ldo %%s/%s/%s/g]], search, replacement)) -- Run substitution
         end)
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1,3..",
       ["--disabled"] = true,
       ["--multi"] = true,
       ["--query"] = string.format([['%s']], opts.initial_query),
-      ["--preview-window"] = string.format(
-        [['%s,%s']],
-        helpers.fzf_default_preview_window_args,
-        fzf_utils.preview_offset("{2}", { fixed_header = 4 })
-      ),
     }),
   })
 end

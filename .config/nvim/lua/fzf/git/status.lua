@@ -158,24 +158,29 @@ local git_status = function(opts)
       ["focus"] = function(state)
         local filepath, status = parse_entry(state.focused_entry)
 
-        ---@type string
-        local command
         if status.renamed then
-          command =
-            string.format([[bat %s %s]], helpers.bat_default_opts, filepath)
-        else
-          command = string.format(
-            "%s diff --color %s %s | delta",
-            git,
-            status.is_fully_staged and "--staged"
-              or (
-                (status.added or status.is_untracked)
-                  and "--no-index /dev/null"
-                or (status.deleted and "--cached -- " or "")
-              ),
-            filepath
-          )
+          local filename = vim.fn.fnamemodify(filepath, ":t")
+          local ft = vim.filetype.match({
+            filename = filename,
+            contents = vim.fn.readfile(filepath),
+          })
+
+          set_preview_content(vim.fn.readfile(filepath))
+          if ft then vim.bo[popups.nvim_preview.bufnr].filetype = ft end
+          return
         end
+
+        local command = string.format(
+          "%s diff --color %s %s | delta %s",
+          git,
+          status.is_fully_staged and "--staged"
+            or (
+              (status.added or status.is_untracked) and "--no-index /dev/null"
+              or (status.deleted and "--cached -- " or "")
+            ),
+          filepath,
+          helpers.delta_nvim_default_opts
+        )
 
         local output = vim.fn.systemlist(command)
         if vim.v.shell_error ~= 0 then

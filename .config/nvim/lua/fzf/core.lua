@@ -300,6 +300,7 @@ M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 ---@param input string[] | string
 ---@param opts { layout?: NuiLayout, extra_args?: table<string, string>, prompt?: string, preview_cmd?: string, initial_position?: integer, binds?: table<string, bind_type> }
 ---@param parent_state_id? string
+---@return state
 M.fzf = function(input, opts, parent_state_id)
   local state_id, state = create_state(parent_state_id)
 
@@ -496,6 +497,8 @@ EOF
   )
 
   vim.cmd("startinsert")
+
+  return state
 end
 
 return M

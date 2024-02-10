@@ -57,7 +57,7 @@ M.docker_images = function(opts)
   core.fzf(entries, {
     prompt = "Docker-Images",
     layout = layout,
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(
           popups.main,
@@ -94,7 +94,7 @@ M.docker_images = function(opts)
         end
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
       ["--preview-window"] = helpers.fzf_default_preview_window_args,

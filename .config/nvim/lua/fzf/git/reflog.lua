@@ -51,14 +51,48 @@ return function(opts)
     return entries
   end
 
+  local layout, popups, set_preview_content =
+    helpers.create_nvim_preview_layout({
+      preview_in_terminal_mode = true,
+      preview_popup_win_options = { number = false },
+    })
+
   core.fzf(get_entries(), {
     prompt = "Git-Reflog",
-    preview_cmd = string.format(
-      [[git -C %s diff {1} | delta %s]],
-      opts.git_dir,
-      helpers.delta_default_opts
-    ),
-    binds = fzf_utils.bind_extend(helpers.default_fzf_keybinds, {
+    layout = layout,
+    binds = {
+      ["+before-start"] = function(state)
+        helpers.set_keymaps_for_preview_remote_nav(
+          popups.main,
+          popups.nvim_preview
+        )
+        helpers.set_keymaps_for_popups_nav({
+          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
+        })
+      end,
+      ["focus"] = function(state)
+        local ref = reflog[state.focused_entry_index].ref
+
+        local command = string.format(
+          [[git -C %s diff %s | delta %s]],
+          opts.git_dir,
+          ref,
+          helpers.delta_nvim_default_opts
+        )
+
+        local output = vim.fn.systemlist(command)
+        if vim.v.shell_error ~= 0 then
+          vim.error(
+            "Error getting details for git ref",
+            ref,
+            table.concat(output, "\n")
+          )
+          return
+        end
+
+        set_preview_content(output)
+      end,
       ["+select"] = function(state)
         local ref = reflog[state.focused_entry_index].ref
 
@@ -70,10 +104,9 @@ return function(opts)
         vim.fn.setreg("+", ref)
         vim.info(string.format([[Copied to clipboard: %s]], ref))
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "2..",
-      ["--preview-window"] = helpers.fzf_default_preview_window_args,
     }),
   })
 end

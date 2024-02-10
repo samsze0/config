@@ -101,6 +101,47 @@ M.default_fzf_keybinds = {
   -- ["alt-b"] = "preview-down",
 }
 
+-- Create a simple window layout for Fzf that includes only a main window
+--
+---@return NuiLayout, { main: NuiPopup }
+M.create_simple_layout = function()
+  local main_popup = Popup({
+    enter = true,
+    focusable = true,
+    border = {
+      style = "rounded",
+    },
+    buf_options = {
+      modifiable = false,
+      filetype = "fzf",
+    },
+    win_options = {
+      winblend = 0,
+      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+    },
+  })
+
+  local layout = Layout(
+    {
+      position = "50%",
+      relative = "editor",
+      size = {
+        width = "90%",
+        height = "90%",
+      },
+    },
+    Layout.Box({
+      Layout.Box(main_popup, { size = "100%" }),
+    }, {})
+  )
+
+  main_popup:on("BufLeave", function() layout:unmount() end)
+
+  return layout, {
+    main = main_popup,
+  }
+end
+
 -- Create a window layout for Fzf that includes:
 -- - a main window
 -- - a preview window

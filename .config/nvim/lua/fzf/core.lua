@@ -8,7 +8,7 @@ local utils = require("utils")
 local fzf_utils = require("fzf.utils")
 local uv_utils = require("utils.uv")
 
----@alias state { id: string, parent?: string, port: string, query: string, focused_entry?: string, focused_entry_index?: integer, popups?: table<string, NuiPopup>, layout: NuiLayout, _event_callback_map: table, _response_callback_map: table, _request_count: number }
+---@alias state { id: string, parent?: string, port: string, query: string, focused_entry?: string, focused_entry_index?: integer, layout: NuiLayout, _event_callback_map: table, _response_callback_map: table, _request_count: number }
 ---@type table<string, state>
 local states = {}
 
@@ -25,7 +25,6 @@ local create_state = function(parent_state_id)
     query = nil, ---@diagnostic disable-line: assign-type-mismatch
     focused_entry = nil, ---@diagnostic disable-line: assign-type-mismatch
     focused_entry_index = nil, ---@diagnostic disable-line: assign-type-mismatch
-    popups = nil, ---@diagnostic disable-line: assign-type-mismatch
     layout = nil, ---@diagnostic disable-line: assign-type-mismatch
     _event_callback_map = {},
     _response_callback_map = {},
@@ -298,17 +297,14 @@ M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 ---@alias event_callback fun(state: state): nil
 ---@alias bind_type string | event_callback | (string | event_callback)[]
 ---@param input string[] | string
----@param opts { layout?: NuiLayout, extra_args?: table<string, string>, prompt?: string, preview_cmd?: string, initial_position?: integer, binds?: table<string, bind_type> }
+---@param opts { layout: NuiLayout, extra_args?: table<string, string>, prompt: string, preview_cmd?: string, initial_position?: integer, binds?: table<string, bind_type> }
 ---@param parent_state_id? string
 ---@return state
 M.fzf = function(input, opts, parent_state_id)
   local state_id, state = create_state(parent_state_id)
 
   opts = vim.tbl_extend("force", {
-    layout = nil,
     extra_args = {},
-    prompt = "",
-    preview_cmd = nil,
     initial_position = 0,
     binds = {},
   }, opts or {})
@@ -323,12 +319,6 @@ M.fzf = function(input, opts, parent_state_id)
   local prev_win = vim.api.nvim_get_current_win()
 
   local layout = opts.layout
-  local popups = nil
-  if not layout then
-    layout, popups = fzf_utils.create_simple_layout()
-  end
-  state.layout = layout
-  state.popups = popups
 
   if parent_state_id then
     local parent_state = get_state(parent_state_id)

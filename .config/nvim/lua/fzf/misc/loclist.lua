@@ -39,13 +39,45 @@ return function(opts)
     return unpack(vim.split(entry, utils.nbsp))
   end
 
+  local layout, popups, set_preview_content =
+    helpers.create_nvim_preview_layout({
+      preview_popup_win_options = {
+        cursorline = true,
+      },
+    })
+
   core.fzf(entries, {
     prompt = "Loclist",
-    preview_cmd = string.format(
-      [[bat %s --highlight-line {3} {2}]],
-      helpers.bat_default_opts
-    ),
+    layout = layout,
     binds = {
+      ["+before-start"] = function(state)
+        helpers.set_keymaps_for_preview_remote_nav(
+          popups.main,
+          popups.nvim_preview
+        )
+        helpers.set_keymaps_for_popups_nav({
+          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          {
+            popup = popups.nvim_preview,
+            key = "<C-f>",
+            is_terminal = false,
+          },
+        })
+      end,
+      ["focus"] = function(state)
+        local bufnr, filepath, row, col = parse_entry(state.focused_entry)
+
+        popups.nvim_preview.border:set_text(
+          "top",
+          " " .. vim.fn.fnamemodify(filepath, ":t") .. " "
+        )
+
+        helpers.preview_file(
+          filepath,
+          popups.nvim_preview,
+          { cursor_pos = { row = row, col = col } }
+        )
+      end,
       ["+select"] = function(state)
         local bufnr = parse_entry(state.focused_entry)
 
@@ -57,11 +89,6 @@ return function(opts)
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "2,5",
-      ["--preview-window"] = string.format(
-        [['%s,%s']],
-        helpers.fzf_default_preview_window_args,
-        fzf_utils.preview_offset("{3}", { fixed_header = 3 })
-      ),
     }),
   })
 end

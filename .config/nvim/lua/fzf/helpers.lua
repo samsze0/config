@@ -13,7 +13,7 @@ local M = {
   -- Let fzf handle the wrapping such that fzf can correctly offset the preview window
   bat_default_opts = "--color always --wrap never --terminal-width $FZF_PREVIEW_COLUMNS",
   delta_default_opts = "--width=$FZF_PREVIEW_COLUMNS",
-  delta_nvim_default_opts = "--syntax-theme 'Nord'", -- FIX: base16 theme not working properly
+  delta_nvim_default_opts = "--syntax-theme='Nord'", -- FIX: base16 theme not working properly
   use_rg_colors = use_rg_colors,
   rg_default_opts = "--smart-case --no-ignore --hidden --trim "
     .. (use_rg_colors and "--color=always --colors 'match:fg:blue' --colors 'path:fg:80,130,150' --colors 'line:fg:80,130,150' " or "--color=never ")

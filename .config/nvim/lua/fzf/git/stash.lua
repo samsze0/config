@@ -48,7 +48,6 @@ local git_stash = function(opts)
   core.fzf(get_entries(), {
     prompt = "Git-Stash",
     layout = layout,
-    initial_position = 1,
     binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(

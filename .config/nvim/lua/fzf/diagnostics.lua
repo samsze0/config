@@ -55,13 +55,51 @@ M.diagnostics = function(opts)
 
   local entries, diagnostics = get_entries()
 
+  local parse_entry = function(entry)
+    local args = vim.split(entry, utils.nbsp)
+    return unpack(args)
+  end
+
+  local layout, popups, set_preview_content =
+    helpers.create_nvim_preview_layout({
+      preview_popup_win_options = {
+        cursorline = true,
+      },
+    })
+
   core.fzf(entries, {
     prompt = "Diagnostics",
-    preview_cmd = string.format(
-      "bat %s --highlight-line {4} {3}",
-      helpers.bat_default_opts
-    ),
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    layout = layout,
+    binds = {
+      ["+before-start"] = function(state)
+        helpers.set_keymaps_for_preview_remote_nav(
+          popups.main,
+          popups.nvim_preview
+        )
+        helpers.set_keymaps_for_popups_nav({
+          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          {
+            popup = popups.nvim_preview,
+            key = "<C-f>",
+            is_terminal = false,
+          },
+        })
+      end,
+      ["focus"] = function(state)
+        local severity, source, filepath, row, col =
+          parse_entry(state.focused_entry)
+
+        popups.nvim_preview.border:set_text(
+          "top",
+          " " .. vim.fn.fnamemodify(filepath, ":t") .. " "
+        )
+
+        helpers.preview_file(
+          filepath,
+          popups.nvim_preview,
+          { cursor_pos = { row = row, col = col } }
+        )
+      end,
       ["ctrl-w"] = function(state)
         local symbol = diagnostics[state.focused_entry_index]
 
@@ -94,14 +132,9 @@ M.diagnostics = function(opts)
         vim.fn.cursor({ symbol.lnum + 1, symbol.col })
         vim.cmd("normal! zz")
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1,2,6..",
-      ["--preview-window"] = string.format(
-        [['%s,%s']],
-        helpers.fzf_default_preview_window_args,
-        fzf_utils.preview_offset("{4}", { fixed_header = 3 })
-      ),
     }),
   })
 end

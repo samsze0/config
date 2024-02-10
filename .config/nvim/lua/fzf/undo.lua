@@ -64,10 +64,31 @@ M.undos = function(opts)
     return undo_nr, alt_indent, time
   end
 
+  local layout, popups, set_preview_content =
+    helpers.create_nvim_preview_layout({
+      preview_in_terminal_mode = true,
+      preview_popup_win_options = { number = false },
+    })
+
   core.fzf(entries, {
     prompt = "Undos",
+    layout = layout,
     initial_position = initial_pos,
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    binds = {
+      ["+before-start"] = function(state)
+        helpers.set_keymaps_for_preview_remote_nav(
+          popups.main,
+          popups.nvim_preview
+        )
+        helpers.set_keymaps_for_popups_nav({
+          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          {
+            popup = popups.nvim_preview,
+            key = "<C-f>",
+            is_terminal = false,
+          },
+        })
+      end,
       ["ctrl-y"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)
         vim.fn.setreg("+", undo_nr)
@@ -93,15 +114,23 @@ M.undos = function(opts)
         local delta_str, brief, additions, deletions =
           undo_utils.show_undo_diff_with_delta(buf, undo_nr)
 
-        core.send_to_fzf(
-          state.id,
-          "change-preview:"
-            .. string.format(
-              [[cat %s | delta %s --file-style=omit]],
-              fzf_utils.write_to_tmpfile(delta_str),
-              helpers.delta_default_opts
-            )
+        local command = string.format(
+          [[cat %s | delta %s --file-style=omit]],
+          fzf_utils.write_to_tmpfile(delta_str),
+          helpers.delta_nvim_default_opts
         )
+
+        local output = vim.fn.systemlist(command)
+        if vim.v.shell_error ~= 0 then
+          vim.error(
+            "Error previewing undo diff",
+            undo_nr,
+            table.concat(output, "\n")
+          )
+          return
+        end
+
+        set_preview_content(output)
       end,
       ["+select"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)
@@ -109,10 +138,9 @@ M.undos = function(opts)
         vim.cmd(string.format("undo %s", undo_nr))
         vim.notify(string.format("Restored to %s", undo_nr))
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "2..",
-      ["--preview-window"] = helpers.fzf_default_preview_window_args,
     }),
   })
 end

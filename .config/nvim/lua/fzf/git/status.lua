@@ -164,14 +164,7 @@ local git_status = function(opts)
         )
 
         if status.renamed then
-          local filename = vim.fn.fnamemodify(filepath, ":t")
-          local ft = vim.filetype.match({
-            filename = filename,
-            contents = vim.fn.readfile(filepath),
-          })
-
-          set_preview_content(vim.fn.readfile(filepath))
-          if ft then vim.bo[popups.nvim_preview.bufnr].filetype = ft end
+          helpers.preview_file(filepath, popups.nvim_preview)
           return
         end
 

@@ -16,19 +16,64 @@ return function(opts)
   local handle
   local current_symbols
 
+  local layout, popups, set_preview_content =
+    helpers.create_nvim_preview_layout({
+      preview_popup_win_options = {
+        cursorline = true,
+      },
+    })
+
   core.fzf({}, {
     prompt = "LSP-Workspace-Symbols",
-    preview_cmd = string.format(
-      "bat %s --highlight-line {2} {1}",
-      helpers.bat_default_opts
-    ),
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    layout = layout,
+    binds = {
+      ["+before-start"] = function(state)
+        helpers.set_keymaps_for_preview_remote_nav(
+          popups.main,
+          popups.nvim_preview
+        )
+        helpers.set_keymaps_for_popups_nav({
+          { popup = popups.main, key = "<C-s>", is_terminal = true },
+          {
+            popup = popups.nvim_preview,
+            key = "<C-f>",
+            is_terminal = false,
+          },
+        })
+      end,
+      ["focus"] = function(state)
+        local symbol = current_symbols[state.focused_entry_index]
+
+        popups.nvim_preview.border:set_text("top", " " .. symbol.name .. " ")
+
+        helpers.preview_file(
+          shared.uri_to_path(symbol.location.uri),
+          popups.nvim_preview,
+          {
+            cursor_pos = {
+              row = symbol.location.range.start.line + 1,
+              col = symbol.location.range.start.character + 1,
+            },
+          }
+        )
+      end,
       ["ctrl-w"] = function(state)
         local symbol = current_symbols[state.focused_entry_index]
 
         core.abort_and_execute(state.id, function()
-          vim.cmd(string.format([[vsplit %s]], symbol.filename))
-          vim.cmd(string.format([[normal! %sG%s|]], symbol.lnum, symbol.col))
+          vim.cmd(
+            string.format(
+              [[vsplit %s]],
+              shared.uri_to_path(symbol.location.uri)
+            )
+          )
+          vim.cmd(
+            string.format(
+              [[normal! %sG%s|]],
+              symbol.location.range.start.line + 1,
+              symbol.location.range.start.character + 1
+            )
+          )
           vim.cmd([[normal! zz]])
         end)
       end,
@@ -36,8 +81,19 @@ return function(opts)
         local symbol = current_symbols[state.focused_entry_index]
 
         core.abort_and_execute(state.id, function()
-          vim.cmd(string.format([[tabnew %s]], symbol.filename))
-          vim.cmd(string.format([[normal! %sG%s|]], symbol.lnum, symbol.col))
+          vim.cmd(
+            string.format(
+              [[tabnew %s]],
+              shared.uri_to_path(symbol.location.uri)
+            )
+          )
+          vim.cmd(
+            string.format(
+              [[normal! %sG%s|]],
+              symbol.location.range.start.line + 1,
+              symbol.location.range.start.character + 1
+            )
+          )
           vim.cmd([[normal! zz]])
         end)
       end,
@@ -88,18 +144,16 @@ return function(opts)
         local symbol = current_symbols[state.focused_entry_index]
 
         jumplist.save(win)
-        vim.cmd("e " .. symbol.filename)
-        vim.fn.cursor({ symbol.lnum, symbol.col })
+        vim.cmd("e " .. shared.uri_to_path(symbol.location.uri))
+        vim.fn.cursor({
+          symbol.location.range.start.line + 1,
+          symbol.location.range.start.character + 1,
+        })
         vim.cmd("normal! zz")
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1,4,5..",
-      ["--preview-window"] = string.format(
-        [['%s,%s']],
-        helpers.fzf_default_preview_window_args,
-        fzf_utils.preview_offset("{2}", { fixed_header = 3 })
-      ),
     }),
   })
 end

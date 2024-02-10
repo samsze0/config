@@ -78,11 +78,6 @@ M.docker_images = function(opts)
 
         set_preview_content(vim.split(vim.inspect(image), "\n"))
         vim.bo[popups.nvim_preview.bufnr].filetype = "lua"
-
-        -- Switch to preview window and back in order to refresh scrollbar
-        -- TODO: Remove this once scrollbar plugin support remote refresh
-        vim.api.nvim_set_current_win(popups.nvim_preview.winid)
-        vim.api.nvim_set_current_win(popups.main.winid)
       end,
       ["ctrl-y"] = function(state)
         local image = images[state.focused_entry_index]

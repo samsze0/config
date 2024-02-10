@@ -198,19 +198,7 @@ M.files = function(opts)
           return
         end
 
-        local filename = vim.fn.fnamemodify(path, ":t")
-        local ft = vim.filetype.match({
-          filename = filename,
-          contents = vim.fn.readfile(path),
-        })
-
-        set_preview_content(vim.fn.readfile(path))
-        if ft then vim.bo[popups.nvim_preview.bufnr].filetype = ft end
-
-        -- Switch to preview window and back in order to refresh scrollbar
-        -- TODO: Remove this once scrollbar plugin support remote refresh
-        vim.api.nvim_set_current_win(popups.nvim_preview.winid)
-        vim.api.nvim_set_current_win(popups.main.winid)
+        helpers.preview_file(path, popups.nvim_preview.bufnr)
       end,
       ["ctrl-y"] = function(state)
         local entry = state.focused_entry

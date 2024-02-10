@@ -211,6 +211,13 @@ M.create_nvim_preview_layout = function(opts)
       if opts.preview_in_terminal_mode then
         vim.bo[popups.nvim_preview.bufnr].filetype = "terminal"
       end
+
+      local current_win = vim.api.nvim_get_current_win()
+
+      -- Switch to preview window and back in order to refresh scrollbar
+      -- TODO: Remove this once scrollbar plugin support remote refresh
+      vim.api.nvim_set_current_win(popups.nvim_preview.winid)
+      vim.api.nvim_set_current_win(current_win)
     end
 end
 
@@ -244,6 +251,41 @@ M.auto_reload_binds = function(get_entries, opts)
     end,
     ["+after-exit"] = function(state) timer = nil end,
   }
+end
+
+-- Open a file in the preview buffer and auto detect the filetype
+--
+---@param filepath string
+---@param preview_popup NuiPopup
+---@param opts? { cursor_pos?: { row: number, col?: number } }
+M.preview_file = function(filepath, preview_popup, opts)
+  opts = vim.tbl_extend("force", {}, opts or {})
+
+  local filename = vim.fn.fnamemodify(filepath, ":t")
+  local ft = vim.filetype.match({
+    filename = filename,
+    contents = vim.fn.readfile(filepath),
+  })
+
+  vim.api.nvim_buf_set_lines(
+    preview_popup.bufnr,
+    0,
+    -1,
+    false,
+    vim.fn.readfile(filepath)
+  )
+  if ft then vim.bo[preview_popup.bufnr].filetype = ft end
+
+  local current_win = vim.api.nvim_get_current_win()
+
+  -- Switch to preview window and back in order to refresh scrollbar
+  -- TODO: Remove this once scrollbar plugin support remote refresh
+  vim.api.nvim_set_current_win(preview_popup.winid)
+  if opts.cursor_pos then
+    vim.fn.cursor({ opts.cursor_pos.row, opts.cursor_pos.col or 0 })
+    vim.cmd([[normal! zz]])
+  end
+  vim.api.nvim_set_current_win(current_win)
 end
 
 return M

@@ -34,13 +34,45 @@ return function(opts)
         )
       end
 
+      local layout, popups, set_preview_content =
+        helpers.create_nvim_preview_layout({
+          preview_popup_win_options = {
+            cursorline = true,
+          },
+        })
+
       core.fzf(entries, {
         prompt = "LSP-References",
-        preview_cmd = string.format(
-          "bat %s --highlight-line {2} {1}",
-          helpers.bat_default_opts
-        ),
-        binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+        layout = layout,
+        binds = {
+          ["+before-start"] = function(state)
+            helpers.set_keymaps_for_preview_remote_nav(
+              popups.main,
+              popups.nvim_preview
+            )
+            helpers.set_keymaps_for_popups_nav({
+              { popup = popups.main, key = "<C-s>", is_terminal = true },
+              {
+                popup = popups.nvim_preview,
+                key = "<C-f>",
+                is_terminal = false,
+              },
+            })
+          end,
+          ["focus"] = function(state)
+            local symbol = refs[state.focused_entry_index]
+
+            popups.nvim_preview.border:set_text(
+              "top",
+              " " .. vim.fn.fnamemodify(symbol.filename, ":t") .. " "
+            )
+
+            helpers.preview_file(
+              symbol.filename,
+              popups.nvim_preview,
+              { cursor_pos = { row = symbol.lnum, col = symbol.col } }
+            )
+          end,
           ["+select"] = function(state)
             local symbol = refs[state.focused_entry_index]
 
@@ -71,14 +103,9 @@ return function(opts)
               vim.cmd([[normal! zz]])
             end)
           end,
-        }),
+        },
         extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
           ["--with-nth"] = "1,4",
-          ["--preview-window"] = string.format(
-            [['%s,%s']],
-            helpers.fzf_default_preview_window_args,
-            fzf_utils.preview_offset("{2}", { fixed_header = 3 })
-          ),
         }),
       })
     end,

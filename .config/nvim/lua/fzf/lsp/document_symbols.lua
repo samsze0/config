@@ -52,14 +52,43 @@ return function(opts)
 
     process_list(result)
 
+    local layout, popups, set_preview_content =
+      helpers.create_nvim_preview_layout({
+        preview_popup_win_options = {
+          cursorline = true,
+        },
+      })
+
     core.fzf(entries, {
       prompt = "LSP-Document-Symbols",
-      preview_cmd = string.format(
-        "bat %s --highlight-line {2} %s",
-        helpers.bat_default_opts,
-        current_file
-      ),
-      binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+      layout = layout,
+      binds = {
+        ["+before-start"] = function(state)
+          helpers.set_keymaps_for_preview_remote_nav(
+            popups.main,
+            popups.nvim_preview
+          )
+          helpers.set_keymaps_for_popups_nav({
+            { popup = popups.main, key = "<C-s>", is_terminal = true },
+            {
+              popup = popups.nvim_preview,
+              key = "<C-f>",
+              is_terminal = false,
+            },
+          })
+        end,
+        ["focus"] = function(state)
+          local symbol = symbols[state.focused_entry_index]
+
+          popups.nvim_preview.border:set_text("top", " " .. symbol.name .. " ")
+
+          helpers.preview_file(current_file, popups.nvim_preview, {
+            cursor_pos = {
+              row = symbol.selectionRange.start.line + 1,
+              col = symbol.selectionRange.start.character + 1,
+            },
+          })
+        end,
         ["ctrl-w"] = function(state)
           local symbol = symbols[state.focused_entry_index]
 
@@ -100,14 +129,9 @@ return function(opts)
           })
           vim.cmd("normal! zz")
         end,
-      }),
+      },
       extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
         ["--with-nth"] = "1,4,5..",
-        ["--preview-window"] = string.format(
-          [['%s,%s']],
-          helpers.fzf_default_preview_window_args,
-          fzf_utils.preview_offset("{2}", { fixed_header = 3 })
-        ),
       }),
     })
   end)

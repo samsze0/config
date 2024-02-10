@@ -137,35 +137,43 @@ end, {})
 - Karabiner [command + left/right]
 - Fzf TODO comments
 - Fzf backups
-- Tests
 - LSP import path update (with watchman and LSP willrename etc...)
 - Project specific config w/ exrc https://github.com/klen/nvim-config-local
-- Custom treesitter textobjects plugin
 - Fzf one after another doesn't enter insert mode
-- Remove all usage of global var
-- Output bat stuff into scratch buffer for easy copy
-- Backup filename collision + auto cleanup
-- Lf show git status (pico-lf?)
-- Lf flatten dir (for Java)
-- Markdown syntax highlighting
 - Fzf Pulumi
+- Tree hierarchy (an info bar + multi-stage fzf; tree is useful for git)
+- Fzf go back, fzf info bar (as border text)
+- Git diff +/- proper syntax highlighting
+- Git hunk preview as Nui split with proper syntax highlighting
+
+**Mid priority**
+
+- Fzf linux commands (lsof, lsblk, etc)
 - Fzf brew services and formulae?
 - Fzf terraform
 - Fzf k8s
 - Fzf pulumi stack and env
-- Tree hierarchy (a header window + multi-stage fzf; tree is useful for git)
-- Fzf move away from native preview
-- Fzf go back, fzf info window/bar
+- Fzf gcp
+- Fzf aws
+- Fzf azure
+- Markdown syntax highlighting
+- Backup filename collision + auto cleanup
 
 **Low priority**
 
+- Custom treesitter textobjects plugin
+- Remove all usage of global var
+- Lf show git status (pico-lf?)
+- Lf flatten dir (for Java)
+- Tests
+- LF preview in nvim
+- Fzf core - handler error reporting and handling (at the moment is sliented)
 - Performance profiling & optimization (w/ flamegraph)
 - Fix Fzf somethings hang if actions happen too quick?
-- Fzf core - handler error reporting and handling (at the moment is sliented)
-- LF preview in nvim
 - Custom autopair and comment plugin
 - Git worktree workflow
 - Custom copilot plugin (possible to use chat?)
 - Lf create_new multi-layer dir support
 - Tabline dedup by git-files
+- Tabline better "scrolling"
 - React dev workflow

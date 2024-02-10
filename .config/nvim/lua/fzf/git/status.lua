@@ -169,7 +169,7 @@ local git_status = function(opts)
         end
 
         local command = string.format(
-          "%s diff --color %s %s | delta %s",
+          "%s diff --color %s %s | delta %s --file-style='omit'",
           git,
           status.is_fully_staged and "--staged"
             or (

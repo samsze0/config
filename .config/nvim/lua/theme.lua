@@ -294,41 +294,6 @@ function M.setup()
   hi.DiffDelete =
     { guifg = c.gray_200, guibg = c.gray_100, gui = nil, guisp = nil }
   hi.DiffText = { guifg = nil, guibg = c.blue_300, gui = nil, guisp = nil }
-  hi.DiffAdded = { guifg = nil, guibg = c.blue_100, gui = nil, guisp = nil }
-  hi.DiffFile = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
-  hi.DiffNewFile = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.DiffLine = { guifg = nil, guibg = c.yellow_100, gui = nil, guisp = nil }
-  hi.DiffRemoved = { guifg = nil, guibg = c.red_100, gui = nil, guisp = nil }
-
-  -- Git highlighting
-  hi.gitcommitOverflow = { guifg = c.red, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitSummary =
-    { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitComment =
-    { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitUntracked =
-    { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitDiscarded =
-    { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitSelected =
-    { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitHeader = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitSelectedType =
-    { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitUnmergedType =
-    { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitDiscardedType =
-    { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitBranch =
-    { guifg = c.yellow, guibg = nil, gui = "bold", guisp = nil }
-  hi.gitcommitUntrackedFile =
-    { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
-  hi.gitcommitUnmergedFile =
-    { guifg = c.red, guibg = nil, gui = "bold", guisp = nil }
-  hi.gitcommitDiscardedFile =
-    { guifg = c.red, guibg = nil, gui = "bold", guisp = nil }
-  hi.gitcommitSelectedFile =
-    { guifg = c.yellow, guibg = nil, gui = "bold", guisp = nil }
 
   -- GitGutter highlighting
   hi.GitGutterAdd = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }
@@ -732,7 +697,7 @@ M.debug = function(opts)
     return lines
   end
 
-  local hl_groups = split_string(vim.api.nvim_exec("highlight", true), "\n")
+  local hl_groups = split_string(vim.cmd("highlight"), "\n")
   hl_groups = join_lines_if_begins_with_links(hl_groups)
 
   local buf_lines = map(hl_groups, function(i, g)

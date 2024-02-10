@@ -50,7 +50,7 @@ M.split_string = function(inputstr, sep)
 end
 
 ---@param buf_lines string[]
----@param opts { filetype?: string, buf_listed?: boolean, open_in_current_tab?: boolean }
+---@param opts? { filetype?: string, buf_listed?: boolean, open_in_current_tab?: boolean }
 ---@return number buf_nr Buffer number
 M.show_content_in_buffer = function(buf_lines, opts)
   opts = vim.tbl_deep_extend("keep", opts or {}, {

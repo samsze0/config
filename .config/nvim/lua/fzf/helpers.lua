@@ -130,8 +130,8 @@ M.create_fzf_preview_layout = function()
       position = "50%",
       relative = "editor",
       size = {
-        width = "90%",
-        height = "90%",
+        width = "95%",
+        height = "95%",
       },
     },
     Layout.Box({
@@ -214,8 +214,8 @@ M.create_nvim_preview_layout = function(opts)
       position = "50%",
       relative = "editor",
       size = {
-        width = "90%",
-        height = "90%",
+        width = "95%",
+        height = "95%",
       },
     },
     Layout.Box({
@@ -352,16 +352,16 @@ M.create_nvim_diff_preview_layout = function(opts)
       position = "50%",
       relative = "editor",
       size = {
-        width = "90%",
-        height = "90%",
+        width = "95%",
+        height = "95%",
       },
     },
     Layout.Box({
-      Layout.Box(main_popup, { size = "40%" }),
+      Layout.Box(main_popup, { size = "30%" }),
       Layout.Box({
         Layout.Box(nvim_preview_popups.before, { size = "50%" }),
         Layout.Box(nvim_preview_popups.after, { size = "50%" }),
-      }, { dir = "row", size = "60%" }),
+      }, { dir = "row", size = "70%" }),
     }, { dir = "col" })
   )
 

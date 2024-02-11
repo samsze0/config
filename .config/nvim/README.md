@@ -158,6 +158,10 @@ end, {})
 - Fzf azure
 - Markdown syntax highlighting
 - Backup filename collision + auto cleanup
+- Streaming
+- Async
+- OOP
+- Threads pool and sync primitives (semaphore)
 
 **Low priority**
 

@@ -53,6 +53,7 @@ local git_commits = function(opts)
   core.fzf(get_entries(), {
     prompt = "Git-Commits",
     layout = layout,
+    main_popup = popups.main,
     initial_position = 1, -- TODO: assign to current checkout-ed commit
     binds = fzf_utils.bind_extend(helpers.default_fzf_keybinds, {
       ["+before-start"] = function(state)

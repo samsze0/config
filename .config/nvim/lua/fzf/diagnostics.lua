@@ -70,6 +70,7 @@ M.diagnostics = function(opts)
   core.fzf(entries, {
     prompt = "Diagnostics",
     layout = layout,
+    main_popup = popups.main,
     binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(

@@ -65,8 +65,9 @@ local grep_file = function(opts)
   core.fzf(get_cmd(""), {
     prompt = "Grep-File",
     layout = layout,
+    main_popup = popups.main,
     initial_position = vim.fn.line("."), -- Assign to current line number
-    binds = vim.tbl_extend("force", helpers.default_fzf_keybinds, {
+    binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(
           popups.main,
@@ -115,17 +116,12 @@ local grep_file = function(opts)
           end
         )
       end,
-    }),
+    },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
       ["--disabled"] = true,
       ["--multi"] = true,
       ["--query"] = string.format([['%s']], opts.initial_query),
-      ["--preview-window"] = string.format(
-        [['%s,%s']],
-        helpers.fzf_default_preview_window_args,
-        fzf_utils.preview_offset("{1}", { fixed_header = 4 })
-      ),
     }),
   })
 end

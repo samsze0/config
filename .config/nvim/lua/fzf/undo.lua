@@ -72,6 +72,7 @@ M.undos = function(opts)
   core.fzf(entries, {
     prompt = "Undos",
     layout = layout,
+    main_popup = popups.main,
     initial_position = initial_pos,
     binds = {
       ["+before-start"] = function(state)

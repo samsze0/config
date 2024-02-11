@@ -17,6 +17,12 @@ function M.create_layout()
     focusable = true,
     border = {
       style = "rounded",
+      text = {
+        top = "", -- FIX: border text not showing if undefined
+        bottom = "",
+        top_align = "center",
+        bottom_align = "center",
+      },
     },
     buf_options = {
       modifiable = false,
@@ -91,17 +97,10 @@ function M.create_layout()
     }, { dir = "row" })
   )
 
-  for _, popup in pairs(popups) do
-    popup:on("BufLeave", function()
-      vim.schedule(function()
-        local curr_bufnr = vim.api.nvim_get_current_buf()
-        for _, p in pairs(popups) do
-          if p.bufnr == curr_bufnr then return end
-        end
-        layout:unmount()
-      end)
-    end)
-  end
+  vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    buffer = main_popup.bufnr,
+    callback = function(ctx) vim.cmd("startinsert") end,
+  })
 
   local function get_replacement()
     return table.concat(

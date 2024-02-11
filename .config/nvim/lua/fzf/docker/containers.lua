@@ -62,6 +62,7 @@ M.docker_containers = function(opts)
   core.fzf(get_entries(), {
     prompt = "Docker-Containers",
     layout = layout,
+    main_popup = popups.main,
     binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(

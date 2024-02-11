@@ -48,6 +48,7 @@ return function()
   core.fzf(get_entries(), {
     prompt = "Buffers",
     layout = layout,
+    main_popup = popups.main,
     initial_position = initial_pos,
     binds = {
       ["+before-start"] = function(state)

@@ -34,6 +34,7 @@ return function()
   core.fzf(get_entries(), {
     prompt = "Tabs",
     layout = layout,
+    main_popup = popups.main,
     initial_position = current_tab,
     binds = {
       ["+before-start"] = function(state)

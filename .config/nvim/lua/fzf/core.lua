@@ -1,5 +1,4 @@
 -- System dependencies: netcat-openbsd on osx and socat on linux and perl
--- FIX: opening 1 fzf after another would not startinsert
 
 local M = {}
 
@@ -8,7 +7,7 @@ local utils = require("utils")
 local fzf_utils = require("fzf.utils")
 local uv_utils = require("utils.uv")
 
----@alias state { id: string, parent?: string, port: string, query: string, focused_entry?: string, focused_entry_index?: integer, layout: NuiLayout, _event_callback_map: table, _response_callback_map: table, _request_count: number }
+---@alias state { id: string, parent?: string, port: string, query: string, focused_entry?: string, focused_entry_index?: integer, layout: NuiLayout, main_popup: NuiPopup, prompt: string, _event_callback_map: table, _response_callback_map: table, _request_count: number }
 ---@type table<string, state>
 local states = {}
 
@@ -26,6 +25,7 @@ local create_state = function(parent_state_id)
     focused_entry = nil, ---@diagnostic disable-line: assign-type-mismatch
     focused_entry_index = nil, ---@diagnostic disable-line: assign-type-mismatch
     layout = nil, ---@diagnostic disable-line: assign-type-mismatch
+    main_popup = nil, ---@diagnostic disable-line: assign-type-mismatch
     _event_callback_map = {},
     _response_callback_map = {},
     _request_count = 0, -- For generating unique ID for requests to fzf
@@ -291,13 +291,20 @@ M.abort_and_execute = function(state_id, callback)
   end
 end
 
+---@param state_id string
+M.get_root_state = function(state_id)
+  local state = get_state(state_id)
+  if not state.parent then return state end
+  return M.get_root_state(state.parent)
+end
+
 ---@return boolean
 M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 
 ---@alias event_callback fun(state: state): nil
 ---@alias bind_type string | event_callback | (string | event_callback)[]
 ---@param input string[] | string
----@param opts { layout: NuiLayout, extra_args?: table<string, string>, prompt: string, preview_cmd?: string, initial_position?: integer, binds?: table<string, bind_type> }
+---@param opts { layout: NuiLayout, main_popup: NuiPopup, other_popups?: NuiPopup[], extra_args?: table<string, string>, prompt: string, preview_cmd?: string, initial_position?: integer, binds?: table<string, bind_type> }
 ---@param parent_state_id? string
 ---@return state
 M.fzf = function(input, opts, parent_state_id)
@@ -307,8 +314,9 @@ M.fzf = function(input, opts, parent_state_id)
     extra_args = {},
     initial_position = 0,
     binds = {},
+    other_popups = {},
   }, opts or {})
-  ---@cast opts { layout: NuiLayout, extra_args: table<string, string>, prompt: string, preview_cmd: string, initial_position: integer, binds: table<string, bind_type> }
+  ---@cast opts { layout: NuiLayout, main_popup: NuiPopup, other_popups: NuiPopup[], extra_args: table<string, string>, prompt: string, preview_cmd: string, initial_position: integer, binds: table<string, bind_type> }
 
   if not M.is_fzf_available() then error("Fzf executable not found") end
 
@@ -319,13 +327,61 @@ M.fzf = function(input, opts, parent_state_id)
   local prev_win = vim.api.nvim_get_current_win()
 
   local layout = opts.layout
+  local main_popup = opts.main_popup
+  state.layout = layout
+  state.main_popup = main_popup
+
+  state.prompt = opts.prompt
 
   if parent_state_id then
     local parent_state = get_state(parent_state_id)
     parent_state.layout:hide()
   end
 
+  local build_statusline = function()
+    -- Loop over each ancestor and construct the statusline
+    local statusline = ""
+
+    ---@type state[]
+    local stages = {}
+
+    local current_state = state
+    while current_state do
+      table.insert(stages, 1, current_state)
+      current_state = states[current_state.parent]
+    end
+
+    statusline = statusline
+      .. table.concat(
+        utils.map(stages, function(_, stage) return stage.prompt end),
+        " > "
+      )
+    return statusline
+  end
+
+  main_popup.border:set_text("top", " " .. build_statusline() .. " ", "left")
   layout:mount()
+
+  local on_buf_leave = function(ctx)
+    local success, current_buf_root_state_id = pcall(
+      function() return vim.b[0].fzf_root_state_id end ---@diagnostic disable-line undefined-field
+    )
+    if not success then return end
+    local success, prev_buf_root_state_id = pcall(
+      function() return vim.b[ctx.bufnr].fzf_root_state_id end
+    )
+    if not success then
+      vim.error(
+        "Unable to get `fzf_root_state_id` buffer variable from fzf popup"
+      )
+      return
+    end
+    if current_buf_root_state_id ~= prev_buf_root_state_id then
+      layout:unmount()
+    end
+  end
+
+  local root_state = M.get_root_state(state_id)
 
   local extended_binds = fzf_utils.bind_extend({
     focus = M.send_to_lua_action(state_id, "focus {n} {}"),
@@ -339,6 +395,16 @@ M.fzf = function(input, opts, parent_state_id)
     },
     change = M.send_to_lua_action(state_id, "query {q}"),
   }, opts.binds)
+
+  -- FIX
+  -- extended_binds = fzf_utils.bind_extend(extended_binds, {
+  --   ["+before-start"] = function()
+  --     for _, popup in ipairs({ main_popup, unpack(opts.other_popups) }) do
+  --       vim.b[popup.bufnr].fzf_root_state_id = root_state.id
+  --       popup:on("BufLeave", on_buf_leave)
+  --     end
+  --   end,
+  -- })
 
   if config.debug then
     vim.info(opts.binds)
@@ -415,9 +481,9 @@ M.fzf = function(input, opts, parent_state_id)
     invoke_event_callback(state_id, "+before-start")
   end
 
+  -- Async will mess up the "start:pos" trigger
   local fzf_cmd = string.format(
-    [[fzf --sync --listen --ansi --prompt='%s❯ ' --border=none --height=100%% %s --bind='%s' --delimiter='%s' %s]],
-    opts.prompt, -- Async will mess up the "start:pos" trigger
+    [[fzf --sync --listen --ansi --prompt='❯ ' --border=none --height=100%% %s --bind='%s' --delimiter='%s' %s]],
     opts.preview_cmd and string.format([[--preview='%s']], opts.preview_cmd)
       or "",
     binds_fzf_arg,
@@ -440,21 +506,25 @@ EOF
       on_exit = function(job_id, code, event)
         vim.cmd("silent! :checktime")
 
-        local finally = function()
-          if parent_state_id then
-            local parent_state = get_state(parent_state_id)
-            parent_state.layout:show()
-          end
-          destroy_state(state_id)
-        end
+        local finally = function() destroy_state(state_id) end
 
-        -- Restore focus to preview window
-        if vim.api.nvim_win_is_valid(prev_win) then
-          layout:unmount()
-          vim.api.nvim_set_current_win(prev_win)
+        layout:unmount()
+
+        if parent_state_id then
+          local parent_state = get_state(parent_state_id)
+          parent_state.layout:show()
+          -- `enter` option of NuiPopup doesn't cater show/hide
+          vim.api.nvim_set_current_win(parent_state.main_popup.winid)
+          vim.defer_fn(function() vim.cmd("startinsert") end, 100) -- FIX: fragile solution
         else
-          vim.error("Invalid previous window", prev_win)
-          finally()
+          -- Restore focus to preview window
+          if vim.api.nvim_win_is_valid(prev_win) then
+            vim.api.nvim_set_current_win(prev_win)
+          else
+            vim.error("Invalid previous window", prev_win)
+            finally()
+            return
+          end
         end
 
         if code == 0 then
@@ -475,6 +545,7 @@ EOF
             event
           )
           finally()
+          return
         end
 
         if event_callback_map["+after-exit"] then
@@ -485,8 +556,6 @@ EOF
       end,
     }
   )
-
-  vim.cmd("startinsert")
 
   return state
 end

@@ -151,7 +151,7 @@ function json.stringify(obj, as_key)
   return table.concat(s)
 end
 
-json.null = {} -- This is a one-off table to represent the null value.
+json.null = "null" -- This is a one-off table to represent the null value.
 
 function json.parse(str, pos, end_delim)
   pos = pos or 1

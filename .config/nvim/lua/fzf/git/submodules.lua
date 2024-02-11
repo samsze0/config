@@ -33,6 +33,7 @@ local git_submodules = function(on_submodule)
   core.fzf(submodules, {
     prompt = "Git-Submodules",
     layout = layout,
+    main_popup = popups.main,
     binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(

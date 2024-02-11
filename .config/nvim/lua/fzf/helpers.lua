@@ -36,10 +36,11 @@ M.set_keymaps_for_popups_nav = function(popup_nav_configs)
   for i, ci in ipairs(popup_nav_configs) do
     for j, cj in ipairs(popup_nav_configs) do
       if j ~= i then
-        cj.popup:map(cj.is_terminal and "t" or "n", ci.key, function()
-          vim.api.nvim_set_current_win(ci.popup.winid)
-          if ci.is_terminal then vim.cmd("startinsert") end
-        end)
+        cj.popup:map(
+          cj.is_terminal and "t" or "n",
+          ci.key,
+          function() vim.api.nvim_set_current_win(ci.popup.winid) end
+        )
       end
     end
   end
@@ -62,18 +63,12 @@ M.set_keymaps_for_preview_remote_nav = function(main_popup, preview_popup, opts)
     -- Setting current window to right window will cause scrollbar to refresh as well
     vim.api.nvim_set_current_win(preview_popup.winid)
     vim.api.nvim_input("<S-Up>")
-    vim.schedule(function()
-      vim.api.nvim_set_current_win(main_popup.winid)
-      vim.cmd("startinsert")
-    end)
+    vim.schedule(function() vim.api.nvim_set_current_win(main_popup.winid) end)
   end)
   main_popup:map("t", opts.scrolldown_key, function()
     vim.api.nvim_set_current_win(preview_popup.winid)
     vim.api.nvim_input("<S-Down>")
-    vim.schedule(function()
-      vim.api.nvim_set_current_win(main_popup.winid)
-      vim.cmd("startinsert")
-    end)
+    vim.schedule(function() vim.api.nvim_set_current_win(main_popup.winid) end)
   end)
 end
 
@@ -139,7 +134,10 @@ M.create_fzf_preview_layout = function()
     }, {})
   )
 
-  main_popup:on("BufLeave", function() layout:unmount() end)
+  vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    buffer = main_popup.bufnr,
+    callback = function(ctx) vim.cmd("startinsert") end,
+  })
 
   return layout, {
     main = main_popup,
@@ -224,23 +222,10 @@ M.create_nvim_preview_layout = function(opts)
     }, { dir = "row" })
   )
 
-  for _, popup in pairs(popups) do
-    popup:on("BufLeave", function()
-      vim.schedule(function()
-        local curr_bufnr = vim.api.nvim_get_current_buf()
-        for _, p in pairs(popups) do
-          if p.bufnr == curr_bufnr then return end
-        end
-        layout:unmount()
-      end)
-    end)
-  end
-
-  -- Performance issues with creating channels
-  -- local set_preview = function(content)
-  --   local channel = vim.api.nvim_open_term(popups.nvim_preview.bufnr, {})
-  --   vim.api.nvim_chan_send(channel, table.concat(content, "\r\n"))
-  -- end
+  vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    buffer = main_popup.bufnr,
+    callback = function(ctx) vim.cmd("startinsert") end,
+  })
 
   return layout,
     popups,
@@ -365,25 +350,10 @@ M.create_nvim_diff_preview_layout = function(opts)
     }, { dir = "col" })
   )
 
-  for _, popup in pairs({
-    main_popup,
-    nvim_preview_popups.before,
-    nvim_preview_popups.after,
-  }) do
-    popup:on("BufLeave", function()
-      vim.schedule(function()
-        local curr_bufnr = vim.api.nvim_get_current_buf()
-        for _, p in pairs({
-          main_popup,
-          nvim_preview_popups.before,
-          nvim_preview_popups.after,
-        }) do
-          if p.bufnr == curr_bufnr then return end
-        end
-        layout:unmount()
-      end)
-    end)
-  end
+  vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    buffer = main_popup.bufnr,
+    callback = function(ctx) vim.cmd("startinsert") end,
+  })
 
   return layout,
     popups,

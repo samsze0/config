@@ -60,6 +60,7 @@ return function(opts)
   core.fzf(get_entries(), {
     prompt = "Git-Reflog",
     layout = layout,
+    main_popup = popups.main,
     binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(

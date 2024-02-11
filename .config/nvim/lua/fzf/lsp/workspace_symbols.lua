@@ -26,6 +26,7 @@ return function(opts)
   core.fzf({}, {
     prompt = "LSP-Workspace-Symbols",
     layout = layout,
+    main_popup = popups.main,
     binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(

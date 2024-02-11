@@ -9,6 +9,7 @@ local shared = require("fzf.grep.shared")
 local event = require("nui.utils.autocmd").event
 
 -- TODO: no-git mode
+-- TODO: "BufEnter" "startinsert" not working
 
 -- Grep all git files
 --
@@ -74,6 +75,7 @@ local grep = function(opts)
   core.fzf({}, {
     prompt = "Grep",
     layout = layout,
+    main_popup = popups.main,
     binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(

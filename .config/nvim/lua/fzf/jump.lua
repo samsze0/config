@@ -56,6 +56,7 @@ M.jumps = function(opts)
   core.fzf(get_entries(), {
     prompt = "Jumps",
     layout = layout,
+    main_popup = popups.main,
     initial_position = pos,
     binds = {
       ["+before-start"] = function(state)

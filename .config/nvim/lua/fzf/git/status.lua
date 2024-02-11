@@ -134,6 +134,7 @@ local git_status = function(opts)
   core.fzf(entries, {
     prompt = "Git-Status",
     layout = layout,
+    main_popup = popups.main,
     initial_position = pos,
     binds = {
       ["+before-start"] = function(state)

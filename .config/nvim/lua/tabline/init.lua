@@ -9,6 +9,8 @@ local config = {
   inactive_tab_max_length = 500, -- Disable this feature
 }
 
+-- TODO: move away from global var
+
 _G.tabs = {}
 
 local M = {}

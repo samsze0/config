@@ -544,15 +544,15 @@ function M.setup()
     { guifg = c.black, guibg = c.gray_800, gui = nil, guisp = nil }
 
   hi.NotifyErrorNormal =
-    { guifg = c.gray_700, guibg = c.red_200, gui = nil, guisp = nil }
+    { guifg = c.gray_700, guibg = c.red_300, gui = nil, guisp = nil }
   hi.NotifyWarnNormal =
-    { guifg = c.gray_700, guibg = c.yellow_200, gui = nil, guisp = nil }
+    { guifg = c.gray_700, guibg = c.yellow_300, gui = nil, guisp = nil }
   hi.NotifyInfoNormal =
-    { guifg = c.gray_700, guibg = c.blue_200, gui = nil, guisp = nil }
+    { guifg = c.gray_700, guibg = c.blue_300, gui = nil, guisp = nil }
   hi.NotifyDebugNormal =
-    { guifg = c.gray_700, guibg = c.gray_200, gui = nil, guisp = nil }
+    { guifg = c.gray_700, guibg = c.gray_300, gui = nil, guisp = nil }
   hi.NotifyTraceNormal =
-    { guifg = c.gray_700, guibg = c.gray_200, gui = nil, guisp = nil }
+    { guifg = c.gray_700, guibg = c.gray_300, gui = nil, guisp = nil }
   hi.NotifyUnknownNormal =
     { guifg = c.gray_700, guibg = c.gray_200, gui = nil, guisp = nil }
 

@@ -1,5 +1,7 @@
 local utils = require("utils")
 
+-- TODO: move away from global vars
+
 _G.notification_subscribers = {}
 _G.notifications = {}
 _G.notification_meta = {

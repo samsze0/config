@@ -1,3 +1,5 @@
+-- TODO: move away from global vars
+
 _G.jumps_subscribers = {}
 _G.current_jump = {}
 

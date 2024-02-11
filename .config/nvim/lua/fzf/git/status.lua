@@ -127,9 +127,8 @@ local git_status = function(opts)
   local timer ---@type uv_timer_t?
 
   local layout, popups, set_preview_content =
-    helpers.create_nvim_preview_layout({
-      preview_in_terminal_mode = true,
-      preview_popup_win_options = { number = false, wrap = false },
+    helpers.create_nvim_diff_preview_layout({
+      preview_popups_win_options = {},
     })
 
   core.fzf(entries, {
@@ -140,11 +139,20 @@ local git_status = function(opts)
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(
           popups.main,
-          popups.nvim_preview
+          popups.nvim_previews.after
         )
         helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-s>", is_terminal = true },
-          { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
+          { popup = popups.main, key = "<C-e>", is_terminal = true },
+          {
+            popup = popups.nvim_previews.before,
+            key = "<C-s>",
+            is_terminal = false,
+          },
+          {
+            popup = popups.nvim_previews.after,
+            key = "<C-f>",
+            is_terminal = false,
+          },
         })
 
         popups.main:map(
@@ -157,40 +165,90 @@ local git_status = function(opts)
       end,
       ["focus"] = function(state)
         local filepath, status = parse_entry(state.focused_entry)
-
-        popups.nvim_preview.border:set_text(
-          "top",
-          " " .. git_utils.convert_filepath_to_gitpath(filepath) .. " "
-        )
+        local filename = vim.fn.fnamemodify(filepath, ":t")
+        local after = vim.fn.readfile(filepath)
 
         if status.renamed then
-          helpers.preview_file(filepath, popups.nvim_preview)
+          local ft = vim.filetype.match({
+            filename = filename,
+            contents = after,
+          })
+          set_preview_content(after, after, {
+            filetype = ft,
+          })
           return
         end
 
-        local command = string.format(
-          "%s diff --color %s %s | delta %s --file-style='omit'",
-          git,
-          status.is_fully_staged and "--staged"
-            or (
-              (status.added or status.is_untracked) and "--no-index /dev/null"
-              or (status.deleted and "--cached -- " or "")
-            ),
-          filepath,
-          helpers.delta_nvim_default_opts
-        )
+        if status.added or status.is_untracked then
+          local ft = vim.filetype.match({
+            filename = filename,
+            contents = after,
+          })
+          set_preview_content({}, after, {
+            filetype = ft,
+          })
+          return
+        end
 
-        local output = vim.fn.systemlist(command)
+        local before = vim.fn.systemlist(
+          string.format(
+            "git show HEAD:%s",
+            git_utils.convert_filepath_to_gitpath(filepath)
+          )
+        )
         if vim.v.shell_error ~= 0 then
           vim.error(
             "Error getting git file diff content for",
             filepath,
-            table.concat(output, "\n")
+            table.concat(before, "\n")
           )
           return
         end
 
-        set_preview_content(output)
+        local staged = vim.fn.systemlist(
+          string.format(
+            "git show :%s",
+            git_utils.convert_filepath_to_gitpath(filepath)
+          )
+        )
+        if vim.v.shell_error ~= 0 then
+          vim.error(
+            "Error getting git file diff content for",
+            filepath,
+            table.concat(staged, "\n")
+          )
+          return
+        end
+
+        if status.deleted then
+          local ft = vim.filetype.match({
+            filename = filename,
+            contents = before,
+          })
+          set_preview_content(before, {}, {
+            filetype = ft,
+          })
+          return
+        end
+
+        if status.is_fully_staged then
+          local ft = vim.filetype.match({
+            filename = filename,
+            contents = after,
+          })
+          set_preview_content(before, after, {
+            filetype = ft,
+          })
+          return
+        end
+
+        local ft = vim.filetype.match({
+          filename = filename,
+          contents = after,
+        })
+        set_preview_content(staged, after, {
+          filetype = ft,
+        })
       end,
       ["+select"] = function(state)
         local filepath, status, gitpath = parse_entry(state.focused_entry)

@@ -289,11 +289,11 @@ function M.setup()
   hi.Todo = { guifg = nil, guibg = c.blue_300, gui = nil, guisp = nil }
 
   -- Diff highlighting
-  hi.DiffAdd = { guifg = nil, guibg = c.blue_100, gui = nil, guisp = nil }
-  hi.DiffChange = { guifg = c.yellow, guibg = nil, gui = nil, guisp = nil }
+  hi.DiffAdd = { guifg = nil, guibg = c.blue_200, gui = nil, guisp = nil }
+  hi.DiffChange = { guifg = nil, guibg = c.yellow_200, gui = nil, guisp = nil }
   hi.DiffDelete =
-    { guifg = c.gray_200, guibg = c.gray_100, gui = nil, guisp = nil }
-  hi.DiffText = { guifg = nil, guibg = c.blue_300, gui = nil, guisp = nil }
+    { guifg = c.gray_200, guibg = c.red_200, gui = nil, guisp = nil }
+  hi.DiffText = { guifg = nil, guibg = c.yellow_400, gui = nil, guisp = nil }
 
   -- GitGutter highlighting
   hi.GitGutterAdd = { guifg = c.blue, guibg = nil, gui = nil, guisp = nil }

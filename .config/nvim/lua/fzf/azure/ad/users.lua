@@ -5,7 +5,7 @@ local utils = require("utils")
 local json = require("utils.json")
 local shared = require("fzf.azure.shared")
 local azuread_objects = require("fzf.azure.ad.objects")
-local azuread_groups = require("fzf.azure.ad.groups")
+-- local azuread_groups = require("fzf.azure.ad.groups")
 
 local manual = {
   businessPhones = "Array of business phone numbers associated with the user.",
@@ -149,7 +149,8 @@ return function(opts)
       ["ctrl-g"] = function(state)
         local user = users[state.focused_entry_index]
 
-        azuread_groups({ user_id = user.id, parent_state = state.id })
+        -- TODO: avoid circular dependency
+        -- azuread_groups({ user_id = user.id, parent_state = state.id })
       end,
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

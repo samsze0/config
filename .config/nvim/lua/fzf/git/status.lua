@@ -167,7 +167,7 @@ local git_status = function(opts)
       ["focus"] = function(state)
         local filepath, status = parse_entry(state.focused_entry)
         local filename = vim.fn.fnamemodify(filepath, ":t")
-        local after = vim.fn.readfile(filepath)
+        local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
 
         if status.renamed then
           local ft = vim.filetype.match({

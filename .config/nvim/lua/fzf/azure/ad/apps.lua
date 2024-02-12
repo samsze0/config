@@ -75,9 +75,9 @@ local manual = {
   },
 }
 
--- Fzf all azuread apps
+-- Fzf all azuread apps associated with the signed-in user
 --
----@param opts? {  }
+---@param opts? { parent_state?: string }
 return function(opts)
   opts = vim.tbl_extend("force", {}, opts or {})
 
@@ -147,5 +147,5 @@ return function(opts)
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
     }),
-  })
+  }, opts.parent_state)
 end

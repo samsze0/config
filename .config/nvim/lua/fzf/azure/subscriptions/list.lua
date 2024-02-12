@@ -7,7 +7,7 @@ local shared = require("fzf.azure.shared")
 
 -- Fzf all azure subscriptions/accounts (both enabled and disabled)
 --
----@param opts? {  }
+---@param opts? { parent_state?: string }
 return function(opts)
   opts = vim.tbl_extend("force", {}, opts or {})
 
@@ -98,5 +98,5 @@ return function(opts)
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
     }),
-  })
+  }, opts.parent_state)
 end

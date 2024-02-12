@@ -4,6 +4,8 @@ local fzf_utils = require("fzf.utils")
 local utils = require("utils")
 local json = require("utils.json")
 local shared = require("fzf.azure.shared")
+local azuread_objects = require("fzf.azure.ad.objects")
+local azuread_groups = require("fzf.azure.ad.groups")
 
 local manual = {
   businessPhones = "Array of business phone numbers associated with the user.",
@@ -19,15 +21,23 @@ local manual = {
   userPrincipalName = "The principal name of the user, used for signing in to their Azure AD account.",
 }
 
--- Fzf all azuread users, or the owners of the azuread service principal (if `service_principal_id` is provided)
+-- Fzf all azuread users associated with the signed-in user,
+-- or the owners of the azuread service principal (if `service_principal_id` is provided)
+-- or the owners of the azuread group (if `owners_group_id` is provided)
+-- or the owners of the azuread group (if `members_group_id` is provided)
 --
----@param opts? { service_principal_id?: string, parent_state?: string }
+---@param opts? { service_principal_id?: string, members_group_id?: string, owners_group_id?: string, parent_state?: string }
 return function(opts)
   opts = vim.tbl_extend("force", {}, opts or {})
 
   ---@alias azuread_user { businessPhones: string[], displayName: string, givenName: string, id: string, jobTitle: string, mail: string, mobilePhone: string, officeLocation: string, preferredLanguage: string, surname: string, userPrincipalName: string }
   ---@type azuread_user[]
   local users
+
+  ---@type azuread_user?
+  local signed_in_user
+
+  local initial_pos
 
   local function get_entries()
     if not shared.is_azurecli_available() then error("Azure cli not found") end
@@ -38,6 +48,21 @@ return function(opts)
         vim.fn.system("az ad sp owner list --id " .. opts.service_principal_id)
       if vim.v.shell_error ~= 0 then
         vim.error("Fail to retrieve azuread service principal owners", result)
+        return {}
+      end
+    elseif opts.owners_group_id then
+      result =
+        vim.fn.system("az ad group owner list --group " .. opts.owners_group_id)
+      if vim.v.shell_error ~= 0 then
+        vim.error("Fail to retrieve azuread group owners", result)
+        return {}
+      end
+    elseif opts.members_group_id then
+      result = vim.fn.system(
+        "az ad group member list --group " .. opts.members_group_id
+      )
+      if vim.v.shell_error ~= 0 then
+        vim.error("Fail to retrieve azuread group members", result)
         return {}
       end
     else
@@ -54,10 +79,27 @@ return function(opts)
     users = json.parse(result) ---@diagnostic disable-line cast-local-type
     ---@cast users azuread_user[]
 
-    return utils.map(
-      users,
-      function(i, user) return fzf_utils.join_by_delim(user.displayName) end
-    )
+    -- TODO: handle case where there is no signed in user
+    local result = vim.fn.system("az ad signed-in-user show")
+    if vim.v.shell_error ~= 0 then
+      vim.error("Fail to retrieve currently signed-in user", result)
+      return {}
+    end
+
+    result = vim.trim(result)
+
+    signed_in_user = json.parse(result) ---@diagnostic disable-line cast-local-type
+    ---@cast signed_in_user azuread_user
+
+    return utils.map(users, function(i, user)
+      local signed_in = user.id == signed_in_user.id
+      if signed_in then initial_pos = i end
+
+      return fzf_utils.join_by_delim(
+        signed_in and utils.ansi_codes.blue("") or " ",
+        user.displayName
+      )
+    end)
   end
 
   local layout, popups, set_preview_content =
@@ -67,6 +109,7 @@ return function(opts)
     prompt = "Azuread-Users",
     layout = layout,
     main_popup = popups.main,
+    initial_position = initial_pos,
     binds = {
       ["+before-start"] = function(state)
         helpers.set_keymaps_for_preview_remote_nav(
@@ -93,6 +136,20 @@ return function(opts)
         local user = users[state.focused_entry_index]
         vim.fn.setreg("+", user.id)
         vim.notify(string.format([[Copied %s to clipboard]], user.id))
+      end,
+      ["ctrl-o"] = function(state)
+        local user = users[state.focused_entry_index]
+        if user.id ~= signed_in_user.id then
+          vim.error("Can only get owned objects for the signed-in user")
+          return
+        end
+
+        azuread_objects({ user_id = user.id, parent_state = state.id })
+      end,
+      ["ctrl-g"] = function(state)
+        local user = users[state.focused_entry_index]
+
+        azuread_groups({ user_id = user.id, parent_state = state.id })
       end,
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

@@ -5,6 +5,8 @@ local utils = require("utils")
 local json = require("utils.json")
 local shared = require("fzf.azure.shared")
 local azuread_users = require("fzf.azure.ad.users")
+local azuread_service_principal_credentials =
+  require("fzf.azure.ad.service-principal-credentials")
 
 local manual = {
   ["@odata.type"] = "The OData type of the service principal object.",
@@ -58,9 +60,9 @@ local manual = {
   },
 }
 
--- Fzf all azuread service principals
+-- Fzf all azuread service principals associated with the signed-in user
 --
----@param opts? {  }
+---@param opts? { parent_state?: string }
 return function(opts)
   opts = vim.tbl_extend("force", {}, opts or {})
 
@@ -138,9 +140,15 @@ return function(opts)
           parent_state = state.id,
         })
       end,
+      ["ctrl-l"] = function(state)
+        local sp = service_principals[state.focused_entry_index]
+        azuread_service_principal_credentials(sp.id, {
+          parent_state = state.id,
+        })
+      end,
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
     }),
-  })
+  }, opts.parent_state)
 end

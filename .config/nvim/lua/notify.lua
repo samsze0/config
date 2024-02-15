@@ -57,6 +57,7 @@ local popup = Popup({
   win_options = {
     winblend = 0,
     winhighlight = "Normal:NormalFloat",
+    wrap = true,
   },
 })
 popup:mount()

@@ -100,7 +100,7 @@ return function(opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    apps = json.parse(result) ---@diagnostic disable-line cast-local-type
+    apps = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast apps azuread_app[]
 
     return utils.map(

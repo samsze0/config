@@ -81,7 +81,7 @@ return function(opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    groups = json.parse(result) ---@diagnostic disable-line cast-local-type
+    groups = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast groups azuread_group[]
 
     return utils.map(

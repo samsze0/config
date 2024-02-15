@@ -33,7 +33,7 @@ return function(opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    subscriptions = json.parse(result) ---@diagnostic disable-line cast-local-type
+    subscriptions = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast subscriptions azure_subscription[]
 
     return utils.map(subscriptions, function(i, acc)

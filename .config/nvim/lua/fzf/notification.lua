@@ -72,7 +72,9 @@ M.notifications = function(opts)
 
   local layout, popups, set_preview_content =
     helpers.create_nvim_preview_layout({
-      preview_popup_win_options = {},
+      preview_popup_win_options = {
+        wrap = true,
+      },
     })
 
   core.fzf(get_entries(), {

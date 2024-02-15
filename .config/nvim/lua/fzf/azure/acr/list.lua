@@ -5,6 +5,13 @@ local utils = require("utils")
 local json = require("utils.json")
 local shared = require("fzf.azure.shared")
 local repositories = require("fzf.azure.acr.repositories")
+local cache_rules = require("fzf.azure.acr.cache_rules")
+local scope_maps = require("fzf.azure.acr.scope_maps")
+local tokens = require("fzf.azure.acr.tokens")
+local geo_replications = require("fzf.azure.acr.geo_replications")
+local network_rules = require("fzf.azure.acr.network_rules")
+local tasks = require("fzf.azure.acr.tasks")
+local webhooks = require("fzf.azure.acr.webhooks")
 
 local manual = {
   adminUserEnabled = "Indicates whether the admin user is enabled.",
@@ -97,7 +104,7 @@ return function(opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    registries = json.parse(result) ---@diagnostic disable-line cast-local-type
+    registries = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast registries azure_container_registry[]
 
     return utils.map(
@@ -145,8 +152,15 @@ return function(opts)
       end,
       ["ctrl-l"] = function(state)
         local registry = registries[state.focused_entry_index]
-        local output =
-          vim.fn.system(string.format("az acr login --name %s", registry.name))
+
+        local command = string.format("az acr login --name %s", registry.name)
+        if true then
+          vim.fn.setreg("+", command)
+          vim.notify(string.format([[Copied %s to clipboard]], command))
+          return
+        end
+
+        local output = vim.fn.system(command)
         if vim.v.shell_error ~= 0 then
           vim.error("Fail to login to azure container registry", output)
           return
@@ -155,15 +169,35 @@ return function(opts)
       end,
       ["ctrl-r"] = function(state)
         local registry = registries[state.focused_entry_index]
-        -- Replications
+        geo_replications(registry.name, { parent_state = state.id })
       end,
       ["ctrl-h"] = function(state)
         local registry = registries[state.focused_entry_index]
-        -- Webhooks
+        webhooks(registry, { parent_state = state.id })
+      end,
+      ["ctrl-n"] = function(state)
+        local registry = registries[state.focused_entry_index]
+        network_rules(registry.name, { parent_state = state.id })
       end,
       ["ctrl-i"] = function(state)
         local registry = registries[state.focused_entry_index]
         repositories(registry.name, { parent_state = state.id })
+      end,
+      ["ctrl-c"] = function(state)
+        local registry = registries[state.focused_entry_index]
+        cache_rules(registry, { parent_state = state.id })
+      end,
+      ["ctrl-m"] = function(state)
+        local registry = registries[state.focused_entry_index]
+        scope_maps(registry.name, { parent_state = state.id })
+      end,
+      ["ctrl-t"] = function(state)
+        local registry = registries[state.focused_entry_index]
+        tasks(registry, { parent_state = state.id })
+      end,
+      ["ctrl-g"] = function(state)
+        local registry = registries[state.focused_entry_index]
+        tokens(registry, { parent_state = state.id })
       end,
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

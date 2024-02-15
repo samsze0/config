@@ -70,6 +70,9 @@ return function(opts)
   ---@type azuread_service_principal[]
   local service_principals
 
+  -- Whether to show all service principals or only the ones owned by the signed-in user
+  local show_all = false
+
   ---@param opts?: { show_mine_only?: boolean }
   local function get_entries(opts)
     opts = vim.tbl_extend("force", { show_mine_only = true }, opts or {})
@@ -87,7 +90,7 @@ return function(opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    service_principals = json.parse(result) ---@diagnostic disable-line cast-local-type
+    service_principals = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast service_principals azuread_service_principal[]
 
     return utils.map(
@@ -128,9 +131,12 @@ return function(opts)
         vim.notify(string.format([[Copied %s to clipboard]], sp.id))
       end,
       ["ctrl-a"] = function(state)
+        show_all = not show_all
         core.send_to_fzf(
           state.id,
-          fzf_utils.reload_action(get_entries({ show_mine_only = false }))
+          fzf_utils.reload_action(
+            get_entries({ show_mine_only = not show_all })
+          )
         )
       end,
       ["ctrl-o"] = function(state)

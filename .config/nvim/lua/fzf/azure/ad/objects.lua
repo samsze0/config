@@ -32,7 +32,7 @@ return function(opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    objects = json.parse(result) ---@diagnostic disable-line cast-local-type
+    objects = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast objects azuread_object[]
 
     return utils.map(

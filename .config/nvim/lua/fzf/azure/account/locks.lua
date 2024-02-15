@@ -27,7 +27,7 @@ return function(opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    locks = json.parse(result) ---@diagnostic disable-line cast-local-type
+    locks = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast locks subscription_level_lock[]
 
     return utils.map(

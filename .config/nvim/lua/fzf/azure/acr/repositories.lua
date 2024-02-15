@@ -22,7 +22,7 @@ local manual = {
 
 -- Fzf all repositories (images) under the acr.
 --
----@param acr: string
+---@param acr string
 ---@param opts? { parent_state?: string }
 return function(acr, opts)
   opts = vim.tbl_extend("force", {}, opts or {})
@@ -45,7 +45,7 @@ return function(acr, opts)
     end
 
     result = vim.trim(result)
-    local repository_names = json.parse(result) ---@diagnostic disable-line cast-local-type
+    local repository_names = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast repository_names string[]
 
     repositories = utils.map(repository_names, function(_, repo_name)
@@ -65,7 +65,7 @@ return function(acr, opts)
         )
         return {}
       end
-      return json.parse(result) ---@diagnostic disable-line cast-local-type
+      return json.parse(result) ---@diagnostic disable-line: cast-local-type
 
       -- TODO: also fetch the tags with the `show-tags` subcommand?
       -- TODO: fetch info of all repositories in parallel

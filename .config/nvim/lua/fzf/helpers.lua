@@ -98,17 +98,21 @@ M.default_fzf_keybinds = {
   -- ["alt-b"] = "preview-down",
 }
 
--- TODO: cleanup layout code
-
 -- Create a simple window layout for Fzf that includes only a main window
 --
 ---@return NuiLayout, { main: NuiPopup }
-M.create_fzf_preview_layout = function()
+M.create_plain_layout = function()
   local main_popup = Popup({
     enter = true,
     focusable = true,
     border = {
       style = "rounded",
+      text = {
+        top = "", -- FIX: border text not showing if undefined
+        bottom = "",
+        top_align = "center",
+        bottom_align = "center",
+      },
     },
     buf_options = {
       modifiable = false,

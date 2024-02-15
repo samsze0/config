@@ -43,7 +43,7 @@ return function(service_principal_id, opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    credentials = json.parse(result) ---@diagnostic disable-line cast-local-type
+    credentials = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast credentials azuread_service_principal_credential[]
 
     return utils.map(

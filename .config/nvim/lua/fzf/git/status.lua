@@ -90,7 +90,7 @@ local git_status = function(opts)
     local worktree_clean = status_y == " "
 
     local added = status_x == "A" and worktree_clean
-    local deleted = status_x == "D" and worktree_clean
+    local deleted = status_x == "D" or status_y == "D"
     local renamed = status_x == "R" and worktree_clean
     local copied = status_x == "C" and worktree_clean
     local type_changed = status_x == "T" and worktree_clean
@@ -167,9 +167,9 @@ local git_status = function(opts)
       ["focus"] = function(state)
         local filepath, status = parse_entry(state.focused_entry)
         local filename = vim.fn.fnamemodify(filepath, ":t")
-        local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
 
         if status.renamed then
+          local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
           local ft = vim.filetype.match({
             filename = filename,
             contents = after,
@@ -181,6 +181,7 @@ local git_status = function(opts)
         end
 
         if status.added or status.is_untracked then
+          local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
           local ft = vim.filetype.match({
             filename = filename,
             contents = after,
@@ -206,6 +207,17 @@ local git_status = function(opts)
           return
         end
 
+        if status.deleted then
+          local ft = vim.filetype.match({
+            filename = filename,
+            contents = before,
+          })
+          set_preview_content(before, {}, {
+            filetype = ft,
+          })
+          return
+        end
+
         local staged = vim.fn.systemlist(
           string.format(
             "git show :%s",
@@ -221,18 +233,8 @@ local git_status = function(opts)
           return
         end
 
-        if status.deleted then
-          local ft = vim.filetype.match({
-            filename = filename,
-            contents = before,
-          })
-          set_preview_content(before, {}, {
-            filetype = ft,
-          })
-          return
-        end
-
         if status.is_fully_staged then
+          local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
           local ft = vim.filetype.match({
             filename = filename,
             contents = after,
@@ -242,6 +244,8 @@ local git_status = function(opts)
           })
           return
         end
+
+        local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
 
         local ft = vim.filetype.match({
           filename = filename,

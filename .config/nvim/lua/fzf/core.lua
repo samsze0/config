@@ -51,6 +51,8 @@ local get_state = function(state_id)
   return state
 end
 
+M.get_state = get_state
+
 -- Invoke event callback
 --
 ---@param state_id string
@@ -364,7 +366,7 @@ M.fzf = function(input, opts, parent_state_id)
 
   local on_buf_leave = function(ctx)
     local success, current_buf_root_state_id = pcall(
-      function() return vim.b[0].fzf_root_state_id end ---@diagnostic disable-line undefined-field
+      function() return vim.b[0].fzf_root_state_id end ---@diagnostic disable-line: undefined-field
     )
     if not success then return end
     local success, prev_buf_root_state_id = pcall(

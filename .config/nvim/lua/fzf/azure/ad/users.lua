@@ -76,7 +76,7 @@ return function(opts)
     result = vim.trim(result)
 
     -- TODO: impl something like zod?
-    users = json.parse(result) ---@diagnostic disable-line cast-local-type
+    users = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast users azuread_user[]
 
     -- TODO: handle case where there is no signed in user
@@ -88,7 +88,7 @@ return function(opts)
 
     result = vim.trim(result)
 
-    signed_in_user = json.parse(result) ---@diagnostic disable-line cast-local-type
+    signed_in_user = json.parse(result) ---@diagnostic disable-line: cast-local-type
     ---@cast signed_in_user azuread_user
 
     return utils.map(users, function(i, user)

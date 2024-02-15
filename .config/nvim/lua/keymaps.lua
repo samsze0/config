@@ -377,6 +377,35 @@ lua_keymap("n", "<space>j", require("fzf.jump").jumps, {})
 lua_keymap("n", "<f9><f1>", require("fzf.docker").docker_images, {})
 lua_keymap("n", "<f9><f2>", require("fzf.docker").docker_containers, {})
 
+-- Azure Fzf
+vim.api.nvim_create_user_command("Azure", require("fzf.azure"), {})
+vim.api.nvim_create_user_command("AzureAcr", require("fzf.azure.acr").list, {})
+vim.api.nvim_create_user_command(
+  "AzureAccountSubscriptions",
+  require("fzf.azure.account").subscriptions,
+  {}
+)
+vim.api.nvim_create_user_command(
+  "AzureAdApps",
+  require("fzf.azure.ad").apps,
+  {}
+)
+vim.api.nvim_create_user_command(
+  "AzureAdUsers",
+  require("fzf.azure.ad").users,
+  {}
+)
+vim.api.nvim_create_user_command(
+  "AzureAdGroups",
+  require("fzf.azure.ad").groups,
+  {}
+)
+vim.api.nvim_create_user_command(
+  "AzureAdServicePrincipals",
+  require("fzf.azure.ad").service_principals,
+  {}
+)
+
 -- LSP
 vim_keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
 vim_keymap("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)

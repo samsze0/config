@@ -142,9 +142,10 @@ end, {})
 - Fzf one after another doesn't enter insert mode
 - Fzf Pulumi
 - Tree hierarchy (an info bar + multi-stage fzf; tree is useful for git)
-- Fzf go back, fzf info bar (as border text)
 - Git diff +/- proper syntax highlighting
 - Git hunk preview as Nui split with proper syntax highlighting
+- Prefetch, job system, fetch-in-background, mark as dirty/stale (need refresh)
+- Optimistic update?
 
 **Mid priority**
 

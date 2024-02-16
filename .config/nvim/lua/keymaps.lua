@@ -405,6 +405,16 @@ vim.api.nvim_create_user_command(
   require("fzf.azure.ad").service_principals,
   {}
 )
+vim.api.nvim_create_user_command(
+  "AzureAdvisorRecommendations",
+  require("fzf.azure.advisor").recommendations,
+  {}
+)
+vim.api.nvim_create_user_command(
+  "AzureAppConfigs",
+  require("fzf.azure.appconfig").list,
+  {}
+)
 
 -- LSP
 vim_keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)

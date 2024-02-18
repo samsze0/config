@@ -2,12 +2,12 @@
 
 # Creates and listen on unix socket server w/ netcat
 nc_socket_listen() {
-	nc -lU "$@"
+	nc -lU $@
 }
 
 # Connect to unix socket server w/ netcat
 nc_socket_connect() {
-	nc -U "$@"
+	nc -U $@
 }
 
 # List sockets with lsof -U

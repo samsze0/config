@@ -34,3 +34,8 @@ block_devices_info() {
 format_disk() {
 	mkfs -t ext4 "$@"
 }
+
+# List all processes
+fzf_process() {
+	ps aux | fzf # a: show processes for all users; x: show also the processes not attached to a terminal; u: formatting
+}

@@ -6,5 +6,5 @@ lemminx_init() {
 	unzip lemminx.zip
 	rm lemminx.zip
 
-  mv lemminx-osx-x86_64 "$HOME/bin/lemminx"
+	mv lemminx-osx-x86_64 "$HOME/bin/lemminx"
 }

@@ -50,7 +50,7 @@ brew_taps_cask_token_list() {
 brew_freeze() (
 	set_flags
 
-	if [ $(arch) = "i386" ]; then # Rosetta
+	if [ "$(arch)" = "i386" ]; then # Rosetta
 		FORMULAE_FILE=~/formulae-x86.brew
 		CASKS_FILE=~/casks-x86.brew
 	else # M1
@@ -97,7 +97,7 @@ brew_uninstall() {
 
 # pip install -r but for brew. Input *.brew files
 brew_install_from() {
-	if [ $(arch) = "i386" ]; then # Rosetta
+	if [ "$(arch)" = "i386" ]; then # Rosetta
 		cat ~/formulae-x86.brew | xargs brew install
 		cat ~/casks-x86.brew | xargs brew install --cask
 	else # M1

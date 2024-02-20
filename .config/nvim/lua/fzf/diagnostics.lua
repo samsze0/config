@@ -15,14 +15,15 @@ M.diagnostics = function(opts)
     current_buffer_only = false,
   }, opts or {})
 
-  local win = vim.api.nvim_get_current_win()
-  local buf = vim.api.nvim_get_current_buf()
-  local current_file = vim.api.nvim_buf_get_name(buf)
+  local current_win = vim.api.nvim_get_current_win()
+  local current_buf = vim.api.nvim_get_current_buf()
+
+  local current_file = vim.api.nvim_buf_get_name(current_buf)
   current_file = vim.fn.fnamemodify(current_file, ":~:.")
 
   local function get_entries()
     local diagnostics = vim.diagnostic.get(
-      opts.current_buffer_only and buf or nil,
+      opts.current_buffer_only and current_buf or nil,
       { severity = opts.severity }
     )
     return utils.map(diagnostics, function(i, e)
@@ -31,18 +32,12 @@ M.diagnostics = function(opts)
       diagnostics[i].filename = filename ---@diagnostic disable-line: inject-field
 
       return fzf_utils.join_by_delim(
-        e.severity == vim.diagnostic.severity.HINT
-            and utils.ansi_codes.blue("H")
-          or e.severity == vim.diagnostic.severity.INFO and utils.ansi_codes.blue(
-            "I"
-          )
-          or e.severity == vim.diagnostic.severity.WARN and utils.ansi_codes.yellow(
-            "W"
-          )
-          or e.severity == vim.diagnostic.severity.ERROR and utils.ansi_codes.red(
-            "E"
-          )
-          or "?",
+        utils.switch(e.severity, {
+          [vim.diagnostic.severity.HINT] = utils.ansi_codes.blue("H"),
+          [vim.diagnostic.severity.INFO] = utils.ansi_codes.blue("I"),
+          [vim.diagnostic.severity.WARN] = utils.ansi_codes.yellow("W"),
+          [vim.diagnostic.severity.ERROR] = utils.ansi_codes.red("E"),
+        }, "?"),
         utils.ansi_codes.grey(e.source),
         utils.ansi_codes.blue(filename),
         e.lnum + 1,
@@ -126,7 +121,7 @@ M.diagnostics = function(opts)
       ["+select"] = function(state)
         local symbol = diagnostics[state.focused_entry_index]
 
-        jumplist.save(win)
+        jumplist.save(current_win)
         if not opts.current_buffer_only then
           vim.cmd(string.format([[e %s]], symbol.filename)) --- @diagnostic disable-line: undefined-field
         end

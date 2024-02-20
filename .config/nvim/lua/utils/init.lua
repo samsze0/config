@@ -461,10 +461,11 @@ M.keys = function(tbl)
 end
 
 ---@generic T : any
+---@generic U : any
 ---@param tbl table<any, T> | T[]
----@param accessor fun(k: any, v: T): any
+---@param accessor fun(k: any, v: T): U
 ---@param opts? { is_array?: boolean }
----@return T
+---@return U
 M.max = function(tbl, accessor, opts)
   opts = vim.tbl_extend("force", {
     is_array = nil, -- If nil, auto-detect if tbl is array
@@ -554,6 +555,90 @@ M.uuid = function()
     return string.format("%x", v)
   end)
   return result
+end
+
+-- Format arguments into a string
+--
+---@vararg any
+---@return string
+M.str_fmt = function(...)
+  local args = { ... }
+  local tbl = M.map(args, function(_, arg)
+    if type(arg) ~= "string" then
+      return vim.inspect(arg)
+    else
+      return arg
+    end
+  end)
+  return table.concat(tbl, " ")
+end
+
+-- vim.system wrapper
+--
+---@param cmd string
+---@param opts? { error_msg_title?: string, input?: any, on_error?: fun(err: string): nil }
+---@return string
+M.system = function(cmd, opts)
+  opts = vim.tbl_extend(
+    "force",
+    { error_msg_title = "Failed to execute command: %s" },
+    opts or {}
+  )
+
+  local result = vim.fn.system(cmd, opts.input)
+  if vim.v.shell_error ~= 0 then
+    if opts.on_error then opts.on_error(result) end
+    error(M.str_fmt(opts.error_msg_title, result))
+  end
+
+  return result
+end
+
+-- vim.systemlist wrapper
+--
+---@param cmd string
+---@param opts? { error_msg_title?: string, input?: any, keepempty?: boolean, on_error?: fun(err: string): nil }
+---@return string[]
+M.systemlist = function(cmd, opts)
+  opts = vim.tbl_extend(
+    "force",
+    { error_msg_title = "Failed to execute command: %s" },
+    opts or {}
+  )
+
+  local result = vim.fn.systemlist(cmd, opts.input, opts.keepempty)
+  if vim.v.shell_error ~= 0 then
+    if opts.on_error then opts.on_error(result) end
+    error(M.str_fmt(opts.error_msg_title, table.concat(result, "\n")))
+  end
+
+  return result
+end
+
+-- Switch statement/expression
+--
+---@generic T : any
+---@generic U : any
+---@param val T
+---@param switches table<T, U | fun(val: T): U>
+---@param default U | fun(val: T): U
+---@return U
+M.switch = function(val, switches, default)
+  for case, expr in pairs(switches) do
+    if val == case then
+      if type(expr) == "function" then
+        return expr(val)
+      else
+        return expr
+      end
+    end
+  end
+
+  if type(default) == "function" then
+    return default(val)
+  else
+    return default
+  end
 end
 
 return M

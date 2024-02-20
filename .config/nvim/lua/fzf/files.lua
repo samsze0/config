@@ -34,18 +34,16 @@ M.files = function(opts)
     entries = git_utils.git_files(opts.git_dir)
   else
     if vim.fn.executable("fd") ~= 1 then error("fd is not installed") end
-    entries = vim.fn.systemlist(
+    entries = utils.systemlist(
       string.format([[fd --type f --no-ignore %s]], opts.fd_extra_args)
     )
   end
-  if #entries > opts.max_num_files then
-    vim.error("Too many git files")
-    return
-  end
+  if #entries > opts.max_num_files then error("Too many git files") end
   ---@cast entries string[]
+
   entries = utils.sort_by_files(entries)
 
-  local win = vim.api.nvim_get_current_win()
+  local current_win = vim.api.nvim_get_current_win()
 
   local layout, popups, set_preview_content =
     helpers.create_nvim_preview_layout()
@@ -69,18 +67,17 @@ M.files = function(opts)
         local entry = state.focused_entry
         local path = parse_entry(entry)
 
-        popups.nvim_preview.border:set_text("top", " " .. path .. " ")
+        popups.nvim_preview.border:set_text("top", " " .. entry .. " ")
 
-        local is_binary =
-          vim.fn.system("file --mime " .. path):match("charset=binary")
-
-        if vim.v.shell_error ~= 0 then
-          vim.error("Failed to determine if file is binary using file command")
-          set_preview_content({
-            "Cannot determine if file is binary",
+        local is_binary = utils
+          .system("file --mime " .. path, {
+            on_error = function()
+              set_preview_content({
+                "Cannot determine if file is binary",
+              })
+            end,
           })
-          return
-        end
+          :match("charset=binary")
 
         if is_binary then
           set_preview_content({ "No preview available" })
@@ -118,7 +115,7 @@ M.files = function(opts)
         local entry = state.focused_entry
         local path = parse_entry(entry)
 
-        jumplist.save(win)
+        jumplist.save(current_win)
         vim.cmd(string.format([[e %s]], path))
       end,
     },

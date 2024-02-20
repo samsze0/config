@@ -16,14 +16,16 @@ M.jumps = function(opts)
     max_num_entries = 100,
   }, opts or {})
 
+  ---@type jump[]
   local jumps
 
   local pos
-  local win = vim.api.nvim_get_current_win()
+
+  local current_win = vim.api.nvim_get_current_win()
 
   local function get_entries()
     jumps, pos = jumplist.get_jumps_as_list(
-      win,
+      current_win,
       { max_num_entries = opts.max_num_entries }
     )
     pos = pos or 0

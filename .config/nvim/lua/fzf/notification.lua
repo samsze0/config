@@ -5,6 +5,7 @@ local fzf_utils = require("fzf.utils")
 local helpers = require("fzf.helpers")
 local timeago = require("utils.timeago")
 local utils = require("utils")
+local notifier = require("notify")
 
 -- Fzf all notifications
 --
@@ -18,24 +19,26 @@ M.notifications = function(opts)
   }, opts or {})
 
   local get_entries = function()
-    local notifications = _G.notifications
-    local num_unread = utils.sum(_G.notification_meta.unread)
-    _G.notification_meta.unread = {} -- Clear unread
+    local notifications = notifier.notifications
+    local num_unread = utils.sum(notifier.unread_notifications)
+    notifier.clear_unread()
 
     local entries = {}
     for i = #notifications, 1, -1 do
       if #entries >= opts.max_num_entries then break end
 
       local noti = notifications[i]
-      local level = noti.level
+      local l = noti.level
+      ---@type string
+      local level
       local unread = #entries < num_unread
-      if level == vim.log.levels.INFO then
+      if l == vim.log.levels.INFO then
         level = unread and utils.ansi_codes.blue("󰋼 ") or "󰋼 "
-      elseif level == vim.log.levels.WARN then
+      elseif l == vim.log.levels.WARN then
         level = unread and utils.ansi_codes.yellow(" ") or " "
-      elseif level == vim.log.levels.ERROR then
+      elseif l == vim.log.levels.ERROR then
         level = unread and utils.ansi_codes.red(" ") or " "
-      elseif level == vim.log.levels.DEBUG or level == vim.log.levels.TRACE then
+      elseif l == vim.log.levels.DEBUG or level == vim.log.levels.TRACE then
         level = unread and utils.ansi_codes.grey(" ") or " "
       else
         level = unread and utils.ansi_codes.grey(" ") or " "
@@ -61,7 +64,8 @@ M.notifications = function(opts)
   end
 
   local get_notification = function(index)
-    return _G.notifications[#_G.notifications - index + 1]
+    local notifications = require("notify").notifications
+    return notifications[#notifications - index + 1]
   end
 
   local parse_entry = function(entry)

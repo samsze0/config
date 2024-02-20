@@ -163,6 +163,8 @@ end, {})
 - Async
 - OOP
 - Threads pool and sync primitives (semaphore)
+- Fzf tailscale
+- Fzf syncthing (supported?)
 
 **Low priority**
 

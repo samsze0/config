@@ -24,6 +24,7 @@ git-delta
 gnu-sed
 gojq
 golangci-lint
+google-java-format
 gopls
 gradle
 grafana

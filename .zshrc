@@ -16,6 +16,9 @@ source ~/.config/zsh/syncthing.sh
 source ~/.config/zsh/osx.sh
 source ~/.config/zsh/bat.sh
 source ~/.config/zsh/lemminx.sh
+source ~/.config/zsh/azure.sh
+source ~/.config/zsh/openssh.sh
+source ~/.config/zsh/android.sh
 
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
@@ -72,6 +75,16 @@ function rbenv_init_if_available() {
 	fi
 }
 
+function nvm_init_if_available() {
+  export NVM_DIR="$HOME/.nvm"
+  if [[ -s "$HOME/homebrew/opt/nvm/nvm.sh" ]]; then
+    . "$HOME/homebrew/opt/nvm/nvm.sh"
+  fi
+  if [[ -s "$HOME/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]]; then
+    . "/Users/mingsumsze/homebrew/opt/nvm/etc/bash_completion.d/nvm"
+  fi
+}
+
 if [ $(arch) = "x86_64" ]; then # Linux / NixOS
 	starship_init_if_available
 	zoxide_init_if_available
@@ -122,6 +135,7 @@ else                           # OSX
 	pyenv_init_if_available
 	pip_init_if_available
 	rbenv_init_if_available
+  nvm_init_if_available
 
 	export BROWSER="open -a '/Applications/Firefox Developer Edition.app'"
 	export IMAGE_VIEWER="open"

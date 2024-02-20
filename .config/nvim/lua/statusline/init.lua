@@ -76,10 +76,7 @@ M.setup = function()
   vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
 
   -- Subscribe to notifications
-  if not _G.notifications then
-    error("Statusline must be loaded after notify backend")
-  end
-  table.insert(_G.notification_subscribers, function() set_active() end)
+  require("notify").subscribe(function() set_active() end)
 end
 
 local pcall_section = function(section, name)
@@ -232,11 +229,13 @@ M.section_copilot = function()
 end
 
 M.section_notifications = function()
-  if vim.tbl_isempty(_G.notification_meta.unread) then return "" end
+  local unread_notifications = require("notify").unread_notifications
+
+  if vim.tbl_isempty(unread_notifications) then return "" end
 
   local result = {}
 
-  local error_count = _G.notification_meta.unread[vim.log.levels.ERROR] or 0
+  local error_count = unread_notifications[vim.log.levels.ERROR] or 0
   if error_count > 0 then
     table.insert(
       result,
@@ -244,7 +243,7 @@ M.section_notifications = function()
     )
   end
 
-  local warn_count = _G.notification_meta.unread[vim.log.levels.WARN] or 0
+  local warn_count = unread_notifications[vim.log.levels.WARN] or 0
   if warn_count > 0 then
     table.insert(
       result,
@@ -252,7 +251,7 @@ M.section_notifications = function()
     )
   end
 
-  local total_count = utils.sum(vim.tbl_values(_G.notification_meta.unread))
+  local total_count = utils.sum(vim.tbl_values(unread_notifications))
   local other_count = total_count - error_count - warn_count
   if other_count > 0 then
     table.insert(

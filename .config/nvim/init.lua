@@ -6,7 +6,7 @@ vim.opt.number = true
 vim.opt.cursorline = false -- Highlight current line
 vim.opt.signcolumn = "auto"
 vim.opt.signcolumn = "yes:1" -- Maximum 1 signs, fixed
-vim.opt.wrap = false
+vim.opt.wrap = true
 
 -- New window spawn on right or bottom
 vim.opt.splitright = true

@@ -121,6 +121,7 @@ M.create_plain_layout = function()
     win_options = {
       winblend = 0,
       winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+      wrap = false,
     },
   })
 
@@ -180,6 +181,7 @@ M.create_nvim_preview_layout = function(opts)
     win_options = {
       winblend = 0,
       winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+      wrap = false,
     },
   })
 
@@ -206,6 +208,7 @@ M.create_nvim_preview_layout = function(opts)
       number = true,
       conceallevel = opts.preview_in_terminal_mode and 3 or 0,
       concealcursor = "nvic",
+      wrap = false,
     }, opts.preview_popup_win_options),
   })
 
@@ -286,6 +289,7 @@ M.create_nvim_diff_preview_layout = function(opts)
     win_options = {
       winblend = 0,
       winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+      wrap = false,
     },
   })
 

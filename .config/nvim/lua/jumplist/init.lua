@@ -1,29 +1,43 @@
 -- TODO: move away from global vars
 
-_G.jumps_subscribers = {}
-_G.current_jump = {}
-
-local debug = true
+---@type fun(win_id: number)[]
+local jumps_subscribers = {}
 
 local M = {}
+
+---@param callback fun(win_id: number)
+M.subscribe = function(callback) table.insert(jumps_subscribers, callback) end
+
+---@alias jump { filename: string, line: number, col: number, time: number, text: string }
+---@alias jump_node { value: jump, next: jump_node[], prev: jump_node | nil }
+
+---@type table<number, jump_node>
+M.current_jump = {}
+
+local debug = true
 
 -- FIX: Quickly jumping back and forward crashes window, regardless of whether there is a next node
 
 local ag = vim.api.nvim_create_augroup("Jump", { clear = true })
 
+---@param opts? { }
 M.setup = function(opts)
   opts = vim.tbl_extend("force", {}, opts or {})
   vim.api.nvim_create_autocmd("WinClosed", {
     group = ag,
     callback = function(ctx)
       local win_id = ctx.match
-      _G.current_jump[win_id] = nil
+      M.current_jump[win_id] = nil
     end,
   })
 end
 
+---@param value jump
+---@return jump_node
 local function new_node(value) return { value = value, next = {}, prev = nil } end
 
+---@param win_id number
+---@return jump
 local function create_jump(win_id)
   local bufnr = vim.api.nvim_win_get_buf(win_id)
   local line, col = unpack(vim.api.nvim_win_get_cursor(win_id))
@@ -42,8 +56,10 @@ local function create_jump(win_id)
   return jump
 end
 
+---@param win_id number
+---@return boolean
 local function cursor_on_current_jump(win_id)
-  local current_jump_node = _G.current_jump[win_id]
+  local current_jump_node = M.current_jump[win_id]
   if not current_jump_node then return false end
   local current_jump = current_jump_node.value
   local jump = create_jump(win_id)
@@ -52,29 +68,40 @@ local function cursor_on_current_jump(win_id)
     and jump.col == current_jump.col
 end
 
+---@param win_id number
 local function notify_subscribers(win_id)
-  for _, sub in ipairs(_G.jumps_subscribers) do
+  for _, sub in ipairs(jumps_subscribers) do
     sub(win_id)
   end
 end
 
+---@param jump jump
 local function jump_to(jump)
   vim.cmd("e " .. jump.filename)
   vim.api.nvim_win_set_cursor(0, { jump.line, jump.col })
 end
 
+---@param win_id number
 local function jump_to_current(win_id)
-  local jump = _G.current_jump[win_id].value
+  local jump = M.current_jump[win_id].value
   jump_to(jump)
 end
 
+-- Get jumps as list
+--
+---@param win_id number
+---@param opts? { max_num_entries?: number }
+---@return jump[] jumps, number? current_jump_idx
 function M.get_jumps_as_list(win_id, opts)
   opts = vim.tbl_extend("force", { max_num_entries = 100 }, opts or {})
+
   win_id = win_id or vim.api.nvim_get_current_win()
+
   local node = M.get_latest_jump(win_id)
-  if node == nil then return {} end
+  if node == nil then return {}, nil end
+
   local current_jump_idx = nil
-  local current_jumpnode = _G.current_jump[win_id]
+  local current_jumpnode = M.current_jump[win_id]
 
   local entries = {}
   for i = 1, opts.max_num_entries do
@@ -86,6 +113,9 @@ function M.get_jumps_as_list(win_id, opts)
   return entries, current_jump_idx
 end
 
+-- Save current position as jump
+--
+---@param win_id number
 function M.save(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   local buf = vim.api.nvim_win_get_buf(win_id)
@@ -101,71 +131,77 @@ function M.save(win_id)
   local jump = create_jump(win_id)
 
   local node = new_node(jump)
-  if not _G.current_jump[win_id] then
-    _G.current_jump[win_id] = node
+  if not M.current_jump[win_id] then
+    M.current_jump[win_id] = node
   else
-    table.insert(_G.current_jump[win_id].next, node)
-    node.prev = _G.current_jump[win_id]
-    _G.current_jump[win_id] = node
+    table.insert(M.current_jump[win_id].next, node)
+    node.prev = M.current_jump[win_id]
+    M.current_jump[win_id] = node
   end
 
   notify_subscribers(win_id)
 end
 
+-- Jump back
+--
+---@param win_id? number
 function M.jump_back(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   if debug then
     vim.notify(
       string.format(
         "Jumping back from\n%s",
-        vim.inspect(_G.current_jump[win_id])
+        vim.inspect(M.current_jump[win_id])
       )
     )
   end
-  if not _G.current_jump[win_id] then
+  if not M.current_jump[win_id] then
     vim.notify("No jumps for window " .. win_id)
     return
   end
   if cursor_on_current_jump(win_id) then
-    if _G.current_jump[win_id].prev == nil then
+    if M.current_jump[win_id].prev == nil then
       vim.notify("No previous jump")
       return
     end
 
-    _G.current_jump[win_id] = _G.current_jump[win_id].prev
+    M.current_jump[win_id] = M.current_jump[win_id].prev
     jump_to_current(win_id)
   else
     local jump = create_jump(win_id)
     local node = new_node(jump)
-    table.insert(_G.current_jump[win_id].next, node)
-    node.prev = _G.current_jump[win_id]
+    table.insert(M.current_jump[win_id].next, node)
+    node.prev = M.current_jump[win_id]
     jump_to_current(win_id)
   end
 
   notify_subscribers(win_id)
 end
 
+-- Jump forward
+--
+---@param win_id? number
 function M.jump_forward(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   if debug then
     vim.notify(
       string.format(
         "Jumping forward from\n%s",
-        vim.inspect(_G.current_jump[win_id])
+        vim.inspect(M.current_jump[win_id])
       )
     )
   end
-  if not _G.current_jump[win_id] then
-    vim.notify("No jumps for window " .. win_id)
+  if not M.current_jump[win_id] then
+    vim.warn("No jumps for window", win_id)
     return
   end
-  local next = _G.current_jump[win_id].next
+  local next = M.current_jump[win_id].next
   if #next == 0 then
-    vim.notify("No next jump")
+    vim.warn("No next jump")
     return
   end
   if not cursor_on_current_jump(win_id) then
-    _G.current_jump[win_id].value = create_jump(win_id) -- Update current jump
+    M.current_jump[win_id].value = create_jump(win_id) -- Update current jump
   end
 
   local node = next[#next]
@@ -174,17 +210,21 @@ function M.jump_forward(win_id)
     jump_to(jump)
     table.remove(next, #next)
   else
-    _G.current_jump[win_id] = node
+    M.current_jump[win_id] = node
     jump_to_current(win_id)
   end
 
   notify_subscribers(win_id)
 end
 
+-- Get the latest jump node for a window
+--
+---@param win_id number
+---@return jump_node?
 function M.get_latest_jump(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
-  if not _G.current_jump[win_id] then return nil end
-  local latest = _G.current_jump[win_id]
+  if not M.current_jump[win_id] then return nil end
+  local latest = M.current_jump[win_id]
   while #latest.next > 0 do
     latest = latest.next[#latest.next]
   end

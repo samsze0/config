@@ -45,19 +45,13 @@ M.clear_unread = function() M.unread_notifications = {} end
 ---@param level number
 ---@return string
 local function log_level_to_str(level)
-  if level == vim.log.levels.ERROR then
-    return "Error"
-  elseif level == vim.log.levels.WARN then
-    return "Warn"
-  elseif level == vim.log.levels.INFO then
-    return "Info"
-  elseif level == vim.log.levels.DEBUG then
-    return "Debug"
-  elseif level == vim.log.levels.TRACE then
-    return "Trace"
-  else
-    return "Unknown"
-  end
+  return utils.switch(level, {
+    [vim.log.levels.ERROR] = "Error",
+    [vim.log.levels.WARN] = "Warn",
+    [vim.log.levels.INFO] = "Info",
+    [vim.log.levels.DEBUG] = "Debug",
+    [vim.log.levels.TRACE] = "Trace",
+  }, "Unknown")
 end
 
 local popup = Popup({

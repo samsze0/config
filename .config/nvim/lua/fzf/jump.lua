@@ -8,6 +8,8 @@ local jumplist = require("jumplist")
 
 local fn = vim.fn
 
+-- FIX: remove extra spacing in the main popup window
+
 -- Show jump tree
 --
 ---@param opts? { max_num_entries?: number }

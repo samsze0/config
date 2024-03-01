@@ -83,6 +83,11 @@ local grep_file = function(opts)
           { event.TextChanged, event.TextChangedI },
           function() reload_preview(state) end
         )
+
+        popups.main.border:set_text(
+          "bottom",
+          " <select> goto | <l> loclist | <p> replace "
+        )
       end,
       ["+select"] = function(state)
         local line = parse_entry(state.focused_entry)

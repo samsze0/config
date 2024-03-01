@@ -54,7 +54,7 @@ vim.opt.ignorecase = true
 vim.opt.hlsearch = true -- Highlight all matches. Pair with keymap :noh to clear highlights
 
 -- Conceal
-vim.opt.conceallevel = 2
+vim.opt.conceallevel = 0
 
 vim.opt.fillchars:append({ diff = "╱" })
 

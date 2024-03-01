@@ -11,11 +11,11 @@ local fn = vim.fn
 return function(opts)
   opts = vim.tbl_extend("force", {}, opts or {})
 
-  local win = vim.api.nvim_get_current_win()
-  local buf = vim.api.nvim_get_current_buf()
+  local current_win = vim.api.nvim_get_current_win()
+  local current_buf = vim.api.nvim_get_current_buf()
 
   local function get_entries()
-    local ll = vim.fn.getloclist(win)
+    local ll = vim.fn.getloclist(current_win)
 
     return utils.map(
       ll,
@@ -64,6 +64,11 @@ return function(opts)
             is_terminal = false,
           },
         })
+
+        popups.main.border:set_text(
+          "bottom",
+          " <select> goto buf | <w> write all changes "
+        )
       end,
       ["focus"] = function(state)
         local bufnr, filepath, row, col = parse_entry(state.focused_entry)

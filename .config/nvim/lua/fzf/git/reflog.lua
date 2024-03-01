@@ -12,14 +12,11 @@ return function(opts)
     git_dir = git_utils.current_git_dir(),
   }, opts or {})
 
+  ---@type { sha: string, ref: string, action: string, description: string }[]
   local reflog
 
   local get_entries = function()
-    local result = vim.fn.systemlist("git reflog")
-    if vim.v.shell_error ~= 0 then
-      vim.error("Error getting git reflog")
-      return {}
-    end
+    local result = utils.systemlist("git reflog")
 
     local entries = {}
     reflog = {}
@@ -42,10 +39,7 @@ return function(opts)
           description = description,
         })
       else
-        vim.notify(
-          "Failed to parse git reflog entry: " .. line,
-          vim.log.levels.WARN
-        )
+        vim.warn("Failed to parse git reflog entry", line)
       end
     end
     return entries
@@ -71,6 +65,8 @@ return function(opts)
           { popup = popups.main, key = "<C-s>", is_terminal = true },
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
         })
+
+        popups.main.border:set_text("bottom", " <y> copy ref ")
       end,
       ["focus"] = function(state)
         local ref = reflog[state.focused_entry_index].ref
@@ -82,17 +78,8 @@ return function(opts)
           helpers.delta_nvim_default_opts
         )
 
-        local output = vim.fn.systemlist(command)
-        if vim.v.shell_error ~= 0 then
-          vim.error(
-            "Error getting details for git ref",
-            ref,
-            table.concat(output, "\n")
-          )
-          return
-        end
-
-        set_preview_content(output)
+        local reflog = utils.systemlist(command)
+        set_preview_content(reflog)
       end,
       ["+select"] = function(state)
         local ref = reflog[state.focused_entry_index].ref

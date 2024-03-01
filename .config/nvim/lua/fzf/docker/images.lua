@@ -25,11 +25,7 @@ M.docker_images = function(opts)
     -- if vim.fn.executable("jq") ~= 1 then
     --   error("jq executable not found")
     -- end
-    local result = vim.fn.system("docker image ls -a --format json")
-    if vim.v.shell_error ~= 0 then
-      vim.error("Fail to retrieve docker images", result)
-      return {}
-    end
+    local result = utils.system("docker image ls -a --format json")
 
     result = vim.trim(result)
 
@@ -49,8 +45,6 @@ M.docker_images = function(opts)
 
   local entries = get_entries()
 
-  local win = vim.api.nvim_get_current_win()
-
   local layout, popups, set_preview_content =
     helpers.create_nvim_preview_layout()
 
@@ -68,6 +62,8 @@ M.docker_images = function(opts)
           { popup = popups.main, key = "<C-s>", is_terminal = true },
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
         })
+
+        popups.main.border:set_text("bottom", " <y> copy id | <x> delete ")
       end,
       ["focus"] = function(state)
         local image = images[state.focused_entry_index]
@@ -88,11 +84,7 @@ M.docker_images = function(opts)
       ["ctrl-x"] = function(state)
         local image = images[state.focused_entry_index]
 
-        vim.fn.system(string.format([[docker image rm %s]], image.ID))
-        if vim.v.shell_error ~= 0 then
-          vim.error("Fail to delete image")
-          return
-        end
+        utils.system(string.format([[docker image rm %s]], image.ID))
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
     },

@@ -21,7 +21,7 @@ local M = {
   fzf_default_args = {
     ["--padding"] = "0,1",
     ["--margin"] = "0",
-    ["--scroll-off"] = "10",
+    ["--scroll-off"] = "2",
   },
   fzf_default_preview_window_args = "right,50%,border-none,wrap,nofollow,nocycle",
 }
@@ -110,8 +110,8 @@ M.create_plain_layout = function()
       text = {
         top = "", -- FIX: border text not showing if undefined
         bottom = "",
-        top_align = "center",
-        bottom_align = "center",
+        top_align = "left",
+        bottom_align = "left",
       },
     },
     buf_options = {
@@ -170,8 +170,8 @@ M.create_nvim_preview_layout = function(opts)
       text = {
         top = "", -- FIX: border text not showing if undefined
         bottom = "",
-        top_align = "center",
-        bottom_align = "center",
+        top_align = "left",
+        bottom_align = "left",
       },
     },
     buf_options = {
@@ -278,8 +278,8 @@ M.create_nvim_diff_preview_layout = function(opts)
       text = {
         top = "", -- FIX: border text not showing if undefined
         bottom = "",
-        top_align = "center",
-        bottom_align = "center",
+        top_align = "left",
+        bottom_align = "left",
       },
     },
     buf_options = {

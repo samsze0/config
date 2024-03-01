@@ -11,7 +11,7 @@ local jumplist = require("jumplist")
 return function(opts)
   opts = vim.tbl_extend("force", {}, opts or {})
 
-  local win = vim.api.nvim_get_current_win()
+  local current_win = vim.api.nvim_get_current_win()
 
   local handle = vim.lsp.buf.definition({
     on_list = function(list)
@@ -62,6 +62,11 @@ return function(opts)
                 is_terminal = false,
               },
             })
+
+            popups.main.border:set_text(
+              "bottom",
+              " <select> goto | <w> goto (window) | <t> goto (tab) "
+            )
           end,
           ["focus"] = function(state)
             local symbol = defs[state.focused_entry_index]
@@ -80,7 +85,7 @@ return function(opts)
           ["+select"] = function(state)
             local symbol = defs[state.focused_entry_index]
 
-            jumplist.save(win)
+            jumplist.save(current_win)
             vim.cmd("e " .. symbol.filename)
             vim.fn.cursor({ symbol.lnum, symbol.col })
             vim.cmd("normal! zz")

@@ -65,6 +65,8 @@ local git_commits = function(opts)
           { popup = popups.main, key = "<C-s>", is_terminal = true },
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
         })
+
+        popups.main.border:set_text("bottom", " <y> copy hash ")
       end,
       ["focus"] = function(state)
         local commit_hash, commit_subject = parse_entry(state.focused_entry)

@@ -92,6 +92,15 @@ local grep = function(opts)
           { event.TextChanged, event.TextChangedI },
           function() reload_preview(state) end
         )
+
+        popups.main.border:set_text(
+          "bottom",
+          " <select> goto | <w> goto (window) | <t> goto (tab) "
+        )
+        popups.nvim_preview.border:set_text(
+          "bottom",
+          " <l> loclist | <p> replace | <y> copy path "
+        )
       end,
       ["+select"] = function(state)
         local filepath, line = parse_entry(state.focused_entry)

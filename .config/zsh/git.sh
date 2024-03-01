@@ -4,6 +4,14 @@ git_stash_show() {
 	git stash show -u --full-index "$@"
 }
 
+git_fetch_prune() {
+	git fetch --prune
+}
+
+git_remote_prune() {
+	git remote update origin --prune
+}
+
 # Git diff helper
 # man git diff
 git_diff() (

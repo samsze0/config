@@ -18,23 +18,22 @@ local git_status = function(opts)
   local git = string.format([[git -C %s]], opts.git_dir)
 
   local function get_entries()
-    local entries = vim.fn.systemlist(
+    local entries = utils.systemlist(
       string.format(
         [[%s -c color.status=false status -su]], -- Show in short format and show all untracked files
         git
       ),
-      nil,
-      false
+      {
+        keepempty = false,
+      }
     )
 
-    if vim.v.shell_error ~= 0 then
-      vim.error("Error getting git status")
-      return {}
-    end
-
     if #entries > opts.max_num_files then
-      vim.error("Too many files to show in git status")
-      return {}
+      vim.warn(
+        "Too many files to show in git status. Only showing the top",
+        opts.max_num_files
+      )
+      entries = utils.slice(entries, 1, opts.max_num_files)
     end
 
     entries = utils.sort_by_files(entries, function(e) return e:sub(4) end)
@@ -156,12 +155,9 @@ local git_status = function(opts)
           },
         })
 
-        popups.main:map(
-          "t",
-          "<C-r>",
-          function()
-            core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
-          end
+        popups.main.border:set_text(
+          "bottom",
+          " <select> goto file | <left> stage | <right> unstage | <x> restore | <y> copy path | <r> reload "
         )
       end,
       ["focus"] = function(state)
@@ -192,20 +188,12 @@ local git_status = function(opts)
           return
         end
 
-        local before = vim.fn.systemlist(
+        local before = utils.systemlist(
           string.format(
             "git show HEAD:%s",
             git_utils.convert_filepath_to_gitpath(filepath)
           )
         )
-        if vim.v.shell_error ~= 0 then
-          vim.error(
-            "Error getting git file diff content for",
-            filepath,
-            table.concat(before, "\n")
-          )
-          return
-        end
 
         if status.deleted then
           local ft = vim.filetype.match({
@@ -218,20 +206,12 @@ local git_status = function(opts)
           return
         end
 
-        local staged = vim.fn.systemlist(
+        local staged = utils.systemlist(
           string.format(
             "git show :%s",
             git_utils.convert_filepath_to_gitpath(filepath)
           )
         )
-        if vim.v.shell_error ~= 0 then
-          vim.error(
-            "Error getting git file diff content for",
-            filepath,
-            table.concat(staged, "\n")
-          )
-          return
-        end
 
         if status.is_fully_staged then
           local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
@@ -259,32 +239,12 @@ local git_status = function(opts)
         local filepath, status, gitpath = parse_entry(state.focused_entry)
 
         if status.has_merge_conflicts then
-          local ours = vim.fn.systemlist(
+          local ours = utils.systemlist(
             string.format([[git -C %s show :2:%s]], opts.git_dir, gitpath)
           )
-          if vim.v.shell_error ~= 0 then
-            vim.error(
-              string.format(
-                [[Error getting ours version of file: %s]],
-                filepath,
-                table.concat(ours, "\n")
-              )
-            )
-            return
-          end
-          local theirs = vim.fn.systemlist(
+          local theirs = utils.systemlist(
             string.format([[git -C %s show :3:%s]], opts.git_dir, gitpath)
           )
-          if vim.v.shell_error ~= 0 then
-            vim.error(
-              string.format(
-                [[Error getting theirs version of file: %s]],
-                filepath,
-                table.concat(theirs, "\n")
-              )
-            )
-            return
-          end
 
           local filename = vim.fn.fnamemodify(filepath, ":t")
           local ft = vim.filetype.match({
@@ -315,20 +275,16 @@ local git_status = function(opts)
       ["left"] = function(state)
         local filepath = parse_entry(state.focused_entry)
 
-        local output = vim.fn.system(string.format([[git add %s]], filepath))
-        if vim.v.shell_error ~= 0 then
-          vim.error("Error staging file", filepath, output)
-        end
+        utils.system(string.format([[git add %s]], filepath))
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["right"] = function(state)
         local filepath = parse_entry(state.focused_entry)
 
-        local output =
-          vim.fn.system(string.format([[git restore --staged %s]], filepath))
-        if vim.v.shell_error ~= 0 then
-          vim.error("Error restoring staged file", filepath, output)
-        end
+        utils.system(string.format([[git restore --staged %s]], filepath))
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
+      end,
+      ["ctrl-r"] = function(state)
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["ctrl-y"] = function(state)
@@ -345,13 +301,12 @@ local git_status = function(opts)
           return
         end
 
-        vim.fn.system(string.format([[git restore %s]], filepath))
-        if vim.v.shell_error ~= 0 then
-          local output = vim.fn.system(string.format([[rm %s]], filepath))
-          if vim.v.shell_error ~= 0 then
-            vim.error("Error restoring/deleting file", filepath, output)
-          end
-        end
+        utils.system(string.format([[git restore %s]], filepath), {
+          on_error = function(err)
+            utils.system(string.format([[rm %s]], filepath))
+          end,
+          throw_error = false,
+        })
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
     },

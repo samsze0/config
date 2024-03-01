@@ -64,6 +64,8 @@ return function()
             is_terminal = false,
           },
         })
+
+        popups.main.border:set_text("bottom", " <select> goto | <x> delete ")
       end,
       ["focus"] = function(state)
         local bufnr, filepath = parse_entry(state.focused_entry)

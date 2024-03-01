@@ -576,19 +576,19 @@ end
 -- vim.system wrapper
 --
 ---@param cmd string
----@param opts? { error_msg_title?: string, input?: any, on_error?: fun(err: string): nil }
+---@param opts? { error_msg_title?: string, input?: any, throw_error?: boolean, on_error?: fun(err: string): nil }
 ---@return string
 M.system = function(cmd, opts)
   opts = vim.tbl_extend(
     "force",
-    { error_msg_title = "Failed to execute command: %s" },
+    { error_msg_title = "Failed to execute command: %s", throw_error = true },
     opts or {}
   )
 
   local result = vim.fn.system(cmd, opts.input)
   if vim.v.shell_error ~= 0 then
     if opts.on_error then opts.on_error(result) end
-    error(M.str_fmt(opts.error_msg_title, result))
+    if opts.throw_error then error(M.str_fmt(opts.error_msg_title, result)) end
   end
 
   return result
@@ -597,7 +597,7 @@ end
 -- vim.systemlist wrapper
 --
 ---@param cmd string
----@param opts? { error_msg_title?: string, input?: any, keepempty?: boolean, on_error?: fun(err: string): nil }
+---@param opts? { error_msg_title?: string, input?: any, keepempty?: boolean, throw_error?: boolean, on_error?: fun(err: string): nil }
 ---@return string[]
 M.systemlist = function(cmd, opts)
   opts = vim.tbl_extend(
@@ -609,7 +609,9 @@ M.systemlist = function(cmd, opts)
   local result = vim.fn.systemlist(cmd, opts.input, opts.keepempty)
   if vim.v.shell_error ~= 0 then
     if opts.on_error then opts.on_error(result) end
-    error(M.str_fmt(opts.error_msg_title, table.concat(result, "\n")))
+    if opts.throw_error then
+      error(M.str_fmt(opts.error_msg_title, table.concat(result, "\n")))
+    end
   end
 
   return result
@@ -639,6 +641,24 @@ M.switch = function(val, switches, default)
   else
     return default
   end
+end
+
+-- Slice an array
+--
+---@generic T : any
+---@param list T[]
+---@param first? number
+---@param last? number
+---@param step? number
+---@return T[]
+M.slice = function(list, first, last, step)
+  local sliced = {}
+
+  for i = first or 1, last or #list, step or 1 do
+    sliced[#sliced + 1] = list[i]
+  end
+
+  return sliced
 end
 
 return M

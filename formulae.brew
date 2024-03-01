@@ -9,6 +9,7 @@ chafa
 cmake
 cmctl
 cocoapods
+coreutils
 croc
 curl
 eslint

@@ -99,6 +99,8 @@ M.notifications = function(opts)
             is_terminal = false,
           },
         })
+
+        popups.main.border:set_text("bottom", " ")
       end,
       ["focus"] = function(state)
         local level, time, brief = parse_entry(state.focused_entry)

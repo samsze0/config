@@ -14,12 +14,7 @@ local git_stash = function(opts)
 
   local get_entries = function()
     local stash =
-      vim.fn.systemlist(string.format([[git -C %s stash list]], opts.git_dir))
-
-    if vim.v.shell_error ~= 0 then
-      vim.error("Error getting git stash")
-      return {}
-    end
+      utils.systemlist(string.format([[git -C %s stash list]], opts.git_dir))
 
     stash = utils.map(stash, function(_, e)
       local parts = utils.split_string_n(e, 1, ":")
@@ -59,6 +54,8 @@ local git_stash = function(opts)
           { popup = popups.main, key = "<C-s>", is_terminal = true },
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
         })
+
+        popups.main.border:set_text("bottom", " <y> copy ref ")
       end,
       ["focus"] = function(state)
         local stash_ref = parse_entry(state.focused_entry)
@@ -70,17 +67,8 @@ local git_stash = function(opts)
           helpers.delta_nvim_default_opts
         )
 
-        local output = vim.fn.systemlist(command)
-        if vim.v.shell_error ~= 0 then
-          vim.error(
-            "Error getting details for git stash",
-            stash_ref,
-            table.concat(output, "\n")
-          )
-          return
-        end
-
-        set_preview_content(output)
+        local diff = utils.systemlist(command)
+        set_preview_content(diff)
       end,
       ["+select"] = function(state)
         local stash_ref = parse_entry(state.focused_entry)

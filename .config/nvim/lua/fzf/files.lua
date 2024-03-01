@@ -62,6 +62,11 @@ M.files = function(opts)
           { popup = popups.main, key = "<C-s>", is_terminal = true },
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
         })
+
+        popups.main.border:set_text(
+          "bottom",
+          " <select> goto | <w> goto (window) | <t> goto (tab) | <y> copy path "
+        )
       end,
       ["focus"] = function(state)
         local entry = state.focused_entry

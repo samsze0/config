@@ -3,7 +3,6 @@ local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
 local git_utils = require("utils.git")
-local jumplist = require("jumplist")
 
 -- Fzf all git branches
 --
@@ -15,11 +14,7 @@ return function(opts)
   }, opts or {})
 
   if opts.fetch_in_advance then
-    local result = vim.fn.system(string.format("git -C %s fetch", opts.git_dir))
-    if vim.v.shell_error ~= 0 then
-      vim.error("Error fetching git commits", result)
-      return
-    end
+    utils.system(string.format("git -C %s fetch", opts.git_dir))
   end
 
   local initial_pos
@@ -27,11 +22,7 @@ return function(opts)
   local get_entries = function()
     ---@type string[]
     local branches =
-      vim.fn.systemlist(string.format("git -C %s branch --all", opts.git_dir))
-    if vim.v.shell_error ~= 0 then
-      vim.error("Error getting git branches", table.concat(branches, "\n"))
-      return {}
-    end
+      utils.systemlist(string.format("git -C %s branch --all", opts.git_dir))
 
     branches = utils.map(branches, function(i, b)
       local branch = b:sub(3)
@@ -78,41 +69,32 @@ return function(opts)
           { popup = popups.main, key = "<C-s>", is_terminal = true },
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
         })
+
+        popups.main.border:set_text(
+          "bottom",
+          " <select> checkout | <y> copy branch name | <x> delete "
+        )
       end,
       ["focus"] = function(state)
         local branch = parse_entry(state.focused_entry)
 
         popups.nvim_preview.border:set_text("top", " " .. branch .. " ")
 
-        local output = vim.fn.systemlist(
+        local log = utils.systemlist(
           string.format(
             "git -C %s log --color --decorate %s",
             opts.git_dir,
             branch
           )
         )
-        if vim.v.shell_error ~= 0 then
-          vim.error(
-            "Error getting git commits for branch",
-            branch,
-            table.concat(output, "\n")
-          )
-          return
-        end
-
-        set_preview_content(output)
+        set_preview_content(log)
       end,
       ["+select"] = function(state)
         local branch = parse_entry(state.focused_entry)
 
-        local output = vim.fn.system(
+        utils.system(
           string.format("git -C %s checkout %s", opts.git_dir, branch)
         )
-        if vim.v.shell_error ~= 0 then
-          vim.error("Error checking out git branch", branch, output)
-          return
-        end
-
         vim.info(string.format([[Checked out branch: %s]], branch))
       end,
       ["ctrl-y"] = function(state)
@@ -120,6 +102,14 @@ return function(opts)
 
         vim.fn.setreg("+", branch)
         vim.info(string.format([[Copied to clipboard: %s]], branch))
+      end,
+      ["ctrl-x"] = function(state)
+        local branch = parse_entry(state.focused_entry)
+
+        utils.system(
+          string.format("git -C %s branch -D %s", opts.git_dir, branch)
+        )
+        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
     },
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

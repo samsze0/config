@@ -93,6 +93,11 @@ M.undos = function(opts)
             is_terminal = false,
           },
         })
+
+        popups.main.border:set_text(
+          "bottom",
+          " <select> undo | <y> copy undo nr | <o> open diff  "
+        )
       end,
       ["ctrl-y"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)

@@ -9,12 +9,7 @@ local git_utils = require("utils.git")
 ---@param on_submodule function
 local git_submodules = function(on_submodule)
   local submodules =
-    vim.fn.systemlist([[git submodule --quiet foreach 'echo $path']])
-
-  if vim.v.shell_error ~= 0 then
-    vim.error("Error fetching git submodules", table.concat(submodules, "\n"))
-    return
-  end
+    utils.systemlist([[git submodule --quiet foreach 'echo $path']])
 
   submodules = utils.map(submodules, function(_, e) return vim.trim(e) end)
 
@@ -44,6 +39,8 @@ local git_submodules = function(on_submodule)
           { popup = popups.main, key = "<C-s>", is_terminal = true },
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
         })
+
+        popups.main.border:set_text("bottom", " <y> copy path ")
       end,
       ["focus"] = function(state)
         local submodule_path = parse_entry(state.focused_entry)
@@ -53,19 +50,10 @@ local git_submodules = function(on_submodule)
           " " .. git_utils.convert_filepath_to_gitpath(submodule_path) .. " "
         )
 
-        local output = vim.fn.systemlist(
+        local log = utils.systemlist(
           string.format("git -C %s log --color --decorate", submodule_path)
         )
-        if vim.v.shell_error ~= 0 then
-          vim.error(
-            "Error getting git commits for current HEAD of git submodule",
-            submodule_path,
-            table.concat(output, "\n")
-          )
-          return
-        end
-
-        set_preview_content(output)
+        set_preview_content(log)
       end,
       ["+select"] = function(state)
         local submodule_path = parse_entry(state.focused_entry)

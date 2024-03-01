@@ -25,11 +25,7 @@ M.docker_containers = function(opts)
     -- if vim.fn.executable("jq") ~= 1 then
     --   error("jq executable not found")
     -- end
-    local result = vim.fn.system("docker container ls -a --format json")
-    if vim.v.shell_error ~= 0 then
-      vim.error("Fail to retrieve docker containers", result)
-      return {}
-    end
+    local result = utils.system("docker container ls -a --format json")
 
     result = vim.trim(result)
 
@@ -54,8 +50,6 @@ M.docker_containers = function(opts)
     end)
   end
 
-  local win = vim.api.nvim_get_current_win()
-
   local layout, popups, set_preview_content =
     helpers.create_nvim_preview_layout()
 
@@ -73,6 +67,11 @@ M.docker_containers = function(opts)
           { popup = popups.main, key = "<C-s>", is_terminal = true },
           { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
         })
+
+        popups.main.border:set_text(
+          "bottom",
+          " <y> copy id | <left> start | <right> stop | <x> delete "
+        )
       end,
       ["focus"] = function(state)
         local container = containers[state.focused_entry_index]
@@ -98,13 +97,7 @@ M.docker_containers = function(opts)
           return
         end
 
-        vim.fn.system(
-          string.format([[docker container start %s]], container.ID)
-        )
-        if vim.v.shell_error ~= 0 then
-          vim.error("Fail to start container")
-          return
-        end
+        utils.system(string.format([[docker container start %s]], container.ID))
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["right"] = function(state)
@@ -115,11 +108,7 @@ M.docker_containers = function(opts)
           return
         end
 
-        vim.fn.system(string.format([[docker container stop %s]], container.ID))
-        if vim.v.shell_error ~= 0 then
-          vim.error("Fail to stop container")
-          return
-        end
+        utils.system(string.format([[docker container stop %s]], container.ID))
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
       ["ctrl-x"] = function(state)
@@ -130,11 +119,7 @@ M.docker_containers = function(opts)
           return
         end
 
-        vim.fn.system(string.format([[docker container rm %s]], container.ID))
-        if vim.v.shell_error ~= 0 then
-          vim.error("Fail to delete container")
-          return
-        end
+        utils.system(string.format([[docker container rm %s]], container.ID))
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
     },

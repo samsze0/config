@@ -50,6 +50,8 @@ return function()
             is_terminal = false,
           },
         })
+
+        popups.main.border:set_text("bottom", " <select> goto | <x> close ")
       end,
       ["focus"] = function(state)
         local tabnr, filepath = parse_entry(state.focused_entry)

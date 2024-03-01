@@ -80,6 +80,11 @@ M.diagnostics = function(opts)
             is_terminal = false,
           },
         })
+
+        popups.main.border:set_text(
+          "bottom",
+          " <select> goto | <w> goto (window) | <t> goto (tab) "
+        )
       end,
       ["focus"] = function(state)
         local severity, source, filepath, row, col =

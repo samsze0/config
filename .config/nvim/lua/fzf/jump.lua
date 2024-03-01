@@ -76,6 +76,8 @@ M.jumps = function(opts)
             is_terminal = false,
           },
         })
+
+        popups.main.border:set_text("bottom", " <select> goto location ")
       end,
       ["focus"] = function(state)
         local filepath, row, col = parse_entry(state.focused_entry)

@@ -80,7 +80,7 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
 
     local state_id, message = string.match(full_message, "^([%w-]+) (.*)$")
     if not state_id or not message then
-      vim.error("Invalid fzf message", full_message)
+      vim.error("Received invalid fzf message", full_message)
       return
     end
     local state = get_state(state_id)
@@ -88,14 +88,14 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
     if string.match(message, "^port") then
       local port = string.match(message, "^port (%d+)")
       if not port then
-        vim.error("Invalid fzf port message", message)
+        vim.error("Received invalid fzf port message", message)
         return
       end
       state.port = port
     elseif string.match(message, "^focus") then
       local index, entry = string.match(message, "^focus (%d+) '(.*)'")
       if not index or not entry then
-        vim.error("Invalid fzf focus message", message)
+        vim.error("Received invalid fzf focus message", message)
         return
       end
       state.focused_entry_index = tonumber(index) + 1
@@ -103,14 +103,14 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
     elseif string.match(message, "^query") then
       local query = string.match(message, "^query '(.*)'")
       if not query then
-        vim.error("Invalid fzf query message", message)
+        vim.error("Received invalid fzf query message", message)
         return
       end
       state.query = query
     elseif string.match(message, "^event") then
       local event = string.match(message, "^event (.*)\n")
       if not event then
-        vim.error("Invalid fzf event", event)
+        vim.error("Received invalid fzf event", event)
         return
       end
       if state._event_callback_map[event] then
@@ -122,7 +122,7 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
     elseif string.match(message, "^request") then
       local req, content = string.match(message, "^request (%d+) (.*)$")
       if not req or not content then
-        vim.error("Invalid fzf request message", message)
+        vim.error("Received invalid fzf request message", message)
         return
       end
       if state._response_callback_map[req] then
@@ -135,7 +135,7 @@ local server_socket, server_socket_path, close_server = uv_utils.create_server(
         return
       end
     else
-      vim.error("Fzf server received invalid message", message)
+      vim.error("Received invalid fzf message", message)
       return
     end
   end
@@ -163,10 +163,7 @@ end
 M.send_to_fzf = function(state_id, message)
   local state = get_state(state_id)
 
-  if not state.port then
-    vim.error("Fzf server not ready")
-    return
-  end
+  if not state.port then error("Fzf server not ready") end
   local output = vim.fn.system(
     string.format([[curl -X POST localhost:%s -d '%s']], state.port, message)
   )
@@ -186,14 +183,10 @@ M.request_fzf = function(state_id, to_fzf, to_lua, callback)
   local state = get_state(state_id)
 
   if not to_fzf and not to_lua then
-    vim.error("Either to_fzf or to_lua must be provided")
-    return
+    error("Either to_fzf or to_lua must be provided")
   end
 
-  if not state.port then
-    vim.error("Fzf server not ready")
-    return
-  end
+  if not state.port then error("Fzf server not ready") end
   state._request_count = state._request_count + 1
   state._response_callback_map[tostring(state._request_count)] = callback
 
@@ -361,7 +354,7 @@ M.fzf = function(input, opts, parent_state_id)
     return statusline
   end
 
-  main_popup.border:set_text("top", " " .. build_statusline() .. " ", "left")
+  main_popup.border:set_text("top", " " .. build_statusline() .. " ")
   layout:mount()
 
   local on_buf_leave = function(ctx)

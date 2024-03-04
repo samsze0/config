@@ -36,7 +36,8 @@ return function(opts)
   local entries = get_entries()
 
   local parse_entry = function(entry)
-    return unpack(vim.split(entry, utils.nbsp))
+    local bufnr, filepath, row, col = unpack(vim.split(entry, utils.nbsp))
+    return tonumber(bufnr), filepath, tonumber(row), tonumber(col)
   end
 
   local layout, popups, set_preview_content =
@@ -78,11 +79,9 @@ return function(opts)
           " " .. vim.fn.fnamemodify(filepath, ":t") .. " "
         )
 
-        helpers.preview_file(
-          filepath,
-          popups.nvim_preview,
-          { cursor_pos = { row = row, col = col } }
-        )
+        helpers.preview_buffer(bufnr, popups.nvim_preview, {
+          cursor_pos = { row = row, col = col },
+        })
       end,
       ["+select"] = function(state)
         local bufnr = parse_entry(state.focused_entry)

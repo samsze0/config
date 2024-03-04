@@ -8,6 +8,7 @@ homebrew/cask/docker
 homebrew/cask/google-chrome
 homebrew/cask/iina
 homebrew/cask/insomnia
+homebrew/cask/intellij-idea-ce
 homebrew/cask/karabiner-elements
 homebrew/cask/kitty
 homebrew/cask/microsoft-remote-desktop
@@ -15,6 +16,7 @@ homebrew/cask/obs
 homebrew/cask/outline-manager
 homebrew/cask/postman
 homebrew/cask/raspberry-pi-imager
+homebrew/cask/rectangle
 homebrew/cask/spotify
 homebrew/cask/visual-studio-code
 homebrew/cask/warp

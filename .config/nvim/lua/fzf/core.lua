@@ -164,12 +164,9 @@ M.send_to_fzf = function(state_id, message)
   local state = get_state(state_id)
 
   if not state.port then error("Fzf server not ready") end
-  local output = vim.fn.system(
+  utils.system(
     string.format([[curl -X POST localhost:%s -d '%s']], state.port, message)
   )
-  if vim.v.shell_error ~= 0 then
-    error("Fail to send message to fzf" .. output)
-  end
   if config.debug then vim.info("Sent message to fzf", message) end
 end
 
@@ -355,6 +352,7 @@ M.fzf = function(input, opts, parent_state_id)
   end
 
   main_popup.border:set_text("top", " " .. build_statusline() .. " ")
+
   layout:mount()
 
   local on_buf_leave = function(ctx)

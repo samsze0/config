@@ -23,7 +23,7 @@ return function(opts)
       },
     })
 
-  core.fzf({}, {
+  core.fzf({}, { -- FIX: startinsert doesn't trigger (BufEnter event)
     prompt = "LSP-Workspace-Symbols",
     layout = layout,
     main_popup = popups.main,

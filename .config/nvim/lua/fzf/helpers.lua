@@ -98,11 +98,9 @@ M.default_fzf_keybinds = {
   -- ["alt-b"] = "preview-down",
 }
 
--- Create a simple window layout for Fzf that includes only a main window
---
----@return NuiLayout, { main: NuiPopup }
-M.create_plain_layout = function()
-  local main_popup = Popup({
+---@return NuiPopup
+M.generate_main_popup = function()
+  local popup = Popup({
     enter = true,
     focusable = true,
     border = {
@@ -125,6 +123,23 @@ M.create_plain_layout = function()
     },
   })
 
+  vim.api.nvim_create_autocmd({ "BufEnter" }, {
+    buffer = popup.bufnr,
+    callback = function(ctx)
+      vim.info("Test")
+      vim.cmd("startinsert")
+    end,
+  })
+
+  return popup
+end
+
+-- Create a simple window layout for Fzf that includes only a main window
+--
+---@return NuiLayout, { main: NuiPopup }
+M.create_plain_layout = function()
+  local main_popup = M.generate_main_popup()
+
   local layout = Layout(
     {
       position = "50%",
@@ -138,11 +153,6 @@ M.create_plain_layout = function()
       Layout.Box(main_popup, { size = "100%" }),
     }, {})
   )
-
-  vim.api.nvim_create_autocmd({ "BufEnter" }, {
-    buffer = main_popup.bufnr,
-    callback = function(ctx) vim.cmd("startinsert") end,
-  })
 
   return layout, {
     main = main_popup,
@@ -162,28 +172,7 @@ M.create_nvim_preview_layout = function(opts)
     preview_popup_buf_options = {},
   }, opts or {})
 
-  local main_popup = Popup({
-    enter = true,
-    focusable = true,
-    border = {
-      style = "rounded",
-      text = {
-        top = "", -- FIX: border text not showing if undefined
-        bottom = "",
-        top_align = "left",
-        bottom_align = "left",
-      },
-    },
-    buf_options = {
-      modifiable = false,
-      filetype = "fzf",
-    },
-    win_options = {
-      winblend = 0,
-      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-      wrap = false,
-    },
-  })
+  local main_popup = M.generate_main_popup()
 
   local nvim_preview_popup = Popup({
     enter = false,
@@ -229,11 +218,6 @@ M.create_nvim_preview_layout = function(opts)
     }, { dir = "row" })
   )
 
-  vim.api.nvim_create_autocmd({ "BufEnter" }, {
-    buffer = main_popup.bufnr,
-    callback = function(ctx) vim.cmd("startinsert") end,
-  })
-
   return layout,
     popups,
     function(content)
@@ -270,28 +254,7 @@ M.create_nvim_diff_preview_layout = function(opts)
     preview_popups_buf_options = {},
   }, opts or {})
 
-  local main_popup = Popup({
-    enter = true,
-    focusable = true,
-    border = {
-      style = "rounded",
-      text = {
-        top = "", -- FIX: border text not showing if undefined
-        bottom = "",
-        top_align = "left",
-        bottom_align = "left",
-      },
-    },
-    buf_options = {
-      modifiable = false,
-      filetype = "fzf",
-    },
-    win_options = {
-      winblend = 0,
-      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-      wrap = false,
-    },
-  })
+  local main_popup = M.generate_main_popup()
 
   local nvim_preview_popups = {
     before = Popup({
@@ -357,11 +320,6 @@ M.create_nvim_diff_preview_layout = function(opts)
       }, { dir = "row", size = "70%" }),
     }, { dir = "col" })
   )
-
-  vim.api.nvim_create_autocmd({ "BufEnter" }, {
-    buffer = main_popup.bufnr,
-    callback = function(ctx) vim.cmd("startinsert") end,
-  })
 
   return layout,
     popups,
@@ -472,6 +430,36 @@ M.preview_file = function(filepath, preview_popup, opts)
     false,
     vim.fn.readfile(filepath)
   )
+  if ft then vim.bo[preview_popup.bufnr].filetype = ft end
+
+  local current_win = vim.api.nvim_get_current_win()
+
+  -- Switch to preview window and back in order to refresh scrollbar
+  -- TODO: Remove this once scrollbar plugin support remote refresh
+  vim.api.nvim_set_current_win(preview_popup.winid)
+  if opts.cursor_pos then
+    vim.fn.cursor({ opts.cursor_pos.row, opts.cursor_pos.col or 0 })
+    vim.cmd([[normal! zz]])
+  end
+  vim.api.nvim_set_current_win(current_win)
+end
+
+-- Open a buffer's content in the preview buffer and auto detect the filetype
+--
+---@param bufnr number
+---@param preview_popup NuiPopup
+---@param opts? { cursor_pos?: { row: number, col?: number } }
+M.preview_buffer = function(bufnr, preview_popup, opts)
+  opts = vim.tbl_extend("force", {}, opts or {})
+
+  local filename = vim.fn.bufname(bufnr)
+  local buf_content = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local ft = vim.filetype.match({
+    filename = filename,
+    contents = buf_content,
+  })
+
+  vim.api.nvim_buf_set_lines(preview_popup.bufnr, 0, -1, false, buf_content)
   if ft then vim.bo[preview_popup.bufnr].filetype = ft end
 
   local current_win = vim.api.nvim_get_current_win()

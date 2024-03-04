@@ -128,48 +128,42 @@ end, {})
 
 **High priority**
 
-- LSP rename workflow (WorkspaceEdit[]). Perhaps have a watchman daemon running and a local socket server that takes a list of subscribers?
 - Fzf grep (fzf disabled) focus entry not updating when query changed
-- Fzf "watch mode" that runs the command in the background and hashes it to see if it output changes? Require idempotent command
+- LF nvim preview
 - LF image preview over SSH
 - SSH line editor ignore delay?
-- Syncthing clipboard
-- Karabiner [command + left/right]
+- Syncthing/tailscale clipboard
 - Fzf TODO comments
 - Fzf backups
-- LSP import path update (with watchman and LSP willrename etc...)
-- Project specific config w/ exrc https://github.com/klen/nvim-config-local
-- Fzf one after another doesn't enter insert mode
-- Fzf Pulumi
-- Tree hierarchy (an info bar + multi-stage fzf; tree is useful for git)
 - Git diff +/- proper syntax highlighting
 - Git hunk preview as Nui split with proper syntax highlighting
-- Prefetch, job system, fetch-in-background, mark as dirty/stale (need refresh)
-- Optimistic update?
+- Job system, refetch-in-background "watch mode" by comparising hashes? Requires idempotent command; mark as dirty/stale (need invalidate/refresh); Perhaps have a watchman daemon running and a local socket server that takes a list of subscribers?
+- LSP import path update (with watchman and LSP willrename etc...) (depends on watchman)
+- LSP rename workflow (WorkspaceEdit[]). depends on watchman
+- Fix Lf add new file will add line at bottom that breaks layout
 
 **Mid priority**
 
 - Fzf linux commands (lsof, lsblk, etc)
-- Fzf brew services and formulae?
-- Fzf terraform
+- Fzf brew services and formulae
 - Fzf k8s
-- Fzf pulumi stack and env
-- Fzf gcp
-- Fzf aws
-- Fzf azure
-- Markdown syntax highlighting
-- Backup filename collision + auto cleanup
-- Streaming
-- Async
-- OOP
-- Threads pool and sync primitives (semaphore)
 - Fzf tailscale
-- Fzf syncthing (supported?)
+- Fzf syncthing
+- Fzf git worktree
+- Better markdown workflow
+- Backup filename collision + auto cleanup with systemd?
+- Streaming with fzf async that works with initial position
+- Async await syntax rather than callback
+- OOP rather than all modules and functions
+- Threads pool and sync primitives (semaphore)
+- Lf create_new multi-layer dir support
+- Tabline dedup by git-files
+- Tabline better "scrolling"
 
 **Low priority**
 
+- Lf fork that has Lua API (for git status, dynamic dir flatten)
 - Custom treesitter textobjects plugin
-- Remove all usage of global var
 - Lf show git status (pico-lf?)
 - Lf flatten dir (for Java)
 - Tests
@@ -177,10 +171,5 @@ end, {})
 - Fzf core - handler error reporting and handling (at the moment is sliented)
 - Performance profiling & optimization (w/ flamegraph)
 - Fix Fzf somethings hang if actions happen too quick?
-- Custom autopair and comment plugin
-- Git worktree workflow
 - Custom copilot plugin (possible to use chat?)
-- Lf create_new multi-layer dir support
-- Tabline dedup by git-files
-- Tabline better "scrolling"
 - React dev workflow

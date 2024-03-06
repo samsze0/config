@@ -5,6 +5,7 @@ local utils = require("utils")
 local layouts = require("fzf.layouts")
 local git_utils = require("utils.git")
 local jumplist = require("jumplist")
+local git_files = require("fzf.git.git_files")
 
 -- Fzf all git commits
 --
@@ -58,7 +59,7 @@ local git_commits = function(opts)
     initial_position = 1, -- TODO: assign to current checkout-ed commit
     binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        popups.main.border:set_text("bottom", " <y> copy hash ")
+        popups.main.border:set_text("bottom", " <y> copy hash | <l> git files")
       end,
       ["focus"] = function(state)
         local commit_hash, commit_subject = parse_entry(state.focused_entry)
@@ -85,10 +86,13 @@ local git_commits = function(opts)
 
         set_preview_content(output)
       end,
-      ["+select"] = function(state)
+      ["ctrl-l"] = function(state)
         local commit_hash = parse_entry(state.focused_entry)
 
-        vim.info(commit_hash)
+        git_files(
+          commit_hash,
+          { git_dir = opts.git_dir, parent_state = state.id }
+        )
       end,
       ["ctrl-y"] = function(state)
         local commit_hash = parse_entry(state.focused_entry)

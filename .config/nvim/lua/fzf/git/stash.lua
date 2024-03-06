@@ -4,6 +4,7 @@ local fzf_utils = require("fzf.utils")
 local layouts = require("fzf.layouts")
 local utils = require("utils")
 local git_utils = require("utils.git")
+local git_files = require("fzf.git.git_files")
 
 -- Fzf git stash
 --
@@ -72,6 +73,14 @@ local git_stash = function(opts)
 
         vim.fn.setreg("+", stash_ref)
         vim.info(string.format([[Copied to clipboard: %s]], stash_ref))
+      end,
+      ["ctrl-l"] = function(state)
+        local commit_hash = parse_entry(state.focused_entry)
+
+        git_files(
+          commit_hash,
+          { git_dir = opts.git_dir, parent_state = state.id }
+        )
       end,
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

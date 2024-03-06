@@ -577,7 +577,7 @@ end
 --
 ---@param cmd string
 ---@param opts? { error_msg_title?: string, input?: any, throw_error?: boolean, on_error?: fun(err: string): nil }
----@return string
+---@return string?
 M.system = function(cmd, opts)
   opts = vim.tbl_extend(
     "force",
@@ -589,6 +589,7 @@ M.system = function(cmd, opts)
   if vim.v.shell_error ~= 0 then
     if opts.on_error then opts.on_error(result) end
     if opts.throw_error then error(M.str_fmt(opts.error_msg_title, result)) end
+    return nil
   end
 
   return result
@@ -598,7 +599,7 @@ end
 --
 ---@param cmd string
 ---@param opts? { error_msg_title?: string, input?: any, keepempty?: boolean, throw_error?: boolean, on_error?: fun(err: string): nil }
----@return string[]
+---@return string[]?
 M.systemlist = function(cmd, opts)
   opts = vim.tbl_extend(
     "force",
@@ -612,6 +613,7 @@ M.systemlist = function(cmd, opts)
     if opts.throw_error then
       error(M.str_fmt(opts.error_msg_title, table.concat(result, "\n")))
     end
+    return nil
   end
 
   return result

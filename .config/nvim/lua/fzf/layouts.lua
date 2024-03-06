@@ -107,10 +107,7 @@ M._generate_main_popup = function()
 
   vim.api.nvim_create_autocmd({ "BufEnter" }, {
     buffer = popup.bufnr,
-    callback = function(ctx)
-      vim.info("Test")
-      vim.cmd("startinsert")
-    end,
+    callback = function(ctx) vim.cmd("startinsert") end,
   })
 
   return popup
@@ -240,7 +237,7 @@ end
 -- - two preview windows. One for before and one for after
 ---@param opts? { preview_popups_win_options?: table<string, any>, preview_popups_buf_options?: table<string, any> }
 --
----@return NuiLayout layout, { main: NuiPopup, nvim_previews: { before: NuiPopup, after: NuiPopup } } popups, fun(before: string[], after: string[], opts?: {}): nil set_preview_content, fzf_binds
+---@return NuiLayout layout, { main: NuiPopup, nvim_previews: { before: NuiPopup, after: NuiPopup } } popups, fun(before: string[], after: string[], opts?: { filetype?: string }): nil set_preview_content, fzf_binds
 M.create_nvim_diff_preview_layout = function(opts)
   opts = vim.tbl_extend("force", {
     preview_popups_win_options = {},

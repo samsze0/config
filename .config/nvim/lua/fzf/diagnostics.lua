@@ -43,7 +43,7 @@ M.diagnostics = function(opts)
         utils.ansi_codes.blue(filename),
         e.lnum + 1,
         e.col,
-        e.message
+        vim.split(e.message, "\n")[1]
       )
     end),
       diagnostics

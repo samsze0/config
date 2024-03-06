@@ -4,6 +4,28 @@ local event = require("nui.utils.autocmd").event
 
 local M = {}
 
+local base_popup_config = {
+  focusable = true,
+  border = {
+    style = "rounded",
+    text = {
+      top = "", -- FIX: border text not showing if undefined
+      bottom = "",
+      top_align = "center",
+      bottom_align = "center",
+    },
+  },
+  buf_options = {
+    modifiable = true,
+  },
+  win_options = {
+    winblend = 0,
+    winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
+    number = false,
+    wrap = false,
+  },
+}
+
 -- Set keymaps for navigating between popups
 --
 ---@param popup_nav_configs { popup: NuiPopup, key: string, is_terminal: boolean }[]
@@ -82,14 +104,10 @@ M.default_fzf_keybinds = {
 
 ---@return NuiPopup
 M._generate_main_popup = function()
-  local popup = Popup({
+  local popup = Popup(vim.tbl_deep_extend("force", base_popup_config, {
     enter = true,
-    focusable = true,
     border = {
-      style = "rounded",
       text = {
-        top = "", -- FIX: border text not showing if undefined
-        bottom = "",
         top_align = "left",
         bottom_align = "left",
       },
@@ -98,12 +116,8 @@ M._generate_main_popup = function()
       modifiable = false,
       filetype = "fzf",
     },
-    win_options = {
-      winblend = 0,
-      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-      wrap = false,
-    },
-  })
+    win_options = {},
+  }))
 
   vim.api.nvim_create_autocmd({ "BufEnter" }, {
     buffer = popup.bufnr,
@@ -153,32 +167,18 @@ M.create_nvim_preview_layout = function(opts)
 
   local main_popup = M._generate_main_popup()
 
-  local nvim_preview_popup = Popup({
-    enter = false,
-    focusable = true,
-    border = {
-      style = "rounded",
-      text = {
-        top = "", -- FIX: border text not showing if undefined
-        bottom = "",
-        top_align = "center",
-        bottom_align = "center",
-      },
-    },
-    buf_options = vim.tbl_extend("force", {
-      filetype = opts.preview_in_terminal_mode and "terminal" or "",
-      modifiable = true,
-      synmaxcol = 0,
-    }, opts.preview_popup_buf_options),
-    win_options = vim.tbl_extend("force", {
-      winblend = 0,
-      winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
-      number = true,
-      conceallevel = opts.preview_in_terminal_mode and 3 or 0,
-      concealcursor = "nvic",
-      wrap = false,
-    }, opts.preview_popup_win_options),
-  })
+  local nvim_preview_popup =
+    Popup(vim.tbl_deep_extend("force", base_popup_config, {
+      buf_options = vim.tbl_extend("force", {
+        filetype = opts.preview_in_terminal_mode and "terminal" or "",
+        synmaxcol = 0,
+      }, opts.preview_popup_buf_options),
+      win_options = vim.tbl_extend("force", {
+        number = true,
+        conceallevel = opts.preview_in_terminal_mode and 3 or 0,
+        concealcursor = "nvic",
+      }, opts.preview_popup_win_options),
+    }))
 
   local popups = { main = main_popup, nvim_preview = nvim_preview_popup }
 
@@ -247,48 +247,26 @@ M.create_nvim_diff_preview_layout = function(opts)
   local main_popup = M._generate_main_popup()
 
   local nvim_preview_popups = {
-    before = Popup({
-      enter = false,
-      focusable = true,
-      border = {
-        style = "rounded",
-        text = {
-          top = "", -- FIX: border text not showing if undefined
-          bottom = "",
-          top_align = "center",
-          bottom_align = "center",
-        },
-      },
-      buf_options = vim.tbl_extend("force", {
-        modifiable = true,
-      }, opts.preview_popups_buf_options),
+    before = Popup(vim.tbl_deep_extend("force", base_popup_config, {
+      buf_options = vim.tbl_extend(
+        "force",
+        {},
+        opts.preview_popups_buf_options
+      ),
       win_options = vim.tbl_extend("force", {
-        winblend = 0,
-        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
         number = true,
       }, opts.preview_popups_win_options),
-    }),
-    after = Popup({
-      enter = false,
-      focusable = true,
-      border = {
-        style = "rounded",
-        text = {
-          top = "", -- FIX: border text not showing if undefined
-          bottom = "",
-          top_align = "center",
-          bottom_align = "center",
-        },
-      },
-      buf_options = vim.tbl_extend("force", {
-        modifiable = true,
-      }, opts.preview_popups_buf_options),
+    })),
+    after = Popup(vim.tbl_deep_extend("force", base_popup_config, {
+      buf_options = vim.tbl_extend(
+        "force",
+        {},
+        opts.preview_popups_buf_options
+      ),
       win_options = vim.tbl_extend("force", {
-        winblend = 0,
-        winhighlight = "Normal:Normal,FloatBorder:FloatBorder",
         number = true,
       }, opts.preview_popups_win_options),
-    }),
+    })),
   }
 
   local popups = { main = main_popup, nvim_previews = nvim_preview_popups }
@@ -399,6 +377,79 @@ M.create_nvim_diff_preview_layout = function(opts)
   }
 
   return layout, popups, set_preview_content, binds
+end
+
+---@return NuiLayout, { main: NuiPopup, bottom_right: NuiPopup, top_right: NuiPopup }, fzf_binds
+function M._create_1_2_layout()
+  local main_popup = M._generate_main_popup()
+
+  local top_right = Popup(vim.tbl_deep_extend("force", base_popup_config, {
+    buf_options = {},
+    win_options = {},
+  }))
+
+  local bottom_right = Popup(vim.tbl_deep_extend("force", base_popup_config, {
+    buf_options = {},
+    win_options = {},
+  }))
+
+  local popups = {
+    main = main_popup,
+    bottom_right = bottom_right,
+    top_right = top_right,
+  }
+
+  local layout = Layout(
+    {
+      position = "50%",
+      relative = "editor",
+      size = {
+        width = "90%",
+        height = "90%",
+      },
+    },
+    Layout.Box({
+      Layout.Box(main_popup, { size = "50%" }),
+      Layout.Box({
+        Layout.Box(top_right, { size = "20%" }),
+        Layout.Box(bottom_right, { grow = 1 }),
+      }, { size = "50%", dir = "col" }),
+    }, { dir = "row" })
+  )
+
+  ---@type fzf_binds
+  local binds = {
+    ["+before-start"] = function(state)
+      M._set_keymaps_for_preview_remote_nav(popups.main, popups.bottom_right)
+      popups.main:map(
+        "t",
+        "<C-f>",
+        function() vim.api.nvim_set_current_win(popups.bottom_right.winid) end
+      )
+      popups.bottom_right:map(
+        "n",
+        "<C-s>",
+        function() vim.api.nvim_set_current_win(popups.main.winid) end
+      )
+      popups.bottom_right:map(
+        "n",
+        "<C-e>",
+        function() vim.api.nvim_set_current_win(popups.top_right.winid) end
+      )
+      popups.top_right:map(
+        "n",
+        "<C-d>",
+        function() vim.api.nvim_set_current_win(popups.bottom_right.winid) end
+      )
+      popups.top_right:map(
+        "n",
+        "<C-s>",
+        function() vim.api.nvim_set_current_win(popups.main.winid) end
+      )
+    end,
+  }
+
+  return layout, popups, binds
 end
 
 return M

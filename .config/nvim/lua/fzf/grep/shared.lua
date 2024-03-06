@@ -126,11 +126,6 @@ function M.create_layout()
         "<C-s>",
         function() vim.api.nvim_set_current_win(popups.main.winid) end
       )
-      layouts._set_keymaps_for_popups_nav({
-        { popup = popups.main, key = "<C-s>", is_terminal = true },
-        { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
-        { popup = popups.replace, key = "<C-r>", is_terminal = false },
-      })
     end,
   }
 

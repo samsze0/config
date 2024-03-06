@@ -295,6 +295,8 @@ M.is_fzf_available = function() return vim.fn.executable("fzf") == 1 end
 
 ---@alias event_callback fun(state: state): nil
 ---@alias bind_type string | event_callback | (string | event_callback)[]
+---@alias fzf_binds table<string, bind_type>
+
 ---@param input string[] | string
 ---@param opts { layout: NuiLayout, main_popup: NuiPopup, other_popups?: NuiPopup[], extra_args?: table<string, string>, prompt: string, preview_cmd?: string, initial_position?: integer, binds?: table<string, bind_type> }
 ---@param parent_state_id? string

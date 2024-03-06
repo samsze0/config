@@ -2,6 +2,7 @@ local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local layouts = require("fzf.layouts")
 local uv_utils = require("utils.uv")
 local git_utils = require("utils.git")
 local jumplist = require("jumplist")
@@ -125,8 +126,8 @@ local git_status = function(opts)
   local win = vim.api.nvim_get_current_win()
   local timer ---@type uv_timer_t?
 
-  local layout, popups, set_preview_content =
-    helpers.create_nvim_diff_preview_layout({
+  local layout, popups, set_preview_content, binds =
+    layouts.create_nvim_diff_preview_layout({
       preview_popups_win_options = {},
     })
 
@@ -135,26 +136,8 @@ local git_status = function(opts)
     layout = layout,
     main_popup = popups.main,
     initial_position = pos,
-    binds = {
+    binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        helpers.set_keymaps_for_preview_remote_nav(
-          popups.main,
-          popups.nvim_previews.after
-        )
-        helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-e>", is_terminal = true },
-          {
-            popup = popups.nvim_previews.before,
-            key = "<C-s>",
-            is_terminal = false,
-          },
-          {
-            popup = popups.nvim_previews.after,
-            key = "<C-f>",
-            is_terminal = false,
-          },
-        })
-
         popups.main.border:set_text(
           "bottom",
           " <select> goto file | <left> stage | <right> unstage | <x> restore | <y> copy path | <r> reload "
@@ -309,7 +292,7 @@ local git_status = function(opts)
         })
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
-    },
+    }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
     }),

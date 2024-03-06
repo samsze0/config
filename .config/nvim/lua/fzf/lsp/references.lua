@@ -2,6 +2,7 @@ local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local layouts = require("fzf.layouts")
 local shared = require("fzf.lsp.shared")
 local jumplist = require("jumplist")
 
@@ -34,8 +35,8 @@ return function(opts)
         )
       end
 
-      local layout, popups, set_preview_content =
-        helpers.create_nvim_preview_layout({
+      local layout, popups, set_preview_content, binds =
+        layouts.create_nvim_preview_layout({
           preview_popup_win_options = {
             cursorline = true,
           },
@@ -45,21 +46,8 @@ return function(opts)
         prompt = "LSP-References",
         layout = layout,
         main_popup = popups.main,
-        binds = {
+        binds = fzf_utils.bind_extend(binds, {
           ["+before-start"] = function(state)
-            helpers.set_keymaps_for_preview_remote_nav(
-              popups.main,
-              popups.nvim_preview
-            )
-            helpers.set_keymaps_for_popups_nav({
-              { popup = popups.main, key = "<C-s>", is_terminal = true },
-              {
-                popup = popups.nvim_preview,
-                key = "<C-f>",
-                is_terminal = false,
-              },
-            })
-
             popups.main.border:set_text(
               "bottom",
               " <select> goto | <w> goto (window) | <t> goto (tab) "
@@ -109,7 +97,7 @@ return function(opts)
               vim.cmd([[normal! zz]])
             end)
           end,
-        },
+        }),
         extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
           ["--with-nth"] = "1,4",
         }),

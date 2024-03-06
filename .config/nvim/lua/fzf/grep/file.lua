@@ -53,7 +53,7 @@ local grep_file = function(opts)
   local current_win = vim.api.nvim_get_current_win()
   local current_buf = vim.api.nvim_get_current_buf()
 
-  local layout, popups, get_replacement, set_preview_content =
+  local layout, popups, get_replacement, set_preview_content, binds =
     shared.create_layout()
 
   ---@param state state
@@ -104,18 +104,8 @@ local grep_file = function(opts)
     layout = layout,
     main_popup = popups.main,
     initial_position = vim.fn.line("."), -- Assign to current line number
-    binds = {
+    binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        helpers.set_keymaps_for_preview_remote_nav(
-          popups.main,
-          popups.nvim_preview
-        )
-        helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-s>", is_terminal = true },
-          { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
-          { popup = popups.replace, key = "<C-r>", is_terminal = false },
-        })
-
         local ft = vim.filetype.match({
           filename = filename,
           contents = filecontent,
@@ -194,7 +184,7 @@ local grep_file = function(opts)
           end)
         end)
       end,
-    },
+    }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
       ["--disabled"] = true,

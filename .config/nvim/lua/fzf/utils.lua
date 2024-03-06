@@ -4,10 +4,6 @@ local tempfile = vim.fn.tempname()
 local utils = require("utils")
 local os_utils = require("utils.os")
 
-local Layout = require("nui.layout")
-local Popup = require("nui.popup")
-local event = require("nui.utils.autocmd").event
-
 -- Generate a preview window offset string for fzf
 --
 ---@param offset integer | string
@@ -92,12 +88,12 @@ M.join_by_delim = function(...)
   return string.format(string.rep("%s", size, utils.nbsp), ...)
 end
 
----@vararg table<string, bind_type>
----@return table<string, bind_type>
+---@vararg fzf_binds
+---@return fzf_binds
 function M.bind_extend(...)
   local binds_list = { ... }
 
-  local result = {} ---@type table<string, bind_type>
+  local result = {} ---@type fzf_binds
 
   for _, binds in pairs(binds_list) do
     for ev, actions in pairs(binds) do

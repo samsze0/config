@@ -3,6 +3,7 @@ local M = {}
 local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
+local layouts = require("fzf.layouts")
 local utils = require("utils")
 local git_utils = require("utils.git")
 local json = require("utils.json")
@@ -50,24 +51,15 @@ M.docker_containers = function(opts)
     end)
   end
 
-  local layout, popups, set_preview_content =
-    helpers.create_nvim_preview_layout()
+  local layout, popups, set_preview_content, binds =
+    layouts.create_nvim_preview_layout()
 
   core.fzf(get_entries(), {
     prompt = "Docker-Containers",
     layout = layout,
     main_popup = popups.main,
-    binds = {
+    binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        helpers.set_keymaps_for_preview_remote_nav(
-          popups.main,
-          popups.nvim_preview
-        )
-        helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-s>", is_terminal = true },
-          { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
-        })
-
         popups.main.border:set_text(
           "bottom",
           " <y> copy id | <left> start | <right> stop | <x> delete "
@@ -122,7 +114,7 @@ M.docker_containers = function(opts)
         utils.system(string.format([[docker container rm %s]], container.ID))
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
-    },
+    }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
     }),

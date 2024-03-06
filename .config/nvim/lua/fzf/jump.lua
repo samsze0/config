@@ -3,6 +3,7 @@ local M = {}
 local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
+local layouts = require("fzf.layouts")
 local utils = require("utils")
 local jumplist = require("jumplist")
 
@@ -50,8 +51,8 @@ M.jumps = function(opts)
     return unpack(args)
   end
 
-  local layout, popups, set_preview_content =
-    helpers.create_nvim_preview_layout({
+  local layout, popups, set_preview_content, binds =
+    layouts.create_nvim_preview_layout({
       preview_popup_win_options = {
         cursorline = true,
       },
@@ -62,21 +63,8 @@ M.jumps = function(opts)
     layout = layout,
     main_popup = popups.main,
     initial_position = pos,
-    binds = {
+    binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        helpers.set_keymaps_for_preview_remote_nav(
-          popups.main,
-          popups.nvim_preview
-        )
-        helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-s>", is_terminal = true },
-          {
-            popup = popups.nvim_preview,
-            key = "<C-f>",
-            is_terminal = false,
-          },
-        })
-
         popups.main.border:set_text("bottom", " <select> goto location ")
       end,
       ["focus"] = function(state)
@@ -99,7 +87,7 @@ M.jumps = function(opts)
         vim.cmd(string.format([[e %s]], jump.filename))
         vim.cmd(string.format([[normal! %sG%s|]], jump.line, jump.col))
       end,
-    },
+    }),
   })
 end
 

@@ -2,6 +2,7 @@ local M = {}
 
 local core = require("fzf.core")
 local fzf_utils = require("fzf.utils")
+local layouts = require("fzf.layouts")
 local helpers = require("fzf.helpers")
 local timeago = require("utils.timeago")
 local utils = require("utils")
@@ -74,8 +75,8 @@ M.notifications = function(opts)
     return level, time, vim.trim(brief)
   end
 
-  local layout, popups, set_preview_content =
-    helpers.create_nvim_preview_layout({
+  local layout, popups, set_preview_content, binds =
+    layouts.create_nvim_preview_layout({
       preview_popup_win_options = {
         wrap = true,
       },
@@ -85,21 +86,8 @@ M.notifications = function(opts)
     prompt = "Notifications",
     layout = layout,
     main_popup = popups.main,
-    binds = {
+    binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        helpers.set_keymaps_for_preview_remote_nav(
-          popups.main,
-          popups.nvim_preview
-        )
-        helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-s>", is_terminal = true },
-          {
-            popup = popups.nvim_preview,
-            key = "<C-f>",
-            is_terminal = false,
-          },
-        })
-
         popups.main.border:set_text("bottom", " ")
       end,
       ["focus"] = function(state)
@@ -113,7 +101,7 @@ M.notifications = function(opts)
         helpers.preview_file(tmpfile, popups.nvim_preview)
       end,
       ["+after-exit"] = function(state) vim.notify = notify end, -- Restore vim.notify
-    },
+    }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1..",
     }),

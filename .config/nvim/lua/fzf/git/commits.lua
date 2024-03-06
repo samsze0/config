@@ -2,6 +2,7 @@ local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
 local utils = require("utils")
+local layouts = require("fzf.layouts")
 local git_utils = require("utils.git")
 local jumplist = require("jumplist")
 
@@ -44,8 +45,8 @@ local git_commits = function(opts)
     return unpack(args)
   end
 
-  local layout, popups, set_preview_content =
-    helpers.create_nvim_preview_layout({
+  local layout, popups, set_preview_content, binds =
+    layouts.create_nvim_preview_layout({
       preview_in_terminal_mode = true,
       preview_popup_win_options = { number = false },
     })
@@ -55,17 +56,8 @@ local git_commits = function(opts)
     layout = layout,
     main_popup = popups.main,
     initial_position = 1, -- TODO: assign to current checkout-ed commit
-    binds = fzf_utils.bind_extend(helpers.default_fzf_keybinds, {
+    binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        helpers.set_keymaps_for_preview_remote_nav(
-          popups.main,
-          popups.nvim_preview
-        )
-        helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-s>", is_terminal = true },
-          { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
-        })
-
         popups.main.border:set_text("bottom", " <y> copy hash ")
       end,
       ["focus"] = function(state)

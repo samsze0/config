@@ -1,5 +1,6 @@
 local core = require("fzf.core")
 local fzf_utils = require("fzf.utils")
+local layouts = require("fzf.layouts")
 local helpers = require("fzf.helpers")
 local utils = require("utils")
 
@@ -26,8 +27,8 @@ return function()
     return unpack(vim.split(entry, utils.nbsp))
   end
 
-  local layout, popups, set_preview_content =
-    helpers.create_nvim_preview_layout({
+  local layout, popups, set_preview_content, binds =
+    layouts.create_nvim_preview_layout({
       preview_popup_win_options = {},
     })
 
@@ -36,21 +37,8 @@ return function()
     layout = layout,
     main_popup = popups.main,
     initial_position = current_tab,
-    binds = {
+    binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        helpers.set_keymaps_for_preview_remote_nav(
-          popups.main,
-          popups.nvim_preview
-        )
-        helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-s>", is_terminal = true },
-          {
-            popup = popups.nvim_preview,
-            key = "<C-f>",
-            is_terminal = false,
-          },
-        })
-
         popups.main.border:set_text("bottom", " <select> goto | <x> close ")
       end,
       ["focus"] = function(state)
@@ -74,7 +62,7 @@ return function()
         vim.cmd(string.format([[tabclose %s]], tabnr))
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
       end,
-    },
+    }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "1,3",
     }),

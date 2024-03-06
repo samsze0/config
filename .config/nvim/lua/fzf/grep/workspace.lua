@@ -58,7 +58,7 @@ local grep = function(opts)
     )
   end
 
-  local layout, popups, get_replacement, set_preview_content =
+  local layout, popups, get_replacement, set_preview_content, binds =
     shared.create_layout()
 
   ---@param state state
@@ -124,18 +124,8 @@ local grep = function(opts)
       prompt = "Grep",
       layout = layout,
       main_popup = popups.main,
-      binds = {
+      binds = fzf_utils.bind_extend(binds, {
         ["+before-start"] = function(state)
-          helpers.set_keymaps_for_preview_remote_nav(
-            popups.main,
-            popups.nvim_preview
-          )
-          helpers.set_keymaps_for_popups_nav({
-            { popup = popups.main, key = "<C-s>", is_terminal = true },
-            { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
-            { popup = popups.replace, key = "<C-r>", is_terminal = false },
-          })
-
           popups.replace:on(
             { event.TextChanged, event.TextChangedI },
             function() reload_preview(state) end
@@ -245,7 +235,7 @@ local grep = function(opts)
             end)
           end)
         end,
-      },
+      }),
       extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
         ["--with-nth"] = "1,3..",
         ["--disabled"] = true,

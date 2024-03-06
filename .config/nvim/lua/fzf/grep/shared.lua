@@ -1,7 +1,4 @@
-local core = require("fzf.core")
-local utils = require("utils")
-local fzf_misc = require("fzf.misc")
-local helpers = require("fzf.helpers")
+local layouts = require("fzf.layouts")
 
 local Layout = require("nui.layout")
 local Popup = require("nui.popup")
@@ -11,9 +8,9 @@ local M = {}
 
 -- TODO: cleanup
 
----@return NuiLayout, { main: NuiPopup, nvim_preview: NuiPopup, replace: NuiPopup }, fun(): string get_replacement, fun(content: string[]): nil set_preview_content
+---@return NuiLayout, { main: NuiPopup, nvim_preview: NuiPopup, replace: NuiPopup }, fun(): string get_replacement, fun(content: string[]): nil set_preview_content, fzf_binds
 function M.create_layout()
-  local main_popup = helpers.generate_main_popup()
+  local main_popup = layouts._generate_main_popup()
 
   local nvim_preview_popup = Popup({
     enter = false,
@@ -97,7 +94,47 @@ function M.create_layout()
     vim.api.nvim_set_current_win(current_win)
   end
 
-  return layout, popups, get_replacement, set_preview_content
+  ---@type fzf_binds
+  local binds = {
+    ["+before-start"] = function(state)
+      layouts._set_keymaps_for_preview_remote_nav(
+        popups.main,
+        popups.nvim_preview
+      )
+      popups.main:map(
+        "t",
+        "<C-f>",
+        function() vim.api.nvim_set_current_win(popups.nvim_preview.winid) end
+      )
+      popups.nvim_preview:map(
+        "n",
+        "<C-s>",
+        function() vim.api.nvim_set_current_win(popups.main.winid) end
+      )
+      popups.nvim_preview:map(
+        "n",
+        "<C-e>",
+        function() vim.api.nvim_set_current_win(popups.replace.winid) end
+      )
+      popups.replace:map(
+        "n",
+        "<C-d>",
+        function() vim.api.nvim_set_current_win(popups.nvim_preview.winid) end
+      )
+      popups.replace:map(
+        "n",
+        "<C-s>",
+        function() vim.api.nvim_set_current_win(popups.main.winid) end
+      )
+      layouts._set_keymaps_for_popups_nav({
+        { popup = popups.main, key = "<C-s>", is_terminal = true },
+        { popup = popups.nvim_preview, key = "<C-f>", is_terminal = false },
+        { popup = popups.replace, key = "<C-r>", is_terminal = false },
+      })
+    end,
+  }
+
+  return layout, popups, get_replacement, set_preview_content, binds
 end
 
 return M

@@ -3,6 +3,7 @@ local M = {}
 local core = require("fzf.core")
 local helpers = require("fzf.helpers")
 local fzf_utils = require("fzf.utils")
+local layouts = require("fzf.layouts")
 local utils = require("utils")
 local undo_utils = require("utils.undo")
 local timeago = require("utils.timeago")
@@ -64,8 +65,8 @@ M.undos = function(opts)
     return undo_nr, alt_indent, time
   end
 
-  local layout, popups, set_preview_content =
-    helpers.create_nvim_diff_preview_layout({
+  local layout, popups, set_preview_content, binds =
+    layouts.create_nvim_diff_preview_layout({
       preview_popups_win_options = {},
     })
 
@@ -74,26 +75,8 @@ M.undos = function(opts)
     layout = layout,
     main_popup = popups.main,
     initial_position = initial_pos,
-    binds = {
+    binds = fzf_utils.bind_extend(binds, {
       ["+before-start"] = function(state)
-        helpers.set_keymaps_for_preview_remote_nav(
-          popups.main,
-          popups.nvim_previews.after
-        )
-        helpers.set_keymaps_for_popups_nav({
-          { popup = popups.main, key = "<C-e>", is_terminal = true },
-          {
-            popup = popups.nvim_previews.before,
-            key = "<C-s>",
-            is_terminal = false,
-          },
-          {
-            popup = popups.nvim_previews.after,
-            key = "<C-f>",
-            is_terminal = false,
-          },
-        })
-
         popups.main.border:set_text(
           "bottom",
           " <select> undo | <y> copy undo nr | <o> open diff  "
@@ -131,7 +114,7 @@ M.undos = function(opts)
         vim.cmd(string.format("undo %s", undo_nr))
         vim.notify(string.format("Restored to %s", undo_nr))
       end,
-    },
+    }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
       ["--with-nth"] = "2..",
       ["--scroll-off"] = "2",

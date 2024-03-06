@@ -19,6 +19,7 @@ vim_keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", opts) -- Execute <C-u> twice
 vim_keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
 
 -- Find and replace (local)
+-- TODO: lua plugin?
 vim_keymap("n", "rw", "*N:%s///g<left><left>", opts) -- Select next occurrence of word under cursor then go back to current instance
 vim_keymap("n", "rr", ":%s//g<left><left>", opts)
 vim_keymap("v", "rr", ":s//g<left><left>", opts)
@@ -43,45 +44,30 @@ vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts) -- "ra" but bac
 vim_keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but forward direction only
 
 -- Diff
-local function get_diff_buffers()
-  local buffers
-  local ok = pcall(
-    function() buffers = vim.api.nvim_tabpage_get_var(0, "diff_buffers") end
-  )
-  if not ok then return nil end
-
-  return buffers
-end
 lua_keymap("n", "sj", function()
-  local diff_buffers = get_diff_buffers()
-  if not diff_buffers then
-    vim.error("Not in diff mode")
-    return
-  end
-  if vim.api.nvim_get_current_buf() == diff_buffers[2] then
-    vim.cmd(string.format([[diffget %s]], diff_buffers[1]))
-  elseif vim.api.nvim_get_current_buf() == diff_buffers[3] then
-    vim.cmd(string.format([[diffput %s]], diff_buffers[2]))
-  else
-    return
-  end
+  local diff_buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
+  if not diff_buffers then vim.error("Not in diff mode") end
+  utils.switch(vim.api.nvim_get_current_buf(), {
+    [diff_buffers[2]] = function()
+      vim.cmd(string.format([[diffget %s]], diff_buffers[1]))
+    end,
+    [diff_buffers[3]] = function()
+      vim.cmd(string.format([[diffput %s]], diff_buffers[2]))
+    end,
+  }, nil)
 end, {})
 lua_keymap("n", "sl", function()
-  local diff_buffers = get_diff_buffers()
-  if not diff_buffers then
-    vim.error("Not in diff mode")
-    return
-  end
-  if vim.api.nvim_get_current_buf() == diff_buffers[2] then
-    vim.cmd(string.format([[diffget %s]], diff_buffers[3]))
-  elseif vim.api.nvim_get_current_buf() == diff_buffers[1] then
-    vim.cmd(string.format([[diffput %s]], diff_buffers[2]))
-  else
-    return
-  end
+  local diff_buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
+  if not diff_buffers then vim.error("Not in diff mode") end
+  utils.switch(vim.api.nvim_get_current_buf(), {
+    [diff_buffers[2]] = function()
+      vim.cmd(string.format([[diffget %s]], diff_buffers[3]))
+    end,
+    [diff_buffers[1]] = function()
+      vim.cmd(string.format([[diffput %s]], diff_buffers[2]))
+    end,
+  }, nil)
 end, {})
-
--- Find and replace (global)
 
 -- Move by word
 vim_keymap("n", "<C-Left>", "b", opts)
@@ -206,6 +192,7 @@ vim_keymap("n", "<C-d>", "<cmd>wincmd j<CR>", opts)
 vim_keymap("n", "<C-s>", "<cmd>wincmd h<CR>", opts)
 vim_keymap("n", "<C-f>", "<cmd>wincmd l<CR>", opts)
 
+-- TODO: more intuitive control with lua
 vim_keymap("n", "<C-S-->", "10<C-w>-", opts) -- Decrease height
 vim_keymap("n", "<C-S-=>", "10<C-w>+", opts) -- Increase height
 vim_keymap("n", "<C-S-.>", "20<C-w>>", opts) -- Increase width
@@ -220,6 +207,7 @@ vim_keymap("n", "ws", "<cmd>vsplit<CR>", opts)
 
 vim_keymap("n", "wt", "<cmd>wincmd T<CR>", opts) -- Move to new tab
 
+-- TODO: remove
 vim_keymap("n", "wz", "<C-W>_<C-W>|", opts) -- Maximise both horizontally and vertically
 vim_keymap("n", "wx", "<C-W>=", opts)
 
@@ -378,43 +366,63 @@ lua_keymap("n", "<f9><f1>", require("fzf.docker").docker_images, {})
 lua_keymap("n", "<f9><f2>", require("fzf.docker").docker_containers, {})
 
 -- Azure Fzf
-vim.api.nvim_create_user_command("Azure", require("fzf.azure"), {})
-vim.api.nvim_create_user_command("AzureAcr", require("fzf.azure.acr").list, {})
-vim.api.nvim_create_user_command(
-  "AzureAccountSubscriptions",
-  require("fzf.azure.account").subscriptions,
-  {}
-)
-vim.api.nvim_create_user_command(
-  "AzureAdApps",
-  require("fzf.azure.ad").apps,
-  {}
-)
-vim.api.nvim_create_user_command(
-  "AzureAdUsers",
-  require("fzf.azure.ad").users,
-  {}
-)
-vim.api.nvim_create_user_command(
-  "AzureAdGroups",
-  require("fzf.azure.ad").groups,
-  {}
-)
-vim.api.nvim_create_user_command(
-  "AzureAdServicePrincipals",
-  require("fzf.azure.ad").service_principals,
-  {}
-)
-vim.api.nvim_create_user_command(
-  "AzureAdvisorRecommendations",
-  require("fzf.azure.advisor").recommendations,
-  {}
-)
-vim.api.nvim_create_user_command(
-  "AzureAppConfigs",
-  require("fzf.azure.appconfig").list,
-  {}
-)
+-- vim.api.nvim_create_user_command("Azure", require("fzf.azure"), {})
+-- vim.api.nvim_create_user_command("AzureAcr", require("fzf.azure.acr").list, {})
+-- vim.api.nvim_create_user_command(
+--   "AzureAccountSubscriptions",
+--   require("fzf.azure.account").subscriptions,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureAdApps",
+--   require("fzf.azure.ad").apps,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureAdUsers",
+--   require("fzf.azure.ad").users,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureAdGroups",
+--   require("fzf.azure.ad").groups,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureAdServicePrincipals",
+--   require("fzf.azure.ad").service_principals,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureAdvisorRecommendations",
+--   require("fzf.azure.advisor").recommendations,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureAppConfigs",
+--   require("fzf.azure.appconfig").list,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureAppServicePlans",
+--   require("fzf.azure.appservice").plans,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureWebApps",
+--   require("fzf.azure.webapp").list,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureFunctionApps",
+--   require("fzf.azure.functionapp").list,
+--   {}
+-- )
+-- vim.api.nvim_create_user_command(
+--   "AzureResources",
+--   require("fzf.azure.resource").list,
+--   {}
+-- )
 
 -- LSP
 vim_keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
@@ -504,19 +512,19 @@ end
 -- GitSigns
 vim_keymap("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>", opts)
 lua_keymap("n", "si", function()
-  local buffers = get_diff_buffers()
+  local buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
   if not buffers then
     vim.cmd([[Gitsigns prev_hunk]])
   else
-    vim.cmd("normal! [c")
+    vim.cmd("normal! [c") -- Goto previous diff
   end
 end, {})
 lua_keymap("n", "sk", function()
-  local buffers = get_diff_buffers()
+  local buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
   if not buffers then
     vim.cmd([[Gitsigns next_hunk]])
   else
-    vim.cmd("normal! ]c")
+    vim.cmd("normal! ]c") -- Goto next diff
   end
 end, {})
 vim_keymap("n", "sb", "<cmd>Gitsigns blame_line<CR>", opts)

@@ -4,6 +4,7 @@ local fzf_utils = require("fzf.utils")
 local utils = require("utils")
 local layouts = require("fzf.layouts")
 local git_utils = require("utils.git")
+local git_commits = require("fzf.git.commits")
 
 -- Fzf all git branches
 --
@@ -64,7 +65,7 @@ return function(opts)
       ["+before-start"] = function(state)
         popups.main.border:set_text(
           "bottom",
-          " <select> checkout | <y> copy branch name | <x> delete "
+          " <select> checkout | <y> copy branch name | <x> delete | <l> fzf commits "
         )
       end,
       ["focus"] = function(state)
@@ -102,6 +103,15 @@ return function(opts)
           string.format("git -C %s branch -D %s", opts.git_dir, branch)
         )
         core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
+      end,
+      ["ctrl-l"] = function(state)
+        local branch = parse_entry(state.focused_entry)
+
+        git_commits({
+          git_dir = opts.git_dir,
+          parent_state = state.id,
+          branch = branch,
+        })
       end,
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

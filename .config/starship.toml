@@ -118,7 +118,7 @@ disabled = false
 
 [character]
 format = '$symbol '
-success_symbol = '[❯](bold green)'
+success_symbol = '[❯](bold blue)'
 error_symbol = '[❯](bold red)'
 vimcmd_symbol = '[❮](bold blue)'
 vimcmd_visual_symbol = '[❮](bold yellow)'

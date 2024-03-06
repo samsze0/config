@@ -36,6 +36,8 @@ ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 # zsh-syntax-highlighting
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
 source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+typeset -A ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
 
 # Enable zsh completion
 autoload -U compinit

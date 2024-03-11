@@ -49,10 +49,11 @@ end
 -- Set default keymaps for remotely navigating the preview window
 -- This includes:
 -- - <S-Up> and <S-Down> to scroll the preview window up and down
+-- - <S-Left> and <S-Right> to scroll the preview window left and right
 --
 ---@param main_popup NuiPopup
 ---@param preview_popup NuiPopup
----@param opts? { scrollup_key: string, scrolldown_key: string }
+---@param opts? { scrollup_key: string, scrolldown_key: string, scrollleft_key: string, scrollright_key: string }
 M._set_keymaps_for_preview_remote_nav = function(
   main_popup,
   preview_popup,
@@ -61,6 +62,8 @@ M._set_keymaps_for_preview_remote_nav = function(
   opts = vim.tbl_extend("force", {
     scrollup_key = "<S-Up>",
     scrolldown_key = "<S-Down>",
+    scrollleft_key = "<S-Left>",
+    scrollright_key = "<S-Right>",
   }, opts or {})
 
   main_popup:map("t", opts.scrollup_key, function()
@@ -74,15 +77,20 @@ M._set_keymaps_for_preview_remote_nav = function(
     vim.api.nvim_input("<S-Down>")
     vim.schedule(function() vim.api.nvim_set_current_win(main_popup.winid) end)
   end)
+  main_popup:map("t", opts.scrollleft_key, function()
+    vim.api.nvim_set_current_win(preview_popup.winid)
+    vim.api.nvim_input("<S-Left>")
+    vim.schedule(function() vim.api.nvim_set_current_win(main_popup.winid) end)
+  end)
+  main_popup:map("t", opts.scrollright_key, function()
+    vim.api.nvim_set_current_win(preview_popup.winid)
+    vim.api.nvim_input("<S-Right>")
+    vim.schedule(function() vim.api.nvim_set_current_win(main_popup.winid) end)
+  end)
 end
 
 -- FIX: low-level input to trigger Fzf key bind not working
 -- M.set_keymaps_for_fzf_preview = function(main_popup, opts)
---   opts = vim.tbl_extend("force", {
---     scrollup_preview_from_main_popup = "<S-Up>",
---     scrolldown_preview_from_main_popup = "<S-Down>",
---   }, opts or {})
---
 --   main_popup:map( -- TODO
 --     "t",
 --     opts.scrollup_preview_from_main_popup,

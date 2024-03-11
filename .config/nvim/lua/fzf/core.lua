@@ -175,7 +175,7 @@ end
 ---@param state_id string
 ---@param to_fzf? string
 ---@param to_lua? string
----@param callback fun(response: string): ...any
+---@param callback? fun(response: string): ...any
 M.request_fzf = function(state_id, to_fzf, to_lua, callback)
   local state = get_state(state_id)
 
@@ -184,6 +184,8 @@ M.request_fzf = function(state_id, to_fzf, to_lua, callback)
   end
 
   if not state.port then error("Fzf server not ready") end
+  if not callback then callback = function() end end
+
   state._request_count = state._request_count + 1
   state._response_callback_map[tostring(state._request_count)] = callback
 
@@ -198,6 +200,15 @@ M.request_fzf = function(state_id, to_fzf, to_lua, callback)
   )
 
   M.send_to_fzf(state_id, table.concat(tbl, "+"))
+end
+
+-- Request content from current Fzf instance
+--
+---@param state_id string
+---@param entries string[]
+M.reload_entries = function(state_id, entries)
+  local state = get_state(state_id)
+  M.request_fzf(state_id, fzf_utils.reload_action(entries), "focus {n} {}")
 end
 
 -- Get current selected entries
@@ -357,6 +368,7 @@ M.fzf = function(input, opts, parent_state_id)
 
   layout:mount()
 
+  -- FIX: fix close layout on leave
   local on_buf_leave = function(ctx)
     local success, current_buf_root_state_id = pcall(
       function() return vim.b[0].fzf_root_state_id end ---@diagnostic disable-line: undefined-field
@@ -391,7 +403,6 @@ M.fzf = function(input, opts, parent_state_id)
     change = M.send_to_lua_action(state_id, "query {q}"),
   }, opts.binds)
 
-  -- FIX
   -- extended_binds = fzf_utils.bind_extend(extended_binds, {
   --   ["+before-start"] = function()
   --     for _, popup in ipairs({ main_popup, unpack(opts.other_popups) }) do
@@ -473,7 +484,7 @@ M.fzf = function(input, opts, parent_state_id)
   )
 
   if event_callback_map["+before-start"] then
-    invoke_event_callback(state_id, "+before-start")
+    invoke_event_callback(state_id, "+before-start") -- Must execute before start
   end
 
   -- Async will mess up the "start:pos" trigger
@@ -510,7 +521,6 @@ EOF
           parent_state.layout:show()
           -- `enter` option of NuiPopup doesn't cater show/hide
           vim.api.nvim_set_current_win(parent_state.main_popup.winid)
-          vim.defer_fn(function() vim.cmd("startinsert") end, 100) -- FIX: fragile solution
         else
           -- Restore focus to preview window
           if vim.api.nvim_win_is_valid(prev_win) then

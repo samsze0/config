@@ -85,7 +85,7 @@ M.undos = function(opts)
       ["ctrl-y"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)
         vim.fn.setreg("+", undo_nr)
-        vim.notify(string.format("Copied %s to clipboard", undo_nr))
+        vim.info(string.format("Copied %s to clipboard", undo_nr))
       end,
       ["ctrl-o"] = function(state)
         local undo_nr = parse_entry(state.focused_entry)
@@ -112,7 +112,7 @@ M.undos = function(opts)
         local undo_nr = parse_entry(state.focused_entry)
 
         vim.cmd(string.format("undo %s", undo_nr))
-        vim.notify(string.format("Restored to %s", undo_nr))
+        vim.info(string.format("Restored to %s", undo_nr))
       end,
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

@@ -31,7 +31,7 @@ local git_commits = function(opts)
         "git -C %s log --oneline --color --pretty=format:'%s' %s %s",
         opts.git_dir,
         git_format,
-        opts.branch,
+        opts.branch or "",
         opts.filepaths and string.format("-- %s", opts.filepaths) or ""
       )
     )

@@ -30,20 +30,19 @@ M.notifications = function(opts)
 
       local noti = notifications[i]
       local l = noti.level
-      ---@type string
-      local level
       local unread = #entries < num_unread
-      if l == vim.log.levels.INFO then
-        level = unread and utils.ansi_codes.blue("󰋼 ") or "󰋼 "
-      elseif l == vim.log.levels.WARN then
-        level = unread and utils.ansi_codes.yellow(" ") or " "
-      elseif l == vim.log.levels.ERROR then
-        level = unread and utils.ansi_codes.red(" ") or " "
-      elseif l == vim.log.levels.DEBUG or level == vim.log.levels.TRACE then
-        level = unread and utils.ansi_codes.grey(" ") or " "
-      else
-        level = unread and utils.ansi_codes.grey(" ") or " "
-      end
+      local level = utils.switch(l, {
+        [vim.log.levels.INFO] = unread and utils.ansi_codes.blue("󰋼 ")
+          or "󰋼 ",
+        [vim.log.levels.WARN] = unread and utils.ansi_codes.yellow(" ")
+          or " ",
+        [vim.log.levels.ERROR] = unread and utils.ansi_codes.red(" ")
+          or " ",
+        [vim.log.levels.DEBUG] = unread and utils.ansi_codes.grey(" ")
+          or " ",
+        [vim.log.levels.TRACE] = unread and utils.ansi_codes.grey(" ")
+          or " ",
+      }, unread and utils.ansi_codes.grey(" ") or " ")
       local brief = noti.message
       local parts = vim.split(brief, "\n")
       if #parts > 1 then brief = parts[1] end

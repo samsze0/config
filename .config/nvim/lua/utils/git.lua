@@ -1,14 +1,16 @@
 local M = {}
 
+local utils = require("utils")
+
 ---@param git_dir string
----@param opts? { as_cmd?: boolean, filter_directories?: boolean }
+---@param opts? { as_cmd?: boolean, filter_unreadable?: boolean }
 ---@return string | string[] cmd_or_git_files
 M.git_files = function(git_dir, opts)
   if vim.fn.executable("git") ~= 1 then error("git is not installed") end
 
   opts = vim.tbl_extend("force", {
     as_cmd = false,
-    filter_directories = false, -- Used to remove symlinks. Can hinder performance
+    filter_unreadable = false, -- For removing unreadable files
   }, opts or {})
 
   -- GIT_TEMP=$(mktemp); git submodule --quiet foreach 'echo $path' > $GIT_TEMP; git ls-files --full-name --no-recurse-submodules --exclude-standard --exclude-from $GIT_TEMP
@@ -18,17 +20,27 @@ M.git_files = function(git_dir, opts)
     git_dir,
     git_dir
   )
-  if opts.filter_directories then
-    -- TODO: Possibly another way that doesn't involve xargs?
-    -- Or remove the need to filter_directories if rg can filter out directories?
-    -- Or if git can filter out symbolic links?
-    cmd = cmd .. " | xargs -I {} bash -c 'if [[ ! -d {} ]]; then echo {}; fi'"
+  if opts.filter_unreadable then
+    -- FIX: support filtering out unreadable files in bash
+    -- xargs is too slow
+    -- cmd = cmd .. " | xargs -I {} bash -c 'if [[ ! -d {} ]]; then echo {}; fi'"
+    -- Can git can filter out symbolic links?
   end
   if opts.return_as_cmd then return cmd end
 
-  local results = vim.fn.systemlist(cmd, nil, false)
-  if vim.v.shell_error ~= 0 then error("Failed to get git files") end
-  return results
+  local files = utils.systemlist(cmd, {
+    keepempty = false,
+  })
+  ---@cast files string[]
+
+  if opts.filter_unreadable then
+    files = utils.filter(
+      files,
+      function(i, e) return vim.fn.filereadable(git_dir .. "/" .. e) == 1 end
+    )
+  end
+
+  return utils.filter(files, function(i, e) return vim.trim(e):len() > 0 end)
 end
 
 ---@param opts? { as_cmd?: boolean }

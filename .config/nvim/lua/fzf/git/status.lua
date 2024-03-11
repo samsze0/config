@@ -7,6 +7,8 @@ local uv_utils = require("utils.uv")
 local git_utils = require("utils.git")
 local jumplist = require("jumplist")
 
+-- TODO: remove file limit?
+
 -- Fzf git status
 --
 ---@param opts? { git_dir?: string, max_num_files?: number }
@@ -123,13 +125,92 @@ local git_status = function(opts)
       gitpath
   end
 
-  local win = vim.api.nvim_get_current_win()
+  local current_win = vim.api.nvim_get_current_win()
   local timer ---@type uv_timer_t?
 
   local layout, popups, set_preview_content, binds =
     layouts.create_nvim_diff_preview_layout({
       preview_popups_win_options = {},
     })
+
+  ---@param state state
+  local function refresh_preview(state)
+    vim.info("Refresh")
+
+    local filepath, status = parse_entry(state.focused_entry)
+    local filename = vim.fn.fnamemodify(filepath, ":t")
+
+    if status.renamed then
+      local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
+      local ft = vim.filetype.match({
+        filename = filename,
+        contents = after,
+      })
+      set_preview_content(after, after, {
+        filetype = ft,
+      })
+      return
+    end
+
+    if status.added or status.is_untracked then
+      local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
+      local ft = vim.filetype.match({
+        filename = filename,
+        contents = after,
+      })
+      set_preview_content({}, after, {
+        filetype = ft,
+      })
+      return
+    end
+
+    local before = utils.systemlist(
+      string.format(
+        "git show HEAD:%s",
+        git_utils.convert_filepath_to_gitpath(filepath)
+      )
+    )
+
+    if status.deleted then
+      local ft = vim.filetype.match({
+        filename = filename,
+        contents = before,
+      })
+      set_preview_content(before, {}, {
+        filetype = ft,
+      })
+      return
+    end
+
+    local staged = utils.systemlist(
+      string.format(
+        "git show :%s",
+        git_utils.convert_filepath_to_gitpath(filepath)
+      )
+    )
+
+    if status.is_fully_staged then
+      local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
+      local ft = vim.filetype.match({
+        filename = filename,
+        contents = after,
+      })
+      set_preview_content(before, after, {
+        filetype = ft,
+      })
+      return
+    end
+
+    local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
+
+    local ft = vim.filetype.match({
+      filename = filename,
+      contents = after,
+    })
+    set_preview_content(staged, after, {
+      filetype = ft,
+    })
+  end
 
   core.fzf(entries, {
     prompt = "Git-Status",
@@ -143,81 +224,7 @@ local git_status = function(opts)
           " <select> goto file | <left> stage | <right> unstage | <x> restore | <y> copy path | <r> reload "
         )
       end,
-      ["focus"] = function(state)
-        local filepath, status = parse_entry(state.focused_entry)
-        local filename = vim.fn.fnamemodify(filepath, ":t")
-
-        if status.renamed then
-          local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
-          local ft = vim.filetype.match({
-            filename = filename,
-            contents = after,
-          })
-          set_preview_content(after, after, {
-            filetype = ft,
-          })
-          return
-        end
-
-        if status.added or status.is_untracked then
-          local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
-          local ft = vim.filetype.match({
-            filename = filename,
-            contents = after,
-          })
-          set_preview_content({}, after, {
-            filetype = ft,
-          })
-          return
-        end
-
-        local before = utils.systemlist(
-          string.format(
-            "git show HEAD:%s",
-            git_utils.convert_filepath_to_gitpath(filepath)
-          )
-        )
-
-        if status.deleted then
-          local ft = vim.filetype.match({
-            filename = filename,
-            contents = before,
-          })
-          set_preview_content(before, {}, {
-            filetype = ft,
-          })
-          return
-        end
-
-        local staged = utils.systemlist(
-          string.format(
-            "git show :%s",
-            git_utils.convert_filepath_to_gitpath(filepath)
-          )
-        )
-
-        if status.is_fully_staged then
-          local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
-          local ft = vim.filetype.match({
-            filename = filename,
-            contents = after,
-          })
-          set_preview_content(before, after, {
-            filetype = ft,
-          })
-          return
-        end
-
-        local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
-
-        local ft = vim.filetype.match({
-          filename = filename,
-          contents = after,
-        })
-        set_preview_content(staged, after, {
-          filetype = ft,
-        })
-      end,
+      ["focus"] = refresh_preview,
       ["+select"] = function(state)
         local filepath, status, gitpath = parse_entry(state.focused_entry)
 
@@ -225,9 +232,11 @@ local git_status = function(opts)
           local ours = utils.systemlist(
             string.format([[git -C %s show :2:%s]], opts.git_dir, gitpath)
           )
+          ---@cast ours string[]
           local theirs = utils.systemlist(
             string.format([[git -C %s show :3:%s]], opts.git_dir, gitpath)
           )
+          ---@cast theirs string[]
 
           local filename = vim.fn.fnamemodify(filepath, ":t")
           local ft = vim.filetype.match({
@@ -252,24 +261,22 @@ local git_status = function(opts)
           return
         end
 
-        jumplist.save(win)
+        jumplist.save(current_win)
         vim.cmd(string.format([[e %s]], filepath))
       end,
       ["left"] = function(state)
         local filepath = parse_entry(state.focused_entry)
 
         utils.system(string.format([[git add %s]], filepath))
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
+        core.reload_entries(state.id, get_entries())
       end,
       ["right"] = function(state)
         local filepath = parse_entry(state.focused_entry)
 
         utils.system(string.format([[git restore --staged %s]], filepath))
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
+        core.reload_entries(state.id, get_entries())
       end,
-      ["ctrl-r"] = function(state)
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
-      end,
+      ["ctrl-r"] = function(state) core.reload_entries(state.id, get_entries()) end,
       ["ctrl-y"] = function(state)
         local filepath = parse_entry(state.focused_entry)
 
@@ -290,7 +297,7 @@ local git_status = function(opts)
           end,
           throw_error = false,
         })
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
+        core.reload_entries(state.id, get_entries())
       end,
     }),
     extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {

@@ -141,6 +141,8 @@ end, {})
 - LSP import path update (with watchman and LSP willrename etc...) (depends on watchman)
 - LSP rename workflow (WorkspaceEdit[]). depends on watchman
 - Fix Lf add new file will add line at bottom that breaks layout
+- Stream entries to fzf and fzf async
+- Simplify way to define max col width for columns
 
 **Mid priority**
 
@@ -173,3 +175,4 @@ end, {})
 - Fix Fzf somethings hang if actions happen too quick?
 - Custom copilot plugin (possible to use chat?)
 - React dev workflow
+- Custom scrollbar plugin that supports remote refresh and git status and support background + foreground

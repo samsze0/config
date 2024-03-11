@@ -22,34 +22,39 @@ M.files = function(opts)
     max_num_files = 1000,
   }, opts or {})
 
-  local parse_entry = function(entry)
+  local files
+
+  local get_filepath = function(index)
+    local file = files[index]
     if opts.git_dir then
-      return vim.fn.fnamemodify(opts.git_dir .. "/" .. entry, ":.")
+      return vim.fn.fnamemodify(opts.git_dir .. "/" .. file, ":.")
     else
-      return entry
+      return file
     end
   end
 
-  local entries
   if opts.git_dir then
-    entries = git_utils.git_files(opts.git_dir)
+    files = git_utils.git_files(opts.git_dir)
   else
     if vim.fn.executable("fd") ~= 1 then error("fd is not installed") end
-    entries = utils.systemlist(
+    files = utils.systemlist(
       string.format([[fd --type f --no-ignore %s]], opts.fd_extra_args)
     )
   end
-  if #entries > opts.max_num_files then error("Too many git files") end
-  ---@cast entries string[]
 
-  entries = utils.sort_by_files(entries)
+  if #files > opts.max_num_files then error("Too many git files") end
+  ---@cast files string[]
+
+  files = utils.sort_by_files(files)
+
+  local fzf_rows = utils.map(files, function(i, e) return e end) -- Shallow clone
 
   local current_win = vim.api.nvim_get_current_win()
 
   local layout, popups, set_preview_content, binds =
     layouts.create_nvim_preview_layout()
 
-  core.fzf(entries, {
+  core.fzf(fzf_rows, {
     prompt = "Files",
     layout = layout,
     main_popup = popups.main,
@@ -61,10 +66,14 @@ M.files = function(opts)
         )
       end,
       ["focus"] = function(state)
-        local entry = state.focused_entry
-        local path = parse_entry(entry)
+        local path = get_filepath(state.focused_entry_index)
 
-        popups.nvim_preview.border:set_text("top", " " .. entry .. " ")
+        popups.nvim_preview.border:set_text("top", " " .. path .. " ")
+
+        if vim.fn.filereadable(vim.fn.fnamemodify(path, ":p")) ~= 1 then
+          set_preview_content({ "File not readable, or doesnt exist" })
+          return
+        end
 
         local is_binary = utils
           .system("file --mime " .. path, {
@@ -84,15 +93,13 @@ M.files = function(opts)
         helpers.preview_file(path, popups.nvim_preview)
       end,
       ["ctrl-y"] = function(state)
-        local entry = state.focused_entry
-        local path = parse_entry(entry)
+        local path = get_filepath(state.focused_entry_index)
 
         vim.fn.setreg("+", path)
-        vim.notify(string.format([[Copied %s to clipboard]], path))
+        vim.info(string.format([[Copied %s to clipboard]], path))
       end,
       ["ctrl-w"] = function(state)
-        local entry = state.focused_entry
-        local path = parse_entry(entry)
+        local path = get_filepath(state.focused_entry_index)
 
         core.abort_and_execute(
           state.id,
@@ -100,8 +107,7 @@ M.files = function(opts)
         )
       end,
       ["ctrl-t"] = function(state)
-        local entry = state.focused_entry
-        local path = parse_entry(entry)
+        local path = get_filepath(state.focused_entry_index)
 
         core.abort_and_execute(
           state.id,
@@ -109,8 +115,7 @@ M.files = function(opts)
         )
       end,
       ["+select"] = function(state)
-        local entry = state.focused_entry
-        local path = parse_entry(entry)
+        local path = get_filepath(state.focused_entry_index)
 
         jumplist.save(current_win)
         vim.cmd(string.format([[e %s]], path))

@@ -148,7 +148,7 @@ end
 function M.jump_back(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   if debug then
-    vim.notify(
+    vim.info(
       string.format(
         "Jumping back from\n%s",
         vim.inspect(M.current_jump[win_id])
@@ -156,12 +156,12 @@ function M.jump_back(win_id)
     )
   end
   if not M.current_jump[win_id] then
-    vim.notify("No jumps for window " .. win_id)
+    vim.info("No jumps for window " .. win_id)
     return
   end
   if cursor_on_current_jump(win_id) then
     if M.current_jump[win_id].prev == nil then
-      vim.notify("No previous jump")
+      vim.info("No previous jump")
       return
     end
 
@@ -184,7 +184,7 @@ end
 function M.jump_forward(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   if debug then
-    vim.notify(
+    vim.info(
       string.format(
         "Jumping forward from\n%s",
         vim.inspect(M.current_jump[win_id])

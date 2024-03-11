@@ -118,4 +118,28 @@ M.preview_buffer = function(bufnr, preview_popup, opts)
   vim.api.nvim_set_current_win(current_win)
 end
 
+-- Truncate or pad a string to a certain width
+--
+---@param str string
+---@param width number The width to truncate or pad to, expressed in number of columns or percentage of current window
+---@param opts? { width_in_percentage?: boolean }
+---@return string
+M.trunc_or_pad_to_width = function(str, width, opts)
+  opts = vim.tbl_extend("force", {
+    width_in_percentage = false,
+  }, opts or {})
+
+  if width < 0 then error("Width must be at least 0") end
+
+  if opts.width_in_percentage then
+    width = math.floor(vim.api.nvim_win_get_width(0) * width * 0.01)
+  end
+
+  if #str > width then
+    return str:sub(1, width - 3) .. "..."
+  else
+    return str .. string.rep(" ", width - #str)
+  end
+end
+
 return M

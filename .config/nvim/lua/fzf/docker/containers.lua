@@ -79,7 +79,7 @@ M.docker_containers = function(opts)
       ["ctrl-y"] = function(state)
         local container = containers[state.focused_entry_index]
         vim.fn.setreg("+", container.ID)
-        vim.notify(string.format([[Copied %s to clipboard]], container.ID))
+        vim.info(string.format([[Copied %s to clipboard]], container.ID))
       end,
       ["left"] = function(state)
         local container = containers[state.focused_entry_index]

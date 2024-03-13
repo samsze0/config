@@ -1,67 +1,111 @@
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
-local layouts = require("fzf.layouts")
 local utils = require("utils")
 local git_utils = require("utils.git")
+local jumplist = require("jumplist")
+local fzf_git_commits = require("fzf.git.commits")
+local fzf_utils = require("fzf.utils")
+local config = require("fzf.config")
+local terminal_ft = require("terminal-filetype")
+local fzf_files = require("fzf.files")
+local fzf_git_status = require("fzf.git.status")
+local fzf_git_commits = require("fzf.git.commits")
+local fzf_git_branches = require("fzf.git.branch")
 
--- Fzf all git submodules
+-- Fzf git submodules
 --
----@param on_submodule function
-local git_submodules = function(on_submodule)
-  local submodules =
-    utils.systemlist([[git submodule --quiet foreach 'echo $path']])
+---@alias FzfGitSubmodulesOptions { }
+---@param opts? FzfGitSubmodulesOptions
+---@return FzfController
+return function(opts)
+  opts = utils.opts_extend({}, opts)
+  ---@cast opts FzfGitSubmodulesOptions
 
-  submodules = utils.map(submodules, function(_, e) return vim.trim(e) end)
+  local current_git_dir = git_utils.current_dir()
 
-  local git_dir = git_utils.current_git_dir()
+  local controller = Controller.new({
+    name = "Git-Submodules",
+  })
 
-  local function parse_entry(entry)
-    local submodule_path = entry
-    submodule_path = git_dir .. "/" .. submodule_path
+  local layout, popups = helpers.dual_pane_terminal_preview(controller)
 
-    return submodule_path
+  ---@alias FzfGitSubmoduleEntry { display: string, path: string, gitpath: string }
+  ---@return FzfGitSubmoduleEntry[]
+  local entries_getter = function()
+    local submodules =
+      utils.systemlist([[git submodule --quiet foreach 'echo $path']])
+
+    return utils.map(submodules, function(i, e)
+      local gitpath = vim.trim(e)
+
+      return {
+        display = gitpath,
+        gitpath = gitpath,
+        path = current_git_dir .. "/" .. gitpath,
+      }
+    end)
   end
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_preview_layout({ preview_in_terminal_mode = true })
+  controller:set_entries_getter(entries_getter)
 
-  core.fzf(submodules, {
-    prompt = "Git-Submodules",
-    layout = layout,
-    main_popup = popups.main,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text("bottom", " <y> copy path ")
-      end,
-      ["focus"] = function(state)
-        local submodule_path = parse_entry(state.focused_entry)
+  controller:subscribe("focus", nil, function(payload)
+    local focus = controller.focus
+    ---@cast focus FzfGitSubmoduleEntry?
 
-        popups.nvim_preview.border:set_text(
-          "top",
-          " " .. git_utils.convert_filepath_to_gitpath(submodule_path) .. " "
-        )
+    popups.side:set_lines({})
 
-        local log = utils.systemlist(
-          string.format("git -C %s log --color --decorate", submodule_path)
-        )
-        set_preview_content(log)
-      end,
-      ["+select"] = function(state)
-        local submodule_path = parse_entry(state.focused_entry)
-        on_submodule(submodule_path)
-      end,
-      ["ctrl-y"] = function(state)
-        local submodule_path = parse_entry(state.focused_entry)
+    if not focus then return end
 
-        vim.fn.setreg("+", submodule_path)
-        vim.info(string.format([[Copied to clipboard: %s]], submodule_path))
-      end,
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "1..",
-    }),
-  })
+    local git_log = utils.systemlist(
+      ("git -C '%s' log --color --decorate"):format(focus.path)
+    )
+    popups.side:set_lines(git_log)
+    terminal_ft.refresh_highlight(popups.side.bufnr)
+  end)
+
+  popups.main:map("<C-y>", "Copy path", function()
+    if not controller.focus then return end
+
+    local path = controller.focus.path
+    vim.fn.setreg("+", path)
+    vim.info(([[Copied %s to clipboard]]):format(path))
+  end)
+
+  popups.main:map("<C-l>", "List git files", function()
+    if not controller.focus then return end
+
+    local path = controller.focus.path
+    local next = fzf_files({ git_dir = path })
+    next:set_parent(controller)
+    next:start()
+  end)
+
+  popups.main:map("<C-c>", "List git commits", function()
+    if not controller.focus then return end
+
+    local path = controller.focus.path
+    local next = fzf_git_commits({ git_dir = path })
+    next:set_parent(controller)
+    next:start()
+  end)
+
+  popups.main:map("<C-s>", "Show git status", function()
+    if not controller.focus then return end
+
+    local path = controller.focus.path
+    local next = fzf_git_status({ git_dir = path })
+    next:set_parent(controller)
+    next:start()
+  end)
+
+  popups.main:map("<C-b>", "List branches", function()
+    if not controller.focus then return end
+
+    local path = controller.focus.path
+    local next = fzf_git_branches({ git_dir = path })
+    next:set_parent(controller)
+    next:start()
+  end)
+
+  return controller
 end
-
-return git_submodules

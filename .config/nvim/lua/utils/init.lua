@@ -40,10 +40,16 @@ M.map = function(tbl, func, opts)
   return new_tbl
 end
 
+-- Split string using lua regular expression
+-- See also: split_string_n
+--
+---@param inputstr string
+---@param sep? string
+---@return string[]
 M.split_string = function(inputstr, sep)
   if sep == nil then sep = "%s" end
   local t = {}
-  for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
+  for str in inputstr:gmatch("([^" .. sep .. "]+)") do
     table.insert(t, str)
   end
   return t
@@ -159,17 +165,14 @@ M.safe_require = function(module_name, on_error)
   return module
 end
 
--- Tweaked from:
--- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/utils.lua
---
--- Remove escape sequences of the following formats:
--- 1. ^[[34m
--- 2. ^[[0;34m
--- 3. ^[[m
+-- Remove ansi escape sequences
 --
 ---@param str string
 ---@return string
-function M.strip_ansi_coloring(str) return str:gsub("%[[%d;]-m", "")[1] end
+function M.strip_ansi_codes(str)
+  local x, count = str:gsub("\x1b%[[%d:;]*[mK]", "")
+  return x or str
+end
 
 -- Tweaked from:
 -- https://github.com/ibhagwan/fzf-lua/blob/main/lua/fzf-lua/utils.lua
@@ -425,16 +428,18 @@ end
 ---@param str string
 ---@param count? number
 ---@param sep? string
----@param opts? { include_remaining?: boolean, trimempty?: boolean }
+---@param opts? { include_remaining?: boolean, discard_empty?: boolean, trim?: boolean, plain?: boolean }
 ---@return string[]
 M.split_string_n = function(str, count, sep, opts)
   sep = sep or "%s+"
   opts = vim.tbl_extend(
     "force",
-    { include_remaining = true, trimempty = true },
+    { include_remaining = true, discard_empty = true },
     opts or {}
   )
   local result = {}
+
+  -- TODO: handle error gracefully
 
   -- Lua doesn't support multi-char-negative-lookahead
   -- So we cannot just use Lua regex (because it won't support multi-char sep)
@@ -442,10 +447,23 @@ M.split_string_n = function(str, count, sep, opts)
   -- We perform split by first replacing all occurrences of sep with nbsp,
   -- then we `vim.split` by nbsp
 
-  str = string.gsub(str, sep, M.nbsp, count)
-  result = vim.split(str, M.nbsp, { trimempty = opts.trimempty })
-  if count ~= nil and #result ~= count + 1 then error("Unexpected") end
+  str = str:gsub(sep, M.nbsp, count)
+  result = vim.split(
+    str,
+    M.nbsp,
+    { trimempty = opts.discard_empty, plain = opts.plain }
+  )
+  if count ~= nil and #result ~= count + 1 then
+    error(M.str_fmt("Expected", count + 1, "parts, but got", result))
+  end
   if not opts.include_remaining then table.remove(result, #result) end
+
+  if opts.trim then
+    for i, v in ipairs(result) do
+      result[i] = vim.trim(v)
+    end
+  end
+
   return result
 end
 
@@ -576,19 +594,33 @@ end
 -- vim.system wrapper
 --
 ---@param cmd string
----@param opts? { error_msg_title?: string, input?: any, throw_error?: boolean, on_error?: fun(err: string): nil }
----@return string?
+---@param opts? { error_msg_title?: string, input?: any, on_error?: fun(err: string): nil }
+---@return string
 M.system = function(cmd, opts)
-  opts = vim.tbl_extend(
-    "force",
-    { error_msg_title = "Failed to execute command: %s", throw_error = true },
-    opts or {}
-  )
+  opts = M.opts_extend({
+    error_msg_title = "Failed to execute command " .. cmd,
+  }, opts)
 
   local result = vim.fn.system(cmd, opts.input)
   if vim.v.shell_error ~= 0 then
     if opts.on_error then opts.on_error(result) end
-    if opts.throw_error then error(M.str_fmt(opts.error_msg_title, result)) end
+    error(M.str_fmt(opts.error_msg_title, result))
+  end
+
+  return result
+end
+
+-- vim.system wrapper
+--
+---@param cmd string
+---@param opts? { input?: any, on_error?: fun(err: string): nil }
+---@return string?
+M.system_safe = function(cmd, opts)
+  opts = opts or {}
+
+  local result = vim.fn.system(cmd, opts.input)
+  if vim.v.shell_error ~= 0 then
+    if opts.on_error then opts.on_error(result) end
     return nil
   end
 
@@ -597,22 +629,48 @@ end
 
 -- vim.systemlist wrapper
 --
+---@alias UtilsSystemlistOptions { trim?: boolean, error_msg_title?: string, input?: any, keepempty?: boolean, on_error?: fun(err: string): nil }
 ---@param cmd string
----@param opts? { error_msg_title?: string, input?: any, keepempty?: boolean, throw_error?: boolean, on_error?: fun(err: string): nil }
----@return string[]?
+---@param opts? UtilsSystemlistOptions
+---@return string[]
 M.systemlist = function(cmd, opts)
-  opts = vim.tbl_extend(
-    "force",
-    { error_msg_title = "Failed to execute command: %s" },
-    opts or {}
+  opts = M.opts_extend(
+    { error_msg_title = "Failed to execute command " .. cmd },
+    opts
   )
+  ---@cast opts UtilsSystemlistOptions
 
   local result = vim.fn.systemlist(cmd, opts.input, opts.keepempty)
   if vim.v.shell_error ~= 0 then
-    if opts.on_error then opts.on_error(result) end
-    if opts.throw_error then
-      error(M.str_fmt(opts.error_msg_title, table.concat(result, "\n")))
+    local err_msg = table.concat(result, "\n")
+    if opts.on_error then opts.on_error(err_msg) end
+    error(M.str_fmt(opts.error_msg_title, err_msg))
+  end
+
+  if opts.trim then
+    for i, v in ipairs(result) do
+      result[i] = vim.trim(v)
     end
+    if not opts.keepempty then
+      result = M.filter(result, function(_, v) return v ~= "" end)
+    end
+  end
+
+  return result
+end
+
+-- vim.systemlist wrapper
+--
+---@param cmd string
+---@param opts? { input?: any, keepempty?: boolean, on_error?: fun(err: string): nil }
+---@return string[]?
+M.systemlist_safe = function(cmd, opts)
+  opts = opts or {}
+
+  local result = vim.fn.systemlist(cmd, opts.input, opts.keepempty)
+  if vim.v.shell_error ~= 0 then
+    local err_msg = table.concat(result, "\n")
+    if opts.on_error then opts.on_error(err_msg) end
     return nil
   end
 
@@ -624,25 +682,33 @@ end
 ---@generic T : any
 ---@generic U : any
 ---@param val T
----@param switches table<T, U | fun(val: T): U>
----@param default U | fun(val: T): U
+---@param switches table<T, U>
+---@param default U?
 ---@return U
 M.switch = function(val, switches, default)
   for case, expr in pairs(switches) do
-    if val == case then
-      if type(expr) == "function" then
-        return expr(val)
-      else
-        return expr
-      end
-    end
+    if val == case then return expr end
   end
 
-  if type(default) == "function" then
-    return default(val)
-  else
-    return default
+  if not default then error("No default case provided") end
+  return default
+end
+
+-- Switch with function cases
+--
+---@generic T : any
+---@generic U : any
+---@param val T
+---@param switches table<T, fun(val: T): U>
+---@param default (fun(val: T): U)?
+---@return U
+M.switch_with_func = function(val, switches, default)
+  for case, expr in pairs(switches) do
+    if val == case then return expr(val) end
   end
+
+  if not default then error("No default case provided") end
+  return default(val)
 end
 
 -- Slice an array
@@ -661,6 +727,208 @@ M.slice = function(list, first, last, step)
   end
 
   return sliced
+end
+
+---@param target table
+---@param k any key
+---@param v any value
+---@param mode "force" | "keep" | "error"
+M._tbl_extend = function(target, k, v, mode)
+  if mode == "keep" then
+    if target[k] == nil then target[k] = v end
+  elseif mode == "force" then
+    target[k] = v
+  else -- opts.mode == "error"
+    if target[k] ~= nil then error(("Key %s already exists"):format(k)) end
+    target[k] = v
+  end
+end
+
+-- Same as `vim.tbl_extend` but does not mutate the input args
+--
+---@alias UtilsTblExtendOpts { mode: "force" | "keep" | "error" }
+---@param opts UtilsTblExtendOpts
+---@vararg table
+---@return table
+M.tbl_extend = function(opts, ...)
+  local result = {}
+  local args = { ... }
+  for _, tbl in ipairs(args) do
+    for k, v in pairs(tbl) do
+      M._tbl_extend(result, k, v, opts.mode)
+    end
+  end
+
+  return result
+end
+
+-- Same as `vim.tbl_deep_extend` but does not mutate the input args
+-- Careful with classes as they will be treated as regular tables, unless `__is_class` is `true`
+--
+---@alias UtilsTblDeepExtendOpts { mode: "force" | "keep" | "error" }
+---@param opts UtilsTblDeepExtendOpts
+---@vararg table
+---@return table
+M.tbl_deep_extend = function(opts, ...)
+  local result = {}
+  local args = { ... }
+  for _, tbl in ipairs(args) do
+    M._tbl_deep_extend(result, tbl, opts.mode)
+  end
+
+  return result
+end
+
+---@param target table
+---@param source table
+---@param mode "force" | "keep" | "error"
+M._tbl_deep_extend = function(target, source, mode)
+  for k, v in pairs(source) do
+    if type(v) ~= "table" then
+      M._tbl_extend(target, k, v, mode)
+    elseif getmetatable(v) ~= nil then -- If table is a class instance
+      M._tbl_extend(target, k, v, mode)
+    elseif v["__is_class"] == true or v["__is_module"] == true then
+      M._tbl_extend(target, k, v, mode)
+    elseif M.is_array(v) then
+      M._tbl_extend(target, k, v, mode)
+    else
+      if target[k] == nil then target[k] = {} end
+      M._tbl_deep_extend(target[k], v, mode)
+    end
+  end
+end
+
+-- Extension of `utils.tbl_extend`
+--
+---@vararg table?
+---@return table
+M.opts_extend = function(...)
+  local args = { ... }
+  return M.tbl_extend(
+    { mode = "force" },
+    unpack(M.map(args, function(_, tbl) return tbl or {} end))
+  )
+end
+
+-- Extension of `utils.tbl_deep_extend`
+--
+---@vararg table?
+---@return table
+M.opts_deep_extend = function(...)
+  local args = { ... }
+  return M.tbl_deep_extend(
+    { mode = "force" },
+    unpack(M.map(args, function(_, tbl) return tbl or {} end))
+  )
+end
+
+---@vararg number buffers
+M.diff_bufs = function(...)
+  local bufs = { ... }
+  for _, buf in ipairs(bufs) do
+    vim.api.nvim_buf_call(buf, function() vim.cmd("diffthis") end)
+  end
+end
+
+-- Identity function
+M.identity_func = function(...) return ... end
+
+-- Convert shell opts table to string representation
+--
+---@alias UtilsShellOpts table<string, string | boolean | (string | boolean)[]>
+---@param shell_opts UtilsShellOpts
+---@return string
+M.shell_opts_tostring = function(shell_opts)
+  local result = {}
+  for k, v in pairs(shell_opts) do
+    if type(v) == "string" then
+      if #v > 0 then
+        table.insert(result, k .. "=" .. v)
+      else
+        table.insert(result, k)
+      end
+    elseif type(v) == "table" then
+      if not M.is_array(v) then error("Unexpected type") end
+      for _, val in ipairs(v) do
+        table.insert(result, k .. "=" .. val)
+      end
+    elseif type(v) == "boolean" then
+      if v then table.insert(result, k) end
+    else
+      error("Unexpected type")
+    end
+  end
+  return table.concat(result, " ")
+end
+
+-- Join tbl/array as string with custom fn
+--
+---@generic T : any
+---@generic U : any
+---@param tbl table<any, T> | T[]
+---@param fn fun(k: any, v: T): U
+---@param delimiter? string
+---@return string
+M.join = function(tbl, fn, delimiter)
+  delimiter = delimiter or " "
+
+  return M.reduce(tbl, function(acc, i, v)
+    if acc == "" then
+      return fn(i, v)
+    else
+      return acc .. delimiter .. fn(i, v)
+    end
+  end, "")
+end
+
+-- Print and return value
+--
+---@generic T : any
+---@param x T
+---@return T
+M.debug = function(x)
+  print(vim.inspect(x))
+  return x
+end
+
+-- Truncate or pad a string to a certain width
+--
+---@param str string
+---@param width number The width to truncate or pad to
+---@param opts? { pad_character?: string, elipses?: string }
+---@return string
+M.trunc_or_pad_to_width = function(str, width, opts)
+  opts = M.opts_extend({
+    pad_character = " ",
+    elipses = "...",
+  }, opts)
+
+  if width < 0 then error("Width must be at least 0") end
+
+  if #str > width then
+    return str:sub(1, width - #opts.elipses) .. opts.elipses
+  else
+    return str .. opts.pad_character:rep(width - #str)
+  end
+end
+
+-- Extend a list
+--
+---@generic T : any
+---@vararg T[]
+---@return T[]
+M.list_extend = function(...)
+  local args = { ... }
+  local result = {}
+  for _, list in ipairs(args) do
+    if not M.is_array(list) then error("Expected array") end
+
+    for _, v in ipairs(list) do
+      table.insert(result, v)
+    end
+  end
+  return result
 end
 
 return M

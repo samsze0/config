@@ -1,132 +1,81 @@
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
-local layouts = require("fzf.layouts")
 local utils = require("utils")
-local shared = require("fzf.lsp.shared")
+local git_utils = require("utils.git")
 local jumplist = require("jumplist")
+local config = require("fzf.config")
+local fzf_utils = require("fzf.utils")
+local shared = require("fzf.lsp.shared")
 
 -- TODO: integration w/ treesitter to support initial pos
 
--- Fzf all symbols in current document
+-- Fzf document symbols
 --
----@param opts? { }
+---@alias FzfLspDocumentSymbolsOptions { }
+---@param opts? FzfLspDocumentSymbolsOptions
+---@return FzfController
 return function(opts)
-  opts = vim.tbl_extend("force", {}, opts or {})
+  opts = utils.opts_extend({}, opts)
+  ---@cast opts FzfLspDocumentSymbolsOptions
 
-  local win = vim.api.nvim_get_current_win()
-  local buf = vim.api.nvim_get_current_buf()
-  local current_file = vim.api.nvim_buf_get_name(buf)
+  local controller = Controller.new({
+    name = "LSP-Document-Symbols",
+  })
 
+  local layout, popups = helpers.dual_pane_code_preview(controller, {
+    highlight_pos = true,
+    filepath_accessor = function() return controller:prev_filepath() end,
+    row_accessor = function(focus)
+      return focus.symbol.selectionRange.start.line + 1
+    end,
+    col_accessor = function(focus)
+      return focus.symbol.selectionRange.start.character + 1
+    end,
+  })
+
+  local buf = controller:prev_buf()
+
+  controller:set_entries_getter(function() return {} end)
+
+  ---@alias FzfLspDocumentSymbolsEntry { display: string, symbol: table }
   -- https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#documentSymbol
-  vim.lsp.buf_request(buf, "textDocument/documentSymbol", {
-    textDocument = shared.make_lsp_text_document_param(buf),
-  }, function(err, result)
-    if err then
-      vim.error("An error happened querying language server", err)
-      return
-    end
+  local client_request_map, handle = vim.lsp.buf_request(
+    buf,
+    "textDocument/documentSymbol",
+    {
+      textDocument = shared.make_lsp_text_document_param(buf),
+    },
+    function(err, symbol_tree)
+      assert(not err)
 
-    local entries = {}
-    local symbols = {}
+      ---@type FzfLspDocumentSymbolsEntry[]
+      local entries = {}
 
-    local function process_list(items, indent)
-      indent = indent or 0
+      local function process_list(symbols, indent)
+        indent = indent or 0
 
-      for _, s in ipairs(items) do
-        table.insert(
-          entries,
-          fzf_utils.join_by_delim(
-            string.rep("⋅", indent + 1),
-            s.selectionRange.start.line + 1,
-            s.selectionRange.start.character + 1,
-            utils.ansi_codes.blue(
-              vim.lsp.protocol.SymbolKind[s.kind] or "Unknown"
+        for _, s in ipairs(symbols) do
+          table.insert(entries, {
+            display = fzf_utils.join_by_nbsp(
+              ("⋅"):rep(indent + 1),
+              utils.ansi_codes.blue(
+                vim.lsp.protocol.SymbolKind[s.kind] or "Unknown"
+              ),
+              s.name
             ),
-            s.name
-          )
-        )
-        table.insert(symbols, s)
-        if s.children then process_list(s.children, indent + 1) end
+            symbol = s,
+          })
+          if s.children then process_list(s.children, indent + 1) end
+        end
       end
+
+      process_list(symbol_tree)
+
+      controller:set_entries_getter(function() return entries end)
     end
+  )
 
-    process_list(result)
+  controller:on_exited(function() handle() end)
 
-    local layout, popups, set_preview_content, binds =
-      helpers.create_nvim_preview_layout({
-        preview_popup_win_options = {
-          cursorline = true,
-        },
-      })
-
-    core.fzf(entries, {
-      prompt = "LSP-Document-Symbols",
-      layout = layout,
-      main_popup = popups.main,
-      binds = fzf_utils.bind_extend(binds, {
-        ["+before-start"] = function(state)
-          popups.main.border:set_text(
-            "bottom",
-            " <select> goto | <w> goto (window) | <t> goto (tab) "
-          )
-        end,
-        ["focus"] = function(state)
-          local symbol = symbols[state.focused_entry_index]
-
-          popups.nvim_preview.border:set_text("top", " " .. symbol.name .. " ")
-
-          helpers.preview_file(current_file, popups.nvim_preview, {
-            cursor_pos = {
-              row = symbol.selectionRange.start.line + 1,
-              col = symbol.selectionRange.start.character + 1,
-            },
-          })
-        end,
-        ["ctrl-w"] = function(state)
-          local symbol = symbols[state.focused_entry_index]
-
-          core.abort_and_execute(state.id, function()
-            vim.cmd(string.format([[vsplit %s]], current_file))
-            vim.cmd(
-              string.format(
-                [[normal! %sG%s|]],
-                symbol.selectionRange.start.line + 1,
-                symbol.selectionRange.start.character + 1
-              )
-            )
-            vim.cmd([[normal! zz]])
-          end)
-        end,
-        ["ctrl-t"] = function(state)
-          local symbol = symbols[state.focused_entry_index]
-
-          core.abort_and_execute(state.id, function()
-            vim.cmd(string.format([[tabnew %s]], current_file))
-            vim.cmd(
-              string.format(
-                [[normal! %sG%s|]],
-                symbol.selectionRange.start.line + 1,
-                symbol.selectionRange.start.character + 1
-              )
-            )
-            vim.cmd([[normal! zz]])
-          end)
-        end,
-        ["+select"] = function(state)
-          local symbol = symbols[state.focused_entry_index]
-
-          jumplist.save(win)
-          vim.fn.cursor({
-            symbol.selectionRange.start.line + 1,
-            symbol.selectionRange.start.character + 1,
-          })
-          vim.cmd("normal! zz")
-        end,
-      }),
-      extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-        ["--with-nth"] = "1,4,5..",
-      }),
-    })
-  end)
+  return controller
 end

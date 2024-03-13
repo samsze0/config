@@ -8,6 +8,12 @@ local autocmd_group =
 local debug = false -- hinder performance
 local maximum_lines = 2000
 
+local colors = require("theme").colors
+
+local rgb_color_table = {
+  [3] = colors.yellow,
+}
+
 -- TODO: support more escope codes
 -- https://github.com/norcalli/nvim-terminal.lua/issues/8
 
@@ -363,23 +369,32 @@ local function highlight_buffer(buf, rgb_color_table)
   end
 end
 
+---@param buf number
+M.refresh_highlight = function(buf)
+  -- if buf ~= 0 then
+  --   error("FIX: Only support the current buffer")
+  -- end
+
+  -- Seems like some functions above only work with buf == 0
+
+  vim.api.nvim_buf_call(buf, function()
+    if vim.bo.filetype ~= "terminal" then error("Invalid filetype") end
+
+    vim.api.nvim_buf_clear_namespace(0, namespace, 0, -1)
+    highlight_buffer(0, rgb_color_table)
+  end)
+end
+
 M.setup = function()
-  local colors = require("theme").colors
-  local rgb_color_table = {
-    [3] = colors.yellow,
-  }
-
-  vim.api.nvim_create_autocmd({
-    "FileType",
-  }, {
-    group = autocmd_group,
-    callback = function(ctx)
-      if vim.bo.filetype ~= "terminal" then return end
-
-      vim.api.nvim_buf_clear_namespace(0, namespace, 0, -1)
-      highlight_buffer(0, rgb_color_table)
-    end,
-  })
+  -- TODO: find out which buf this event is triggered from and invoke M.refresh_highlight(buf)
+  -- vim.api.nvim_create_autocmd({
+  --   "FileType",
+  -- }, {
+  --   group = autocmd_group,
+  --   callback = function(ctx)
+  --     M.refresh_highlight(0)
+  --   end,
+  -- })
 end
 
 return M

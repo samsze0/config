@@ -1,107 +1,61 @@
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
 local utils = require("utils")
-local layouts = require("fzf.layouts")
-local shared = require("fzf.lsp.shared")
+local git_utils = require("utils.git")
 local jumplist = require("jumplist")
+local config = require("fzf.config")
+local fzf_utils = require("fzf.utils")
+local shared = require("fzf.lsp.shared")
 
 -- Fzf references of symbol under cursor
 --
----@param opts? { }
+---@alias FzfLspReferencesOptions { }
+---@param opts? FzfLspReferencesOptions
+---@return FzfController
 return function(opts)
-  opts = vim.tbl_extend("force", {}, opts or {})
+  opts = utils.opts_extend({}, opts)
+  ---@cast opts FzfLspReferencesOptions
 
-  local win = vim.api.nvim_get_current_win()
+  local controller = Controller.new({
+    name = "LSP-References",
+  })
 
-  local handle = vim.lsp.buf.references({
+  local layout, popups = helpers.dual_pane_code_preview(controller, {
+    highlight_pos = true,
+  })
+
+  controller:set_entries_getter(function() return {} end)
+
+  ---@alias FzfLspReferencesEntry { display: string, filepath: string, relative_path: string, row: number, col: number, text: string }
+  vim.lsp.buf.references({
     includeDeclaration = false,
   }, {
     on_list = function(list)
+      if controller:exited() then return end
+
       local refs = list.items
       local context = list.context
       local title = list.title
 
-      local entries = {}
-      for _, r in ipairs(refs) do
-        table.insert(
-          entries,
-          fzf_utils.join_by_delim(
-            utils.ansi_codes.grey(vim.fn.fnamemodify(r.filename, ":~:.")),
-            r.lnum,
-            r.col,
-            vim.trim(r.text)
-          )
-        )
-      end
+      local entries = utils.map(refs, function(_, e)
+        local relative_path = vim.fn.fnamemodify(e.filename, ":~:.")
 
-      local layout, popups, set_preview_content, binds =
-        layouts.create_nvim_preview_layout({
-          preview_popup_win_options = {
-            cursorline = true,
-          },
-        })
+        return {
+          display = fzf_utils.join_by_nbsp(
+            utils.ansi_codes.grey(relative_path),
+            vim.trim(e.text)
+          ),
+          filepath = e.filename,
+          relative_path = relative_path,
+          row = e.lnum,
+          col = e.col,
+          text = e.text,
+        }
+      end)
 
-      core.fzf(entries, {
-        prompt = "LSP-References",
-        layout = layout,
-        main_popup = popups.main,
-        binds = fzf_utils.bind_extend(binds, {
-          ["+before-start"] = function(state)
-            popups.main.border:set_text(
-              "bottom",
-              " <select> goto | <w> goto (window) | <t> goto (tab) "
-            )
-          end,
-          ["focus"] = function(state)
-            local symbol = refs[state.focused_entry_index]
-
-            popups.nvim_preview.border:set_text(
-              "top",
-              " " .. vim.fn.fnamemodify(symbol.filename, ":t") .. " "
-            )
-
-            helpers.preview_file(
-              symbol.filename,
-              popups.nvim_preview,
-              { cursor_pos = { row = symbol.lnum, col = symbol.col } }
-            )
-          end,
-          ["+select"] = function(state)
-            local symbol = refs[state.focused_entry_index]
-
-            jumplist.save(win)
-            vim.cmd("e " .. symbol.filename)
-            vim.fn.cursor({ symbol.lnum, symbol.col })
-            vim.cmd("normal! zz")
-          end,
-          ["ctrl-w"] = function(state)
-            local symbol = refs[state.focused_entry_index]
-
-            core.abort_and_execute(state.id, function()
-              vim.cmd(string.format([[vsplit %s]], symbol.filename))
-              vim.cmd(
-                string.format([[normal! %sG%s|]], symbol.lnum, symbol.col)
-              )
-              vim.cmd([[normal! zz]])
-            end)
-          end,
-          ["ctrl-t"] = function(state)
-            local symbol = refs[state.focused_entry_index]
-
-            core.abort_and_execute(state.id, function()
-              vim.cmd(string.format([[tabnew %s]], symbol.filename))
-              vim.cmd(
-                string.format([[normal! %sG%s|]], symbol.lnum, symbol.col)
-              )
-              vim.cmd([[normal! zz]])
-            end)
-          end,
-        }),
-        extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-          ["--with-nth"] = "1,4",
-        }),
-      })
+      controller:set_entries_getter(function() return entries end)
     end,
   })
+
+  return controller
 end

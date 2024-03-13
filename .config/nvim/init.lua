@@ -178,7 +178,7 @@ require("lazy").setup({
   },
 })
 
-require("notify")
+require("noti")
 require("jumplist").setup()
 require("keymaps")
 require("winbar").setup()

@@ -1,110 +1,114 @@
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
 local utils = require("utils")
-local layouts = require("fzf.layouts")
 local git_utils = require("utils.git")
+local fzf_utils = require("fzf.utils")
+local uv_utils = require("utils.uv")
 local jumplist = require("jumplist")
-local git_files = require("fzf.git.git_files")
+local fzf_git_file_changes = require("fzf.git.file-changes")
+local config = require("fzf.config")
+local terminal_ft = require("terminal-filetype")
 
--- Fzf all git commits
+-- Fzf git commits (i.e. run `git log`)
 --
 -- If filepaths is nil, then all commits are shown, otherwise only those commits that
 -- affect the given filepaths are shown.
+-- Likewise for `ref`.
 --
----@param opts? { git_dir?: string, filepaths?: string, parent_state?: string, branch?: string }
-local git_commits = function(opts)
-  opts = vim.tbl_extend("force", {
-    git_dir = git_utils.current_git_dir(),
-    filepaths = nil,
-  }, opts or {})
+---@alias FzfGitCommitsOptions { git_dir?: string, filepaths?: string, ref?: string }
+---@param opts? FzfGitCommitsOptions
+---@return FzfController
+return function(opts)
+  opts = utils.opts_extend({
+    git_dir = git_utils.current_dir(),
+  }, opts)
+  ---@cast opts FzfGitCommitsOptions
 
-  local git_format = "%C(blue)%h%Creset" -- Hash. In blue
-    .. utils.nbsp
-    .. "%C(white)%s%Creset" -- Subject
-    .. utils.nbsp
-    .. "%D" -- Ref names
+  local controller = Controller.new({
+    name = "Git-Commits",
+  })
 
-  local get_entries = function()
-    local commits = utils.systemlist(
-      string.format(
-        "git -C %s log --oneline --color --pretty=format:'%s' %s %s",
-        opts.git_dir,
-        git_format,
-        opts.branch or "",
-        opts.filepaths and string.format("-- %s", opts.filepaths) or ""
-      )
+  local layout, popups = helpers.dual_pane_terminal_preview(controller)
+
+  ---@alias FzfGitCommitEntry { display: string, hash: string, subject: string, ref_names: string, author: string, commit_date: string }
+  ---@return FzfGitStatusEntry[]
+  local entries_getter = function()
+    local format = fzf_utils.join_by_nbsp(
+      "%h", -- Hash
+      "%s", -- Subject
+      "%D", -- Ref names
+      "%an", -- Author
+      "%cr" -- Commit date (relative)
     )
-    return commits
-  end
 
-  local parse_entry = function(entry)
-    local args = vim.split(entry, utils.nbsp)
-    return unpack(args)
-  end
+    local command = ([[git -C '%s' log --oneline --color --pretty=format:'%s']]):format(
+      opts.git_dir,
+      format
+    )
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_preview_layout({
-      preview_in_terminal_mode = true,
-      preview_popup_win_options = { number = false },
+    if opts.ref then command = command .. ([[ '%s']]):format(opts.ref) end
+    if opts.filepaths then
+      command = command .. ([[ -- %s]]):format(opts.filepaths) -- Be careful special chars must be escaped
+    end
+
+    local entries = utils.systemlist(command, {
+      keepempty = false,
     })
 
-  core.fzf(get_entries(), {
-    prompt = "Git-Commits",
-    layout = layout,
-    main_popup = popups.main,
-    initial_position = 1, -- TODO: assign to current checkout-ed commit
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text(
-          "bottom",
-          " <y> copy hash | <l> fzf git files "
-        )
-      end,
-      ["focus"] = function(state)
-        local commit_hash, commit_subject = parse_entry(state.focused_entry)
+    return utils.map(entries, function(_, e)
+      local parts = vim.split(e, utils.nbsp)
+      if #parts ~= 5 then error("Invalid git log entry: " .. e) end
 
-        popups.nvim_preview.border:set_text("top", " " .. commit_subject .. " ")
+      return {
+        display = fzf_utils.join_by_nbsp(
+          utils.ansi_codes.blue(parts[1]),
+          utils.ansi_codes.white(parts[2]),
+          utils.ansi_codes.grey("| " .. parts[4]),
+          utils.ansi_codes.grey("| " .. parts[5]),
+          "| " .. parts[3]
+        ),
+        hash = parts[1],
+        subject = parts[2],
+        ref_names = parts[3],
+        author = parts[4],
+        commit_date = parts[5],
+      }
+    end)
+  end
 
-        local command = string.format(
-          [[git -C %s show --color %s %s | delta %s]],
-          opts.git_dir,
-          commit_hash,
-          opts.filepaths and string.format("-- %s", opts.filepaths) or "",
-          helpers.delta_nvim_default_opts
-        )
+  controller:set_entries_getter(entries_getter)
 
-        local output = vim.fn.systemlist(command)
-        if vim.v.shell_error ~= 0 then
-          vim.error(
-            "Error getting details for git commit",
-            commit_hash,
-            table.concat(output, "\n")
-          )
-          return
-        end
+  controller:subscribe("focus", nil, function(payload)
+    local focus = controller.focus
+    ---@cast focus FzfGitCommitEntry?
 
-        set_preview_content(output)
-      end,
-      ["ctrl-l"] = function(state)
-        local commit_hash = parse_entry(state.focused_entry)
+    popups.side:set_lines({})
 
-        git_files(
-          commit_hash,
-          { git_dir = opts.git_dir, parent_state = state.id }
-        )
-      end,
-      ["ctrl-y"] = function(state)
-        local commit_hash = parse_entry(state.focused_entry)
+    if not focus then return end
 
-        vim.fn.setreg("+", commit_hash)
-        vim.info(string.format([[Copied to clipboard: %s]], commit_hash))
-      end,
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "1..",
-    }),
-  }, opts.parent_state)
+    local git_show =
+      utils.systemlist(([[git -C '%s' show --color %s %s | delta %s]]):format(
+        opts.git_dir,
+        focus.hash,
+        opts.filepaths and ("-- %s"):format(opts.filepaths) or "",
+        "" -- TODO: move delta options to a config
+      ))
+    popups.side:set_lines(git_show)
+    terminal_ft.refresh_highlight(popups.side.bufnr)
+  end)
+
+  popups.main:map("<C-l>", "List file changes", function()
+    if not controller.focus then return end
+
+    local focus = controller.focus
+    ---@cast focus FzfGitCommitEntry
+
+    local next = fzf_git_file_changes(focus.hash, {
+      git_dir = opts.git_dir,
+    })
+    next:set_parent(controller)
+    next:start()
+  end)
+
+  return controller
 end
-
-return git_commits

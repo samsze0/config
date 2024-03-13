@@ -1,121 +1,155 @@
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
 local utils = require("utils")
-local layouts = require("fzf.layouts")
 local git_utils = require("utils.git")
-local git_commits = require("fzf.git.commits")
+local jumplist = require("jumplist")
+local fzf_git_commits = require("fzf.git.commits")
+local fzf_utils = require("fzf.utils")
+local config = require("fzf.config")
+local terminal_ft = require("terminal-filetype")
 
--- Fzf all git branches
+-- TODO: initial pos
+
+-- Fzf git branches
 --
----@param opts? { git_dir?: string, fetch_in_advance?: boolean }
+---@alias FzfGitBranchOptions { git_dir?: string }
+---@param opts? FzfGitBranchOptions
+---@return FzfController
 return function(opts)
-  opts = vim.tbl_extend("force", {
-    git_dir = git_utils.current_git_dir(),
-    fetch_in_advance = false,
-  }, opts or {})
+  opts = utils.opts_extend({
+    git_dir = git_utils.current_dir(),
+  }, opts)
+  ---@cast opts FzfGitBranchOptions
 
-  if opts.fetch_in_advance then
-    utils.system(string.format("git -C %s fetch", opts.git_dir))
-  end
+  -- if opts.fetch_in_advance then
+  --   utils.system(("git -C '%s' fetch"):format(opts.git_dir))
+  -- end
 
-  local initial_pos
+  local controller = Controller.new({
+    name = "Git-Branch",
+  })
 
-  local get_entries = function()
-    ---@type string[]
-    local branches =
-      utils.systemlist(string.format("git -C %s branch --all", opts.git_dir))
+  local layout, popups = helpers.dual_pane_terminal_preview(controller)
 
-    branches = utils.map(branches, function(i, b)
-      local branch = b:sub(3)
+  ---@alias FzfGitBranchEntry { display: string, branch?: string, is_current_branch?: boolean, is_remote_branch?: boolean, detached_commit?: string }
+  ---@return FzfFileEntry[]
+  local entries_getter = function()
+    local output =
+      utils.systemlist(("git -C '%s' branch --all"):format(opts.git_dir))
 
-      -- Handle tracking information
+    return utils.map(output, function(i, b)
+      local branch = vim.trim(b:sub(3))
+
+      local deteched_commit = branch:match([[^%(HEAD detached at (.*)%)$]])
+      if deteched_commit then
+        return {
+          display = utils.ansi_codes.yellow(
+            ("Detached commit %s"):format(deteched_commit)
+          ),
+          detached_commit = deteched_commit,
+        }
+      end
+
+      -- TODO: handle tracking information
       local parts = vim.split(branch, "->")
-      if #parts > 1 then branch = parts[1] end
+      if #parts > 1 then branch = vim.trim(parts[1]) end
 
-      local is_current = b:sub(1, 2) == "* "
-      if is_current then initial_pos = i end
+      local is_current_branch = b:sub(1, 2) == "* "
+
       local is_remote_branch = b:sub(1, 2) == "  "
-        and b:len() > 10
         and b:sub(3, 10) == "remotes/"
 
-      local color = not is_remote_branch and utils.ansi_codes.grey
-        or function(...) return ... end
-
-      return fzf_utils.join_by_delim(color(branch))
+      return {
+        display = fzf_utils.join_by_nbsp(
+          is_current_branch and utils.ansi_codes.blue("") or " ",
+          branch
+        ),
+        branch = branch,
+        is_current_branch = is_current_branch,
+        is_remote_branch = is_remote_branch,
+      }
     end)
-
-    return branches
   end
 
-  local parse_entry = function(entry)
-    local args = vim.split(entry, utils.nbsp)
-    return unpack(args)
-  end
+  controller:set_entries_getter(entries_getter)
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_preview_layout({ preview_in_terminal_mode = true })
+  controller:subscribe("focus", nil, function(payload)
+    local focus = controller.focus
+    ---@cast focus FzfGitBranchEntry?
 
-  core.fzf(get_entries(), {
-    prompt = "Git-Branches",
-    layout = layout,
-    main_popup = popups.main,
-    initial_position = initial_pos,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text(
-          "bottom",
-          " <select> checkout | <y> copy branch name | <x> delete | <l> fzf commits "
-        )
-      end,
-      ["focus"] = function(state)
-        local branch = parse_entry(state.focused_entry)
+    popups.side:set_lines({})
 
-        popups.nvim_preview.border:set_text("top", " " .. branch .. " ")
+    if not focus then return end
 
-        local log = utils.systemlist(
-          string.format(
-            "git -C %s log --color --decorate %s",
-            opts.git_dir,
-            branch
-          )
-        )
-        set_preview_content(log)
-      end,
-      ["+select"] = function(state)
-        local branch = parse_entry(state.focused_entry)
+    local git_log = utils.systemlist(
+      ("git -C '%s' log --color --decorate '%s'"):format(
+        opts.git_dir,
+        focus.branch or focus.detached_commit
+      )
+    )
+    popups.side:set_lines(git_log)
+    terminal_ft.refresh_highlight(popups.side.bufnr)
+  end)
 
-        utils.system(
-          string.format("git -C %s checkout %s", opts.git_dir, branch)
-        )
-        vim.info(string.format([[Checked out branch: %s]], branch))
-      end,
-      ["ctrl-y"] = function(state)
-        local branch = parse_entry(state.focused_entry)
+  popups.main:map("<C-y>", "Copy branch name or commit hash", function()
+    if not controller.focus then return end
 
-        vim.fn.setreg("+", branch)
-        vim.info(string.format([[Copied to clipboard: %s]], branch))
-      end,
-      ["ctrl-x"] = function(state)
-        local branch = parse_entry(state.focused_entry)
+    local branch_or_commit_hash = controller.focus.branch
+      or controller.focus.detached_commit
+    vim.fn.setreg("+", branch_or_commit_hash)
+    vim.info(([[Copied %s to clipboard]]):format(branch_or_commit_hash))
+  end)
 
-        utils.system(
-          string.format("git -C %s branch -D %s", opts.git_dir, branch)
-        )
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
-      end,
-      ["ctrl-l"] = function(state)
-        local branch = parse_entry(state.focused_entry)
+  popups.main:map("<C-x>", "Delete branch", function()
+    if not controller.focus then return end
 
-        git_commits({
-          git_dir = opts.git_dir,
-          parent_state = state.id,
-          branch = branch,
-        })
-      end,
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "1..",
-    }),
-  })
+    local focus = controller.focus
+    ---@cast focus FzfGitBranchEntry
+
+    if focus.detached_commit then
+      vim.error("Cannot delete detached commit")
+      return
+    end
+
+    if focus.is_current_branch then
+      vim.error("Cannot delete current branch")
+      return
+    end
+
+    if focus.is_remote_branch then
+      vim.error("Cannot delete remote branch")
+      return
+    end
+
+    local branch = focus.branch
+    utils.system(("git -C '%s' branch -D '%s'"):format(opts.git_dir, branch))
+    controller:refresh()
+  end)
+
+  popups.main:map("<C-l>", "List commits", function()
+    if not controller.focus then return end
+
+    local branch_or_commit_hash = controller.focus.branch
+      or controller.focus.detached_commit
+    local next = fzf_git_commits({
+      git_dir = opts.git_dir,
+      ref = branch_or_commit_hash,
+    })
+    next:set_parent(controller)
+    next:start()
+  end)
+
+  popups.main:map("<CR>", "Checkout", function()
+    if not controller.focus then return end
+
+    local branch_or_commit_hash = controller.focus.branch
+      or controller.focus.detached_commit
+    utils.system(
+      ("git -C '%s' checkout '%s'"):format(opts.git_dir, branch_or_commit_hash)
+    )
+    vim.info(([[Checked out: %s]]):format(branch_or_commit_hash))
+    controller:refresh()
+  end)
+
+  return controller
 end

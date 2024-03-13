@@ -1,111 +1,86 @@
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
 local utils = require("utils")
-local layouts = require("fzf.layouts")
-local uv_utils = require("utils.uv")
 local git_utils = require("utils.git")
+local fzf_utils = require("fzf.utils")
+local uv_utils = require("utils.uv")
 local jumplist = require("jumplist")
-
--- TODO: remove file limit?
+local config = require("fzf.config")
 
 -- Fzf git status
 --
----@param opts? { git_dir?: string, max_num_files?: number }
-local git_status = function(opts)
-  opts = vim.tbl_extend("force", {
-    git_dir = git_utils.current_git_dir(),
-    max_num_files = 1000,
-  }, opts or {})
+---@alias FzfGitStatusOptions { git_dir?: string }
+---@param opts? FzfGitStatusOptions
+---@return FzfController
+return function(opts)
+  opts = utils.opts_extend({
+    git_dir = git_utils.current_dir(),
+  }, opts)
+  ---@cast opts FzfGitStatusOptions
 
-  local git = string.format([[git -C %s]], opts.git_dir)
+  local controller = Controller.new({
+    name = "Git-Status",
+  })
 
-  local function get_entries()
+  local current_gitpath =
+    git_utils.convert_filepath_to_gitpath(controller:prev_filepath())
+
+  local layout, popups = helpers.triple_pane_code_diff(controller)
+
+  ---@alias FzfGitStatusEntry { display: string, initial_focus: boolean, gitpath: string, filepath: string, status: string, status_x: string, status_y: string, is_fully_staged: boolean, is_partially_staged: boolean, is_untracked: boolean, unstaged: boolean, has_merge_conflicts: boolean, worktree_clean: boolean, added: boolean, deleted: boolean, renamed: boolean, copied: boolean, type_changed: boolean, ignored: boolean }
+  ---@return FzfGitStatusEntry[]
+  local entries_getter = function()
     local entries = utils.systemlist(
-      string.format(
-        [[%s -c color.status=false status -su]], -- Show in short format and show all untracked files
-        git
-      ),
+      ([[git -C '%s' -c color.status=false status -su]]):format(opts.git_dir), -- Show in short format and show all untracked files
       {
         keepempty = false,
+        trim = false, -- Can mess up status
       }
     )
 
-    if #entries > opts.max_num_files then
-      vim.warn(
-        "Too many files to show in git status. Only showing the top",
-        opts.max_num_files
-      )
-      entries = utils.slice(entries, 1, opts.max_num_files)
-    end
+    -- entries = utils.sort_by_files(entries, function(e) return e:sub(4) end)
 
-    entries = utils.sort_by_files(entries, function(e) return e:sub(4) end)
-
-    entries = utils.map(entries, function(_, e)
+    return utils.map(entries, function(i, e)
       local status = e:sub(1, 2)
-      local filename = e:sub(4)
+      local gitpath = e:sub(4)
+      local filepath = opts.git_dir .. "/" .. gitpath
+
+      -- TODO: cater if git status entry is "rename" i.e. xxx -> xxx
 
       if status == "??" then status = " ?" end
 
-      local status_first = status:sub(1, 1)
-      local status_second = status:sub(2, 2)
-      status = string.format(
-        [[%s %s]],
-        utils.ansi_codes.blue(status_first),
-        status_second == "D" and utils.ansi_codes.red("D")
-          or utils.ansi_codes.yellow(status_second)
+      local status_x = status:sub(1, 1)
+      local status_y = status:sub(2, 2)
+
+      local display = ([[%s %s]]):format(
+        utils.ansi_codes.blue(status_x),
+        utils.switch(status_y, {
+          ["D"] = utils.ansi_codes.red,
+        }, utils.ansi_codes.yellow)(status_y)
       )
 
-      return fzf_utils.join_by_delim(status, filename)
-    end)
+      display = fzf_utils.join_by_nbsp(display, gitpath)
 
-    return entries
-  end
+      local is_fully_staged = status_x == "M" and status_y == " "
+      local is_partially_staged = status_x == "M" and status_y == "M"
+      local is_untracked = status_y == "?"
+      local unstaged = status_x == " " and not is_untracked
+      local has_merge_conflicts = status_x == "U"
+      local worktree_clean = status_y == " "
 
-  local entries = get_entries()
+      local added = status_x == "A" and worktree_clean
+      local deleted = status_x == "D" or status_y == "D"
+      local renamed = status_x == "R" and worktree_clean
+      local copied = status_x == "C" and worktree_clean
+      local type_changed = status_x == "T" and worktree_clean
 
-  local pos, _ = utils.find(
-    entries,
-    function(_, e)
-      return vim.split(e, utils.nbsp)[2]
-        == git_utils.convert_filepath_to_gitpath(vim.fn.expand("%"))
-    end
-  )
-  if pos == nil then pos = 0 end
+      local ignored = status_x == "!" and status_y == "!"
 
-  ---@param entry string
-  ---@return string, { status: string, status_x: string, status_y: string, is_fully_staged: boolean, is_partially_staged: boolean, is_untracked: boolean, unstaged: boolean, worktree_clean: boolean, added: boolean, deleted: boolean, renamed: boolean, copied: boolean, type_changed: boolean, ignored: boolean, has_merge_conflicts: boolean }, string
-  local parse_entry = function(entry)
-    local args = vim.split(entry, utils.nbsp)
-    local gitpath = args[2]
-    local status = args[1]
-
-    local status_x = status:sub(1, 1)
-    local status_y = status:sub(3, 3)
-
-    local is_fully_staged = status_x == "M" and status_y == " "
-    local is_partially_staged = status_x == "M" and status_y == "M"
-    local is_untracked = status_y == "?"
-    local unstaged = status_x == " " and not is_untracked
-    local has_merge_conflicts = status_x == "U"
-
-    local worktree_clean = status_y == " "
-
-    local added = status_x == "A" and worktree_clean
-    local deleted = status_x == "D" or status_y == "D"
-    local renamed = status_x == "R" and worktree_clean
-    local copied = status_x == "C" and worktree_clean
-    local type_changed = status_x == "T" and worktree_clean
-
-    local ignored = status_x == "!" and status_y == "!"
-
-    local parts = vim.split(gitpath, " -> ") -- In case if file is renamed
-    if #parts > 1 then gitpath = parts[2] end
-
-    local filepath = opts.git_dir .. "/" .. gitpath
-
-    return filepath,
-      {
+      return {
+        display = display,
+        initial_focus = current_gitpath == gitpath,
+        gitpath = gitpath,
+        filepath = filepath,
         status = status,
         status_x = status_x,
         status_y = status_y,
@@ -114,196 +89,179 @@ local git_status = function(opts)
         is_untracked = is_untracked,
         unstaged = unstaged,
         worktree_clean = worktree_clean,
+        has_merge_conflicts = has_merge_conflicts,
         added = added,
         deleted = deleted,
         renamed = renamed,
         copied = copied,
         type_changed = type_changed,
         ignored = ignored,
-        has_merge_conflicts = has_merge_conflicts,
-      },
-      gitpath
+      }
+    end)
   end
 
-  local current_win = vim.api.nvim_get_current_win()
-  local timer ---@type uv_timer_t?
+  controller:set_entries_getter(entries_getter)
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_diff_preview_layout({
-      preview_popups_win_options = {},
-    })
+  controller:subscribe("focus", nil, function(payload)
+    local focus = controller.focus
+    ---@cast focus FzfGitStatusEntry?
 
-  ---@param state state
-  local function refresh_preview(state)
-    vim.info("Refresh")
+    -- Reset the side panes
+    popups.side.left:set_lines({})
+    popups.side.right:set_lines({})
 
-    local filepath, status = parse_entry(state.focused_entry)
-    local filename = vim.fn.fnamemodify(filepath, ":t")
+    if not focus then return end
 
-    if status.renamed then
-      local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
-      local ft = vim.filetype.match({
-        filename = filename,
-        contents = after,
-      })
-      set_preview_content(after, after, {
-        filetype = ft,
-      })
-      return
-    end
+    local filepath = focus.filepath
+    local gitpath = focus.gitpath
 
-    if status.added or status.is_untracked then
-      local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
-      local ft = vim.filetype.match({
-        filename = filename,
-        contents = after,
-      })
-      set_preview_content({}, after, {
-        filetype = ft,
-      })
-      return
-    end
-
-    local before = utils.systemlist(
-      string.format(
-        "git show HEAD:%s",
-        git_utils.convert_filepath_to_gitpath(filepath)
+    local get_last_commit = function()
+      return utils.systemlist(
+        ("git -C '%s' show HEAD:'%s'"):format(opts.git_dir, gitpath)
       )
-    )
-
-    if status.deleted then
-      local ft = vim.filetype.match({
-        filename = filename,
-        contents = before,
-      })
-      set_preview_content(before, {}, {
-        filetype = ft,
-      })
-      return
     end
 
-    local staged = utils.systemlist(
-      string.format(
-        "git show :%s",
-        git_utils.convert_filepath_to_gitpath(filepath)
+    local get_staged = function()
+      return utils.systemlist(
+        ("git -C '%s' show :'%s'"):format(opts.git_dir, gitpath)
       )
-    )
+    end
 
-    if status.is_fully_staged then
-      local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
+    if focus.renamed then
+      popups.side.right:show_file_content(filepath)
+    elseif focus.added or focus.is_untracked then
+      popups.side.right:show_file_content(filepath)
+    elseif focus.deleted then
+      local last_commit = get_last_commit()
+
+      popups.side.left:set_lines(last_commit)
+
+      local filename = vim.fn.fnamemodify(filepath, ":t")
       local ft = vim.filetype.match({
         filename = filename,
-        contents = after,
+        contents = last_commit,
       })
-      set_preview_content(before, after, {
-        filetype = ft,
+      vim.bo[popups.side.left.bufnr].filetype = ft or ""
+    elseif focus.is_fully_staged then
+      local last_commit = get_last_commit()
+
+      popups.side.right:show_file_content(filepath)
+
+      popups.side.left:set_lines(last_commit)
+      local filename = vim.fn.fnamemodify(filepath, ":t")
+      local ft = vim.filetype.match({
+        filename = filename,
+        contents = last_commit,
       })
+      vim.bo[popups.side.left.bufnr].filetype = ft or ""
+    else -- Not fully staged
+      local staged = get_staged()
+
+      popups.side.left:set_lines(staged)
+      local filename = vim.fn.fnamemodify(filepath, ":t")
+      local ft = vim.filetype.match({
+        filename = filename,
+        contents = staged,
+      })
+      vim.bo[popups.side.left.bufnr].filetype = ft or ""
+
+      popups.side.right:show_file_content(filepath)
+    end
+
+    utils.diff_bufs(popups.side.left.bufnr, popups.side.right.bufnr)
+  end)
+
+  popups.main:map("<C-y>", "Copy filepath", function()
+    if not controller.focus then return end
+
+    local path = controller.focus.filepath
+    vim.fn.setreg("+", path)
+    vim.info(([[Copied %s to clipboard]]):format(path))
+  end)
+
+  popups.main:map("<C-r>", "Refresh", function() controller:refresh() end)
+
+  popups.main:map("<Left>", "Stage", function()
+    if not controller.focus then return end
+
+    local filepath = controller.focus.filepath
+    utils.system(([[git -C '%s' add '%s']]):format(opts.git_dir, filepath))
+    controller:refresh()
+  end)
+
+  popups.main:map("<Right>", "Unstage", function()
+    if not controller.focus then return end
+
+    local filepath = controller.focus.filepath
+    utils.system(
+      ([[git -C '%s' restore --staged '%s']]):format(opts.git_dir, filepath)
+    )
+    controller:refresh()
+  end)
+
+  popups.main:map("<C-x>", "Restore", function()
+    if not controller.focus then return end
+
+    local filepath = controller.focus.filepath
+    local focus = controller.focus
+    ---@cast focus FzfGitStatusEntry
+
+    if focus.has_merge_conflicts then
+      vim.error("Cannot restore/delete file with merge conflicts", filepath)
       return
     end
 
-    local after = vim.fn.readfile(filepath) -- FIX: if deleted or renamed, cannot read file
+    utils.system_safe(
+      ([[git -C '%s' restore '%s']]):format(opts.git_dir, filepath),
+      {
+        on_error = function(err) utils.system(([[rm '%s']]):format(filepath)) end,
+      }
+    )
+    controller:refresh()
+  end)
 
-    local ft = vim.filetype.match({
-      filename = filename,
-      contents = after,
-    })
-    set_preview_content(staged, after, {
-      filetype = ft,
-    })
-  end
+  popups.main:map("<C-s>", "Stash selected", function()
+    controller:selections(function(entries)
+      if not entries then return end
 
-  core.fzf(entries, {
-    prompt = "Git-Status",
-    layout = layout,
-    main_popup = popups.main,
-    initial_position = pos,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text(
-          "bottom",
-          " <select> goto file | <left> stage | <right> unstage | <x> restore | <y> copy path | <r> reload "
+      local paths = utils.join(entries, function(_, e)
+        ---@cast e FzfGitStatusEntry
+        return "'" .. e.gitpath .. "'"
+      end)
+      -- TODO: make stash message customizable
+      utils.system(
+        ([[git -C '%s' stash push -m %s -- %s]]):format(
+          opts.git_dir,
+          "TODO",
+          paths
         )
-      end,
-      ["focus"] = refresh_preview,
-      ["+select"] = function(state)
-        local filepath, status, gitpath = parse_entry(state.focused_entry)
+      )
+      controller:refresh()
+    end)
+  end)
 
-        if status.has_merge_conflicts then
-          local ours = utils.systemlist(
-            string.format([[git -C %s show :2:%s]], opts.git_dir, gitpath)
-          )
-          ---@cast ours string[]
-          local theirs = utils.systemlist(
-            string.format([[git -C %s show :3:%s]], opts.git_dir, gitpath)
-          )
-          ---@cast theirs string[]
+  popups.main:map("<C-d>", "Stash staged", function()
+    -- TODO: make stash message customizable
+    utils.system(
+      ([[git -C '%s' stash push -m %s --staged]]):format(opts.git_dir, "TODO")
+    )
+    controller:refresh()
+  end)
 
-          local filename = vim.fn.fnamemodify(filepath, ":t")
-          local ft = vim.filetype.match({
-            filename = filename,
-            contents = vim.fn.readfile(filepath),
-          })
+  popups.main:map("<CR>", "Goto file", function()
+    if not controller.focus then return end
 
-          local buffers = utils.show_diff({
-            filetype = ft,
-            cursor_at = 2,
-          }, {
-            filepath_or_content = ours,
-            readonly = true,
-          }, {
-            filepath_or_content = filepath,
-            readonly = false,
-          }, {
-            filepath_or_content = theirs,
-            readonly = true,
-          })
-          vim.api.nvim_tabpage_set_var(0, "diff_buffers", buffers)
-          return
-        end
+    local focus = controller.focus
+    ---@cast focus FzfGitStatusEntry
 
-        jumplist.save(current_win)
-        vim.cmd(string.format([[e %s]], filepath))
-      end,
-      ["left"] = function(state)
-        local filepath = parse_entry(state.focused_entry)
+    local path = focus.filepath
 
-        utils.system(string.format([[git add %s]], filepath))
-        core.reload_entries(state.id, get_entries())
-      end,
-      ["right"] = function(state)
-        local filepath = parse_entry(state.focused_entry)
+    -- TODO: Add a check for merge conflicts. And open a window for diffing
 
-        utils.system(string.format([[git restore --staged %s]], filepath))
-        core.reload_entries(state.id, get_entries())
-      end,
-      ["ctrl-r"] = function(state) core.reload_entries(state.id, get_entries()) end,
-      ["ctrl-y"] = function(state)
-        local filepath = parse_entry(state.focused_entry)
+    controller:hide()
+    jumplist.save()
+    vim.cmd(([[e %s]]):format(path))
+  end)
 
-        vim.fn.setreg("+", filepath)
-        vim.info(string.format([[Copied to clipboard: %s]], filepath))
-      end,
-      ["ctrl-x"] = function(state)
-        local filepath, status = parse_entry(state.focused_entry)
-
-        if status.has_merge_conflicts then
-          vim.error("Cannot restore/delete file with merge conflicts", filepath)
-          return
-        end
-
-        utils.system(string.format([[git restore %s]], filepath), {
-          on_error = function(err)
-            utils.system(string.format([[rm %s]], filepath))
-          end,
-          throw_error = false,
-        })
-        core.reload_entries(state.id, get_entries())
-      end,
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "1..",
-    }),
-  })
+  return controller
 end
-
-return git_status

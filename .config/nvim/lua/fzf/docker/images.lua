@@ -1,89 +1,68 @@
-local M = {}
-
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
 local utils = require("utils")
-local layouts = require("fzf.layouts")
 local git_utils = require("utils.git")
-local json = require("utils.json")
+local jumplist = require("jumplist")
+local config = require("fzf.config")
+local fzf_utils = require("fzf.utils")
+local docker_utils = require("utils.docker")
 
--- TODO: listen to / watch image changes
+-- TODO: watch for changes in background
 
--- Fzf all docker images
+-- Fzf docker images
 --
----@param opts? {  }
-M.docker_images = function(opts)
-  opts = vim.tbl_extend("force", {}, opts or {})
+---@alias FzfDockerImageOptions { }
+---@param opts? FzfDockerImageOptions
+---@return FzfController
+return function(opts)
+  opts = utils.opts_extend({}, opts)
+  ---@cast opts FzfDockerImageOptions
 
-  ---@type { Containers: string, CreatedAt: string, CreatedSince: string, Digest: string, ID: string, Repository: string, SharedSize: string, Size: string, Tag: string, UniqueSize: string, VirtualSize: string }[]
-  local images
+  local controller = Controller.new({
+    name = "Docker-Images",
+  })
 
-  local function get_entries()
-    if vim.fn.executable("docker") ~= 1 then
-      error("Docker executable not found")
-    end
-    -- if vim.fn.executable("jq") ~= 1 then
-    --   error("jq executable not found")
-    -- end
-    local result = utils.system("docker image ls -a --format json")
+  local layout, popups = helpers.dual_pane_lua_object_preview(controller, {
+    lua_object_accessor = function(focus) return focus.image end,
+  })
 
-    result = vim.trim(result)
-
-    images = json.parse_multiple(result)
-    ---@cast images { Containers: string, CreatedAt: string, CreatedSince: string, Digest: string, ID: string, Repository: string, SharedSize: string, Size: string, Tag: string, UniqueSize: string, VirtualSize: string }[]
-
+  ---@alias FzfDockerImagesEntry { display: string, image: DockerImage }
+  ---@return FzfDockerImagesEntry[]
+  local entries_getter = function()
     return utils.map(
-      images,
-      function(_, c)
-        return fzf_utils.join_by_delim(
-          utils.ansi_codes.blue(c.Repository),
-          utils.ansi_codes.grey(c.Tag)
-        )
+      docker_utils.docker_images({
+        all = true,
+      }),
+      function(i, e)
+        return {
+          display = fzf_utils.join_by_nbsp(e.Repository, e.Tag),
+          image = e,
+        }
       end
     )
   end
 
-  local entries = get_entries()
+  controller:set_entries_getter(entries_getter)
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_preview_layout()
+  popups.main:map("<C-y>", "Copy ID", function()
+    local focus = controller.focus
+    ---@cast focus FzfDockerImagesEntry?
 
-  core.fzf(entries, {
-    prompt = "Docker-Images",
-    layout = layout,
-    main_popup = popups.main,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text("bottom", " <y> copy id | <x> delete ")
-      end,
-      ["focus"] = function(state)
-        local image = images[state.focused_entry_index]
+    if not focus then return end
 
-        popups.nvim_preview.border:set_text(
-          "top",
-          " " .. image.Repository .. ":" .. image.Tag .. " "
-        )
+    vim.fn.setreg("+", focus.image.ID)
+    vim.info(([[Copied %s to clipboard]]):format(focus.image.ID))
+  end)
 
-        set_preview_content(vim.split(vim.inspect(image), "\n"))
-        vim.bo[popups.nvim_preview.bufnr].filetype = "lua"
-      end,
-      ["ctrl-y"] = function(state)
-        local image = images[state.focused_entry_index]
-        vim.fn.setreg("+", image.ID)
-        vim.notify(string.format([[Copied %s to clipboard]], image.ID))
-      end,
-      ["ctrl-x"] = function(state)
-        local image = images[state.focused_entry_index]
+  popups.main:map("<C-x>", "Delete", function()
+    local focus = controller.focus
+    ---@cast focus FzfDockerImagesEntry?
 
-        utils.system(string.format([[docker image rm %s]], image.ID))
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
-      end,
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "1..",
-    }),
-  })
+    if not focus then return end
+
+    utils.system(([[docker image rm %s]]):format(focus.image.ID))
+    controller:refresh()
+  end)
+
+  return controller
 end
-
-return M

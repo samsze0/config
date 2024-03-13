@@ -2,6 +2,7 @@
 -- https://github.com/echasnovski/mini.statusline/blob/main/lua/mini/statusline.lua
 
 local utils = require("utils")
+local noti = require("noti")
 
 local config = {
   padding = "  ",
@@ -76,7 +77,7 @@ M.setup = function()
   vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
 
   -- Subscribe to notifications
-  require("notify").subscribe(function() set_active() end)
+  noti.subscribe(function() set_active() end)
 end
 
 local pcall_section = function(section, name)
@@ -229,35 +230,37 @@ M.section_copilot = function()
 end
 
 M.section_notifications = function()
-  local unread_notifications = require("notify").unread_notifications
+  local notifications = noti.unread()
 
-  if vim.tbl_isempty(unread_notifications) then return "" end
+  if #notifications == 0 then return "" end
 
   local result = {}
 
-  local error_count = unread_notifications[vim.log.levels.ERROR] or 0
+  local error_count = utils.sum(
+    notifications,
+    function(_, e) return e.level == vim.log.levels.ERROR and 1 or 0 end
+  )
   if error_count > 0 then
     table.insert(
       result,
-      hl("StatusLineDiagnosticError", string.format("󰂚 %d", error_count))
+      hl("StatusLineDiagnosticError", ("󰂚 %d"):format(error_count))
     )
   end
 
-  local warn_count = unread_notifications[vim.log.levels.WARN] or 0
+  local warn_count = utils.sum(
+    notifications,
+    function(_, e) return e.level == vim.log.levels.WARN and 1 or 0 end
+  )
   if warn_count > 0 then
     table.insert(
       result,
-      hl("StatusLineDiagnosticWarn", string.format("󰂚 %d", warn_count))
+      hl("StatusLineDiagnosticWarn", ("󰂚 %d"):format(warn_count))
     )
   end
 
-  local total_count = utils.sum(vim.tbl_values(unread_notifications))
-  local other_count = total_count - error_count - warn_count
+  local other_count = noti.num_unread() - error_count - warn_count
   if other_count > 0 then
-    table.insert(
-      result,
-      hl("StatusLineMuted", string.format("󰂚 %d", other_count))
-    )
+    table.insert(result, hl("StatusLineMuted", ("󰂚 %d"):format(other_count)))
   end
 
   return table.concat(result, " ")

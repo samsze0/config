@@ -1,37 +1,48 @@
-local M = {}
-
-local core = require("fzf.core")
-local fzf_utils = require("fzf.utils")
-local layouts = require("fzf.layouts")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local timeago = require("utils.timeago")
 local utils = require("utils")
-local notifier = require("notify")
+local timeago = require("utils.timeago")
+local noti = require("noti")
+local fzf_utils = require("fzf.utils")
+local config = require("fzf.config")
 
--- Fzf all notifications
+-- Fzf notifications
 --
----@param opts? { max_num_enxtires?: integer }
-M.notifications = function(opts)
-  local notify = vim.notify -- Restore vim.notify later
-  vim.notify = function(...) end ---@diagnostic disable-line: duplicate-set-field
+---@alias FzfNotificationsOptions { }
+---@param opts? FzfNotificationsOptions
+---@return FzfController
+return function(opts)
+  opts = utils.opts_extend({}, opts)
+  ---@cast opts FzfNotificationsOptions
 
-  opts = vim.tbl_extend("force", {
-    max_num_entries = 100,
-  }, opts or {})
+  local controller = Controller.new({
+    name = "Notifications",
+  })
 
-  local get_entries = function()
-    local notifications = notifier.notifications
-    local num_unread = utils.sum(notifier.unread_notifications)
-    notifier.clear_unread()
+  local layout, popups = helpers.dual_pane_terminal_preview(controller, {
+    side_popup = {
+      extra_options = {
+        win_options = {
+          number = true,
+          wrap = true,
+        },
+      },
+    },
+  })
 
-    local entries = {}
-    for i = #notifications, 1, -1 do
-      if #entries >= opts.max_num_entries then break end
+  ---@alias FzfNotificationEntry { display: string, notification: Notification, unread: boolean }
+  ---@return FzfNotificationEntry[]
+  local entries_getter = function()
+    -- Caution: don't call vim.notify here
 
-      local noti = notifications[i]
-      local l = noti.level
-      local unread = #entries < num_unread
-      local level = utils.switch(l, {
+    local notifications = noti.all()
+    local num_unread = noti.num_unread()
+    noti.clear_unread()
+
+    return utils.map(notifications, function(i, e)
+      local unread = i <= num_unread
+
+      local icon = utils.switch(e.level, {
         [vim.log.levels.INFO] = unread and utils.ansi_codes.blue("󰋼 ")
           or "󰋼 ",
         [vim.log.levels.WARN] = unread and utils.ansi_codes.yellow(" ")
@@ -43,68 +54,41 @@ M.notifications = function(opts)
         [vim.log.levels.TRACE] = unread and utils.ansi_codes.grey(" ")
           or " ",
       }, unread and utils.ansi_codes.grey(" ") or " ")
-      local brief = noti.message
-      local parts = vim.split(brief, "\n")
-      if #parts > 1 then brief = parts[1] end
-      if not brief or brief == "" then brief = "<empty>" end
-      local brief_max_length = 50
-      brief = #brief > brief_max_length
-          and brief:sub(1, brief_max_length - 3) .. "..."
-        or utils.pad_string(brief, brief_max_length)
-      table.insert(
-        entries,
-        fzf_utils.join_by_delim(
-          level,
-          timeago(noti.time),
+
+      local parts = vim.split(e.message, "\n")
+      local brief
+      if #parts > 1 then
+        brief = parts[1]
+      else
+        brief = e.message
+      end
+
+      return {
+        display = ([[%s %s %s]]):format(
+          icon,
+          timeago(e.time),
           unread and utils.ansi_codes.white(brief) or brief
-        )
-      )
-    end
-    return entries
+        ),
+        notification = e,
+        unread = unread,
+      }
+    end)
   end
 
-  local get_notification = function(index)
-    local notifications = require("notify").notifications
-    return notifications[#notifications - index + 1]
-  end
+  controller:set_entries_getter(entries_getter)
 
-  local parse_entry = function(entry)
-    local args = vim.split(entry, utils.nbsp)
-    local level, time, brief = unpack(args)
-    return level, time, vim.trim(brief)
-  end
+  controller:subscribe("focus", nil, function(payload)
+    local focus = controller.focus
+    ---@cast focus FzfNotificationEntry?
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_preview_layout({
-      preview_popup_win_options = {
-        wrap = true,
-      },
-    })
+    popups.side:set_lines({})
 
-  core.fzf(get_entries(), {
-    prompt = "Notifications",
-    layout = layout,
-    main_popup = popups.main,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text("bottom", " ")
-      end,
-      ["focus"] = function(state)
-        local level, time, brief = parse_entry(state.focused_entry)
-        local noti = get_notification(state.focused_entry_index)
+    if not focus then return end
 
-        local tmpfile = fzf_utils.write_to_tmpfile(noti.message)
+    popups.side:show_file_content(
+      fzf_utils.write_to_tmpfile(focus.notification.message)
+    )
+  end)
 
-        popups.nvim_preview.border:set_text("top", " " .. brief .. " ")
-
-        helpers.preview_file(tmpfile, popups.nvim_preview)
-      end,
-      ["+after-exit"] = function(state) vim.notify = notify end, -- Restore vim.notify
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "1..",
-    }),
-  })
+  return controller
 end
-
-return M

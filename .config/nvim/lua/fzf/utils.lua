@@ -1,8 +1,6 @@
-local M = {}
-
-local tempfile = vim.fn.tempname()
 local utils = require("utils")
-local os_utils = require("utils.os")
+
+local M = {}
 
 -- Generate a preview window offset string for fzf
 --
@@ -14,8 +12,8 @@ M.preview_offset = function(offset, opts)
     fixed_header = 0,
     center = true,
   }, opts or {})
-  return string.format(
-    [[~%s,+%s%s,+%s%s]],
+
+  return ([[~%s,+%s%s,+%s%s]]):format(
     tostring(opts.fixed_header),
     tostring(opts.fixed_header),
     opts.center and "/2" or "",
@@ -24,123 +22,28 @@ M.preview_offset = function(offset, opts)
   )
 end
 
--- Generate a reload action string for fzf
+-- Join several string parts by the nbsp character
 --
----@param entries string[]
+---@vararg string
 ---@return string
-M.reload_action = function(entries)
-  return string.format(
-    "reload(%s)",
-    string.format(
-      [[cat <<"EOF"
-%s
-EOF
-]],
-      table.concat(entries, "\n")
-    )
-  )
+M.join_by_nbsp = function(...)
+  local args = { ... }
+  local size = #args
+
+  return (("%s"):rep(size, utils.nbsp)):format(...)
 end
 
--- Generate a send to lua server action string for fzf
---
----@param message string
----@param server_socket_path string
----@param opts? { var_expansion?: boolean }
----@return string
-M._send_to_lua_action = function(message, server_socket_path, opts)
-  opts = vim.tbl_extend("force", {
-    var_expansion = false,
-  }, opts or {})
-
-  return string.format(
-    [[execute-silent(%s)]],
-    string.format(
-      [[cat <<%s | %s
-%s
-EOF
-]],
-      opts.var_expansion and [[EOF]] or [["EOF"]],
-      os_utils.get_unix_sock_cmd(server_socket_path),
-      message
-    )
-  )
-end
-
--- Write the given content to a temporary file and return the path to the file
+-- Write content to a temporary file and return its path
 --
 ---@param content string|string[]
 ---@return string
 M.write_to_tmpfile = function(content)
+  local tmp = vim.fn.tempname()
   vim.fn.writefile(
     type(content) == "string" and vim.split(content, "\n") or content,
-    tempfile
+    tmp
   )
-  return tempfile
-end
-
--- Generate a fzf entry by joining the given arguments with the nbsp character as delimiter
---
----@vararg string
----@return string
-M.join_by_delim = function(...)
-  local args = { ... }
-  local size = #args
-  return string.format(string.rep("%s", size, utils.nbsp), ...)
-end
-
----@vararg fzf_binds
----@return fzf_binds
-function M.bind_extend(...)
-  local binds_list = { ... }
-
-  local result = {} ---@type fzf_binds
-
-  for _, binds in pairs(binds_list) do
-    for ev, actions in pairs(binds) do
-      if type(actions) == "table" then
-        M.add_actions_to_binds(ev, result, false, unpack(actions))
-      else
-        M.add_actions_to_binds(ev, result, false, actions)
-      end
-    end
-  end
-
-  return result
-end
-
----@param event string
----@param binds table<string, bind_type>
----@param prepend boolean
----@vararg bind_type
-function M.add_actions_to_binds(event, binds, prepend, ...)
-  local new_actions = { ... }
-
-  local current_type = type(binds[event])
-  if current_type == "nil" then
-    binds[event] = new_actions
-  elseif current_type == "string" or current_type == "function" then
-    if prepend then
-      binds[event] = {
-        unpack(new_actions), ---@diagnostic disable-line: assign-type-mismatch
-        binds[event], ---@diagnostic disable-line: assign-type-mismatch
-      }
-    else
-      binds[event] = {
-        binds[event], ---@diagnostic disable-line: assign-type-mismatch
-        unpack(new_actions), ---@diagnostic disable-line: assign-type-mismatch
-      }
-    end
-  elseif current_type == "table" then
-    for i, a in pairs(new_actions) do
-      if prepend then
-        table.insert(binds[event], i, a) ---@diagnostic disable-line: param-type-mismatch
-      else
-        table.insert(binds[event], a) ---@diagnostic disable-line: param-type-mismatch
-      end
-    end
-  else
-    error("Invalid fzf bind action type " .. current_type)
-  end
+  return tmp
 end
 
 return M

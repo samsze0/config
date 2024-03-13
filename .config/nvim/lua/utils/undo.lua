@@ -1,18 +1,25 @@
--- Tweaked from:
--- https://github.com/debugloop/telescope-undo.nvim/blob/main/lua/telescope-undo/init.lua
+local utils = require("utils")
+
+-- TODO: complete the types
+
+---@alias VimUndoTree { seq_cur: number, entries: VimUndo[] }
+---@alias VimUndo { seq: number, time: number, alt?: VimUndo[] }
 
 local M = {}
 
 -- Construct the delta string for a specific undo
 --
+-- Tweaked from:
+-- https://github.com/debugloop/telescope-undo.nvim/blob/main/lua/telescope-undo/init.lua
+--
 ---@param buf integer
 ---@param undo_seq_nr integer
 ---@param opts? { diff_context_lines?: integer }
----@return string, string, string[], string[]
+---@return string diff, string brief, string[] additions, string[] deletions
 function M.show_undo_diff_with_delta(buf, undo_seq_nr, opts)
-  opts = vim.tbl_extend("force", {
+  opts = utils.opts_extend({
     diff_context_lines = 10,
-  }, opts or {})
+  }, opts)
 
   local before_lines, after_lines =
     M.get_undo_before_and_after(buf, undo_seq_nr)
@@ -20,7 +27,6 @@ function M.show_undo_diff_with_delta(buf, undo_seq_nr, opts)
   local before = table.concat(before_lines, "\n")
   local after = table.concat(after_lines, "\n")
 
-  -- create temporary vars and prepare this iteration
   local diff = ""
   local brief = ""
   local additions = {}
@@ -51,6 +57,7 @@ function M.show_undo_diff_with_delta(buf, undo_seq_nr, opts)
       for j = start_a, start_a + count_a - 1 do
         diff = diff .. "\n-" .. before_lines[j]
         table.insert(deletions, before_lines[j])
+
         brief = brief .. before_lines[j]
       end
 
@@ -60,6 +67,7 @@ function M.show_undo_diff_with_delta(buf, undo_seq_nr, opts)
       for j = start_b, start_b + count_b - 1 do
         diff = diff .. "\n+" .. after_lines[j]
         table.insert(additions, after_lines[j])
+
         brief = brief .. after_lines[j]
       end
 
@@ -84,12 +92,12 @@ end
 --
 ---@param buf integer
 ---@param undo_seq_nr integer
----@return string[], string[]
+---@return string[] before, string[] after
 M.get_undo_before_and_after = function(buf, undo_seq_nr)
   return unpack(vim.api.nvim_buf_call(buf, function()
     local cursor = vim.api.nvim_win_get_cursor(0)
     local undotree = vim.fn.undotree()
-    local current_seq_nr = undotree.seq_cur ---@diagnostic disable-line: undefined-field
+    ---@cast undotree VimUndoTree
 
     vim.cmd("undo " .. undo_seq_nr)
     local after = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -97,7 +105,7 @@ M.get_undo_before_and_after = function(buf, undo_seq_nr)
     vim.cmd("undo")
     local before = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
-    vim.cmd("undo " .. current_seq_nr)
+    vim.cmd("undo " .. undotree.seq_cur)
     vim.api.nvim_win_set_cursor(0, cursor)
 
     return { before, after } ---@diagnostic disable-line: redundant-return-value

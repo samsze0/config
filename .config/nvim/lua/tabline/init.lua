@@ -41,7 +41,7 @@ M.render = function()
   if has_error then return "Error" end
 
   -- Caution: using vim.notify could cause infinite loop if vim.notify show message in a window
-  print("Rendered tabline " .. render_count .. " times")
+  -- print("Rendered tabline " .. render_count .. " times")
   render_count = render_count + 1
   return pcall_section(M.section_tabs, "tabs")
 end

@@ -1,30 +1,66 @@
 local utils = require("utils")
 local jumplist = require("jumplist")
+local conform = require("conform")
 
-local vim_keymap = vim.api.nvim_set_keymap
-local opts = { silent = false, noremap = true }
-local opts_can_remap = { silent = false, noremap = false }
-local opts_expr = { silent = false, expr = true, noremap = true }
+local M = {}
 
-local lua_keymap = function(mode, lhs, rhs, opts)
-  if rhs ~= nil then vim.keymap.set(mode, lhs, rhs, opts) end
+---@alias VimMode "n" | "v" | "i"
+
+---@param mode VimMode | VimMode[]
+---@param lhs string
+---@param rhs string | function
+---@param opts? { silent?: boolean, noremap?: boolean, expr?: boolean }
+local function create_keymap_lua(mode, lhs, rhs, opts)
+  return vim.keymap.set(mode, lhs, rhs, opts or {})
 end
+M.create_keymap_lua = create_keymap_lua
+
+---@param mode VimMode | VimMode[]
+---@param lhs string
+---@param rhs string
+---@param opts? { silent?: boolean, noremap?: boolean, expr?: boolean }
+local function create_keymap_vim(mode, lhs, rhs, opts)
+  opts = utils.opts_extend({
+    silent = false,
+    noremap = true,
+    expr = false,
+  }, opts)
+
+  if type(mode) == "table" then
+    for _, m in ipairs(mode) do
+      create_keymap_vim(m, lhs, rhs, opts)
+    end
+  else
+    return vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
+  end
+end
+M.create_keymap_vim = create_keymap_vim
+
+---@param name string
+---@param command string | function
+---@param opts? { }
+local function create_command_vim(name, command, opts)
+  opts = utils.opts_extend({}, opts)
+
+  return vim.api.nvim_create_user_command(name, command, opts)
+end
+M.create_command_vim = create_command_vim
 
 -- Pageup/down
-vim_keymap("n", "<PageUp>", "<C-u><C-u>", opts)
-vim_keymap("n", "<PageDown>", "<C-d><C-d>", opts)
-vim_keymap("v", "<PageUp>", "<C-u><C-u>", opts)
-vim_keymap("v", "<PageDown>", "<C-d><C-d>", opts)
-vim_keymap("i", "<PageUp>", "<C-o><C-u><C-o><C-u>", opts) -- Execute <C-u> twice in normal mode
-vim_keymap("i", "<PageDown>", "<C-o><C-d><C-o><C-d>", opts)
+create_keymap_vim("n", "<PageUp>", "<C-u><C-u>")
+create_keymap_vim("n", "<PageDown>", "<C-d><C-d>")
+create_keymap_vim("v", "<PageUp>", "<C-u><C-u>")
+create_keymap_vim("v", "<PageDown>", "<C-d><C-d>")
+create_keymap_vim("i", "<PageUp>", "<C-o><C-u><C-o><C-u>") -- Execute <C-u> twice in normal mode
+create_keymap_vim("i", "<PageDown>", "<C-o><C-d><C-o><C-d>")
 
 -- Find and replace (local)
 -- TODO: lua plugin?
-vim_keymap("n", "rw", "*N:%s///g<left><left>", opts) -- Select next occurrence of word under cursor then go back to current instance
-vim_keymap("n", "rr", ":%s//g<left><left>", opts)
-vim_keymap("v", "rr", ":s//g<left><left>", opts)
-vim_keymap("v", "r.", ":&gc<CR>", opts) -- Reset flags & add flags
-vim_keymap("v", "ry", [["ry]], opts) -- Yank it into register "r" for later use with "rp"
+create_keymap_vim("n", "rw", "*N:%s///g<left><left>") -- Select next occurrence of word under cursor then go back to current instance
+create_keymap_vim("n", "rr", ":%s//g<left><left>")
+create_keymap_vim("v", "rr", ":s//g<left><left>")
+create_keymap_vim("v", "r.", ":&gc<CR>") -- Reset flags & add flags
+create_keymap_vim("v", "ry", [["ry]]) -- Yank it into register "r" for later use with "rp"
 local function rp_rhs(whole_file) -- Use register "r" as the replacement rather than the subject
   return function()
     local content = vim.fn.getreg("r")
@@ -32,189 +68,189 @@ local function rp_rhs(whole_file) -- Use register "r" as the replacement rather 
     return (
       (whole_file and ":%s" or ":s")
       .. [[//<C-r>r/gc<left><left><left>]]
-      .. string.rep("<left>", length)
+      .. ("<left>"):rep(length)
       .. "<left>"
     )
   end
 end
-lua_keymap("n", "rp", rp_rhs(true), opts_expr)
-lua_keymap("v", "rp", rp_rhs(false), opts_expr)
-vim_keymap("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]], opts) -- Paste selection into register "y" and paste it into command line with <C-r>
-vim_keymap("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]], opts) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
-vim_keymap("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]], opts) -- "ra" but forward direction only
+create_keymap_lua("n", "rp", rp_rhs(true), { expr = true })
+create_keymap_lua("v", "rp", rp_rhs(false), { expr = true })
+create_keymap_vim("v", "ra", [["ry:%s/<C-r>r//gc<left><left><left>]]) -- Paste selection into register "y" and paste it into command line with <C-r>
+create_keymap_vim("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]]) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
+create_keymap_vim("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]]) -- "ra" but forward direction only
 
 -- Diff
-lua_keymap("n", "sj", function()
+create_keymap_lua("n", "sj", function()
   local diff_buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
   if not diff_buffers then vim.error("Not in diff mode") end
   utils.switch(vim.api.nvim_get_current_buf(), {
     [diff_buffers[2]] = function()
-      vim.cmd(string.format([[diffget %s]], diff_buffers[1]))
+      vim.cmd(([[diffget %s]]):format(diff_buffers[1]))
     end,
     [diff_buffers[3]] = function()
-      vim.cmd(string.format([[diffput %s]], diff_buffers[2]))
+      vim.cmd(([[diffput %s]]):format(diff_buffers[2]))
     end,
   }, nil)
-end, {})
-lua_keymap("n", "sl", function()
+end)
+create_keymap_lua("n", "sl", function()
   local diff_buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
   if not diff_buffers then vim.error("Not in diff mode") end
   utils.switch(vim.api.nvim_get_current_buf(), {
     [diff_buffers[2]] = function()
-      vim.cmd(string.format([[diffget %s]], diff_buffers[3]))
+      vim.cmd(([[diffget %s]]):format(diff_buffers[3]))
     end,
     [diff_buffers[1]] = function()
-      vim.cmd(string.format([[diffput %s]], diff_buffers[2]))
+      vim.cmd(([[diffput %s]]):format(diff_buffers[2]))
     end,
   }, nil)
-end, {})
+end)
 
 -- Move by word
-vim_keymap("n", "<C-Left>", "b", opts)
-vim_keymap("n", "<C-S-Left>", "B", opts)
-vim_keymap("n", "<C-Right>", "w", opts)
-vim_keymap("n", "<C-S-Right>", "W", opts)
+create_keymap_vim("n", "<C-Left>", "b")
+create_keymap_vim("n", "<C-S-Left>", "B")
+create_keymap_vim("n", "<C-Right>", "w")
+create_keymap_vim("n", "<C-S-Right>", "W")
 
 -- Delete word
-vim_keymap("i", "<C-BS>", "<C-W>", opts)
-vim_keymap("i", "<C-BS>", "<C-W>", opts)
+create_keymap_vim("i", "<C-BS>", "<C-W>")
 
 -- Move/swap line/selection up/down
 local auto_indent = false
-vim_keymap(
+create_keymap_vim(
   "n",
   "<C-up>",
-  "<cmd>m .-2<CR>" .. (auto_indent and "==" or ""),
-  opts
+  "<cmd>m .-2<CR>" .. (auto_indent and "==" or "")
 )
-vim_keymap(
+create_keymap_vim(
   "n",
   "<C-down>",
-  "<cmd>m .+1<CR>" .. (auto_indent and "==" or ""),
-  opts
+  "<cmd>m .+1<CR>" .. (auto_indent and "==" or "")
 )
-vim_keymap("v", "<C-up>", ":m .-2<CR>gv" .. (auto_indent and "=gv" or ""), opts)
-vim_keymap(
+create_keymap_vim(
+  "v",
+  "<C-up>",
+  ":m .-2<CR>gv" .. (auto_indent and "=gv" or "")
+)
+create_keymap_vim(
   "v",
   "<C-down>",
-  ":m '>+1<CR>gv" .. (auto_indent and "=gv" or ""),
-  opts
+  ":m '>+1<CR>gv" .. (auto_indent and "=gv" or "")
 )
 
 -- Delete line
-vim_keymap("n", "<M-y>", "dd", opts_can_remap)
-vim_keymap("i", "<M-y>", "<C-o><M-y>", opts_can_remap)
-vim_keymap("v", "<M-y>", ":d<CR>", opts)
+create_keymap_vim("n", "<M-y>", "dd", { noremap = false })
+create_keymap_vim("i", "<M-y>", "<C-o><M-y>", { noremap = false })
+create_keymap_vim("v", "<M-y>", ":d<CR>")
 
 -- Duplicate line/selection
-vim_keymap("n", "<M-g>", "<cmd>t .<CR>", opts)
-vim_keymap("i", "<M-g>", "<C-o><M-g>", opts_can_remap)
-vim_keymap("v", "<M-g>", ":t '><CR>", opts)
+create_keymap_vim("n", "<M-g>", "<cmd>t .<CR>")
+create_keymap_vim("i", "<M-g>", "<C-o><M-g>", { noremap = false })
+create_keymap_vim("v", "<M-g>", ":t '><CR>")
 
 -- Matching pair
-vim_keymap("n", "m", "%", opts)
-vim_keymap("v", "m", "%", opts)
+create_keymap_vim("n", "m", "%")
+create_keymap_vim("v", "m", "%")
 
 -- Macro
 local macro_keymaps = false
 if macro_keymaps then
-  vim_keymap("n", ",", "@", opts) -- replay macro x
-  vim_keymap("n", "<", "Q", opts) -- replay last macro
+  create_keymap_vim("n", ",", "@") -- replay macro x
+  create_keymap_vim("n", "<", "Q") -- replay last macro
 end
 
 -- Clear search highlights
-vim_keymap("n", "<Space>/", "<cmd>noh<CR>", opts)
+create_keymap_vim("n", "<Space>/", "<cmd>noh<CR>")
 
 -- Redo
-vim_keymap("n", "U", "<C-R>", opts)
+create_keymap_vim("n", "U", "<C-R>")
 
 -- New line
-vim_keymap("n", "o", "o<Esc>", opts)
-vim_keymap("n", "O", "O<Esc>", opts)
+create_keymap_vim("n", "o", "o<Esc>")
+create_keymap_vim("n", "O", "O<Esc>")
 
 -- Fold
-vim_keymap("n", "zl", "zo", opts)
-vim_keymap("n", "zj", "zc", opts)
-vim_keymap("n", "zp", "za", opts)
+create_keymap_vim("n", "zl", "zo")
+create_keymap_vim("n", "zj", "zc")
+create_keymap_vim("n", "zp", "za")
 
 -- Insert/append swap
-vim_keymap("n", "i", "a", opts)
-vim_keymap("n", "a", "i", opts)
-vim_keymap("n", "I", "A", opts)
-vim_keymap("n", "A", "I", opts)
-vim_keymap("v", "I", "A", opts)
-vim_keymap("v", "A", "I", opts)
+create_keymap_vim("n", "i", "a")
+create_keymap_vim("n", "a", "i")
+create_keymap_vim("n", "I", "A")
+create_keymap_vim("n", "A", "I")
+create_keymap_vim("v", "I", "A")
+create_keymap_vim("v", "A", "I")
 
 -- Home
-vim_keymap("n", "<Home>", "^", opts)
-vim_keymap("v", "<Home>", "^", opts)
-vim_keymap("i", "<Home>", "<C-o>^", opts) -- Execute ^ in normal mode
+create_keymap_vim("n", "<Home>", "^")
+create_keymap_vim("v", "<Home>", "^")
+create_keymap_vim("i", "<Home>", "<C-o>^") -- Execute ^ in normal mode
 
 -- Indent
-vim_keymap("n", "<Tab>", ">>", opts)
-vim_keymap("n", "<S-Tab>", "<<", opts)
-vim_keymap("v", "<Tab>", ">gv", opts) -- keep selection after
-vim_keymap("v", "<S-Tab>", "<gv", opts)
+create_keymap_vim("n", "<Tab>", ">>")
+create_keymap_vim("n", "<S-Tab>", "<<")
+create_keymap_vim("v", "<Tab>", ">gv") -- keep selection after
+create_keymap_vim("v", "<S-Tab>", "<gv")
 
 -- Yank
-vim_keymap("v", "y", "ygv<Esc>", opts) -- Stay at cursor after yank
+create_keymap_vim("v", "y", "ygv<Esc>") -- Stay at cursor after yank
 
 -- Paste
-vim_keymap("v", "p", '"pdP', opts) -- Don't keep the overwritten text in register "+". Instead, keep it in "p"
+create_keymap_vim("v", "p", '"pdP') -- Don't keep the overwritten text in register "+". Instead, keep it in "p"
 
 -- Fold
-vim_keymap("n", "z.", "zo", opts)
-vim_keymap("n", "z,", "zc", opts)
-vim_keymap("n", "z>", "zr", opts)
-vim_keymap("n", "z<", "zm", opts)
+create_keymap_vim("n", "z.", "zo")
+create_keymap_vim("n", "z,", "zc")
+create_keymap_vim("n", "z>", "zr")
+create_keymap_vim("n", "z<", "zm")
 
 -- Screen movement
-vim_keymap("n", "<S-Up>", "5<C-Y>", opts)
-vim_keymap("v", "<S-Up>", "5<C-Y>", opts)
-vim_keymap("i", "<S-Up>", "<C-o>5<C-Y>", opts)
-vim_keymap("n", "<S-Down>", "5<C-E>", opts)
-vim_keymap("v", "<S-Down>", "5<C-E>", opts)
-vim_keymap("i", "<S-Down>", "<C-o>5<C-E>", opts)
-vim_keymap("n", "<S-Left>", "2<ScrollWheelLeft>", opts)
-vim_keymap("v", "<S-Left>", "2<ScrollWheelLeft>", opts)
-vim_keymap("i", "<S-Left>", "<C-o>2<ScrollWheelLeft>", opts)
-vim_keymap("n", "<S-Right>", "2<ScrollWheelRight>", opts)
-vim_keymap("v", "<S-Right>", "2<ScrollWheelRight>", opts)
-vim_keymap("i", "<S-Right>", "<C-o>2<ScrollWheelRight>", opts)
+create_keymap_vim("n", "<S-Up>", "5<C-Y>")
+create_keymap_vim("v", "<S-Up>", "5<C-Y>")
+create_keymap_vim("i", "<S-Up>", "<C-o>5<C-Y>")
+create_keymap_vim("n", "<S-Down>", "5<C-E>")
+create_keymap_vim("v", "<S-Down>", "5<C-E>")
+create_keymap_vim("i", "<S-Down>", "<C-o>5<C-E>")
+create_keymap_vim("n", "<S-Left>", "2<ScrollWheelLeft>")
+create_keymap_vim("v", "<S-Left>", "2<ScrollWheelLeft>")
+create_keymap_vim("i", "<S-Left>", "<C-o>2<ScrollWheelLeft>")
+create_keymap_vim("n", "<S-Right>", "2<ScrollWheelRight>")
+create_keymap_vim("v", "<S-Right>", "2<ScrollWheelRight>")
+create_keymap_vim("i", "<S-Right>", "<C-o>2<ScrollWheelRight>")
 
 -- Window (pane)
-vim_keymap("n", "wi", "<cmd>wincmd k<CR>", opts)
-vim_keymap("n", "wk", "<cmd>wincmd j<CR>", opts)
-vim_keymap("n", "wj", "<cmd>wincmd h<CR>", opts)
-vim_keymap("n", "wl", "<cmd>wincmd l<CR>", opts)
-vim_keymap("n", "<C-e>", "<cmd>wincmd k<CR>", opts)
-vim_keymap("n", "<C-d>", "<cmd>wincmd j<CR>", opts)
-vim_keymap("n", "<C-s>", "<cmd>wincmd h<CR>", opts)
-vim_keymap("n", "<C-f>", "<cmd>wincmd l<CR>", opts)
+create_keymap_vim("n", "wi", "<cmd>wincmd k<CR>")
+create_keymap_vim("n", "wk", "<cmd>wincmd j<CR>")
+create_keymap_vim("n", "wj", "<cmd>wincmd h<CR>")
+create_keymap_vim("n", "wl", "<cmd>wincmd l<CR>")
+create_keymap_vim("n", "<C-e>", "<cmd>wincmd k<CR>")
+create_keymap_vim("n", "<C-d>", "<cmd>wincmd j<CR>")
+create_keymap_vim("n", "<C-s>", "<cmd>wincmd h<CR>")
+create_keymap_vim("n", "<C-f>", "<cmd>wincmd l<CR>")
 
 -- TODO: more intuitive control with lua
-vim_keymap("n", "<C-S-->", "10<C-w>-", opts) -- Decrease height
-vim_keymap("n", "<C-S-=>", "10<C-w>+", opts) -- Increase height
-vim_keymap("n", "<C-S-.>", "20<C-w>>", opts) -- Increase width
-vim_keymap("n", "<C-S-,>", "20<C-w><", opts) -- Decrease width
+create_keymap_vim("n", "<C-S-->", "10<C-w>-") -- Decrease height
+create_keymap_vim("n", "<C-S-=>", "10<C-w>+") -- Increase height
+create_keymap_vim("n", "<C-S-.>", "20<C-w>>") -- Increase width
+create_keymap_vim("n", "<C-S-,>", "20<C-w><") -- Decrease width
 
-vim_keymap("n", "ww", "<cmd>clo<CR>", opts)
+create_keymap_vim("n", "ww", "<cmd>clo<CR>")
 
-vim_keymap("n", "wd", "<cmd>split<CR>", opts)
-vim_keymap("n", "wf", "<cmd>vsplit<CR>", opts)
-vim_keymap("n", "we", "<cmd>split<CR>", opts)
-vim_keymap("n", "ws", "<cmd>vsplit<CR>", opts)
+create_keymap_vim("n", "wd", "<cmd>split<CR>")
+create_keymap_vim("n", "wf", "<cmd>vsplit<CR>")
+create_keymap_vim("n", "we", "<cmd>split<CR>")
+create_keymap_vim("n", "ws", "<cmd>vsplit<CR>")
 
-vim_keymap("n", "wt", "<cmd>wincmd T<CR>", opts) -- Move to new tab
+create_keymap_vim("n", "wt", "<cmd>wincmd T<CR>") -- Move to new tab
 
 -- TODO: remove
-vim_keymap("n", "wz", "<C-W>_<C-W>|", opts) -- Maximise both horizontally and vertically
-vim_keymap("n", "wx", "<C-W>=", opts)
+create_keymap_vim("n", "wz", "<C-W>_<C-W>|") -- Maximise both horizontally and vertically
+create_keymap_vim("n", "wx", "<C-W>=")
 
 -- Tab
-vim_keymap("n", "tj", "<cmd>tabp<CR>", opts)
-vim_keymap("n", "tl", "<cmd>tabn<CR>", opts)
-vim_keymap("n", "tt", "<cmd>tabnew<CR>", opts)
+create_keymap_vim("n", "tj", "<cmd>tabp<CR>")
+create_keymap_vim("n", "tl", "<cmd>tabn<CR>")
+create_keymap_vim("n", "tt", "<cmd>tabnew<CR>")
 local close_tab = function()
   local is_only_tab = vim.fn.tabpagenr("$") == 1
   if is_only_tab then
@@ -230,229 +266,203 @@ local close_tab = function()
     vim.cmd([[tabprevious]])
   end
 end
-lua_keymap("n", "tw", close_tab, {})
-vim_keymap("n", "tq", "<cmd>tabonly<CR>", opts)
-vim_keymap("n", "<C-j>", "<cmd>tabp<CR>", opts)
-vim_keymap("n", "<C-l>", "<cmd>tabn<CR>", opts)
+create_keymap_lua("n", "tw", close_tab)
+create_keymap_vim("n", "tq", "<cmd>tabonly<CR>")
+create_keymap_vim("n", "<C-j>", "<cmd>tabp<CR>")
+create_keymap_vim("n", "<C-l>", "<cmd>tabn<CR>")
 
-vim_keymap("n", "tu", "<cmd>tabm -1<CR>", opts)
-vim_keymap("n", "to", "<cmd>tabm +1<CR>", opts)
-vim_keymap("n", "<C-S-j>", "<cmd>tabm -1<CR>", opts)
-vim_keymap("n", "<C-S-l>", "<cmd>tabm +1<CR>", opts)
+create_keymap_vim("n", "tu", "<cmd>tabm -1<CR>")
+create_keymap_vim("n", "to", "<cmd>tabm +1<CR>")
+create_keymap_vim("n", "<C-S-j>", "<cmd>tabm -1<CR>")
+create_keymap_vim("n", "<C-S-l>", "<cmd>tabm +1<CR>")
 
 -- Delete & cut
-vim_keymap("n", "d", '"dd', opts) -- Put in d register, in case if needed
-vim_keymap("v", "d", '"dd', opts)
-vim_keymap("n", "x", "d", opts)
-vim_keymap("v", "x", "d", opts)
-vim_keymap("n", "xx", "dd", opts)
-vim_keymap("n", "X", "D", opts)
+create_keymap_vim("n", "d", '"dd') -- Put in d register, in case if needed
+create_keymap_vim("v", "d", '"dd')
+create_keymap_vim("n", "x", "d")
+create_keymap_vim("v", "x", "d")
+create_keymap_vim("n", "xx", "dd")
+create_keymap_vim("n", "X", "D")
 
 -- Change (add to register 'd')
-vim_keymap("n", "c", '"dc', opts)
-vim_keymap("n", "C", '"dC', opts)
-vim_keymap("v", "c", '"dc', opts)
-vim_keymap("v", "C", '"dC', opts)
+create_keymap_vim("n", "c", '"dc')
+create_keymap_vim("n", "C", '"dC')
+create_keymap_vim("v", "c", '"dc')
+create_keymap_vim("v", "C", '"dC')
 
 -- Jump (jumplist)
-lua_keymap("n", "<C-u>", jumplist.jump_back, {})
-lua_keymap("n", "<C-o>", jumplist.jump_forward, {})
+create_keymap_lua("n", "<C-u>", jumplist.jump_back)
+create_keymap_lua("n", "<C-o>", jumplist.jump_forward)
 
 -- Fzf/FzfLua
 
-lua_keymap("n", "<f1>", require("fzf-lua").builtin, {})
+create_keymap_lua("n", "<f1>", require("fzf-lua").builtin)
 
-lua_keymap("n", "<f3><f3>", require("fzf.files").files, {})
-lua_keymap("n", "<f3><f4>", function()
-  require("fzf.git").git_submodules(
-    function(submodule_path)
-      require("fzf.files").files({
-        git_dir = submodule_path,
-      })
-    end
-  )
-end, {})
+create_keymap_lua(
+  "n",
+  "<f3><f3>",
+  function() require("fzf.files")():start() end
+)
 
-lua_keymap("n", "<f3><f2>", require("fzf.misc").buffers, {})
-lua_keymap("n", "<f3><f1>", require("fzf.misc").tabs, {})
+create_keymap_lua(
+  "n",
+  "<f3><f2>",
+  function() require("fzf.buffers")():start() end
+)
+create_keymap_lua("n", "<f3><f1>", function() require("fzf.tabs")():start() end)
 
-lua_keymap("n", "<f5><f4>", require("fzf.grep").grep_file, {})
-lua_keymap("n", "<f5><f5>", require("fzf.grep").grep, {})
-lua_keymap(
+create_keymap_lua(
+  "n",
+  "<f5><f4>",
+  function() require("fzf.grep.file")():start() end
+)
+create_keymap_lua(
+  "n",
+  "<f5><f5>",
+  function() require("fzf.grep.workspace")():start() end
+)
+create_keymap_lua(
   "v",
   "<f5><f4>",
   function()
-    require("fzf.grep").grep_file({
+    require("fzf.grep.file")({
       initial_query = utils.get_visual_selection(),
-    })
-  end,
-  {}
+    }):start()
+  end
 )
-lua_keymap(
+create_keymap_lua(
   "v",
   "<f5><f5>",
   function()
-    require("fzf.grep").grep({
+    require("fzf.grep.workspace")({
       initial_query = utils.get_visual_selection(),
-    })
-  end,
-  {}
+    }):start()
+  end
 )
 
-lua_keymap("n", "<f11><f5>", require("fzf.git").git_commits, {})
-lua_keymap("n", "<f10><f5>", function()
-  require("fzf.git").git_submodules(
-    function(submodule_path)
-      require("fzf.git").git_commits({
-        git_dir = submodule_path,
-      })
-    end
-  )
-end, {})
-lua_keymap(
+create_keymap_lua(
+  "n",
+  "<f11><f6>",
+  function() require("fzf.git.stash")():start() end
+)
+create_keymap_lua(
+  "n",
+  "<f11><f5>",
+  function() require("fzf.git.commits")():start() end
+)
+create_keymap_lua(
   "n",
   "<f11><f4>",
   function()
-    require("fzf.git").git_commits({ filepaths = vim.fn.expand("%:p") })
-  end,
-  {}
+    require("fzf.git.commits")({
+      filepaths = vim.fn.expand("%"),
+    }):start()
+  end
 )
-lua_keymap("n", "<f10><f4>", function()
-  require("fzf.git").git_submodules(
-    function(submodule_path)
-      require("fzf.git").git_commits({
-        git_dir = submodule_path,
-        filepaths = vim.fn.expand("%"),
-      })
-    end
-  )
-end, {})
-lua_keymap("n", "<f11><f3>", require("fzf.git").git_status, {})
-lua_keymap("n", "<f10><f4>", function()
-  require("fzf.git").git_submodules(
-    function(submodule_path)
-      require("fzf.git").git_status({
-        git_dir = submodule_path,
-      })
-    end
-  )
-end, {})
-lua_keymap("n", "<f11><f2>", require("fzf.git").git_branch, {})
-lua_keymap("n", "<f11><f6>", require("fzf.git").git_stash, {})
-lua_keymap("n", "<f11><f11>", require("fzf.git").git_reflog, {})
+create_keymap_lua(
+  "n",
+  "<f11><f3>",
+  function() require("fzf.git.status")():start() end
+)
+create_keymap_lua(
+  "n",
+  "<f11><f2>",
+  function() require("fzf.git.branch")():start() end
+)
+create_keymap_lua(
+  "n",
+  "<f11><f1>",
+  function() require("fzf.git.submodules")():start() end
+)
+create_keymap_lua(
+  "n",
+  "<f11><f11>",
+  function() require("fzf.git.reflog")():start() end
+)
 
-lua_keymap("n", "li", require("fzf.lsp").lsp_definitions, {})
-lua_keymap("n", "lr", require("fzf.lsp").lsp_references, {})
-lua_keymap("n", "<f4><f4>", require("fzf.lsp").lsp_document_symbols, {})
-lua_keymap("n", "<f4><f5>", require("fzf.lsp").lsp_workspace_symbols, {})
-lua_keymap(
+create_keymap_lua(
+  "n",
+  "li",
+  function() require("fzf.lsp.definitions")():start() end
+)
+create_keymap_lua(
+  "n",
+  "lr",
+  function() require("fzf.lsp.references")():start() end
+)
+create_keymap_lua(
+  "n",
+  "<f4><f4>",
+  function() require("fzf.lsp.document_symbols")():start() end
+)
+create_keymap_lua(
+  "n",
+  "<f4><f5>",
+  function() require("fzf.lsp.workspace_symbols")():start() end
+)
+create_keymap_lua(
   "n",
   "ld",
   function()
-    require("fzf.diagnostics").diagnostics({
+    require("fzf.diagnostics")({
       current_buffer_only = true,
-    })
-  end,
-  {}
+      severity = {
+        min = vim.diagnostic.severity.HINT,
+      },
+    }):start()
+  end
 )
-lua_keymap("n", "lD", require("fzf.diagnostics").diagnostics, {})
-lua_keymap("n", "la", nil, {})
+create_keymap_lua(
+  "n",
+  "lD",
+  function() require("fzf.diagnostics")():start() end
+)
 
-lua_keymap("n", "<space>u", require("fzf.undo").undos, {})
-lua_keymap("n", "<space>m", require("fzf.notification").notifications, {})
-lua_keymap("n", "<space>j", require("fzf.jump").jumps, {})
+create_keymap_lua("n", "<space>u", function() require("fzf.undo")():start() end)
+create_keymap_lua(
+  "n",
+  "<space>m",
+  function() require("fzf.notification")():start() end
+)
+create_keymap_lua("n", "<space>j", function() require("fzf.jump")():start() end)
 
-lua_keymap("n", "<f9><f1>", require("fzf.docker").docker_images, {})
-lua_keymap("n", "<f9><f2>", require("fzf.docker").docker_containers, {})
-
--- Azure Fzf
--- vim.api.nvim_create_user_command("Azure", require("fzf.azure"), {})
--- vim.api.nvim_create_user_command("AzureAcr", require("fzf.azure.acr").list, {})
--- vim.api.nvim_create_user_command(
---   "AzureAccountSubscriptions",
---   require("fzf.azure.account").subscriptions,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureAdApps",
---   require("fzf.azure.ad").apps,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureAdUsers",
---   require("fzf.azure.ad").users,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureAdGroups",
---   require("fzf.azure.ad").groups,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureAdServicePrincipals",
---   require("fzf.azure.ad").service_principals,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureAdvisorRecommendations",
---   require("fzf.azure.advisor").recommendations,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureAppConfigs",
---   require("fzf.azure.appconfig").list,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureAppServicePlans",
---   require("fzf.azure.appservice").plans,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureWebApps",
---   require("fzf.azure.webapp").list,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureFunctionApps",
---   require("fzf.azure.functionapp").list,
---   {}
--- )
--- vim.api.nvim_create_user_command(
---   "AzureResources",
---   require("fzf.azure.resource").list,
---   {}
--- )
+create_keymap_lua(
+  "n",
+  "<f9><f1>",
+  function() require("fzf.docker.images")():start() end
+)
+create_keymap_lua(
+  "n",
+  "<f9><f2>",
+  function() require("fzf.docker.containers")():start() end
+)
 
 -- LSP
-vim_keymap("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>", opts)
-vim_keymap("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>", opts)
-vim_keymap("n", "lI", "<cmd>lua vim.lsp.buf.definition()<CR>", opts)
-vim_keymap("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>", opts)
-vim_keymap("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>", opts)
-vim_keymap("n", "lR", "<cmd>LspRestart<CR>", opts)
-vim_keymap("n", "<space>l", "<cmd>LspInfo<CR>", opts)
+create_keymap_vim("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>")
+create_keymap_vim("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>")
+create_keymap_vim("n", "lI", "<cmd>lua vim.lsp.buf.definition()<CR>")
+create_keymap_vim("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
+create_keymap_vim("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>")
+create_keymap_vim("n", "lR", "<cmd>LspRestart<CR>")
+create_keymap_vim("n", "<space>l", "<cmd>LspInfo<CR>")
 
 local conform_over_lsp_format = true
 
 if conform_over_lsp_format then
-  lua_keymap("n", "ll", function()
-    local success = require("conform").format()
+  create_keymap_lua("n", "ll", function()
+    local success = conform.format()
     if success then
-      return vim.info(
-        "Formatted with",
-        require("conform").list_formatters()[1].name
-      )
+      return vim.info("Formatted with", conform.list_formatters()[1].name)
     else
       vim.lsp.buf.format()
       vim.info("Formatted with LSP formatter")
     end
-  end, {})
+  end)
 else
-  lua_keymap("n", "ll", function()
+  create_keymap_lua("n", "ll", function()
     vim.lsp.buf.format()
     vim.info("Formatted")
-  end, {})
+  end)
 end
 
 local lsp_pick_formatter = function()
@@ -460,151 +470,144 @@ local lsp_pick_formatter = function()
     bufnr = 0, -- current buffer
   })
 
-  local format_providers = {}
-  for _, c in ipairs(clients) do
-    if c.server_capabilities.documentFormattingProvider then
-      table.insert(format_providers, c.name)
-    end
-  end
+  local formatters = utils.filter(
+    clients,
+    function(i, e) return e.server_capabilities.documentFormattingProvider end
+  )
 
-  vim.ui.select(format_providers, {
+  vim.ui.select(formatters, {
     prompt = "Select format providers:",
-    format_item = function(provider_name) return provider_name end,
-  }, function(provider_name)
+    format_item = function(formatter) return formatter.name end,
+  }, function(formatter)
     vim.lsp.buf.format({
-      filter = function(client) return client.name == provider_name end,
+      filter = function(client) return client.name == formatter.name end,
     })
   end)
 end
 
 local conform_pick_formatter = function()
-  local formatters = require("conform").list_formatters()
+  local formatters = conform.list_formatters()
   formatters = utils.filter(
     formatters,
     function(_, formatter) return formatter.available end
   )
-  vim.ui.select(
-    formatters,
-    {
-      prompt = "Select formatter:",
-      format_item = function(formatter) return formatter.name end,
-    },
-    function(formatter)
-      require("conform").format({ formatters = formatter.name })
-    end
-  )
+  vim.ui.select(formatters, {
+    prompt = "Select formatter:",
+    format_item = function(formatter) return formatter.name end,
+  }, function(formatter) conform.format({ formatters = formatter.name }) end)
 end
 
 if conform_over_lsp_format then
-  lua_keymap("n", "lL", conform_pick_formatter, {})
+  create_keymap_lua("n", "lL", conform_pick_formatter)
 else
-  lua_keymap("n", "lL", lsp_pick_formatter, {})
+  create_keymap_lua("n", "lL", lsp_pick_formatter)
 end
 
 -- Comment
-vim_keymap("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)", opts)
-vim_keymap("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)gv", opts) -- Re-select the last block
+create_keymap_vim("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)")
+create_keymap_vim("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)gv") -- Re-select the last block
 local comment_api = require("Comment.api")
 if not vim.tbl_isempty(comment_api) then
-  lua_keymap("i", "<C-/>", comment_api.toggle.linewise.current, {})
+  create_keymap_lua("i", "<C-/>", comment_api.toggle.linewise.current)
 end
 
 -- GitSigns
-vim_keymap("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>", opts)
-lua_keymap("n", "si", function()
+create_keymap_vim("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>")
+create_keymap_lua("n", "si", function()
   local buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
   if not buffers then
     vim.cmd([[Gitsigns prev_hunk]])
   else
     vim.cmd("normal! [c") -- Goto previous diff
   end
-end, {})
-lua_keymap("n", "sk", function()
+end)
+create_keymap_lua("n", "sk", function()
   local buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
   if not buffers then
     vim.cmd([[Gitsigns next_hunk]])
   else
     vim.cmd("normal! ]c") -- Goto next diff
   end
-end, {})
-vim_keymap("n", "sb", "<cmd>Gitsigns blame_line<CR>", opts)
+end)
+create_keymap_vim("n", "sb", "<cmd>Gitsigns blame_line<CR>")
 if false then
-  vim_keymap("n", "sj", "<cmd>Gitsigns stage_hunk<CR>", opts)
-  vim_keymap("n", "sl", "<cmd>Gitsigns undo_stage_hunk<CR>", opts)
+  create_keymap_vim("n", "sj", "<cmd>Gitsigns stage_hunk<CR>")
+  create_keymap_vim("n", "sl", "<cmd>Gitsigns undo_stage_hunk<CR>")
 end
-vim_keymap("n", "s;", "<cmd>Gitsigns reset_hunk<CR>", opts)
+create_keymap_vim("n", "s;", "<cmd>Gitsigns reset_hunk<CR>")
 
 -- :qa, :q!, :wq
-vim_keymap("n", "<space>q", ":q<cr>", opts)
-vim_keymap("n", "<space>w", ":w<cr>", opts)
-vim_keymap("n", "<space><BS>", ":q!<cr>", opts)
-vim_keymap("n", "<space>s", ":w!<cr>", opts)
-vim_keymap("n", "<space>a", ":qa<cr>", opts)
-vim_keymap("n", "<space>e", ":e<cr>", opts)
-vim_keymap("n", "<space><delete>", ":qa!<cr>", opts)
+create_keymap_vim("n", "<space>q", ":q<cr>")
+create_keymap_vim("n", "<space>w", ":w<cr>")
+create_keymap_vim("n", "<space><BS>", ":q!<cr>")
+create_keymap_vim("n", "<space>s", ":w!<cr>")
+create_keymap_vim("n", "<space>a", ":qa<cr>")
+create_keymap_vim("n", "<space>e", ":e<cr>")
+create_keymap_vim("n", "<space><delete>", ":qa!<cr>")
 
 -- Command line window
-vim_keymap("n", "<space>;", "q:", opts)
+create_keymap_vim("n", "<space>;", "q:")
 
 -- Session restore
-lua_keymap("n", "<Space>r", function()
+create_keymap_lua("n", "<Space>r", function()
   require("persist").load_session()
   vim.info("Reloaded session")
-end, {})
+end)
 
 -- Colorizer
-lua_keymap("n", "<leader>c", function()
+create_keymap_lua("n", "<leader>c", function()
   vim.cmd([[ColorizerToggle]])
   vim.info("Colorizer toggled")
-end, {})
-lua_keymap("n", "<leader>C", function()
+end)
+create_keymap_lua("n", "<leader>C", function()
   vim.cmd([[ColorizerReloadAllBuffers]])
   vim.info("Colorizer reloaded")
-end, {})
+end)
 
 -- Nvim Cmp
-lua_keymap("i", "<M-r>", function()
+create_keymap_lua("i", "<M-r>", function()
   local cmp = require("cmp")
 
   if cmp.visible() then cmp.confirm({ select = true }) end
-end, {})
+end)
 
 -- Copilot
 if not vim.g.vi_mode then
-  lua_keymap("n", "<leader>a", "<cmd>Copilot enable<CR>", {})
-  lua_keymap("i", "<M-a>", require("copilot.suggestion").accept, {})
-  lua_keymap("i", "<M-w>", require("copilot.suggestion").accept_line, {})
-  lua_keymap("i", "<M-d>", require("copilot.suggestion").next, {})
-  lua_keymap("i", "<M-e>", require("copilot.suggestion").prev, {})
-  lua_keymap("i", "<M-q>", require("copilot.panel").open, {})
-  lua_keymap("n", "<M-e>", require("copilot.panel").jump_prev, {})
-  lua_keymap("n", "<M-d>", require("copilot.panel").jump_next, {})
-  lua_keymap("n", "<M-a>", require("copilot.panel").accept, {})
+  create_keymap_lua("n", "<leader>a", "<cmd>Copilot enable<CR>")
+  create_keymap_lua("i", "<M-a>", require("copilot.suggestion").accept)
+  create_keymap_lua("i", "<M-w>", require("copilot.suggestion").accept_line)
+  create_keymap_lua("i", "<M-d>", require("copilot.suggestion").next)
+  create_keymap_lua("i", "<M-e>", require("copilot.suggestion").prev)
+  create_keymap_lua("i", "<M-q>", require("copilot.panel").open)
+  create_keymap_lua("n", "<M-e>", require("copilot.panel").jump_prev)
+  create_keymap_lua("n", "<M-d>", require("copilot.panel").jump_next)
+  create_keymap_lua("n", "<M-a>", require("copilot.panel").accept)
 end
 
 -- File managers
-lua_keymap("n", "<f2><f2>", require("lf").lf, {})
-lua_keymap("n", "<f2><f3>", function()
+create_keymap_lua("n", "<f2><f2>", require("lf").lf)
+create_keymap_lua("n", "<f2><f3>", function()
   require("lf").lf({
     path = vim.fn.expand("%:p"), -- Relative to ~ doesn't work
   })
-end, {})
+end)
 
 -- Copy path
-lua_keymap("n", "<leader>g", function()
+create_keymap_lua("n", "<leader>g", function()
   local path = vim.fn.expand("%:~")
   vim.fn.setreg("+", path)
   vim.info("Copied", path)
-end, {})
-vim.api.nvim_create_user_command("CopyRelativePath", function()
+end)
+create_command_vim("CopyRelativePath", function()
   local path = vim.fn.expand("%:~")
   vim.fn.setreg("+", path)
   vim.info("Copied", path)
-end, {})
+end)
 
 -- Misc
-vim.api.nvim_create_user_command(
+create_command_vim(
   "LogCurrentBuf",
-  function() vim.info(vim.api.nvim_get_current_buf()) end,
-  {}
+  function() vim.info(vim.api.nvim_get_current_buf()) end
 )
+
+return M

@@ -1,19 +1,21 @@
--- TODO: move away from global vars
+---@alias JumpSubscriber fun(win_id: number)
 
----@type fun(win_id: number)[]
+---@type JumpSubscriber[]
 local jumps_subscribers = {}
 
 local M = {}
 
----@param callback fun(win_id: number)
+---@param callback JumpSubscriber
 M.subscribe = function(callback) table.insert(jumps_subscribers, callback) end
 
----@alias jump { filename: string, line: number, col: number, time: number, text: string }
----@alias jump_node { value: jump, next: jump_node[], prev: jump_node | nil }
+---@alias Jump { filename: string, line: number, col: number, time: number, text: string }
+---@alias _JumpNode { value: Jump, next: _JumpNode[], prev: _JumpNode | nil }
 
----@type table<number, jump_node>
+-- Map of window id to jump node
+---@type table<number, _JumpNode>
 M.current_jump = {}
 
+-- TODO: move to config
 local debug = true
 
 -- FIX: Quickly jumping back and forward crashes window, regardless of whether there is a next node
@@ -32,12 +34,12 @@ M.setup = function(opts)
   })
 end
 
----@param value jump
----@return jump_node
+---@param value Jump
+---@return _JumpNode
 local function new_node(value) return { value = value, next = {}, prev = nil } end
 
 ---@param win_id number
----@return jump
+---@return Jump
 local function create_jump(win_id)
   local bufnr = vim.api.nvim_win_get_buf(win_id)
   local line, col = unpack(vim.api.nvim_win_get_cursor(win_id))
@@ -75,7 +77,7 @@ local function notify_subscribers(win_id)
   end
 end
 
----@param jump jump
+---@param jump Jump
 local function jump_to(jump)
   vim.cmd("e " .. jump.filename)
   vim.api.nvim_win_set_cursor(0, { jump.line, jump.col })
@@ -91,7 +93,7 @@ end
 --
 ---@param win_id number
 ---@param opts? { max_num_entries?: number }
----@return jump[] jumps, number? current_jump_idx
+---@return Jump[] jumps, number? current_jump_idx
 function M.get_jumps_as_list(win_id, opts)
   opts = vim.tbl_extend("force", { max_num_entries = 100 }, opts or {})
 
@@ -115,7 +117,7 @@ end
 
 -- Save current position as jump
 --
----@param win_id number
+---@param win_id? number
 function M.save(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   local buf = vim.api.nvim_win_get_buf(win_id)
@@ -149,10 +151,7 @@ function M.jump_back(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   if debug then
     vim.info(
-      string.format(
-        "Jumping back from\n%s",
-        vim.inspect(M.current_jump[win_id])
-      )
+      ("Jumping back from\n%s"):format(vim.inspect(M.current_jump[win_id]))
     )
   end
   if not M.current_jump[win_id] then
@@ -185,10 +184,7 @@ function M.jump_forward(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   if debug then
     vim.info(
-      string.format(
-        "Jumping forward from\n%s",
-        vim.inspect(M.current_jump[win_id])
-      )
+      ("Jumping forward from\n%s"):format(vim.inspect(M.current_jump[win_id]))
     )
   end
   if not M.current_jump[win_id] then
@@ -220,7 +216,7 @@ end
 -- Get the latest jump node for a window
 --
 ---@param win_id number
----@return jump_node?
+---@return _JumpNode?
 function M.get_latest_jump(win_id)
   win_id = win_id or vim.api.nvim_get_current_win()
   if not M.current_jump[win_id] then return nil end

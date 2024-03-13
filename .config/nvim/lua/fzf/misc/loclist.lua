@@ -53,14 +53,14 @@ return function(opts)
     layout = layout,
     main_popup = popups.main,
     binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
+      ["+before-start"] = function(controller)
         popups.main.border:set_text(
           "bottom",
           " <select> goto buf | <w> write all changes "
         )
       end,
-      ["focus"] = function(state)
-        local bufnr, filepath, row, col = parse_entry(state.focused_entry)
+      ["focus"] = function(controller)
+        local bufnr, filepath, row, col = parse_entry(controller.focused_entry)
 
         popups.nvim_preview.border:set_text(
           "top",
@@ -71,12 +71,12 @@ return function(opts)
           cursor_pos = { row = row, col = col },
         })
       end,
-      ["+select"] = function(state)
-        local bufnr = parse_entry(state.focused_entry)
+      ["+select"] = function(controller)
+        local bufnr = parse_entry(controller.focused_entry)
 
         vim.cmd(string.format([[buffer %s]], bufnr))
       end,
-      ["ctrl-w"] = function(state)
+      ["ctrl-w"] = function(controller)
         vim.cmd([[ldo update]]) -- Write all changes
       end,
     }),

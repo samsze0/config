@@ -21,7 +21,10 @@ vim.api.nvim_set_current_buf(buf)
 vim.keymap.set("n", "q", "<cmd>qa!<cr>", { silent = true, buffer = buf })
 vim.keymap.set("n", "<space>q", "<cmd>qa!<cr>", { silent = true, buffer = buf })
 
-vim.api.nvim_create_autocmd("TermEnter", { buffer = buf, command = "stopinsert" })
+vim.api.nvim_create_autocmd(
+  "TermEnter",
+  { buffer = buf, command = "stopinsert" }
+)
 vim.defer_fn(function()
   -- go to the end of the terminal buffer
   vim.cmd.startinsert()

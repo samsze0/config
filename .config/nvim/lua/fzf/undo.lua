@@ -1,26 +1,39 @@
-local M = {}
-
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
-local layouts = require("fzf.layouts")
 local utils = require("utils")
-local undo_utils = require("utils.undo")
+local git_utils = require("utils.git")
+local fzf_utils = require("fzf.utils")
+local uv_utils = require("utils.uv")
+local jumplist = require("jumplist")
+local config = require("fzf.config")
 local timeago = require("utils.timeago")
+local undo_utils = require("utils.undo")
 
--- Fzf undo tree
+-- Fzf current file's undos
 --
----@param opts? {}
-M.undos = function(opts)
-  opts = vim.tbl_extend("force", {}, opts or {})
+---@alias FzfUndoOptions { }
+---@param opts? FzfUndoOptions
+---@return FzfController
+return function(opts)
+  opts = utils.opts_extend({}, opts)
+  ---@cast opts FzfUndoOptions
 
-  local initial_pos = 0
+  local controller = Controller.new({
+    name = "Undo",
+  })
 
-  local function get_entries()
-    local undotree = vim.fn.undotree()
-    local undotree_entries = undotree.entries ---@diagnostic disable-line: undefined-field
-    local current_undo = undotree.seq_cur ---@diagnostic disable-line: undefined-field
+  local layout, popups = helpers.triple_pane_code_diff(controller)
 
+  ---@alias FzfUndoEntry { display: string, initial_focus: boolean, undo: VimUndo }
+  ---@return FzfUndoEntry[]
+  local entries_getter = function()
+    local undotree = vim.api.nvim_buf_call(
+      controller:prev_buf(),
+      function() return vim.fn.undotree() end ---@diagnostic disable-line: redundant-return-value
+    )
+    ---@cast undotree VimUndoTree
+
+    ---@type FzfUndoEntry[]
     local entries = {}
 
     local function process_undos(undos, alt_level)
@@ -28,98 +41,90 @@ M.undos = function(opts)
 
       for i = #undos, 1, -1 do
         local undo = undos[i]
-        local seq_nr = undo.seq ---@diagnostic disable-line: undefined-field
-        local time = undo.time ---@diagnostic disable-line: undefined-field
-        local alt = undo.alt ---@diagnostic disable-line: undefined-field
-        time = timeago(time)
+        ---@cast undo VimUndo
 
-        if seq_nr == current_undo then initial_pos = #entries + 1 end
+        table.insert(entries, {
+          display = fzf_utils.join_by_nbsp(
+            ("⋅"):rep(alt_level + 1),
+            timeago(undo.time)
+          ),
+          undo = undo,
+          initial_focus = undo.seq == undotree.seq_cur,
+        })
 
-        table.insert(
-          entries,
-          fzf_utils.join_by_delim(
-            seq_nr,
-            string.rep("⋅", alt_level + 1),
-            time
-          )
-        )
-
-        if alt then process_undos(alt, alt_level + 1) end
+        if undo.alt then process_undos(undo.alt, alt_level + 1) end
       end
     end
 
-    process_undos(undotree_entries)
+    process_undos(undotree.entries)
 
     return entries
   end
 
-  local buf = vim.api.nvim_get_current_buf()
-  local entries = get_entries()
+  controller:set_entries_getter(entries_getter)
 
-  ---@param entry string
-  ---@return integer undo_nr, string alt_indent, string time
-  local parse_entry = function(entry)
-    local undo_nr_str, alt_indent, time = unpack(vim.split(entry, utils.nbsp))
-    local undo_nr = tonumber(undo_nr_str)
-    ---@cast undo_nr integer
-    return undo_nr, alt_indent, time
-  end
+  vim.bo[popups.side.left.bufnr].filetype = vim.bo[controller:prev_buf()].filetype
+    or ""
+  vim.bo[popups.side.right.bufnr].filetype = vim.bo[controller:prev_buf()].filetype
+    or ""
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_diff_preview_layout({
-      preview_popups_win_options = {},
-    })
+  controller:subscribe("focus", nil, function(payload)
+    popups.side.left:set_lines({})
+    popups.side.right:set_lines({})
 
-  core.fzf(entries, {
-    prompt = "Undos",
-    layout = layout,
-    main_popup = popups.main,
-    initial_position = initial_pos,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text(
-          "bottom",
-          " <select> undo | <y> copy undo nr | <o> open diff  "
-        )
-      end,
-      ["ctrl-y"] = function(state)
-        local undo_nr = parse_entry(state.focused_entry)
-        vim.fn.setreg("+", undo_nr)
-        vim.info(string.format("Copied %s to clipboard", undo_nr))
-      end,
-      ["ctrl-o"] = function(state)
-        local undo_nr = parse_entry(state.focused_entry)
+    local focus = controller.focus
+    ---@cast focus FzfUndoEntry?
 
-        core.abort_and_execute(state.id, function()
-          local before, after =
-            undo_utils.get_undo_before_and_after(buf, undo_nr)
-          utils.show_diff(
-            {
-              filetype = vim.bo.filetype,
-            },
-            { filepath_or_content = before, readonly = true },
-            { filepath_or_content = after, readonly = false }
-          )
-        end)
-      end,
-      ["focus"] = function(state)
-        local undo_nr = parse_entry(state.focused_entry)
-        local before, after = undo_utils.get_undo_before_and_after(buf, undo_nr)
+    if not focus then return end
 
-        set_preview_content(before, after, { filetype = vim.bo[buf].filetype })
-      end,
-      ["+select"] = function(state)
-        local undo_nr = parse_entry(state.focused_entry)
+    local before, after = undo_utils.get_undo_before_and_after(
+      controller:prev_buf(),
+      focus.undo.seq
+    )
+    popups.side.left:set_lines(before)
+    popups.side.right:set_lines(after)
 
-        vim.cmd(string.format("undo %s", undo_nr))
-        vim.info(string.format("Restored to %s", undo_nr))
-      end,
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "2..",
-      ["--scroll-off"] = "2",
-    }),
-  })
+    utils.diff_bufs(popups.side.left.bufnr, popups.side.right.bufnr)
+  end)
+
+  popups.main:map("<C-y>", "Copy undo nr", function()
+    if not controller.focus then return end
+
+    local undo_nr = controller.focus.undo.seq_nr
+    vim.fn.setreg("+", undo_nr)
+    vim.info(([[Copied %s to clipboard]]):format(undo_nr))
+  end)
+
+  popups.main:map("<C-o>", "Open diff", function()
+    local focus = controller.focus
+    ---@cast focus FzfUndoEntry?
+
+    if not focus then return end
+
+    local before, after = undo_utils.get_undo_before_and_after(
+      controller:prev_buf(),
+      focus.undo.seq
+    )
+
+    utils.show_diff(
+      {
+        filetype = vim.bo[controller:prev_buf()].filetype,
+      },
+      { filepath_or_content = before, readonly = true },
+      { filepath_or_content = after, readonly = false }
+    )
+  end)
+
+  popups.main:map("<CR>", "Undo", function()
+    local focus = controller.focus
+    ---@cast focus FzfUndoEntry?
+
+    if not focus then return end
+
+    local undo_nr = focus.undo.seq
+    vim.cmd(("redo %s"):format(undo_nr))
+    vim.info("Redone to %s", undo_nr)
+  end)
+
+  return controller
 end
-
-return M

@@ -1,124 +1,110 @@
-local M = {}
-
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
-local layouts = require("fzf.layouts")
 local utils = require("utils")
 local git_utils = require("utils.git")
-local json = require("utils.json")
+local jumplist = require("jumplist")
+local config = require("fzf.config")
+local fzf_utils = require("fzf.utils")
+local docker_utils = require("utils.docker")
 
--- TODO: listen to / watch container changes
+-- TODO: watch for changes in background
 
--- Fzf all docker containers
+-- Fzf docker containers
 --
----@param opts? {  }
-M.docker_containers = function(opts)
-  opts = vim.tbl_extend("force", {}, opts or {})
+---@alias FzfDockerContainerOptions { }
+---@param opts? FzfDockerContainerOptions
+---@return FzfController
+return function(opts)
+  opts = utils.opts_extend({}, opts)
+  ---@cast opts FzfDockerContainerOptions
 
-  ---@type { Command: string, CreatedAt: string, ID: string, Image: string, Labels: string, LocalVolumes: string, Mounts: string, Names: string, Networks: string, Ports: string, RunningFor: string, Size: string, State: string, Status: string }[]
-  local containers
+  local controller = Controller.new({
+    name = "Docker-Containers",
+  })
 
-  local function get_entries()
-    if vim.fn.executable("docker") ~= 1 then
-      error("Docker executable not found")
-    end
-    -- if vim.fn.executable("jq") ~= 1 then
-    --   error("jq executable not found")
-    -- end
-    local result = utils.system("docker container ls -a --format json")
+  local layout, popups = helpers.dual_pane_lua_object_preview(controller, {
+    lua_object_accessor = function(focus) return focus.container end,
+  })
 
-    result = vim.trim(result)
-
-    containers = json.parse_multiple(result)
-    ---@cast containers { Command: string, CreatedAt: string, ID: string, Image: string, Labels: string, LocalVolumes: string, Mounts: string, Names: string, Networks: string, Ports: string, RunningFor: string, Size: string, State: string, Status: string }[]
-
-    return utils.map(containers, function(_, c)
-      local state
-      if c.State == "exited" then
-        state = utils.ansi_codes.grey(" ")
-      elseif c.State == "running" then
-        state = utils.ansi_codes.blue(" ")
-      else
-        state = utils.ansi_codes.red("??")
+  ---@alias FzfDockerContainersEntry { display: string, container: DockerContainer }
+  ---@return FzfDockerContainersEntry[]
+  local entries_getter = function()
+    return utils.map(
+      docker_utils.docker_containers({
+        all = true,
+      }),
+      function(i, e)
+        return {
+          display = fzf_utils.join_by_nbsp(
+            utils.switch(e.Controller, {
+              ["exited"] = utils.ansi_codes.grey(" "),
+              ["running"] = utils.ansi_codes.blue(" "),
+            }, utils.ansi_codes.red("??")),
+            utils.ansi_codes.blue(e.Image),
+            e.Names
+          ),
+          container = e,
+        }
       end
-
-      return fzf_utils.join_by_delim(
-        state,
-        utils.ansi_codes.blue(c.Image),
-        c.Names
-      )
-    end)
+    )
   end
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_preview_layout()
+  controller:set_entries_getter(entries_getter)
 
-  core.fzf(get_entries(), {
-    prompt = "Docker-Containers",
-    layout = layout,
-    main_popup = popups.main,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text(
-          "bottom",
-          " <y> copy id | <left> start | <right> stop | <x> delete "
-        )
-      end,
-      ["focus"] = function(state)
-        local container = containers[state.focused_entry_index]
+  popups.main:map("<C-y>", "Copy ID", function()
+    local focus = controller.focus
+    ---@cast focus FzfDockerContainersEntry?
 
-        popups.nvim_preview.border:set_text(
-          "top",
-          " " .. container.Names .. " "
-        )
+    if not focus then return end
 
-        set_preview_content(vim.split(vim.inspect(container), "\n"))
-        vim.bo[popups.nvim_preview.bufnr].filetype = "lua"
-      end,
-      ["ctrl-y"] = function(state)
-        local container = containers[state.focused_entry_index]
-        vim.fn.setreg("+", container.ID)
-        vim.info(string.format([[Copied %s to clipboard]], container.ID))
-      end,
-      ["left"] = function(state)
-        local container = containers[state.focused_entry_index]
+    vim.fn.setreg("+", focus.container.ID)
+    vim.info(([[Copied %s to clipboard]]):format(focus.container.ID))
+  end)
 
-        if container.Status == "running" then
-          vim.warn("Container is already running")
-          return
-        end
+  popups.main:map("<C-x>", "Delete", function()
+    local focus = controller.focus
+    ---@cast focus FzfDockerContainersEntry?
 
-        utils.system(string.format([[docker container start %s]], container.ID))
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
-      end,
-      ["right"] = function(state)
-        local container = containers[state.focused_entry_index]
+    if not focus then return end
 
-        if container.Status == "exited" then
-          vim.warn("Container is already stopped")
-          return
-        end
+    if focus.container.Status == "running" then
+      vim.error("Cannot delete running container")
+      return
+    end
 
-        utils.system(string.format([[docker container stop %s]], container.ID))
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
-      end,
-      ["ctrl-x"] = function(state)
-        local container = containers[state.focused_entry_index]
+    utils.system(([[docker container rm %s]]):format(focus.container.ID))
+    controller:refresh()
+  end)
 
-        if container.Status == "running" then
-          vim.error("Cannot delete running container")
-          return
-        end
+  popups.main:map("<Left>", "Start", function()
+    local focus = controller.focus
+    ---@cast focus FzfDockerContainersEntry?
 
-        utils.system(string.format([[docker container rm %s]], container.ID))
-        core.send_to_fzf(state.id, fzf_utils.reload_action(get_entries()))
-      end,
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "1..",
-    }),
-  })
+    if not focus then return end
+
+    if focus.container.Status == "running" then
+      vim.warn("Container is already running")
+      return
+    end
+
+    utils.system(([[docker container start %s]]):format(focus.container.ID))
+    controller:refresh()
+  end)
+
+  popups.main:map("<Right>", "Stop", function()
+    local focus = controller.focus
+    ---@cast focus FzfDockerContainersEntry?
+
+    if not focus then return end
+
+    if focus.container.Status == "exited" then
+      vim.error("Container is already stopped")
+      return
+    end
+
+    utils.system(([[docker container stop %s]]):format(focus.container.ID))
+    controller:refresh()
+  end)
+
+  return controller
 end
-
-return M

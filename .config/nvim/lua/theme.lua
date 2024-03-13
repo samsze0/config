@@ -543,17 +543,17 @@ function M.setup()
   hi.TermCursorNC =
     { guifg = c.black, guibg = c.gray_800, gui = nil, guisp = nil }
 
-  hi.NotifyErrorNormal =
+  hi.NotiError =
     { guifg = c.gray_700, guibg = c.red_300, gui = nil, guisp = nil }
-  hi.NotifyWarnNormal =
+  hi.NotiWarn =
     { guifg = c.gray_700, guibg = c.yellow_300, gui = nil, guisp = nil }
-  hi.NotifyInfoNormal =
+  hi.NotiInfo =
     { guifg = c.gray_700, guibg = c.blue_300, gui = nil, guisp = nil }
-  hi.NotifyDebugNormal =
+  hi.NotiDebug =
     { guifg = c.gray_700, guibg = c.gray_300, gui = nil, guisp = nil }
-  hi.NotifyTraceNormal =
+  hi.NotiTrace =
     { guifg = c.gray_700, guibg = c.gray_300, gui = nil, guisp = nil }
-  hi.NotifyUnknownNormal =
+  hi.NotiUnknown =
     { guifg = c.gray_700, guibg = c.gray_200, gui = nil, guisp = nil }
 
   hi.WinbarPath = { guifg = c.gray_600, guibg = nil, gui = nil, guisp = nil }

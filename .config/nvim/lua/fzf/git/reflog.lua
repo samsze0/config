@@ -1,92 +1,82 @@
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
 local utils = require("utils")
-local layouts = require("fzf.layouts")
 local git_utils = require("utils.git")
+local fzf_utils = require("fzf.utils")
+local uv_utils = require("utils.uv")
+local jumplist = require("jumplist")
+local fzf_git_file_changes = require("fzf.git.file-changes")
+local config = require("fzf.config")
+local terminal_ft = require("terminal-filetype")
 
 -- Fzf git ref log
 --
----@param opts? { git_dir?: string }
+---@alias FzfGitReflogOptions { git_dir?: string }
+---@param opts? FzfGitReflogOptions
 return function(opts)
-  opts = vim.tbl_extend("force", {
-    git_dir = git_utils.current_git_dir(),
-  }, opts or {})
+  opts = utils.opts_extend({
+    git_dir = git_utils.current_dir(),
+  }, opts)
+  ---@cast opts FzfGitReflogOptions
 
-  ---@type { sha: string, ref: string, action: string, description: string }[]
-  local reflog
+  local controller = Controller.new({
+    name = "Git-Reflog",
+  })
 
-  local get_entries = function()
-    local result = utils.systemlist("git reflog")
+  local layout, popups = helpers.dual_pane_terminal_preview(controller)
 
-    local entries = {}
-    reflog = {}
-    for _, line in ipairs(result) do
-      local sha, ref, action, description =
-        line:match("(%w+) (%w+@{%d+}): ([^:]+): (.+)")
-      if sha and ref and action and description then
-        table.insert(
-          entries,
-          fzf_utils.join_by_delim(
-            ref,
-            utils.ansi_codes.blue(action),
+  ---@alias FzfGitReflogEntry { display: string, sha: string, ref: string, action: string, description: string }
+  ---@return FzfGitStashEntry[]
+  local entries_getter = function()
+    return utils.map(
+      utils.systemlist(("git -C '%s' reflog"):format(opts.git_dir)),
+      function(i, e)
+        local sha, ref, action, description =
+          e:match("(%w+) (%w+@{%d+}): ([^:]+): (.+)")
+
+        if not sha or not ref or not action or not description then
+          error("Failed to parse git reflog entry: " .. e)
+        end
+
+        return {
+          display = fzf_utils.join_by_nbsp(
+            -- ref, -- FIX: curly bracket causing line to not render
+            utils.ansi_codes.blue("[" .. action .. "]"),
             description
-          )
-        )
-        table.insert(reflog, {
+          ),
           sha = sha,
           ref = ref,
           action = action,
           description = description,
-        })
-      else
-        vim.warn("Failed to parse git reflog entry", line)
+        }
       end
-    end
-    return entries
+    )
   end
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_preview_layout({
-      preview_in_terminal_mode = true,
-      preview_popup_win_options = { number = false },
-    })
+  controller:set_entries_getter(entries_getter)
 
-  core.fzf(get_entries(), {
-    prompt = "Git-Reflog",
-    layout = layout,
-    main_popup = popups.main,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text("bottom", " <y> copy ref ")
-      end,
-      ["focus"] = function(state)
-        local ref = reflog[state.focused_entry_index].ref
+  controller:subscribe("focus", nil, function(payload)
+    local focus = controller.focus
+    ---@cast focus FzfGitStashEntry?
 
-        local command = string.format(
-          [[git -C %s diff %s | delta %s]],
-          opts.git_dir,
-          ref,
-          helpers.delta_nvim_default_opts
-        )
+    popups.side:set_lines({})
 
-        local reflog = utils.systemlist(command)
-        set_preview_content(reflog)
-      end,
-      ["+select"] = function(state)
-        local ref = reflog[state.focused_entry_index].ref
+    if not focus then return end
 
-        vim.info(ref)
-      end,
-      ["ctrl-y"] = function(state)
-        local ref = reflog[state.focused_entry_index].ref
+    local reflog = utils.systemlist(
+      ([[git -C '%s' diff '%s' | delta %s]]):format(opts.git_dir, focus.ref, "")
+    ) -- TODO: share delta config
+    popups.side:set_lines(reflog)
+    terminal_ft.refresh_highlight(popups.side.bufnr)
+  end)
 
-        vim.fn.setreg("+", ref)
-        vim.info(string.format([[Copied to clipboard: %s]], ref))
-      end,
-    }),
-    extra_args = vim.tbl_extend("force", helpers.fzf_default_args, {
-      ["--with-nth"] = "2..",
-    }),
-  })
+  popups.main:map("<C-y>", "Copy ref", function()
+    if not controller.focus then return end
+
+    local ref = controller.focus.ref
+    vim.fn.setreg("+", ref)
+    vim.info(([[Copied %s to clipboard]]):format(ref))
+  end)
+
+  return controller
 end

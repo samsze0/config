@@ -1,94 +1,49 @@
-local M = {}
-
-local core = require("fzf.core")
+local Controller = require("fzf.core.controllers").Controller
 local helpers = require("fzf.helpers")
-local fzf_utils = require("fzf.utils")
-local layouts = require("fzf.layouts")
 local utils = require("utils")
+local git_utils = require("utils.git")
 local jumplist = require("jumplist")
+local config = require("fzf.config")
+local fzf_utils = require("fzf.utils")
 
-local fn = vim.fn
-
--- FIX: remove extra spacing in the main popup window
-
--- Show jump tree
+-- Fzf jumps
 --
----@param opts? { max_num_entries?: number }
-M.jumps = function(opts)
-  opts = vim.tbl_extend("force", {
-    max_num_entries = 100,
-  }, opts or {})
+---@alias FzfJumpOptions { }
+---@param opts? { }
+---@return FzfController
+return function(opts)
+  opts = utils.opts_extend({}, opts)
+  ---@cast opts FzfJumpOptions
 
-  ---@type jump[]
-  local jumps
+  local controller = Controller.new({
+    name = "Jumps",
+  })
 
-  local pos
+  local layout, popups = helpers.dual_pane_code_preview(controller, {
+    highlight_pos = true,
+    filepath_accessor = function(focus) return focus.jump.filename end,
+    row_accessor = function(focus) return focus.jump.line end,
+    col_accessor = function(focus) return focus.jump.col end,
+  })
 
-  local current_win = vim.api.nvim_get_current_win()
-
-  local function get_entries()
-    jumps, pos = jumplist.get_jumps_as_list(
-      current_win,
-      { max_num_entries = opts.max_num_entries }
-    )
-    pos = pos or 0
+  ---@alias FzfJumpEntry { display: string, jump: Jump, initial_focus: boolean }
+  ---@return FzfJumpEntry[]
+  local entries_getter = function()
+    local jumps, current_pos = jumplist.get_jumps_as_list(controller:prev_win())
 
     return utils.map(
       jumps,
-      function(_, e)
-        return fzf_utils.join_by_delim(
-          utils.ansi_codes.grey(e.filename),
-          e.line,
-          e.col,
-          e.text
-        )
+      function(i, e)
+        return {
+          display = ([[%s]]):format(utils.ansi_codes.grey(e.filename)),
+          jump = e,
+          initial_focus = current_pos == i,
+        }
       end
     )
   end
 
-  local parse_entry = function(entry)
-    local args = vim.split(entry, utils.nbsp)
-    return unpack(args)
-  end
+  controller:set_entries_getter(entries_getter)
 
-  local layout, popups, set_preview_content, binds =
-    layouts.create_nvim_preview_layout({
-      preview_popup_win_options = {
-        cursorline = true,
-      },
-    })
-
-  core.fzf(get_entries(), {
-    prompt = "Jumps",
-    layout = layout,
-    main_popup = popups.main,
-    initial_position = pos,
-    binds = fzf_utils.bind_extend(binds, {
-      ["+before-start"] = function(state)
-        popups.main.border:set_text("bottom", " <select> goto location ")
-      end,
-      ["focus"] = function(state)
-        local filepath, row, col = parse_entry(state.focused_entry)
-
-        popups.nvim_preview.border:set_text(
-          "top",
-          " " .. vim.fn.fnamemodify(filepath, ":t") .. " "
-        )
-
-        helpers.preview_file(
-          filepath,
-          popups.nvim_preview,
-          { cursor_pos = { row = row, col = col } }
-        )
-      end,
-      ["+select"] = function(state)
-        local jump = jumps[state.focused_entry_index]
-
-        vim.cmd(string.format([[e %s]], jump.filename))
-        vim.cmd(string.format([[normal! %sG%s|]], jump.line, jump.col))
-      end,
-    }),
-  })
+  return controller
 end
-
-return M

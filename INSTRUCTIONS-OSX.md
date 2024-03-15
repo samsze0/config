@@ -38,13 +38,6 @@ brew tap homebrew/cask-versions
 brew install --cask firefox-developer-edition
 ```
 
-Install homebrew formulae and casks
-```bash
-brew install gojq  # Required by install script
-source ~/.zshrc
-brew_install_from
-```
-
 Remove all apps from dock:
 ```bash
 defaults write com.apple.dock persistent-apps -array

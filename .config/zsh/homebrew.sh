@@ -94,10 +94,10 @@ brew_install_from() {
 		done <~/casks-x86.brew
 	else # Apple silicon
 		while read -r formula; do
-			brew reinstall "$formula"
+			brew install "$formula"
 		done <~/formulae.brew
-		# while read -r cask; do
-		# 	brew install "$cask"
-		# done <~/casks.brew
+		while read -r cask; do
+			brew install "$cask"
+		done <~/casks.brew
 	fi
 }

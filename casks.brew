@@ -13,6 +13,7 @@ homebrew/cask/karabiner-elements
 homebrew/cask/kitty
 homebrew/cask/microsoft-remote-desktop
 homebrew/cask/obs
+homebrew/cask/openvpn-connect
 homebrew/cask/outline-manager
 homebrew/cask/postman
 homebrew/cask/raspberry-pi-imager

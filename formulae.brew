@@ -12,6 +12,7 @@ cocoapods
 coreutils
 croc
 curl
+dockutil
 eslint
 eza
 fd

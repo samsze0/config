@@ -8,10 +8,31 @@ Install homebrew under custom location (e.g. `~/homebrew`):
 mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
 ```
 
+MacOS settings:
+- Enable tap to click in trackpad settings
+- Enable double click to select in accessibility > trackpad options
+
 Install command line developer tools (& XCode ?):
 
 ```bash
 sudo xcode-select --install
+```
+
+On newer versions of OSX key repeat is disabled by default, to enable it, run:
+```bash
+defaults write -g ApplePressAndHoldEnabled -bool false
+```
+
+Install github cli and login:
+```bash
+brew install gh
+gh auth login
+```
+
+Install browser:
+```bash
+brew tap homebrew/cask-versions
+brew install --cask firefox-developer-edition
 ```
 
 Install homebrew formulae and casks

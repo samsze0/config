@@ -44,6 +44,7 @@ lua-language-server
 make
 maven
 mysql@8.0
+neofetch
 neovim
 nvm
 pnpm

@@ -83,25 +83,21 @@ brew_freeze() (
 	fi
 )
 
-# Custom brew install that updates *.brew
-brew_install() {
-	brew install $@
-	brew_freeze
-}
-
-# Custom brew uninstall that updates *.brew
-brew_uninstall() {
-	brew uninstall $@
-	brew_freeze
-}
-
 # pip install -r but for brew. Input *.brew files
 brew_install_from() {
 	if [ "$(arch)" = "i386" ]; then # Rosetta
-		cat ~/formulae-x86.brew | xargs brew install
-		cat ~/casks-x86.brew | xargs brew install --cask
+		while read -r formula; do
+			brew install "$formula"
+		done <~/formulae-x86.brew
+		while read -r cask; do
+			brew install "$cask"
+		done <~/casks-x86.brew
 	else # M1
-		cat ~/formulae.brew | xargs brew install
-		cat ~/casks.brew | xargs brew install --cask
+		while read -r formula; do
+			brew install "$formula"
+		done <~/formulae.brew
+		while read -r cask; do
+			brew install "$cask"
+		done <~/casks.brew
 	fi
 }

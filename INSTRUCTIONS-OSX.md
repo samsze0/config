@@ -1,8 +1,10 @@
 # MacOS
 
 Install homebrew under custom location (e.g. `~/homebrew`):
- 
+(Apparently installing brew outside of `/opt/homebrew` can cause issues. Check with brew doctor)
 ```bash
+
+# If were to install in custom dir
 mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
 ```
 

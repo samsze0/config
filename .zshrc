@@ -44,6 +44,9 @@ autoload -U compinit
 compinit
 compaudit || (compaudit | xargs chmod go-w) # Remove group & other write permission for all insecure directories if there are any
 
+HOMEBREW_PREFIX="/opt/homebrew"
+HOMEBREW_X86_PREFIX="/opt/homebrew-x86"
+
 function pyenv_init_if_available() {
 	if check_command_exists pyenv; then
 		export PYENV_ROOT="$HOME/.pyenv"
@@ -78,13 +81,13 @@ function rbenv_init_if_available() {
 }
 
 function nvm_init_if_available() {
-  export NVM_DIR="$HOME/.nvm"
-  if [[ -s "$HOME/homebrew/opt/nvm/nvm.sh" ]]; then
-    . "$HOME/homebrew/opt/nvm/nvm.sh"
-  fi
-  if [[ -s "$HOME/homebrew/opt/nvm/etc/bash_completion.d/nvm" ]]; then
-    . "/Users/mingsumsze/homebrew/opt/nvm/etc/bash_completion.d/nvm"
-  fi
+	export NVM_DIR="$HOME/.nvm"
+	if [[ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ]]; then
+		. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
+	fi
+	if [[ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ]]; then
+		. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
+	fi
 }
 
 if [ $(arch) = "x86_64" ]; then # Linux / NixOS
@@ -120,16 +123,16 @@ if [ $(arch) = "x86_64" ]; then # Linux / NixOS
 	fi
 else                           # OSX
 	if [ $(arch) = "i386" ]; then # Rosetta
-		eval "$($HOME/homebrew-x86/bin/brew shellenv)"
+		eval "$($HOMEBREW_X86_PREFIX/bin/brew shellenv)"
 	else # M1
-		eval "$($HOME/homebrew/bin/brew shellenv)"
+		eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
 
-		export PATH="$HOME/homebrew/opt/openjdk/bin:$PATH"
-		export JAVA_HOME="$HOME/homebrew/opt/openjdk"
+		export PATH="$HOMEBREW_PREFIX/opt/openjdk/bin:$PATH"
+		export JAVA_HOME="$HOMEBREW_PREFIX/opt/openjdk"
 
-		export PATH="$HOME/homebrew/opt/postgresql@16/bin:$PATH"
+		export PATH="$HOMEBREW_PREFIX/opt/postgresql@16/bin:$PATH"
 
-		export PATH="$HOME/homebrew/opt/mysql@8.0/bin:$PATH"
+		export PATH="$HOMEBREW_PREFIX/opt/mysql@8.0/bin:$PATH"
 	fi
 
 	starship_init_if_available
@@ -137,7 +140,7 @@ else                           # OSX
 	pyenv_init_if_available
 	pip_init_if_available
 	rbenv_init_if_available
-  nvm_init_if_available
+	nvm_init_if_available
 
 	export BROWSER="open -a '/Applications/Firefox Developer Edition.app'"
 	export IMAGE_VIEWER="open"

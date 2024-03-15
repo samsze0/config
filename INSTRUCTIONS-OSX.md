@@ -1,7 +1,5 @@
 # MacOS
 
-**Homebrew**
-
 Install homebrew under custom location (e.g. `~/homebrew`):
  
 ```bash

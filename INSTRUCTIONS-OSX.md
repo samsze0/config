@@ -11,6 +11,9 @@ mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar 
 MacOS settings:
 - Enable tap to click in trackpad settings
 - Enable double click to select in accessibility > trackpad options
+- Disable "Automatically rearrange Spaces" in desktop & dock settings
+- Enable auto hide/show dock
+- Set default browser to Firefox in general settings
 
 Install command line developer tools (& XCode ?):
 
@@ -49,6 +52,18 @@ killall Dock
 # Or use dockutil
 ```
 
+Change keyboard repeat delay:
+
+```bash
+defaults write -g InitialKeyRepeat -int 13 # normal minimum is 15 (225 ms)
+defaults write -g KeyRepeat -float 1.7     # normal minimum is 2 (30 ms)
+```
+
+Create symlink to icloud:
+```bash
+ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud
+```
+
 **Karabiner**
 - Goto `karabiner/` and run `node config.js`
 
@@ -68,12 +83,4 @@ killall Dock
 
 ```bash
 mkdir homebrew-x86 && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew-x86  # Same command as before
-```
-
-**Misc**
-
-Setup iCloud symlink and keyboard repeat delay:
-
-```bash
-osx_init
 ```

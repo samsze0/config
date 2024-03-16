@@ -53,51 +53,53 @@ brew_freeze() (
 	if [ "$(arch)" = "i386" ]; then # Rosetta
 		FORMULAE_FILE=~/formulae-x86.brew
 		CASKS_FILE=~/casks-x86.brew
+		TAPS_FILE=~/taps-x86.brew
 	else # M1
 		FORMULAE_FILE=~/formulae.brew
 		CASKS_FILE=~/casks.brew
+		TAPS_FILE=~/taps.brew
 	fi
 
 	brew_formulae_list >$FORMULAE_FILE
 
-	CASK_TOKENS=$(brew_taps_cask_token_list)
+	# Empty the files
+	echo "" >$TAPS_FILE
+	echo "" >$CASKS_FILE
 
 	for c in $(brew_casks_list); do
 		TAP=$(brew info --casks "$c" --json=v2 | gojq ".casks[0] | .tap" --monochrome-output --raw-output)
-		echo "$TAP/$c"
+		echo "$TAP" >>$TAPS_FILE
+		echo "$c" >>$CASKS_FILE
 	done >$CASKS_FILE
-
-	if false; then
-		for c in $(brew_casks_list); do
-			results=$(echo "$CASK_TOKENS" | rg "$c")
-			num_results=$(echo results | wc -l)
-			if (($num_results > 1)); then
-				echo >&2 "Ambiguous cask token for $c"
-				exit 1
-			elif (($num_results == 1)); then
-				echo "$results" | head -n 1
-			else
-				echo "$c"
-			fi
-		done >$CASKS_FILE
-	fi
 )
 
 # pip install -r but for brew. Input *.brew files
-brew_install_from() {
+brew_install_r() {
 	if [ "$(arch)" = "i386" ]; then # Rosetta
-		while read -r formula; do
-			brew install "$formula"
-		done <~/formulae-x86.brew
-		while read -r cask; do
-			brew install "$cask"
-		done <~/casks-x86.brew
+		for f in $(cat ~/formulae-x86.brew); do
+			brew install "$f"
+		done
+		for c in $(cat ~/casks-x86.brew); do
+			brew install "$c"
+		done
+		# while read -r formula; do
+		# 	brew install "$formula"
+		# done <~/formulae-x86.brew
+		# while read -r cask; do
+		# 	brew install "$cask"
+		# done <~/casks-x86.brew
 	else # Apple silicon
-		while read -r formula; do
-			brew install "$formula"
-		done <~/formulae.brew
-		while read -r cask; do
-			brew install "$cask"
-		done <~/casks.brew
+		for f in $(cat ~/formulae.brew); do
+			brew install "$f"
+		done
+		for c in $(cat ~/casks.brew); do
+			brew install "$c"
+		done
+		# while read -r formula; do
+		# 	brew install "$formula"
+		# done <~/formulae.brew
+		# while read -r cask; do
+		# 	brew install "$cask"
+		# done <~/casks.brew
 	fi
 }

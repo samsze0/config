@@ -1,11 +1,7 @@
 # https://github.com/koekeishiya/yabai/wiki/Commands
 # https://github.com/koekeishiya/yabai/wiki/Configuration
 
-# Debug output
-yabai -m config debug_output on
-
-# Layout (bsp or float)
-yabai -m config layout bsp
+yabai -m config layout float # bsp or float
 
 # Padding & gap
 yabai -m config top_padding    0
@@ -24,18 +20,15 @@ yabai -m config mouse_action2 resize
 yabai -m config focus_follows_mouse off  # autoraise, off, ...
 yabai -m config mouse_follows_focus on
 
-# Floating windows on top
-yabai -m config window_topmost on
+yabai -m config window_topmost on # floating windows on top
 
-# Window shadows (on, off, float)
-yabai -m config window_shadow off
+yabai -m config window_shadow off  # on, off, float
 
 # Window opacity
 yabai -m config window_opacity off
 yabai -m config active_window_opacity 1.0
 yabai -m config normal_window_opacity 1.0
 
-yabai -m rule --add app=".*" manage=off
-
-# External bar (e.g. spacebar)
 yabai -m config external_bar all:0:0
+
+yabai -m rule --add app=".*" manage=off

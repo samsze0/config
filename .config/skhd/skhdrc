@@ -1,45 +1,47 @@
 # List of keys & modifiers: https://github.com/koekeishiya/skhd/issues/1
 
 # Focus window
-ctrl + alt + cmd - e : yabai -m window --focus north
-ctrl + alt + cmd - d : yabai -m window --focus south
-ctrl + alt + cmd - s : yabai -m window --focus west
-ctrl + alt + cmd - f : yabai -m window --focus east
+# ctrl + alt + cmd - e : yabai -m window --focus north
+# ctrl + alt + cmd - d : yabai -m window --focus south
+# ctrl + alt + cmd - s : yabai -m window --focus west
+# ctrl + alt + cmd - f : yabai -m window --focus east
 
 # Swap windows
-ctrl + alt + cmd - up : yabai -m window --swap north
-ctrl + alt + cmd - down : yabai -m window --swap south
-ctrl + alt + cmd - left : yabai -m window --swap west
-ctrl + alt + cmd - right : yabai -m window --swap east
+# ctrl + alt + cmd - up : yabai -m window --swap north
+# ctrl + alt + cmd - down : yabai -m window --swap south
+# ctrl + alt + cmd - left : yabai -m window --swap west
+# ctrl + alt + cmd - right : yabai -m window --swap east
 
 # Zoom window
-ctrl + alt + cmd - z : yabai -m window --toggle zoom-fullscreen
+# ctrl + alt + cmd - z : yabai -m window --toggle zoom-fullscreen
 
 # Goto display
 ctrl + alt + cmd - i : yabai -m display --focus next
 ctrl + alt + cmd - k : yabai -m display --focus prev
 
+# Requires SIP to be disabled
+
 # Goto space (prev/next)
-ctrl + alt + cmd - l : yabai -m space --focus next
-ctrl + alt + cmd - j : yabai -m space --focus prev
+# ctrl + alt + cmd - l : yabai -m space --focus next
+# ctrl + alt + cmd - j : yabai -m space --focus prev
 
 # Goto space (index)
-ctrl + alt + cmd - 1 : yabai -m space --focus 1
-ctrl + alt + cmd - 2 : yabai -m space --focus 2
-ctrl + alt + cmd - 3 : yabai -m space --focus 3
-ctrl + alt + cmd - 4 : yabai -m space --focus 4
-ctrl + alt + cmd - 5 : yabai -m space --focus 5
-ctrl + alt + cmd - 6 : yabai -m space --focus 6
-ctrl + alt + cmd - 7 : yabai -m space --focus 7
-ctrl + alt + cmd - 8 : yabai -m space --focus 8
-ctrl + alt + cmd - 9 : yabai -m space --focus 9
-ctrl + alt + cmd - 0 : yabai -m space --focus 10
-ctrl + alt + cmd + shift - 9 : yabai -m space --focus 11
-ctrl + alt + cmd + shift - 0 : yabai -m space --focus 12
+# ctrl + alt + cmd - 1 : yabai -m space --focus 1
+# ctrl + alt + cmd - 2 : yabai -m space --focus 2
+# ctrl + alt + cmd - 3 : yabai -m space --focus 3
+# ctrl + alt + cmd - 4 : yabai -m space --focus 4
+# ctrl + alt + cmd - 5 : yabai -m space --focus 5
+# ctrl + alt + cmd - 6 : yabai -m space --focus 6
+# ctrl + alt + cmd - 7 : yabai -m space --focus 7
+# ctrl + alt + cmd - 8 : yabai -m space --focus 8
+# ctrl + alt + cmd - 9 : yabai -m space --focus 9
+# ctrl + alt + cmd - 0 : yabai -m space --focus 10
+# ctrl + alt + cmd + shift - 9 : yabai -m space --focus 11
+# ctrl + alt + cmd + shift - 0 : yabai -m space --focus 12
 
 # Move window (space; prev/next)
-ctrl + alt + cmd - home : yabai -m window --space prev
-ctrl + alt + cmd - end : yabai -m window --space next
+# ctrl + alt + cmd - home : yabai -m window --space prev
+# ctrl + alt + cmd - end : yabai -m window --space next
 
 # Move window (display)
 ctrl + alt + cmd - pageup : yabai -m window --display next ; yabai -m display --focus next
@@ -60,9 +62,9 @@ ctrl + alt + cmd - f11 : yabai -m window --space 11
 ctrl + alt + cmd - f12 : yabai -m window --space 12
 
 # Enable/Disable focus_follow_mouse
-ctrl + alt + cmd - p : yabai -m config focus_follows_mouse autoraise
-ctrl + alt + cmd + shift - p : yabai -m config focus_follows_mouse off
+# ctrl + alt + cmd - p : yabai -m config focus_follows_mouse autoraise
+# ctrl + alt + cmd + shift - p : yabai -m config focus_follows_mouse off
 
 # Enable/Disable window_opacity
-ctrl + alt + cmd - o : yabai -m config window_opacity on
-ctrl + alt + cmd + shift - o : yabai -m config window_opacity off
+# ctrl + alt + cmd - o : yabai -m config window_opacity on
+# ctrl + alt + cmd + shift - o : yabai -m config window_opacity off

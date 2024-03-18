@@ -22,17 +22,11 @@ brew_cask_info() {
 
 # Show all installed formulae w/ their descriptions
 brew_formulae_info() {
-	if false; then
-		brew_formulae_list | xargs brew desc --eval-all
-	fi
 	brew_formuale_list | xargs brew_formula_info
 }
 
 # Show all installed casks w/ their descriptions
 brew_casks_info() {
-	if false; then
-		brew_casks_list | xargs brew desc --eval-all
-	fi
 	brew_casks_list | xargs brew_cask_info
 }
 
@@ -61,6 +55,7 @@ brew_freeze() (
 	fi
 
 	brew_formulae_list >$FORMULAE_FILE
+	echo "Added $(wc -l <$FORMULAE_FILE) formulae to $FORMULAE_FILE"
 
 	# Empty the files
 	echo "" >$TAPS_FILE
@@ -68,14 +63,19 @@ brew_freeze() (
 
 	for c in $(brew_casks_list); do
 		TAP=$(brew info --casks "$c" --json=v2 | gojq ".casks[0] | .tap" --monochrome-output --raw-output)
+		echo "Adding $TAP to $TAPS_FILE"
 		echo "$TAP" >>$TAPS_FILE
+		echo "Adding $c to $CASKS_FILE"
 		echo "$c" >>$CASKS_FILE
-	done >$CASKS_FILE
+	done
 )
 
 # pip install -r but for brew. Input *.brew files
 brew_install_r() {
 	if [ "$(arch)" = "i386" ]; then # Rosetta
+		for t in $(cat ~/taps-x86.brew); do
+			brew tap "$t"
+		done
 		for f in $(cat ~/formulae-x86.brew); do
 			brew install "$f"
 		done
@@ -89,6 +89,9 @@ brew_install_r() {
 		# 	brew install "$cask"
 		# done <~/casks-x86.brew
 	else # Apple silicon
+		for t in $(cat ~/taps.brew); do
+			brew tap "$t"
+		done
 		for f in $(cat ~/formulae.brew); do
 			brew install "$f"
 		done

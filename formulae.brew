@@ -28,6 +28,7 @@ gojq
 golangci-lint
 google-java-format
 gopls
+goreleaser
 gradle
 grafana
 helm
@@ -65,6 +66,8 @@ ruff-lsp
 rustup-init
 shellcheck
 shfmt
+sniffer
+sniffnet
 spring-io/tap/spring-boot
 starship
 stylua
@@ -84,3 +87,4 @@ watchman
 wget
 yaml-language-server
 zoxide
+zsh

@@ -77,3 +77,7 @@ ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud
 ```bash
 mkdir homebrew-x86 && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew-x86  # Same command as before
 ```
+
+Install from App store:
+- ColorSlurp
+- Outline

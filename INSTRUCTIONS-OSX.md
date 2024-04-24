@@ -10,7 +10,7 @@ mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar 
 
 MacOS settings:
 - Enable tap to click in trackpad settings
-- Enable double click to select in accessibility > trackpad options
+- Enable drag lock to select in accessibility > pointer control > trackpad options
 - Disable "Automatically rearrange Spaces" in desktop & dock settings
 - Enable auto hide/show dock
 - Set default browser to Firefox in general settings

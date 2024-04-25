@@ -1,47 +1,41 @@
 *
+
 !casks.brew
 !formulae.brew
 !taps.brew
+
 !.gitignore
 !.gitmodules
 !.gitattributes
+
 !README.md
-!.config/
-.config/*
-!.local/
-!.local/share
-.local/share/**
 !INSTRUCTIONS-OSX.md
 
-# VSCode
+!.config/
+.config/*
+
 !.vscode/
 !.vscode/settings.json
 
-# Zsh
 !.zshrc
 !.zprofile
 !.config/zsh/
 !.config/zsh/**
 
-# Starship
 !.config/starship.toml
 !.config/starship_default.toml
 
-# Warp
 !.warp/
 !.warp/themes/
 !.warp/themes/**
 !.warp/keybindings.yaml
 
-# Bat
 !.config/bat/
 !.config/bat/**
 
-# Bottom
 !.config/bottom/
 !.config/bottom/**
 
-# Karabiner
 !.config/karabiner/
 !.config/karabiner/config.ts
 !.config/karabiner/default_config.json
@@ -50,79 +44,39 @@
 !.config/karabiner/flake.lock
 !.config/karabiner/README.md
 
-# Skhd
 !.config/skhd/
 !.config/skhd/**
 
-# Spacebar
 !.config/spacebar/
 !.config/spacebar/**
 
-# Yabai
 !.config/yabai/
 !.config/yabai/**
 
-# Misc
-!.config/misc/
-!.config/misc/**
-.config/misc/rawaccel/RawAccel/
-.config/misc/blender/config/bookmarks.txt
-.config/misc/blender/config/platform_support.txt
-
-# Kitty
-!.config/kitty/
-!.config/kitty/**
-
-# lf
-!.config/lf/
-!.config/lf/**
-
-# Hyprland
-!.config/hypr/
-!.config/hypr/**
-
-# Waybar
-!.config/waybar/
-!.config/waybar/**
-
-# GTK
-!.config/gtk*/
-!.config/gtk*/**
-.config/gtk*/**
-
-# Fcitx5
-!.local/share/fcitx5/
-!.local/share/fcitx5/themes/
-!.local/share/fcitx5/themes/mine/
-!.local/share/fcitx5/themes/mine/**
-!.config/fcitx5/
-!.config/fcitx5/conf/
-!.config/fcitx5/conf/pinyin.conf
-!.config/fcitx5/conf/classicui.conf
-!.config/fcitx5/config
-!.config/fcitx5/profile
-
-# Wallpapers
-!.config/wallpapers/
-!.config/wallpapers/**
-
-# GNOME
 !.config/gnome/
 !.config/gnome/**
 
-# Poetry
+!.config/kitty/
+!.config/kitty/**
+
+!.config/lf/
+!.config/lf/**
+
+!.config/hypr/
+!.config/hypr/**
+
+!.config/wallpapers/
+!.config/wallpapers/**
+
 !.config/pypoetry/
 !.config/pypoetry/**
 
-# Neovim
 !.config/nvim/
 !.config/nvim/**
 .config/nvim/.luarc.json
 
-# Tmux
 !.config/tmux/
 !.config/tmux/**
 
-# Pandoc
 !.config/pandoc/
 !.config/pandoc/**

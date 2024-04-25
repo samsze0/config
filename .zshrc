@@ -23,7 +23,6 @@ source ~/.config/zsh/android.sh
 # fzf-tab
 # https://github.com/Aloxaf/fzf-tab/wiki/Configuration
 source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
-# preview directory's content with exa when completing cd or ls
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -1 --color=always $realpath'
 zstyle ':fzf-tab:*' fzf-min-height 1000
@@ -39,7 +38,7 @@ source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
 
-# Enable zsh completion
+# zsh completion
 autoload -U compinit
 compinit
 compaudit || (compaudit | xargs chmod go-w) # Remove group & other write permission for all insecure directories if there are any
@@ -156,7 +155,7 @@ mkdir -p "$HOME/bin"
 export PATH=$HOME/bin:${PATH}
 export PATH=/usr/local/bin:${PATH}
 
-# ZLE (line editor) bindings
+# zle (line editor)
 bindkey "^[[H" beginning-of-line
 bindkey "^[[F" end-of-line
 bindkey "^H" backward-kill-word
@@ -177,13 +176,12 @@ alias lf='PAGER="nvim -RM" lf'
 
 export FZF_DEFAULT_OPTS=$(fzf_init)
 
-# ZSH history
+# zsh history
 setopt share_history
 export HISTFILE=~/.zhistory
 export SAVEHIST=100 # Capacity of no. lines
 export HISTSIZE=50  # Capacity of no. lines for a session
 
-# Default apps (common)
 export SHELL="$(which zsh)"
 export PAGER="less"
 export EDITOR="nvim"

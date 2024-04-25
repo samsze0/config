@@ -1,21 +1,15 @@
 # MacOS
 
-Install homebrew under custom location (e.g. `~/homebrew`):
-(Apparently installing brew outside of `/opt/homebrew` can cause issues. Check with brew doctor)
 ```bash
-
-# If were to install in custom dir
+# If were to install in custom dir. But this can cause issues
 mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
 ```
 
 MacOS settings:
-- Enable `tap to click` in trackpad settings
-- Enable drag lock to select in `accessibility > pointer control > trackpad options`
-- Disable `Automatically rearrange Spaces` in desktop & dock settings
-- Set default browser to Firefox in general settings
+- Drag lock in `accessibility > pointer control > trackpad options`
+- Disable `Automatically rearrange Spaces`
 
-Install command line developer tools (& XCode ?):
-
+Install command line developer tools
 ```bash
 sudo xcode-select --install
 ```
@@ -25,19 +19,7 @@ On newer versions of OSX key repeat is disabled by default, to enable it, run:
 defaults write -g ApplePressAndHoldEnabled -bool false
 ```
 
-Install github cli and login:
-```bash
-brew install gh
-gh auth login
-```
-
-Install browser:
-```bash
-brew tap homebrew/cask-versions
-brew install --cask firefox-developer-edition
-```
-
-Remove all apps from dock:
+Remove all app icons from dock:
 ```bash
 defaults write com.apple.dock persistent-apps -array
 killall Dock
@@ -45,10 +27,9 @@ killall Dock
 ```
 
 Change keyboard repeat delay:
-
 ```bash
-defaults write -g InitialKeyRepeat -int 13 # normal minimum is 15 (225 ms)
-defaults write -g KeyRepeat -float 1.7     # normal minimum is 2 (30 ms)
+defaults write -g InitialKeyRepeat -int 13 # by default minimum is 15 (225 ms)
+defaults write -g KeyRepeat -float 1.7     # by default minimum is 2 (30 ms)
 ```
 
 Create symlink to icloud:
@@ -56,27 +37,35 @@ Create symlink to icloud:
 ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud
 ```
 
-**Karabiner**
-- Goto `karabiner/` and run `node config.js`
-
-**Spacebar**
-- Spacebar doesn't have apple silicon built. Install rosetta beforehand with `softwareupdate --install-rosetta`
-
-**Yabai**
-- Disable SIP with `csrutil disable` (in recovery mode)
-- Enable ARM64E ABI boot option w/ `sudo nvram boot-args=-arm64e_preview_abi` (then reboot again)
-- Load scripting addition `sudo yabai --load-sa`
-- Sometimes the desktop icons will appear on top of the windows. To fix this, run `killall Finder`
-
-**x86-64**
-- Install rosetta with `softwareupdate --install-rosetta`
-- Create a terminal emulator clone with option `Open with Rosetta`
-- (In rosetta terminal) Install homebrew under custom location (e.g. `~/homebrew-x86`)
-
+Karabiner:
 ```bash
-mkdir homebrew-x86 && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew-x86  # Same command as before
+cd ~/.config/karabiner && node config.js
 ```
 
-Install from App store:
+Spacebar:
+```bash
+# Spacebar doesn't have apple silicon built. Need to install rosetta
+softwareupdate --install-rosetta
+```
+
+Yabai:
+```bash
+# Disable SIP (in recovery mode)
+csrutil disable
+
+# Enable ARM64E ABI boot option (need reboot)
+sudo nvram boot-args=-arm64e_preview_abi
+
+# Load scripting edition
+sudo yabai --load-sa
+```
+
+Sometimes desktop icons will glitch. To fix:
+```bash
+killall Finder
+```
+
+App store:
 - ColorSlurp
 - Outline
+- Klack

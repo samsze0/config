@@ -1,0 +1,57 @@
+# https://pkg.go.dev/github.com/gokcehan/lf#hdr-Configuration
+# or man lf
+
+set icons true
+set ignorecase true
+set hidden true
+set cleaner ~/.config/lf/clean.sh
+set previewer ~/.config/lf/preview.sh
+# set ruler acc:progress:selection:filter:ind:df
+
+cmd delete ${{
+  ~/.config/lf/delete.sh $fx
+}}
+map <delete> delete
+cmd trash ${{
+  ~/.config/lf/delete.sh $fx --trash
+}}
+map d trash
+map x :cut
+
+cmd open ${{
+  ~/.config/lf/open.sh
+}}
+
+cmd create_new ${{
+  ~/.config/lf/create_new.sh $@
+}}
+map a :push :create_new<space>
+
+cmd on-select &{{
+  echo "$fx" > ~/.cache/lf_current_selection
+}}
+on-select # Run on startup as well
+
+# By default <space> = :toggle:down
+map <space> :toggle
+
+map <f-1> ${{
+clear
+  cmd=$(
+    lf -remote "query $id history" |
+    # Set separator to tab and skip first record and print last field for each subsequent record
+    # sed is not suitable for column-based tasks as awk or cut is
+    awk -F'\t' 'NR > 1 { print $NF }' |
+    sort -u |
+    fzf --reverse --prompt='History'
+  )
+  lf -remote "send $id $cmd"
+}}
+
+map z &{{
+  unzip "$fx"
+}}
+
+cmd onstartup ${{
+}}
+onstartup

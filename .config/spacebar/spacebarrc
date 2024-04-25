@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+spacebar -m config position top
+spacebar -m config height 20
+spacebar -m config title off
+spacebar -m config spaces on
+spacebar -m config clock off
+spacebar -m config power off
+spacebar -m config padding_left 20
+spacebar -m config padding_right 20
+spacebar -m config spacing_left 25
+spacebar -m config spacing_right 15
+spacebar -m config text_font "Menlo:Bold:13.0"
+spacebar -m config icon_font "Menlo:Bold:13.0"
+spacebar -m config background_color 0xaa000000 # black
+spacebar -m config foreground_color 0xff547d9c # gray
+spacebar -m config space_icon_color 0xff4C9BFF # blue
+spacebar -m config space_icon_strip 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20

@@ -56,6 +56,9 @@ csrutil disable
 # Enable ARM64E ABI boot option (need reboot)
 sudo nvram boot-args=-arm64e_preview_abi
 
+yabai --start-service
+skhd --start-service
+
 # Load scripting edition
 sudo yabai --load-sa
 ```
@@ -69,3 +72,4 @@ App store:
 - ColorSlurp
 - Outline
 - Klack
+- Dark noise

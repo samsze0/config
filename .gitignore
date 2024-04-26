@@ -9,7 +9,7 @@
 !.gitattributes
 
 !README.md
-!INSTRUCTIONS-OSX.md
+!OSX.md
 
 !.config/
 .config/*

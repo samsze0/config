@@ -1,6 +1,7 @@
 local utils = require("utils")
 local EventMap = require("fzf.core.event-map")
 local uv_utils = require("utils.uv")
+local websocket_client = require("utils.websocket.client")
 local json = require("utils.json")
 local os_utils = require("utils.os")
 local CallbackMap = require("fzf.core.callback-map")
@@ -10,6 +11,7 @@ local CLIENT_TYPE = {
   tcp = 1,
   named_pipe = 2,
   nvim_rpc = 3,
+  websocket = 4,
 }
 
 local FZF_API_KEY = utils.uuid()
@@ -18,8 +20,8 @@ local FZF_BASE_PORT = 8839
 
 ---@class FzfIpcClient
 ---@field client_type FzfIpcClientType
----@field host string The host of which the server that listens to incoming messages from fzf is running on
----@field port number The port of which the server that listens to incoming messages from fzf is running on
+---@field host string The host of which the server that listens to incoming messages from fzf is running on. Ignore this field if client_type is websocket
+---@field port number The port of which the server that listens to incoming messages from fzf is running on. Ignore this field if client_type is websocket
 ---@field fzf_host string
 ---@field fzf_port number
 ---@field _event_map FzfEventMap Map of events to fzf action(s). I.e. the list of Fzf bindings
@@ -153,6 +155,43 @@ function FzfIpcClient.new(client_type)
     -- obj.receive_message_cmd = function(self, message)
     --   return os_utils.write_to_named_pipe_cmd(pipe.name, message)
     -- end
+  elseif client_type == CLIENT_TYPE.websocket then
+    local ws_client =
+      websocket_client.create(obj.fzf_host, obj.fzf_port, {
+        on_message = message_handler,
+      })
+
+    -- TODO: invoke connect()
+
+    obj.execute = function(self, action, opts) ws_client:send_data(action) end
+
+    obj.ask = function(self, response_payload, callback)
+      local key = self._callback_map:add(callback)
+
+      local message = json.stringify({
+        key = key,
+        message = response_payload,
+      })
+      ws_client:send_data("websocket-push$" .. message .. "$")
+    end
+
+    obj.subscribe = function(self, event, response_payload, callback)
+      local key = self._callback_map:add(callback)
+
+      local message = json.stringify({
+        key = key,
+        message = response_payload,
+        event = event,
+      })
+
+      local action = "websocket-push$" .. message .. "$"
+
+      self:bind(event, action)
+
+      return function() self._callback_map:remove(key) end
+    end
+
+    obj.destroy = function(self) ws_client:disconnect() end
   else
     error("Invalid client type")
   end

@@ -168,6 +168,13 @@ require("lazy").setup({
   { -- Required by fzf & lf
     "MunifTanjim/nui.nvim",
   },
+  {
+    "vhyrro/luarocks.nvim",
+    priority = 1000,
+    opts = {
+      rocks = {},
+    },
+  },
 })
 
 require("noti")

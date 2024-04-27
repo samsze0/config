@@ -1,4 +1,8 @@
+local IpcClient = require("fzf.core.ipc-client")
+
 return {
+  fzf_path = "~/dev/fzf/bin/fzf",
+  ipc_client_type = IpcClient.CLIENT_TYPE.websocket,
   keymaps = {
     move_to_pane = {
       left = "<C-s>",

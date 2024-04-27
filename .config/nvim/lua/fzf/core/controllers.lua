@@ -17,9 +17,6 @@ local config = require("fzf.config")
 ---@alias FzfDisplayAccessor fun(entry: string): string
 ---@alias FzfInitialFocusAccessor fun(entry: string): boolean
 
--- TODO: move to config
-local IPC_CLIENT_TYPE = IpcClient.CLIENT_TYPE.tcp
-
 -- Generic classes still WIP
 -- https://github.com/LuaLS/lua-language-server/issues/1861
 --
@@ -87,7 +84,7 @@ function ControllerMap.create(opts)
     _parent_id = nil,
     query = "",
     focus = nil,
-    _ipc_client = IpcClient.new(IPC_CLIENT_TYPE),
+    _ipc_client = IpcClient.new(config.ipc_client_type),
     _extra_args = opts.extra_args,
     _entries_getter = nil,
     _entries = nil,
@@ -276,14 +273,15 @@ function Controller:start()
   args = utils.tbl_extend({ mode = "error" }, args, config.default_extra_args)
   args = utils.tbl_extend({ mode = "error" }, args, self._extra_args)
 
-  local command = "fzf " .. utils.shell_opts_tostring(args)
+  local command = (config.fzf_path or "fzf")
+    .. " "
+    .. utils.shell_opts_tostring(args)
 
   -- TODO: cater Windows
   command = [[printf "" | ]] .. command
 
   local env_vars = {
     ["FZF_API_KEY"] = IpcClient.API_KEY,
-    -- TODO: add warning about SHELL and how it can make the plugin sluggish/lag
   }
   env_vars = utils.tbl_extend(
     { mode = "error" },

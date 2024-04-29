@@ -6,6 +6,7 @@ local utils = require("utils")
 ---@field private value table<string, FzfAction[]>
 local EventMap = {}
 EventMap.__index = EventMap
+EventMap.__is_class = true
 
 ---@param base? FzfEventMap
 ---@return FzfEventMap self

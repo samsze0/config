@@ -26,6 +26,7 @@ local FZF_BASE_PORT = 8839
 ---@field fzf_port number
 ---@field _event_map FzfEventMap Map of events to fzf action(s). I.e. the list of Fzf bindings
 ---@field _callback_map FzfCallbackMap Map of keys to lua callbacks
+---@field start fun(self: FzfIpcClient): nil Start the fzf client
 ---@field execute fun(self: FzfIpcClient, action: string, opts?: { load_action_from_file?: boolean }) Send an action to fzf to execute
 ---@field ask fun(self: FzfIpcClient, response_payload?: string, callback: function) Retrieve information from fzf
 ---@field subscribe fun(self: FzfIpcClient, event: string, response_payload?: string, callback?: function): (fun(): nil) Subscribe to a fzf event
@@ -35,6 +36,7 @@ local FzfIpcClient = {
   API_KEY = FZF_API_KEY,
 }
 FzfIpcClient.__index = FzfIpcClient
+FzfIpcClient.__is_class = true
 
 ---@param client_type FzfIpcClientType
 function FzfIpcClient.new(client_type)
@@ -107,6 +109,8 @@ function FzfIpcClient.new(client_type)
       uv_utils.schedule_if_needed(fn)
     end
 
+    obj.start = function(self) end
+
     obj.execute = function(self, action, opts) to_fzf(action, opts) end
 
     obj.ask = function(self, response_payload, callback)
@@ -123,6 +127,7 @@ function FzfIpcClient.new(client_type)
       to_fzf(action)
     end
 
+    -- FIX: doesn't actually unbind on the fzf side. Use `unbind` action
     obj.subscribe = function(self, event, response_payload, callback)
       local key = self._callback_map:add(callback)
 
@@ -159,9 +164,15 @@ function FzfIpcClient.new(client_type)
     local ws_client =
       websocket_client.create(obj.fzf_host, obj.fzf_port, {
         on_message = message_handler,
+        headers = {
+          ["API-KEY"] = FZF_API_KEY,
+        }
       })
 
-    -- TODO: invoke connect()
+    obj.start = function(self)
+      ws_client:connect()
+      ws_client:send_data("websocket-stop-replay")
+    end
 
     obj.execute = function(self, action, opts) ws_client:send_data(action) end
 
@@ -172,7 +183,7 @@ function FzfIpcClient.new(client_type)
         key = key,
         message = response_payload,
       })
-      ws_client:send_data("websocket-push$" .. message .. "$")
+      ws_client:send_data("websocket-broadcast$" .. message .. "$")
     end
 
     obj.subscribe = function(self, event, response_payload, callback)
@@ -184,7 +195,7 @@ function FzfIpcClient.new(client_type)
         event = event,
       })
 
-      local action = "websocket-push$" .. message .. "$"
+      local action = "websocket-broadcast$" .. message .. "$"
 
       self:bind(event, action)
 

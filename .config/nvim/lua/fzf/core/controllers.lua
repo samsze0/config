@@ -270,6 +270,10 @@ function Controller:start()
     ["--bind"] = "'" .. self._ipc_client:bindings() .. "'",
     ["--delimiter"] = "'" .. utils.nbsp .. "'",
   }
+  if config.ipc_client_type == IpcClient.CLIENT_TYPE.websocket then
+    args["--websocket-listen"] = args["--listen"]
+    args["--listen"] = nil
+  end
   args = utils.tbl_extend({ mode = "error" }, args, config.default_extra_args)
   args = utils.tbl_extend({ mode = "error" }, args, self._extra_args)
 
@@ -282,6 +286,7 @@ function Controller:start()
 
   local env_vars = {
     ["FZF_API_KEY"] = IpcClient.API_KEY,
+    ["FZF_LOG_FILE_PATH"] = config.fzf_log_file_path,
   }
   env_vars = utils.tbl_extend(
     { mode = "error" },
@@ -330,6 +335,10 @@ function Controller:start()
     end,
   })
   self._started = true
+
+  -- FIX: wait for fzf websocket server to spin up
+  vim.fn.system("sleep 1")
+  self._ipc_client:start()
 end
 
 -- Initialize entries getter by forcing an entries reload and setting up a timer to reload entries in the background (if configured)

@@ -6,6 +6,7 @@ local utils = require("utils")
 ---@field private value table<string, FzfCallback> Callback map
 local CallbackMap = {}
 CallbackMap.__index = CallbackMap
+CallbackMap.__is_class = true
 
 ---@param base? FzfCallbackMap
 ---@return FzfCallbackMap self

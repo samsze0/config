@@ -51,8 +51,6 @@ return function(opts)
       end
       local message = parts[3]
 
-      print(ref)
-
       return {
         display = fzf_utils.join_by_nbsp(
           -- utils.ansi_codes.blue(ref), -- FIX: curly brackets are causing lines to fail to render because fzf will evaluate them

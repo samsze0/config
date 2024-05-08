@@ -137,7 +137,7 @@ function Controller.new(opts)
     obj.focus = obj._entries[tonumber(index) + 1]
   end)
   obj:subscribe("change", "{q}", function(payload)
-    local query = string.match(payload, "^'(.*)'$")
+    local query = payload:match("^'(.*)'$")
     if not query then error("Invalid payload", payload) end
     obj.query = query
   end)
@@ -424,8 +424,8 @@ function Controller:_fetch_entries_in_background(opts)
         error("Invalid coroutine status")
       end
 
-      -- Stop existing get-entries timer (if any)
-      local get_entries_timer = self._timers["get-entries"]
+      -- Stop existing timer (if any)
+      local get_entries_timer = self._timers["coroutine-get-entries"]
       if get_entries_timer then
         get_entries_timer:stop()
         get_entries_timer:close()
@@ -442,17 +442,17 @@ function Controller:_fetch_entries_in_background(opts)
             end
 
             local ok, fzf_entry = coroutine.resume(x)
-            assert(ok)
+            assert(ok, debug.traceback(x))
             -- TODO: add fzf_entry to entries
-            print(fzf_entry)
           end
         end)
       )
-      self._timers["get-entries"] = timer
+      self._timers["coroutine-get-entries"] = timer
     elseif type(x) == "table" then
       self._entries = x
       self:set_fetching_entries(false)
 
+      -- TODO: deep compare
       if vim.inspect(old_entries) ~= vim.inspect(self._entries) then
         self:set_is_entries_stale(true)
         if opts.load_immediately then

@@ -28,7 +28,7 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   callback = function(ctx) vim.opt.wrap = true end,
 })
 
-vim.opt.mousescroll = "ver:10" -- Multiplier
+vim.opt.mousescroll = "ver:1" -- Multiplier
 
 -- TODO: respect .editorconfig
 vim.opt.tabstop = 2
@@ -68,9 +68,6 @@ if not vim.loop.fs_stat(lazypath) then
   })
 end
 vim.opt.rtp:prepend(lazypath)
-
--- Setup once in-advance because some plugins might read existing highlight groups values
--- require("theme").setup()
 
 require("lazy").setup({
   {
@@ -185,6 +182,13 @@ require("lazy").setup({
     config = function() require("terminal-filetype").setup({}) end,
   },
   {
+    "samsze0/notifier.nvim",
+    config = function() require("notifier").setup({}) end,
+    dependencies = {
+      "samsze0/utils.nvim",
+    },
+  },
+  {
     "samsze0/fzf.nvim",
     config = function()
       require("fzf").setup({})
@@ -193,12 +197,12 @@ require("lazy").setup({
       "MunifTanjim/nui.nvim",
       "samsze0/utils.nvim",
       "samsze0/jumplist.nvim",
-      "samsze0/terminal-filetype.nvim"
+      "samsze0/terminal-filetype.nvim",
+      "samsze0/notifier.nvim",
     }
   }
 })
 
-require("noti")
 require("keymaps")
 require("winbar").setup()
 require("theme").setup()

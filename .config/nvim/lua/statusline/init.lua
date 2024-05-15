@@ -2,7 +2,6 @@
 -- https://github.com/echasnovski/mini.statusline/blob/main/lua/mini/statusline.lua
 
 local utils = require("utils")
-local noti = require("noti")
 
 local config = {
   padding = "  ",
@@ -75,9 +74,6 @@ M.setup = function()
   -- :h statusline
   vim.g.qf_disable_statusline = 1 -- Disable built-in statusline in Quickfix window
   vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
-
-  -- Subscribe to notifications
-  noti.subscribe(function() set_active() end)
 end
 
 local pcall_section = function(section, name)
@@ -101,7 +97,6 @@ M.active = function()
       pcall_section(M.section_git, "git"),
       pcall_section(M.section_copilot, "copilot"),
       "%=",
-      pcall_section(M.section_notifications, "notifications"),
       pcall_section(M.section_fileinfo, "fileinfo"),
     }, config.padding)
     .. config.margin
@@ -227,43 +222,6 @@ M.section_copilot = function()
 
   if ok then return val end
   return hl("StatusLineDiagnosticWarn", " ")
-end
-
-M.section_notifications = function()
-  local notifications = noti.unread()
-
-  if #notifications == 0 then return "" end
-
-  local result = {}
-
-  local error_count = utils.sum(
-    notifications,
-    function(_, e) return e.level == vim.log.levels.ERROR and 1 or 0 end
-  )
-  if error_count > 0 then
-    table.insert(
-      result,
-      hl("StatusLineDiagnosticError", ("󰂚 %d"):format(error_count))
-    )
-  end
-
-  local warn_count = utils.sum(
-    notifications,
-    function(_, e) return e.level == vim.log.levels.WARN and 1 or 0 end
-  )
-  if warn_count > 0 then
-    table.insert(
-      result,
-      hl("StatusLineDiagnosticWarn", ("󰂚 %d"):format(warn_count))
-    )
-  end
-
-  local other_count = noti.num_unread() - error_count - warn_count
-  if other_count > 0 then
-    table.insert(result, hl("StatusLineMuted", ("󰂚 %d"):format(other_count)))
-  end
-
-  return table.concat(result, " ")
 end
 
 return M

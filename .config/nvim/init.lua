@@ -174,12 +174,25 @@ require("lazy").setup({
     config = function()
       -- Setup once in-advance because some plugins might read existing highlight groups values
       require("theme").setup()
-    end
+    end,
+  },
+  {
+    "samsze0/jumplist.nvim",
+    config = function() require("jumplist").setup({}) end,
+  },
+  {
+    "samsze0/fzf.nvim",
+    config = function()
+      require("fzf").setup({})
+    end,
+    dependencies = {
+      "samsze0/utils.nvim",
+      "samsze0/jumplist.nvim"
+    }
   }
 })
 
 require("noti")
-require("jumplist").setup()
 require("keymaps")
 require("winbar").setup()
 require("theme").setup()

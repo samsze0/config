@@ -181,13 +181,19 @@ require("lazy").setup({
     config = function() require("jumplist").setup({}) end,
   },
   {
+    "samsze0/terminal-filetype.nvim",
+    config = function() require("terminal-filetype").setup({}) end,
+  },
+  {
     "samsze0/fzf.nvim",
     config = function()
       require("fzf").setup({})
     end,
     dependencies = {
+      "MunifTanjim/nui.nvim",
       "samsze0/utils.nvim",
-      "samsze0/jumplist.nvim"
+      "samsze0/jumplist.nvim",
+      "samsze0/terminal-filetype.nvim"
     }
   }
 })
@@ -199,6 +205,5 @@ require("theme").setup()
 require("statusline").setup()
 require("tabline").setup()
 require("persist").setup()
-require("terminal-filetype").setup()
 
 if vim.g.neovide then require("config.neovide") end

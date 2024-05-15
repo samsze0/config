@@ -70,7 +70,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Setup once in-advance because some plugins might read existing highlight groups values
-require("theme").setup()
+-- require("theme").setup()
 
 require("lazy").setup({
   {
@@ -168,6 +168,14 @@ require("lazy").setup({
   { -- Required by fzf & lf
     "MunifTanjim/nui.nvim",
   },
+  {
+    "samsze0/utils.nvim",
+    priority = 100,
+    config = function()
+      -- Setup once in-advance because some plugins might read existing highlight groups values
+      require("theme").setup()
+    end
+  }
 })
 
 require("noti")

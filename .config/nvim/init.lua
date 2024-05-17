@@ -168,6 +168,7 @@ require("lazy").setup({
   {
     "samsze0/utils.nvim",
     priority = 100,
+    dir = os.getenv("NVIM_UTILS_NVIM_PATH"),
     config = function()
       -- Setup once in-advance because some plugins might read existing highlight groups values
       require("theme").setup()
@@ -175,14 +176,17 @@ require("lazy").setup({
   },
   {
     "samsze0/jumplist.nvim",
+    dir = os.getenv("NVIM_JUMPLIST_NVIM_PATH"),
     config = function() require("jumplist").setup({}) end,
   },
   {
     "samsze0/terminal-filetype.nvim",
+    dir = os.getenv("NVIM_TERMINAL_FILETYPE_NVIM_PATH"),
     config = function() require("terminal-filetype").setup({}) end,
   },
   {
     "samsze0/notifier.nvim",
+    dir = os.getenv("NVIM_NOTIFIER_NVIM_PATH"),
     config = function() require("notifier").setup({}) end,
     dependencies = {
       "samsze0/utils.nvim",
@@ -190,6 +194,7 @@ require("lazy").setup({
   },
   {
     "samsze0/fzf.nvim",
+    dir = os.getenv("NVIM_FZF_NVIM_PATH"),
     config = function()
       require("fzf").setup({})
     end,

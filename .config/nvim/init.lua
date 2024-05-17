@@ -69,16 +69,19 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
----@type LazySpec
-local utils_nvim_lazy_spec = {
-  "samsze0/utils.nvim",
-  priority = 100,
-  dir = os.getenv("NVIM_UTILS_NVIM_PATH"), ---@diagnostic disable-line: assign-type-mismatch
-  config = function()
-    -- Setup once in-advance because some plugins might read existing highlight groups values
-    require("theme").setup()
-  end,
-}
+---@param opts? LazySpec
+---@return LazySpec
+local utils_nvim_lazy_spec = function(opts)
+  return vim.tbl_extend("force", {
+    "samsze0/utils.nvim",
+    priority = 100,
+    dir = os.getenv("NVIM_UTILS_NVIM_PATH"), ---@diagnostic disable-line: assign-type-mismatch
+    config = function()
+      -- Setup once in-advance because some plugins might read existing highlight groups values
+      require("theme").setup()
+    end,
+  }, opts or {})
+end
 
 require("lazy").setup({
   {
@@ -176,7 +179,7 @@ require("lazy").setup({
   { -- Required by fzf & lf
     "MunifTanjim/nui.nvim",
   },
-  utils_nvim_lazy_spec,
+  utils_nvim_lazy_spec(),
   {
     "samsze0/jumplist.nvim",
     dir = os.getenv("NVIM_JUMPLIST_NVIM_PATH"),
@@ -192,7 +195,9 @@ require("lazy").setup({
     dir = os.getenv("NVIM_NOTIFIER_NVIM_PATH"),
     config = function() require("notifier").setup({}) end,
     dependencies = {
-      utils_nvim_lazy_spec,
+      utils_nvim_lazy_spec({
+        commit = "c975335137294b1d5d096338cb3d96ba5e9814d2"
+      }),
     },
   },
   {
@@ -201,12 +206,24 @@ require("lazy").setup({
     config = function() require("fzf").setup({}) end,
     dependencies = {
       "MunifTanjim/nui.nvim",
-      utils_nvim_lazy_spec,
+      utils_nvim_lazy_spec({
+        commit = "c975335137294b1d5d096338cb3d96ba5e9814d2"
+      }),
       "samsze0/jumplist.nvim",
       "samsze0/terminal-filetype.nvim",
       "samsze0/notifier.nvim",
     },
   },
+  {
+    "samsze0/websocket.nvim",
+    dir = os.getenv("NVIM_WEBSOCKET_NVIM_PATH"),
+    config = function() require("websocket").setup({}) end,
+    dependencies = {
+      utils_nvim_lazy_spec({
+        commit = "c975335137294b1d5d096338cb3d96ba5e9814d2"
+      }),
+    },
+  }
 })
 
 require("keymaps")

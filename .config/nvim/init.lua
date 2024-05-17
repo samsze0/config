@@ -69,6 +69,17 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+---@type LazySpec
+local utils_nvim_lazy_spec = {
+  "samsze0/utils.nvim",
+  priority = 100,
+  dir = os.getenv("NVIM_UTILS_NVIM_PATH"), ---@diagnostic disable-line: assign-type-mismatch
+  config = function()
+    -- Setup once in-advance because some plugins might read existing highlight groups values
+    require("theme").setup()
+  end,
+}
+
 require("lazy").setup({
   {
     "ibhagwan/fzf-lua",
@@ -165,15 +176,7 @@ require("lazy").setup({
   { -- Required by fzf & lf
     "MunifTanjim/nui.nvim",
   },
-  {
-    "samsze0/utils.nvim",
-    priority = 100,
-    dir = os.getenv("NVIM_UTILS_NVIM_PATH"),
-    config = function()
-      -- Setup once in-advance because some plugins might read existing highlight groups values
-      require("theme").setup()
-    end,
-  },
+  utils_nvim_lazy_spec,
   {
     "samsze0/jumplist.nvim",
     dir = os.getenv("NVIM_JUMPLIST_NVIM_PATH"),
@@ -189,23 +192,21 @@ require("lazy").setup({
     dir = os.getenv("NVIM_NOTIFIER_NVIM_PATH"),
     config = function() require("notifier").setup({}) end,
     dependencies = {
-      "samsze0/utils.nvim",
+      utils_nvim_lazy_spec,
     },
   },
   {
     "samsze0/fzf.nvim",
     dir = os.getenv("NVIM_FZF_NVIM_PATH"),
-    config = function()
-      require("fzf").setup({})
-    end,
+    config = function() require("fzf").setup({}) end,
     dependencies = {
       "MunifTanjim/nui.nvim",
-      "samsze0/utils.nvim",
+      utils_nvim_lazy_spec,
       "samsze0/jumplist.nvim",
       "samsze0/terminal-filetype.nvim",
       "samsze0/notifier.nvim",
-    }
-  }
+    },
+  },
 })
 
 require("keymaps")

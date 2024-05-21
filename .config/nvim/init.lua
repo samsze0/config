@@ -9,10 +9,9 @@ vim.opt.wrap = true
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
--- Make help window open as right split instead of bottom split
 vim.api.nvim_create_autocmd("BufWinEnter", {
   group = vim.api.nvim_create_augroup(
-    "help_window_open_as_right_split",
+    "Open-help-window-as-right-split",
     { clear = true }
   ),
   pattern = { "*.txt" },
@@ -21,16 +20,15 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
   end,
 })
 
--- Markdown
 vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-  group = vim.api.nvim_create_augroup("markdown_settings", { clear = true }),
+  group = vim.api.nvim_create_augroup("Markdown-config", { clear = true }),
   pattern = { "*.md" },
   callback = function(ctx) vim.opt.wrap = true end,
 })
 
 vim.opt.mousescroll = "ver:1" -- Multiplier
 
--- TODO: respect .editorconfig
+-- TODO: source .editorconfig
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.expandtab = true
@@ -69,19 +67,18 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
----@param opts? LazySpec
----@return LazySpec
-local utils_nvim_lazy_spec = function(opts)
-  return vim.tbl_extend("force", {
-    "samsze0/utils.nvim",
-    priority = 100,
-    dir = os.getenv("NVIM_UTILS_NVIM_PATH"), ---@diagnostic disable-line: assign-type-mismatch
-    config = function()
-      -- Setup once in-advance because some plugins might read existing highlight groups values
-      require("theme").setup()
-    end,
-  }, opts or {})
-end
+---@type LazySpec
+local utils_nvim_lazy_spec = {
+  "samsze0/utils.nvim",
+  priority = 100,
+  dir = os.getenv("NVIM_UTILS_NVIM_PATH"), ---@diagnostic disable-line: assign-type-mismatch
+  config = function()
+    -- Load theme once before loading other plugins (to prevent theme flickering)
+    require("utils").setup({})
+    require("theme").setup({})
+    require("keymaps").setup({})
+  end,
+}
 
 require("lazy").setup({
   {
@@ -179,7 +176,7 @@ require("lazy").setup({
   { -- Required by fzf & lf
     "MunifTanjim/nui.nvim",
   },
-  utils_nvim_lazy_spec(),
+  utils_nvim_lazy_spec,
   {
     "samsze0/jumplist.nvim",
     dir = os.getenv("NVIM_JUMPLIST_NVIM_PATH"),
@@ -195,9 +192,7 @@ require("lazy").setup({
     dir = os.getenv("NVIM_NOTIFIER_NVIM_PATH"),
     config = function() require("notifier").setup({}) end,
     dependencies = {
-      utils_nvim_lazy_spec({
-        commit = "c975335137294b1d5d096338cb3d96ba5e9814d2"
-      }),
+      utils_nvim_lazy_spec,
     },
   },
   {
@@ -206,9 +201,7 @@ require("lazy").setup({
     config = function() require("fzf").setup({}) end,
     dependencies = {
       "MunifTanjim/nui.nvim",
-      utils_nvim_lazy_spec({
-        commit = "c975335137294b1d5d096338cb3d96ba5e9814d2"
-      }),
+      utils_nvim_lazy_spec,
       "samsze0/jumplist.nvim",
       "samsze0/terminal-filetype.nvim",
       "samsze0/notifier.nvim",
@@ -219,18 +212,9 @@ require("lazy").setup({
     dir = os.getenv("NVIM_WEBSOCKET_NVIM_PATH"),
     config = function() require("websocket").setup({}) end,
     dependencies = {
-      utils_nvim_lazy_spec({
-        commit = "c975335137294b1d5d096338cb3d96ba5e9814d2"
-      }),
+      utils_nvim_lazy_spec,
     },
   }
 })
-
-require("keymaps")
-require("winbar").setup()
-require("theme").setup()
-require("statusline").setup()
-require("tabline").setup()
-require("persist").setup()
 
 if vim.g.neovide then require("config.neovide") end

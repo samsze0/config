@@ -36,6 +36,9 @@
 !.config/bottom/
 !.config/bottom/**
 
+!.config/yazi/
+!.config/yazi/**
+
 !.config/karabiner/
 !.config/karabiner/config.ts
 !.config/karabiner/default_config.json

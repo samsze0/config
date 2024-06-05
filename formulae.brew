@@ -41,6 +41,7 @@ koekeishiya/formulae/yabai
 kubernetes-cli
 less
 lf
+loc
 loki
 lua-language-server
 make
@@ -49,6 +50,7 @@ mysql@8.0
 neofetch
 neovim
 nvm
+openshift-cli
 pnpm
 postgresql@16
 prettier
@@ -86,5 +88,6 @@ watch
 watchman
 wget
 yaml-language-server
+yazi
 zoxide
 zsh

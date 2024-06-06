@@ -12,6 +12,7 @@ cocoapods
 coreutils
 croc
 curl
+docker
 dockutil
 eslint
 eza
@@ -33,6 +34,7 @@ gradle
 grafana
 helm
 imagemagick
+iproute2mac
 jdtls
 joshuto
 kind
@@ -43,6 +45,7 @@ less
 lf
 loc
 loki
+lua
 lua-language-server
 make
 maven

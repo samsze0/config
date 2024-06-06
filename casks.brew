@@ -1,3 +1,4 @@
+
 altserver
 android-studio
 aws-vpn-client
@@ -6,6 +7,7 @@ brave-browser
 datagrip
 discord
 docker
+firefox-developer-edition
 google-chrome
 iina
 insomnia
@@ -23,8 +25,11 @@ raspberry-pi-imager
 rectangle
 signal
 spotify
+ubiquiti-unifi-controller
 visual-studio-code
 warp
+wechat
 wezterm
+zed
 homebrew/cask-versions/firefox-developer-edition
 shaunsingh/sfmono-nerd-font-ligaturized/font-sf-mono-nerd-font-ligaturized

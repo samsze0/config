@@ -1,8 +1,7 @@
 *
 
-!casks.brew
-!formulae.brew
-!taps.brew
+!.Brewfile
+!.Brewfile.lock.json
 
 !.gitignore
 !.gitmodules

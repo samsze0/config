@@ -1,3 +1,8 @@
+local version = vim.version()
+if version.major ~= 0 or version.minor ~= 10 then
+  error("Neovim version 0.10 is required")
+end
+
 vim.cmd([[set clipboard+=unnamedplus]])
 
 vim.opt.number = true
@@ -166,7 +171,7 @@ require("lazy").setup({
   {
     "nvim-treesitter/nvim-treesitter",
     config = function() require("treesitter") end,
-    commit = "v0.9.2",
+    commit = "v0.9.1",
   },
   {
     "nvim-treesitter/nvim-treesitter-textobjects",

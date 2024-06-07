@@ -164,7 +164,7 @@ alias v='nvim'
 alias vv='neovide'
 alias lf='PAGER="nvim -RM" lf'
 
-export FZF_DEFAULT_OPTS=$(fzf_init)
+export FZF_DEFAULT_OPTS=$(fzf_default_opts)
 
 # zsh history
 setopt share_history

@@ -4,7 +4,7 @@
 
 # Return the command line args containing fzf's keybindings, colors and other config
 # The return value should be exported as `FZF_DEFAULT_OPTS`
-fzf_init() {
+fzf_default_opts() {
 	local is_linux
 	is_linux=false
 	if [[ "$OSTYPE" == "linux-gnu"* ]]; then

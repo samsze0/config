@@ -63,5 +63,5 @@ brew_cleanup() {
 }
 
 brew_install() {
-	brew bundle install --global
+	brew bundle install --global --no-upgrade
 }

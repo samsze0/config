@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+git_remote_list() {
+  git remote -v
+}
+
 git_stash_show() {
 	git stash show -u --full-index "$@"
 }

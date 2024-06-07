@@ -20,13 +20,6 @@ source ~/.config/zsh/azure.sh
 source ~/.config/zsh/openssh.sh
 source ~/.config/zsh/android.sh
 
-# fzf-tab
-# https://github.com/Aloxaf/fzf-tab/wiki/Configuration
-source ~/.config/zsh/plugins/fzf-tab/fzf-tab.plugin.zsh
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
-zstyle ':fzf-tab:complete:ls:*' fzf-preview 'eza -1 --color=always $realpath'
-zstyle ':fzf-tab:*' fzf-min-height 1000
-
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions
 source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
@@ -57,7 +50,7 @@ function pyenv_init_if_available() {
 
 function pip_init_if_available() {
 	if check_command_exists pip; then
-		# eval "$(pip completion --zsh)"
+		eval "$(pip completion --zsh)"
 	fi
 }
 
@@ -163,10 +156,10 @@ bindkey "^[[1;5D" backward-word
 bindkey "^[[1;5C" forward-word
 
 alias ssha='eval $(ssh-agent) && ssh-add'
-alias man-fzf='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
+alias fzf-man='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
 alias duf='duf -theme ansi'
 alias ll='eza -l'
-alias diff-delta='delta --raw'
+alias delta-diff='delta --raw'
 alias ts-get='tailscale_get'
 alias ts-send='tailscale_send'
 alias jq='gojq'
@@ -186,3 +179,4 @@ export SHELL="$(which zsh)"
 export PAGER="less"
 export EDITOR="nvim"
 export MANPAGER="nvim +Man\!" # https://neovim.io/doc/user/filetype.html#ft-man-plugin
+

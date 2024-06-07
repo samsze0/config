@@ -36,10 +36,7 @@ autoload -U compinit
 compinit
 compaudit || (compaudit | xargs chmod go-w) # Remove group & other write permission for all insecure directories if there are any
 
-HOMEBREW_PREFIX="/opt/homebrew"
-HOMEBREW_X86_PREFIX="/opt/homebrew-x86"
-
-function pyenv_init_if_available() {
+function init_pyenv() {
 	if check_command_exists pyenv; then
 		export PYENV_ROOT="$HOME/.pyenv"
 		mkdir -p "$PYENV_ROOT"
@@ -48,47 +45,44 @@ function pyenv_init_if_available() {
 	fi
 }
 
-function pip_init_if_available() {
+function init_pip() {
 	if check_command_exists pip; then
 		eval "$(pip completion --zsh)"
 	fi
 }
 
-function starship_init_if_available() {
+function init_starship() {
 	if check_command_exists starship; then
 		eval "$(starship init zsh)"
 	fi
 }
 
-function zoxide_init_if_available() {
+function init_zoxide() {
 	if check_command_exists zoxide; then
 		eval "$(zoxide init zsh)"
 	fi
 }
 
-function rbenv_init_if_available() {
+function init_rbenv() {
 	if check_command_exists rbenv; then
 		eval "$(rbenv init - zsh)"
 	fi
 }
 
-function nvm_init_if_available() {
-	export NVM_DIR="$HOME/.nvm"
-	if [[ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ]]; then
-		. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
-	fi
-	if [[ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ]]; then
-		. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
+function init_nvm() {
+	if [ $(arch) = "x86_64" ]; then # Linux / NixOS
+	else                            # OSX
+		export NVM_DIR="$HOME/.nvm"
+		if [[ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ]]; then
+			. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
+		fi
+		if [[ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ]]; then
+			. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
+		fi
 	fi
 }
 
 if [ $(arch) = "x86_64" ]; then # Linux / NixOS
-	starship_init_if_available
-	zoxide_init_if_available
-	pyenv_init_if_available
-	pip_init_if_available
-	rbenv_init_if_available
-
 	export PATH="/usr/local/cuda/bin:$PATH"
 
 	if [[ $(uname -a) =~ "nixos" ]]; then # NixOS
@@ -113,7 +107,10 @@ if [ $(arch) = "x86_64" ]; then # Linux / NixOS
 		export IMAGE_VIEWER="imv"
 		export VIDEO_PLAYER="celluloid"
 	fi
-else                           # OSX
+else # OSX
+	HOMEBREW_PREFIX="/opt/homebrew"
+	HOMEBREW_X86_PREFIX="/opt/homebrew-x86"
+
 	if [ $(arch) = "i386" ]; then # Rosetta
 		eval "$($HOMEBREW_X86_PREFIX/bin/brew shellenv)"
 	else # M1
@@ -127,13 +124,6 @@ else                           # OSX
 		export PATH="$HOMEBREW_PREFIX/opt/mysql@8.0/bin:$PATH"
 	fi
 
-	starship_init_if_available
-	zoxide_init_if_available
-	pyenv_init_if_available
-	pip_init_if_available
-	rbenv_init_if_available
-	nvm_init_if_available
-
 	export BROWSER="open -a '/Applications/Firefox Developer Edition.app'"
 	export IMAGE_VIEWER="open"
 	export VIDEO_PLAYER="iina"
@@ -143,6 +133,13 @@ else                           # OSX
 	export PATH="$ANDROID_HOME/emulator:$PATH"
 	export PATH="$ANDROID_HOME/tools:$PATH"
 fi
+
+init_starship
+init_zoxide
+init_pyenv
+init_pip
+init_rbenv
+init_nvm
 
 mkdir -p "$HOME/bin"
 export PATH=$HOME/bin:${PATH}
@@ -179,4 +176,3 @@ export SHELL="$(which zsh)"
 export PAGER="less"
 export EDITOR="nvim"
 export MANPAGER="nvim +Man\!" # https://neovim.io/doc/user/filetype.html#ft-man-plugin
-

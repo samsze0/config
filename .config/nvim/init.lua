@@ -56,7 +56,7 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 ---@type LazySpec
-local utils_nvim_lazy_spec = {
+local utils_nvim = {
   "samsze0/utils.nvim",
   priority = 100,
   dir = os.getenv("NVIM_UTILS_NVIM_PATH"), ---@diagnostic disable-line: assign-type-mismatch
@@ -66,6 +66,56 @@ local utils_nvim_lazy_spec = {
     require("theme").setup({})
     require("keymaps").setup({})
   end,
+}
+
+---@type LazySpec
+local nui = { -- Required by fzf & lf
+  "MunifTanjim/nui.nvim",
+  tag = "0.3.0",
+}
+
+---@type LazySpec
+local jumplist = {
+  "samsze0/jumplist.nvim",
+  dir = os.getenv("NVIM_JUMPLIST_NVIM_PATH"),
+  config = function() require("jumplist").setup({}) end,
+}
+
+local terminal_filetype = {
+  "samsze0/terminal-filetype.nvim",
+  dir = os.getenv("NVIM_TERMINAL_FILETYPE_NVIM_PATH"),
+  config = function() require("terminal-filetype").setup({}) end,
+}
+
+local notifier = {
+  "samsze0/notifier.nvim",
+  dir = os.getenv("NVIM_NOTIFIER_NVIM_PATH"),
+  config = function() require("notifier").setup({}) end,
+  dependencies = {
+    utils_nvim,
+  },
+}
+
+local fzf = {
+  "samsze0/fzf.nvim",
+  dir = os.getenv("NVIM_FZF_NVIM_PATH"),
+  config = function() require("fzf").setup({}) end,
+  dependencies = {
+    nui,
+    utils_nvim,
+    jumplist,
+    terminal_filetype,
+    notifier,
+  },
+}
+
+local websocket = {
+  "samsze0/websocket.nvim",
+  dir = os.getenv("NVIM_WEBSOCKET_NVIM_PATH"),
+  config = function() require("websocket").setup({}) end,
+  dependencies = {
+    utils_nvim,
+  },
 }
 
 require("lazy").setup({
@@ -175,49 +225,13 @@ require("lazy").setup({
     },
     enabled = false,
   },
-  { -- Required by fzf & lf
-    "MunifTanjim/nui.nvim",
-    tag = "0.3.0",
-  },
-  utils_nvim_lazy_spec,
-  {
-    "samsze0/jumplist.nvim",
-    dir = os.getenv("NVIM_JUMPLIST_NVIM_PATH"),
-    config = function() require("jumplist").setup({}) end,
-  },
-  {
-    "samsze0/terminal-filetype.nvim",
-    dir = os.getenv("NVIM_TERMINAL_FILETYPE_NVIM_PATH"),
-    config = function() require("terminal-filetype").setup({}) end,
-  },
-  {
-    "samsze0/notifier.nvim",
-    dir = os.getenv("NVIM_NOTIFIER_NVIM_PATH"),
-    config = function() require("notifier").setup({}) end,
-    dependencies = {
-      utils_nvim_lazy_spec,
-    },
-  },
-  {
-    "samsze0/fzf.nvim",
-    dir = os.getenv("NVIM_FZF_NVIM_PATH"),
-    config = function() require("fzf").setup({}) end,
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-      utils_nvim_lazy_spec,
-      "samsze0/jumplist.nvim",
-      "samsze0/terminal-filetype.nvim",
-      "samsze0/notifier.nvim",
-    },
-  },
-  {
-    "samsze0/websocket.nvim",
-    dir = os.getenv("NVIM_WEBSOCKET_NVIM_PATH"),
-    config = function() require("websocket").setup({}) end,
-    dependencies = {
-      utils_nvim_lazy_spec,
-    },
-  },
+  nui,
+  utils_nvim,
+  jumplist,
+  terminal_filetype,
+  notifier,
+  fzf,
+  websocket,
 })
 
 if vim.g.neovide then require("config.neovide") end

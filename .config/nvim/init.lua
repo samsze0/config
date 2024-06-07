@@ -14,34 +14,17 @@ vim.opt.wrap = true
 vim.opt.splitright = true
 vim.opt.splitbelow = true
 
-vim.api.nvim_create_autocmd("BufWinEnter", {
-  group = vim.api.nvim_create_augroup(
-    "Open-help-window-as-right-split",
-    { clear = true }
-  ),
-  pattern = { "*.txt" },
-  callback = function()
-    if vim.o.filetype == "help" then vim.cmd.wincmd("L") end
-  end,
-})
-
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-  group = vim.api.nvim_create_augroup("Markdown-config", { clear = true }),
-  pattern = { "*.md" },
-  callback = function(ctx) vim.opt.wrap = true end,
-})
-
 vim.opt.mousescroll = "ver:1" -- Multiplier
 
--- TODO: source .editorconfig
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.expandtab = true
 vim.opt.shiftwidth = 2
 vim.opt.smarttab = true
 vim.opt.showtabline = 0
+
 vim.cmd([[filetype on]])
-vim.cmd([[filetype plugin off]])
+vim.cmd([[filetype plugin on]])
 
 vim.cmd([[set formatoptions-=o]]) -- Disable auto comment in normal mode
 vim.cmd([[set formatoptions-=r]]) -- Disable auto comment in insert mode

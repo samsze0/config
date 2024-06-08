@@ -61,9 +61,3 @@ Change default shell to brew's installation of zsh:
 echo /opt/homebrew/bin/zsh | sudo tee -a /etc/shells
 chsh -s /opt/homebrew/bin/zsh
 ```
-
-App store:
-- ColorSlurp
-- Outline
-- Klack
-- Dark noise

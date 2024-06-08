@@ -99,6 +99,7 @@ brew "azure/functions/azure-functions-core-tools@4"
 brew "koekeishiya/formulae/skhd"
 brew "koekeishiya/formulae/yabai"
 brew "spring-io/tap/spring-boot"
+cask "1password"
 cask "altserver"
 cask "android-studio"
 cask "aws-vpn-client"
@@ -131,6 +132,11 @@ cask "warp"
 cask "wechat"
 cask "wezterm"
 cask "zed"
+mas "ColorSlurp", id: 1287239339
+mas "Dark Noise", id: 1465439395
+mas "Klack", id: 6446206067
+mas "Outline", id: 1356178125
+mas "Xcode", id: 497799835
 vscode "42crunch.vscode-openapi"
 vscode "acrylic.acrylic-dark-theme"
 vscode "adam-bender.commit-message-editor"

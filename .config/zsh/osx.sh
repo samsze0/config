@@ -46,9 +46,6 @@ osx_init() {
 	# Save to disk (not to iCloud) by default
 	defaults write -g NSDocumentSaveNewDocumentsToCloud -bool true
 
-	# Set the system accent color
-	defaults write -g AppleAccentColor -int 6
-
 	# Jump to the spot that's clicked on the scroll bar
 	defaults write -g AppleScrollerPagingBehavior -bool true
 

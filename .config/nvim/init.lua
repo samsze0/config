@@ -35,9 +35,19 @@ vim.opt.smartcase = true
 vim.opt.ignorecase = true
 vim.opt.hlsearch = true -- Highlight all matches. Use :noh to clear highlights
 
-vim.opt.conceallevel = 0
-
 vim.opt.fillchars:append({ diff = "╱" })
+
+-- For if buftype == nofile
+vim.api.nvim_create_autocmd({ "BufEnter" }, {
+  callback = function(ctx)
+    if vim.bo[ctx.buf].buftype ~= "nofile" then return end
+
+    if vim.bo[ctx.buf].filetype == "markdown" then
+      vim.opt.conceallevel = 3
+      vim.opt.concealcursor = "nvic" -- Conceal under all circumstances
+    end
+  end,
+})
 
 vim.opt.pumblend = 0 -- Popup-menu transparency
 

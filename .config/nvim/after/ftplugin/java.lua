@@ -3,9 +3,10 @@
 local os_utils = require("utils.os")
 local lang_utils = require("utils.lang")
 local jdtls = require("jdtls")
+local terminal_utils = require("utils.terminal")
 
 local jdtls_path = os.getenv("JDTLS_HOME")
-if not jdtls_path then error("env var JDTLS_HOME not set") end
+if not jdtls_path then error("Env var JDTLS_HOME not set") end
 local jdtls_system_config_path = lang_utils.match(os_utils.OS, {
   ["Darwin"] = jdtls_path .. "/config_mac",
   ["Linux"] = jdtls_path .. "/config_linux",
@@ -16,13 +17,15 @@ local jdtls_equinox_launcher_path =
 -- https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#data-directory-configuration
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
 local workspace_dir = vim.fn.getcwd() .. "/.jdtls"
+terminal_utils.system_unsafe("mkdir -p .jdtls")
 
 local lombok_path = vim.fn.getcwd() .. "/.jdtls/lombok.jar"
 local lombok_exists = vim.fn.filereadable(lombok_path)
 if not lombok_exists then
-  vim.cmd(
+  local _, status, _ = terminal_utils.system(
     "curl https://projectlombok.org/downloads/lombok.jar -o " .. lombok_path
   )
+  if status ~= 0 then error("Failed to download lombok.jar") end
 end
 
 if not jdtls_system_config_path then error("Unsupported OS " .. os_utils.OS) end

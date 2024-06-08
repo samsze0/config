@@ -118,6 +118,7 @@ else # OSX
 
 		export PATH="$HOMEBREW_PREFIX/opt/openjdk/bin:$PATH"
 		export JAVA_HOME="$HOMEBREW_PREFIX/opt/openjdk"
+		export JDTLS_HOME="$HOMEBREW_PREFIX/opt/jdtls/libexec"
 
 		export PATH="$HOMEBREW_PREFIX/opt/postgresql@16/bin:$PATH"
 

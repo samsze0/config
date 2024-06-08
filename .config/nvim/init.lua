@@ -175,6 +175,10 @@ local schemastore = {
   "b0o/schemastore.nvim",
 }
 
+local jdtls = {
+  "mfussenegger/nvim-jdtls",
+}
+
 local lspconfig = {
   "neovim/nvim-lspconfig",
   config = function() require("config.lspconfig") end,
@@ -182,6 +186,7 @@ local lspconfig = {
   dependencies = {
     cmp_nvim_lsp,
     schemastore,
+    jdtls,
   },
 }
 

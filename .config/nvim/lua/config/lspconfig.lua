@@ -118,6 +118,7 @@ require("lspconfig").glsl_analyzer.setup({
 })
 
 -- Java
-require("lspconfig").jdtls.setup({
-  capabilities = capabilities,
-})
+-- See ftplugin/java.lua
+-- require("lspconfig").jdtls.setup({
+--   capabilities = capabilities,
+-- })

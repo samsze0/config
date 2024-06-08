@@ -20,8 +20,9 @@ local workspace_dir = vim.fn.getcwd() .. "/.jdtls"
 terminal_utils.system_unsafe("mkdir -p .jdtls")
 
 local lombok_path = vim.fn.getcwd() .. "/.jdtls/lombok.jar"
-local lombok_exists = vim.fn.filereadable(lombok_path)
+local lombok_exists = vim.fn.filereadable(lombok_path) ~= 0
 if not lombok_exists then
+  vim.info("lombok.jar doesn't exists. Downloading...")
   local _, status, _ = terminal_utils.system(
     "curl https://projectlombok.org/downloads/lombok.jar -o " .. lombok_path
   )

@@ -5,36 +5,24 @@
 mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
 ```
 
-MacOS settings:
-- Drag lock in `accessibility > pointer control > trackpad options`
-- Disable `Automatically rearrange Spaces`
-
 Install command line developer tools
 ```bash
 sudo xcode-select --install
 ```
 
-On newer versions of OSX key repeat is disabled by default, to enable it, run:
+Setup system settings
 ```bash
-defaults write -g ApplePressAndHoldEnabled -bool false
-```
-
-Remove all app icons from dock:
-```bash
-defaults write com.apple.dock persistent-apps -array
-killall Dock
-# Or use dockutil
-```
-
-Change keyboard repeat delay:
-```bash
-defaults write -g InitialKeyRepeat -int 13 # by default minimum is 15 (225 ms)
-defaults write -g KeyRepeat -float 1.7     # by default minimum is 2 (30 ms)
+osx_init
 ```
 
 Create symlink to icloud:
 ```bash
 ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud
+```
+
+Install brew "packages" from `.Brewfile.lock.json`
+```bash
+brew_install
 ```
 
 Karabiner:
@@ -59,13 +47,19 @@ sudo nvram boot-args=-arm64e_preview_abi
 yabai --start-service
 skhd --start-service
 
-# Load scripting edition
+# Load scripting edition (on login)
 sudo yabai --load-sa
 ```
 
 Sometimes desktop icons will glitch. To fix:
 ```bash
 killall Finder
+```
+
+Change default shell to brew's installation of zsh:
+```bash
+echo /opt/homebrew/bin/zsh | sudo tee -a /etc/shells
+chsh -s /opt/homebrew/bin/zsh
 ```
 
 App store:

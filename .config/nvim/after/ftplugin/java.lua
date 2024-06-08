@@ -8,6 +8,11 @@ local jdtls_system_config_path = lang_utils.match(os_utils.OS, {
   ["Darwin"] = jdtls_path .. "/config_mac",
   ["Linux"] = jdtls_path .. "/config_linux",
 })
+local jdtls_equinox_launcher_version = "1.6.800.v20240513-1750" -- TODO
+local jdtls_equinox_launcher_path = jdtls_path
+  .. "/plugins/org.eclipse.equinox.launcher_"
+  .. jdtls_equinox_launcher_version
+  .. ".jar"
 
 -- https://github.com/mfussenegger/nvim-jdtls?tab=readme-ov-file#data-directory-configuration
 local project_name = vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t")
@@ -32,7 +37,7 @@ local config = {
     "--add-opens",
     "java.base/java.lang=ALL-UNNAMED",
     "-jar",
-    jdtls_path .. "/plugins/org.eclipse.equinox.launcher_VERSION_NUMBER.jar", -- TODO: version number
+    jdtls_equinox_launcher_path,
     "-configuration",
     jdtls_system_config_path,
     -- See `data directory configuration` section in the README

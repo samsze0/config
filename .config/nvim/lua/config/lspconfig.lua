@@ -118,7 +118,9 @@ require("lspconfig").glsl_analyzer.setup({
 })
 
 -- Java
--- See ftplugin/java.lua
--- require("lspconfig").jdtls.setup({
---   capabilities = capabilities,
--- })
+-- See also: ftplugin/java.lua
+if not os.getenv("NVIM_USE_JDTLS") then
+  require("lspconfig").jdtls.setup({
+    capabilities = capabilities,
+  })
+end

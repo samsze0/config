@@ -1,3 +1,5 @@
+if not os.getenv("NVIM_USE_JDTLS") then return end
+
 -- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
 
 local os_utils = require("utils.os")

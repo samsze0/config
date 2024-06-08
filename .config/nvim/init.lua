@@ -135,7 +135,6 @@ local treesitter = {
 
 local copilot = {
   "zbirenbaum/copilot.lua",
-  enabled = not vim.g.vi_mode,
   config = function() require("config.copilotlua") end,
   commit = "f7612f5af4a7d7615babf43ab1e67a2d790c13a6",
 }

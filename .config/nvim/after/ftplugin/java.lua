@@ -5,6 +5,7 @@ local lang_utils = require("utils.lang")
 local jdtls = require("jdtls")
 
 local jdtls_path = os.getenv("JDTLS_HOME")
+if not jdtls_path then error("env var JDTLS_HOME not set") end
 local jdtls_system_config_path = lang_utils.match(os_utils.OS, {
   ["Darwin"] = jdtls_path .. "/config_mac",
   ["Linux"] = jdtls_path .. "/config_linux",

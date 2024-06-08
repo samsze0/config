@@ -29,6 +29,9 @@
 !.warp/themes/**
 !.warp/keybindings.yaml
 
+!.config/apple/
+!.config/apple/**
+
 !.config/bat/
 !.config/bat/**
 

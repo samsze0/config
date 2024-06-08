@@ -5,6 +5,31 @@ osx_notify() {
 	osascript -e "display notification \"$2\" with title \"$1\""
 }
 
+osx_find_bundle_id() {
+	osascript -e "id of app \"$1\""
+}
+
+osx_init_keymaps() {
+	# Alternatively, directly edit the plist files
+	# https://www.reddit.com/r/MacOS/comments/12s4i9k/question_is_there_a_way_to_configure/
+  echo "Not ready"
+  exit 1
+	osascript ~/.config/apple/keymaps.scpt
+}
+
+osx_global_settings() {
+	defaults read ~/Library/Preferences/.GlobalPreferences.plist
+}
+
+osx_finder_settings() {
+	defaults read ~/Library/Preferences/com.apple.finder.plist
+}
+
+osx_plist_to_xml() {
+	cp "$1" "$1.xml"
+	plutil -convert xml1 "$1.xml"
+}
+
 osx_init() {
 	# https://macos-defaults.com/
 	# https://sxyz.blog/macos-setup/
@@ -153,7 +178,7 @@ osx_init() {
 	defaults write com.apple.AdLib allowApplePersonalizedAdvertising -bool false
 	defaults write com.apple.AdLib allowIdentifierForAdvertising -bool false
 
- 	# Reload Dock
+	# Reload Dock
 	killall Dock
 
 	# Reload SystemUIServer

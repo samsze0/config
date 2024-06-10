@@ -26,5 +26,7 @@
   "schemastore.nvim": { "branch": "main", "commit": "d9fd6651b47b68bfc1b952f81a0fdded3cb205b2" },
   "terminal-filetype.nvim": { "branch": "main", "commit": "6a76a6d32130cedc119c7472482a6ece1e95f007" },
   "utils.nvim": { "branch": "main", "commit": "1aeb75875cb685fc1d576654db81273d8c89e718" },
-  "websocket.nvim": { "branch": "main", "commit": "2ee5d34b4fe99ee40e772e85eeb39bb4e4642472" }
+  "websocket.nvim": { "branch": "main", "commit": "2ee5d34b4fe99ee40e772e85eeb39bb4e4642472" },
+  "workspace-diagnostics.nvim": { "branch": "main", "commit": "0f0dad6cc3fbc2c9c2d850eb7611917cf66d4595" },
+  "yazi.nvim": { "branch": "main", "commit": "822935d234955133650403785fbd3b3d2861c898" }
 }

@@ -188,6 +188,11 @@ local jdtls = {
   "mfussenegger/nvim-jdtls",
 }
 
+local workspace_diagnostics = {
+  "artemave/workspace-diagnostics.nvim",
+  config = function() require("workspace-diagnostics").setup({}) end,
+}
+
 local lspconfig = {
   "neovim/nvim-lspconfig",
   config = function() require("config.lspconfig") end,
@@ -196,6 +201,7 @@ local lspconfig = {
     cmp_nvim_lsp,
     schemastore,
     jdtls,
+    workspace_diagnostics,
   },
 }
 
@@ -290,6 +296,11 @@ local dap = {
   enabled = false,
 }
 
+local yazi = {
+  "samsze0/yazi.nvim",
+  config = function() require("yazi").setup({}) end,
+}
+
 require("lazy").setup({
   fzf_lua,
   lspconfig,
@@ -313,6 +324,7 @@ require("lazy").setup({
   notifier,
   fzf,
   websocket,
+  yazi,
 })
 
 if vim.g.neovide then require("config.neovide") end

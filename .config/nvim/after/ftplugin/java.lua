@@ -2,6 +2,8 @@ if not os.getenv("NVIM_USE_JDTLS") then return end
 
 -- See `:help vim.lsp.start_client` for an overview of the supported `config` options.
 
+-- https://github.com/exosyphon/nvim/blob/0aa48126c7f35f2009c5a695860a53c8a450485f/ftplugin/java.lua#L1
+
 local os_utils = require("utils.os")
 local lang_utils = require("utils.lang")
 local jdtls = require("jdtls")
@@ -79,6 +81,23 @@ local config = {
     java = {
       signatureHelp = { enabled = true },
       extendedClientCapabilities = jdtls.extendedClientCapabilities,
+      maven = {
+        downloadSources = true,
+      },
+      referencesCodeLens = {
+        enabled = true,
+      },
+      references = {
+        includeDecompiledSources = true,
+      },
+      inlayHints = {
+        parameterNames = {
+          enabled = "all", -- literals, all, none
+        },
+      },
+      format = {
+        enabled = false,
+      },
     },
   },
 

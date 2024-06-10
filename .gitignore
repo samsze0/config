@@ -78,7 +78,6 @@
 
 !.config/nvim/
 !.config/nvim/**
-.config/nvim/.luarc.json
 
 !.config/tmux/
 !.config/tmux/**

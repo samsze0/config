@@ -12,8 +12,8 @@ osx_find_bundle_id() {
 osx_init_keymaps() {
 	# Alternatively, directly edit the plist files
 	# https://www.reddit.com/r/MacOS/comments/12s4i9k/question_is_there_a_way_to_configure/
-  echo "Not ready"
-  exit 1
+	echo "Not ready"
+	exit 1
 	osascript ~/.config/apple/keymaps.scpt
 }
 
@@ -50,8 +50,8 @@ osx_init() {
 	defaults write -g InitialKeyRepeat -int 13 # by default minimum is 15 (225 ms)
 	defaults write -g KeyRepeat -float 1.7     # by default minimum is 2 (30 ms)
 
-	# Disable "Natural" scrolling
-	defaults write -g com.apple.swipescrolldirection -bool false
+	# Enable "Natural" scrolling
+	defaults write -g com.apple.swipescrolldirection -bool true
 
 	# Disable smart dash/period/quote substitutions
 	defaults write -g NSAutomaticDashSubstitutionEnabled -bool false
@@ -98,8 +98,8 @@ osx_init() {
 	# Dock: Disable group apps by window automatically
 	defaults write com.apple.dock "expose-group-apps" -bool false
 
-	# Dock: Display doesn't have separate spaces
-	defaults write com.apple.spaces "spans-displays" -bool true
+	# Dock: Display have separate spaces (required by yabai)
+	defaults write com.apple.spaces "spans-displays" -bool false
 
 	# Finder: Allow quitting via ⌘Q
 	defaults write com.apple.finder QuitMenuItem -bool true

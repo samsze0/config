@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 git_remote_list() {
-  git remote -v
+	git remote -v
 }
 
 git_stash_show() {
@@ -16,75 +16,6 @@ git_remote_prune() {
 	git remote update origin --prune
 }
 
-# Git diff helper
-# man git diff
-git_diff() (
-	set_flags
-
-	mode=$(
-		cat <<EOF | fzf
---full-index
---name-only
---stat
-EOF
-	)
-
-	lhs=$(
-		cat <<EOF | fzf
-working tree (implicit)
-index (--staged / --cached)
-branch
-commit
-EOF
-	)
-
-	if [[ "$lhs" == "index (--staged / --cached)" ]]; then
-		rhs_options=$(
-			cat <<EOF
-HEAD~1 (implicit)
-branch
-commit
-EOF
-		)
-		lhs="--staged"
-	elif [[ "$lhs" == "working tree (implicit)" ]]; then
-		rhs_options=$(
-			cat <<EOF
-HEAD (implicit)
-branch
-commit
-EOF
-		)
-		lhs=""
-	else
-		if [[ "$lhs" == "branch" ]]; then
-			lhs=$(git_select_branch)
-		elif [[ "$lhs" == "commit" ]]; then
-			lhs=$(git_select_commit)
-		fi
-		rhs_options=$(
-			cat <<EOF
-branch
-commit
-EOF
-		)
-	fi
-
-	rhs=$(echo "$rhs_options" | fzf)
-
-	if [[ "$rhs" == "branch" ]]; then
-		rhs=$(git_select_branch)
-	elif [[ "$rhs" == "commit" ]]; then
-		rhs=$(git_select_commit)
-	elif [[ "$rhs" == "HEAD~1 (implicit)" ]]; then
-		rhs=""
-	elif [[ "$rhs" == "HEAD (implicit)" ]]; then
-		rhs=""
-	fi
-
-	git diff $mode $lhs $rhs
-)
-
 # Git branch helper
 # By default show tracking info (relationship between local and remote branches)
 # man git branch
@@ -94,7 +25,7 @@ git_branch() (
 	git branch -vv --all --format="%(refname:short) -> %(upstream:short)"
 )
 
-git_select_branch() (
+git_branch_select() (
 	set_flags
 
 	choice=$(git_branch)
@@ -102,7 +33,7 @@ git_select_branch() (
 	echo "$ref"
 )
 
-git_select_commit() (
+git_commit_select() (
 	set_flags
 
 	branch="${1:-}"
@@ -112,79 +43,6 @@ git_select_commit() (
 	choice=$(git log --oneline --no-color $branch | fzf)
 	read -r commit rest <<<"$choice"
 	echo "$commit"
-)
-
-# Git worktree_add helper
-# man git worktree
-git_worktree_add() (
-	set_flags
-
-	ref=""
-	commit_mode=false
-
-	while (("$#")); do
-		case "$1" in
-		--commit)
-			echo "Commit option specified"
-			commit_mode=true
-			shift
-			;;
-		*)
-			if [[ -z "$ref" ]]; then
-				ref="$1"
-				shift
-				continue
-			fi
-			echo "Invalid option: $1" >&2
-			return 1
-			;;
-		esac
-	done
-
-	if [[ -z "$ref" ]]; then
-		branch=$(git_select_branch)
-		if $commit_mode; then
-			ref=$(git_select_commit $branch)
-		else
-			ref=$branch
-		fi
-	fi
-	git worktree add $ref
-)
-
-# Git clone helper
-git_clone() (
-	set_flags
-
-	local repo_url="${1:-}"
-	if [[ -n "$repo_url" ]]; then
-		shift
-	fi
-	repo_name="${2:-}"
-	if [[ -n "$repo_name" ]]; then
-		shift
-	fi
-
-	mode=$(
-		cat <<EOF | fzf
-normal (implicit)
-worktree (--bare)
-EOF
-	)
-	if [[ "$mode" == "normal (implicit)" ]]; then
-		opts=""
-	elif [[ "$mode" == "worktree (--bare)" ]]; then
-		opts="--bare"
-	fi
-	git clone $opts $repo_url $repo_name
-
-	if [[ -z "$repo_name" ]]; then
-		if [[ "$mode" == "normal (implicit)" ]]; then
-			repo_name=$(basename "$repo_url" .git)
-		elif [[ "$mode" == "worktree (--bare)" ]]; then
-			repo_name=$(basename "$repo_url")
-		fi
-	fi
 )
 
 # Git worktree_remove helper
@@ -210,4 +68,81 @@ git_config_personal() {
 git_config_work() {
 	git config --local user.name "Sam Sze"
 	git config --local user.email "sam.m.sze@accenture.com"
+}
+
+# Append settings to `.gitconfig`. Require manual removal of old entries.
+git_config_init() {
+	cat <<EOT >>~/.gitconfig
+
+[diff]
+    tool = nvimdiff
+
+[difftool]
+    prompt = false
+
+[difftool "nvimdiff"]
+    cmd = "nvim -d \\"\$LOCAL\\" \\"\$REMOTE\\""
+
+[merge]
+    tool = nvimdiff
+
+[mergetool]
+    prompt = true
+
+[mergetool "nvimdiff"]
+    cmd = "nvim -d \\"\$LOCAL\\" \\"\$REMOTE\\" \\"\$MERGED\\" -c 'wincmd w' -c 'wincmd J'"
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    # Tweaked from: https://github.com/maxfangx
+    # https://github.com/dandavison/delta/blob/main/themes.gitconfig
+    # General appearance
+    dark = true
+    syntax-theme = base16
+    # File
+    file-style = "#cbd1da" bold
+    file-added-label = [+]
+    file-copied-label = [==]
+    file-modified-label = [*]
+    file-removed-label = [-]
+    file-renamed-label = [->]
+    file-decoration-style = "#3e4451" ul
+    file-decoration-style = "#727b8f" ul
+    # No hunk headers
+    hunk-header-style = omit
+    # Line numbers
+    line-numbers = true
+    line-numbers-left-style = "#727b8f"
+    line-numbers-right-style = "#727b8f"
+    line-numbers-minus-style = "#c64d4d"
+    line-numbers-plus-style = "#537dcd"
+    line-numbers-zero-style = "#727b8f"
+    line-numbers-left-format = " {nm:>3} │"
+    line-numbers-right-format = " {np:>3} │"
+    # Diff contents
+    inline-hint-style = syntax
+    minus-style = syntax "#2f0f0f"
+    minus-emph-style = syntax "#7b2525"
+    minus-non-emph-style = syntax auto
+    plus-style = syntax "#122241"
+    plus-emph-style = syntax "#26498b"
+    plus-non-emph-style = syntax auto
+    whitespace-error-style = "#7b2525" reverse
+    # Commit hash
+    commit-decoration-style = normal box
+    commit-style = "#cbd1da" bold
+    # Blame
+    blame-code-style = syntax
+    blame-format = "{author:>18} ({commit:>8}) {timestamp:<13} "
+    blame-palette = "#000000" "#1d2021" "#282828" "#3c3836"
+    # Merge conflicts
+    merge-conflict-begin-symbol = ⌃
+    merge-conflict-end-symbol = ⌄
+    merge-conflict-ours-diff-header-style = "#e9a069" bold
+    merge-conflict-theirs-diff-header-style = "#e9a069" bold overline
+    merge-conflict-ours-diff-header-decoration-style = ''
+    merge-conflict-theirs-diff-header-decoration-style = ''
+EOT
 }

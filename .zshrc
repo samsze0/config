@@ -6,7 +6,6 @@ source ~/.config/zsh/image.sh
 source ~/.config/zsh/browser.sh
 source ~/.config/zsh/kitty.sh
 source ~/.config/zsh/nix.sh
-source ~/.config/zsh/gitconfig.sh
 source ~/.config/zsh/fzf.sh
 source ~/.config/zsh/socket.sh
 source ~/.config/zsh/unix.sh

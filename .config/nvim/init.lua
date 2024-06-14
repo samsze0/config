@@ -298,6 +298,7 @@ local dap = {
 
 local yazi = {
   "samsze0/yazi.nvim",
+  dir = os.getenv("NVIM_YAZI_NVIM_PATH"),
   config = function() require("yazi").setup({}) end,
 }
 

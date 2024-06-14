@@ -6,8 +6,13 @@ if not os.getenv("NVIM_USE_JDTLS") then return end
 
 local os_utils = require("utils.os")
 local lang_utils = require("utils.lang")
-local jdtls = require("jdtls")
 local terminal_utils = require("utils.terminal")
+
+local safe_require = lang_utils.safe_require
+
+---@module 'jdtls'
+local jdtls = safe_require("jdtls")
+if not jdtls then return end
 
 local jdtls_path = os.getenv("JDTLS_HOME")
 if not jdtls_path then error("Env var JDTLS_HOME not set") end

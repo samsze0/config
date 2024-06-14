@@ -1,10 +1,33 @@
 local lang_utils = require("utils.lang")
 local tbl_utils = require("utils.table")
-local jumplist = require("jumplist")
-local conform = require("conform")
 local keymap_utils = require("utils.keymap")
 local command_utils = require("utils.command")
 local editor_utils = require("utils.editor")
+
+local safe_require = lang_utils.safe_require
+local nullish = lang_utils.nullish
+
+local jumplist = require("jumplist")
+local lf = require("lf")
+local persist = require("persist")
+
+---@module 'conform'
+local conform = safe_require("conform")
+
+---@module 'copilot.suggestion'
+local copilot_suggestion = safe_require("copilot.suggestion")
+
+---@module 'copilot.panel'
+local copilot_panel = safe_require("copilot.panel")
+
+---@module 'copilot'
+local copilot = safe_require("copilot")
+
+---@module 'cmp'
+local cmp = safe_require("cmp")
+
+---@module 'fzf-lua'
+local fzf_lua = safe_require("fzf-lua")
 
 ---@param opts? {  }
 local setup = function(opts)
@@ -265,7 +288,7 @@ local setup = function(opts)
 
   -- Fzf/FzfLua
 
-  keymap_utils.create("n", "<f1>", require("fzf-lua").builtin)
+  keymap_utils.create("n", "<f1>", nullish(fzf_lua).builtin)
 
   keymap_utils.create(
     "n",
@@ -299,7 +322,7 @@ local setup = function(opts)
     "<f5><f4>",
     function()
       require("fzf.grep.file")({
-        initial_query = editor_utils.get_visual_selection(),
+        initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
       }):start()
     end
   )
@@ -308,7 +331,7 @@ local setup = function(opts)
     "<f5><f5>",
     function()
       require("fzf.grep.workspace")({
-        initial_query = editor_utils.get_visual_selection(),
+        initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
       }):start()
     end
   )
@@ -428,12 +451,14 @@ local setup = function(opts)
   keymap_utils.create("n", "<space>l", "<cmd>LspInfo<CR>")
 
   keymap_utils.create("n", "ll", function()
+    if not conform then return vim.lsp.buf.format() end
+
     local success = conform.format()
     if success then
       return vim.info("Formatted with", conform.list_formatters()[1].name)
     else
       vim.lsp.buf.format()
-      vim.info("Formatted with LSP formatter")
+      vim.info("Conform failed. Formatted with 'vim.lsp.buf.format()'")
     end
   end)
 
@@ -448,7 +473,7 @@ local setup = function(opts)
     )
 
     vim.ui.select(formatters, {
-      prompt = "Select format providers:",
+      prompt = "[LSP] Select formatter:",
       format_item = function(formatter) return formatter.name end,
     }, function(formatter)
       vim.lsp.buf.format({
@@ -464,13 +489,18 @@ local setup = function(opts)
       function(_, formatter) return formatter.available end
     )
     vim.ui.select(formatters, {
-      prompt = "Select formatter:",
+      prompt = "[Conform] Select formatter:",
       format_item = function(formatter) return formatter.name end,
     }, function(formatter) conform.format({ formatters = formatter.name }) end)
   end
 
-  keymap_utils.create("n", "lL", conform_pick_formatter)
-  -- keymap_utils.create("n", "lL", lsp_pick_formatter)
+  keymap_utils.create("n", "lL", function()
+    if conform then
+      conform_pick_formatter()
+    else
+      lsp_pick_formatter()
+    end
+  end)
 
   -- Comment
   keymap_utils.create("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)")
@@ -515,7 +545,7 @@ local setup = function(opts)
 
   -- Session restore
   keymap_utils.create("n", "<Space>r", function()
-    require("persist").load_session()
+    persist.load_session()
     vim.info("Reloaded session")
   end)
 
@@ -531,28 +561,30 @@ local setup = function(opts)
 
   -- Nvim Cmp
   keymap_utils.create("i", "<M-r>", function()
-    local cmp = require("cmp")
+    if not cmp then return end
 
     if cmp.visible() then cmp.confirm({ select = true }) end
   end)
 
   -- Copilot
   if not vim.g.vi_mode then
-    keymap_utils.create("n", "<leader>a", "<cmd>Copilot enable<CR>")
-    keymap_utils.create("i", "<M-a>", require("copilot.suggestion").accept)
-    keymap_utils.create("i", "<M-w>", require("copilot.suggestion").accept_line)
-    keymap_utils.create("i", "<M-d>", require("copilot.suggestion").next)
-    keymap_utils.create("i", "<M-e>", require("copilot.suggestion").prev)
-    keymap_utils.create("i", "<M-q>", require("copilot.panel").open)
-    keymap_utils.create("n", "<M-e>", require("copilot.panel").jump_prev)
-    keymap_utils.create("n", "<M-d>", require("copilot.panel").jump_next)
-    keymap_utils.create("n", "<M-a>", require("copilot.panel").accept)
+    keymap_utils.create("n", "<leader>a", function()
+      if copilot then vim.cmd("Copilot enable") end
+    end)
+    keymap_utils.create("i", "<M-a>", nullish(copilot_suggestion).accept)
+    keymap_utils.create("i", "<M-w>", nullish(copilot_suggestion).accept_line)
+    keymap_utils.create("i", "<M-d>", nullish(copilot_suggestion).next)
+    keymap_utils.create("i", "<M-e>", nullish(copilot_suggestion).prev)
+    keymap_utils.create("i", "<M-q>", nullish(copilot_panel).open)
+    keymap_utils.create("n", "<M-e>", nullish(copilot_panel).jump_prev)
+    keymap_utils.create("n", "<M-d>", nullish(copilot_panel).jump_next)
+    keymap_utils.create("n", "<M-a>", nullish(copilot_panel).accept)
   end
 
   -- File managers
-  keymap_utils.create("n", "<f2><f2>", require("lf").lf)
+  keymap_utils.create("n", "<f2><f2>", lf.lf)
   keymap_utils.create("n", "<f2><f3>", function()
-    require("lf").lf({
+    lf.lf({
       path = vim.fn.expand("%:p"), -- Relative to ~ doesn't work
     })
   end)

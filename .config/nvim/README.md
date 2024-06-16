@@ -12,6 +12,7 @@ Z-. X->git C-. V-. B-> N-> M-> ,->macro .-. /-.
 
 - https://neovimcraft.com/plugin/nanotee/nvim-lua-guide
 - [Programming in Lua (first edition) online ver.](https://www.lua.org/pil/contents.html)
+- `:h lua`
 
 # Less common vim keymaps/tips
 
@@ -114,7 +115,7 @@ Z-. X->git C-. V-. B-> N-> M-> ,->macro .-. /-.
 - `:so <file>` to source the lua file (just like zsh)
 - Launch neovim as `v --cmd "set rtp+=<path-to-lua-lib>"` to add plugin locally
 - Packages/plugins are cached when neovim first loads them. With the snippet below, we can have a quick feedback loop `:Test` -> `:so %` -> `:Test` -> ...
-- Borrow AST information from Treesitter playground! (vscode doesn't support this). https://github.com/nvim-treesitter/playground . Debug using `:InspectTree` and `:EditQuery` (requires nightly 0.10+).
+- Query AST information using Treesitter playground (vscode doesn't support this). https://github.com/nvim-treesitter/playground . Debug using `:InspectTree` and `:EditQuery` (requires nightly 0.10+).
 - `vim.pretty_print` for pretty print
 
 ```lua
@@ -128,51 +129,21 @@ end, {})
 
 **High priority**
 
-- Fzf grep (fzf disabled) focus entry not updating when query changed
 - LF nvim preview
 - LF image preview over SSH
-- SSH line editor ignore delay?
+- SSH line editor delay
 - Syncthing/tailscale clipboard
-- Fzf TODO comments
-- Fzf backups
 - Git diff +/- proper syntax highlighting
 - Git hunk preview as Nui split with proper syntax highlighting
-- Job system, refetch-in-background "watch mode" by comparising hashes? Requires idempotent command; mark as dirty/stale (need invalidate/refresh); Perhaps have a watchman daemon running and a local socket server that takes a list of subscribers?
 - LSP import path update (with watchman and LSP willrename etc...) (depends on watchman)
 - LSP rename workflow (WorkspaceEdit[]). depends on watchman
-- Fix Lf add new file will add line at bottom that breaks layout
-- Stream entries to fzf and fzf async
-- Simplify way to define max col width for columns
 
 **Mid priority**
 
-- Fzf linux commands (lsof, lsblk, etc)
-- Fzf brew services and formulae
-- Fzf k8s
-- Fzf tailscale
-- Fzf syncthing
-- Fzf git worktree
-- Better markdown workflow
-- Backup filename collision + auto cleanup with systemd?
-- Streaming with fzf async that works with initial position
-- Async await syntax rather than callback
-- OOP rather than all modules and functions
-- Threads pool and sync primitives (semaphore)
-- Lf create_new multi-layer dir support
-- Tabline dedup by git-files
-- Tabline better "scrolling"
+- Markdown preview
+- Backup filename collision + purge old backups
 
 **Low priority**
 
-- Lf fork that has Lua API (for git status, dynamic dir flatten)
-- Custom treesitter textobjects plugin
-- Lf show git status (pico-lf?)
-- Lf flatten dir (for Java)
-- Tests
-- LF preview in nvim
-- Fzf core - handler error reporting and handling (at the moment is sliented)
+- Custom treesitter textobjects
 - Performance profiling & optimization (w/ flamegraph)
-- Fix Fzf somethings hang if actions happen too quick?
-- Custom copilot plugin (possible to use chat?)
-- React dev workflow
-- Custom scrollbar plugin that supports remote refresh and git status and support background + foreground

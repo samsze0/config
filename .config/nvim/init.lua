@@ -135,7 +135,7 @@ local treesitter = {
 
 local copilot = {
   "zbirenbaum/copilot.lua",
-  config = function() require("config.copilotlua") end,
+  config = function() require("config.copilot") end,
   commit = "f7612f5af4a7d7615babf43ab1e67a2d790c13a6",
 }
 
@@ -148,7 +148,7 @@ local colorizer = {
 local nvim_lint = {
   -- Linters interface that reports to vim.diagnostic
   "mfussenegger/nvim-lint",
-  config = function() require("config.nvimlint") end,
+  config = function() require("config.nvim-lint") end,
   commit = "1a3a8d047bc01f1760ae4a0f5e80f111ea222e67",
 }
 
@@ -171,7 +171,7 @@ local scrollview = {
 
 local fzf_lua = {
   "ibhagwan/fzf-lua",
-  config = function() require("config.fzflua").setup() end,
+  config = function() require("config.fzf-lua").setup() end,
   commit = "d368f76b37448d31918c81f020b0c725781c8354",
 }
 
@@ -261,7 +261,7 @@ local LuaSnip = {
 
 local nvim_cmp = {
   "hrsh7th/nvim-cmp",
-  config = function() require("config.nvimcmp") end,
+  config = function() require("config.nvim-cmp") end,
   dependencies = {
     cmp_nvim_lsp,
     cmp_path,

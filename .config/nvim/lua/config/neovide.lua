@@ -1,4 +1,4 @@
-vim.o.guifont = "DroidSansM Nerd Font:h11"
+vim.o.guifont = "Liga SFMono Nerd Font:h13"
 
 vim.g.neovide_cursor_vfx_mode = "ripple"
 vim.g.neovide_cursor_vfx_mode = ""

@@ -16,6 +16,12 @@ git_remote_prune() {
 	git remote update origin --prune
 }
 
+git_stash_push_and_pull() {
+    git stash push -m "WIP" --all --include-untracked
+    git pull --rebase
+    git stash pop
+}
+
 # Git branch helper
 # By default show tracking info (relationship between local and remote branches)
 # man git branch

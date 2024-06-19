@@ -164,11 +164,7 @@ osx_init() {
 	defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 	# Screen capture: Set the filename which screencaptures should be written
-	defaults write com.apple.screencapture name -string screenshot
 	defaults write com.apple.screencapture include-date -bool false
-
-	# Screen capture: save to "Pictures"
-	defaults write com.apple.screencapture location -string "$HOME/Pictures"
 
 	# Screen capture: Display the thumbnail after taking a screenshot
 	defaults write com.apple.screencapture show-thumbnail -bool true

@@ -75,12 +75,12 @@ $os\
 $shell\
 $character"""
 
-right_format = """
-$sudo\
-$memory_usage\
-$username\
-$hostname\
-$localip"""
+# right_format = """
+# $sudo\
+# $memory_usage\
+# $username\
+# $hostname\
+# $localip"""
 
 [battery]
 disabled = true
@@ -443,3 +443,4 @@ when = "w -h | awk '{print $6}' | grep 'sshd' | wc -l | xargs -I{} -- test {} -g
 symbol = "SSH "
 format = '⋅ [$symbol($output )]($style)'
 style = " grey"
+

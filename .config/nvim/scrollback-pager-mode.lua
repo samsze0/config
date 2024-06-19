@@ -14,6 +14,8 @@ while #lines > 0 and vim.trim(lines[#lines]) == "" do
   lines[#lines] = nil
 end
 
+lines[#lines] = vim.trim(lines[#lines])
+
 local new_buf = vim.api.nvim_create_buf(false, true)
 local channel = vim.api.nvim_open_term(new_buf, {})
 
@@ -24,6 +26,11 @@ vim.api.nvim_set_current_buf(new_buf)
 vim.api.nvim_buf_delete(current_buf, { force = true })
 
 vim.keymap.set("n", "q", "<cmd>q!<cr>", { silent = true, buffer = new_buf })
-vim.keymap.set("n", "<space>q", "<cmd>q!<cr>", { silent = true, buffer = new_buf })
+vim.keymap.set(
+  "n",
+  "<space>q",
+  "<cmd>q!<cr>",
+  { silent = true, buffer = new_buf }
+)
 
 vim.cmd("normal! G")

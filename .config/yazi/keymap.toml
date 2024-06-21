@@ -18,6 +18,18 @@ prepend_keymap = [
   { on = [
     "<F1>",
   ], run = "tasks_show", desc = "Show task manager" },
+  { on = [
+    "<CR>",
+  ], run = "open --interactive --hover", desc = "Show context menu for hovered file" },
+  { on = [
+    "<C-t>",
+  ], run = "tab_create", desc = "New tab" },
+  { on = [
+    "<C-j>",
+  ], run = "tab_switch -1 --relative", desc = "Prev tab" },
+  { on = [
+    "<C-l>",
+  ], run = "tab_switch +1 --relative", desc = "Next tab" },
 ]
 
 [tasks]

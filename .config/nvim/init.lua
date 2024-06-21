@@ -299,7 +299,22 @@ local dap = {
 local yazi = {
   "samsze0/yazi.nvim",
   dir = os.getenv("NVIM_YAZI_NVIM_PATH"),
-  config = function() require("yazi").setup({}) end,
+  config = function()
+    require("yazi").setup({
+      keymaps = {
+        show_help = "<f12>",
+        file_open = {
+          new_tab = "<M-t>",
+          new_window = "<M-w>",
+        },
+      },
+    })
+  end,
+  dependencies = {
+    utils_nvim,
+    nui,
+    jumplist,
+  },
 }
 
 require("lazy").setup({

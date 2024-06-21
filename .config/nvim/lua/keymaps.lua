@@ -10,6 +10,7 @@ local nullish = lang_utils.nullish
 local jumplist = require("jumplist")
 local lf = require("lf")
 local persist = require("persist")
+local YaziBasicInstance = require("yazi.instance").BasicInstance
 
 ---@module 'conform'
 local conform = safe_require("conform")
@@ -292,34 +293,34 @@ local setup = function(opts)
 
   keymap_utils.create(
     "n",
-    "<f3><f3>",
+    "<f3>",
     function() require("fzf.files")():start() end
   )
 
   keymap_utils.create(
     "n",
-    "<f3><f2>",
+    "<f4><f2>",
     function() require("fzf.buffers")():start() end
   )
   keymap_utils.create(
     "n",
-    "<f3><f1>",
+    "<f4><f1>",
     function() require("fzf.tabs")():start() end
   )
 
   keymap_utils.create(
     "n",
-    "<f5><f4>",
+    "<f5><f3>",
     function() require("fzf.grep.file")():start() end
   )
   keymap_utils.create(
     "n",
-    "<f5><f5>",
+    "<f5><f4>",
     function() require("fzf.grep.workspace")():start() end
   )
   keymap_utils.create(
     "v",
-    "<f5><f4>",
+    "<f5><f3>",
     function()
       require("fzf.grep.file")({
         initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
@@ -328,7 +329,7 @@ local setup = function(opts)
   )
   keymap_utils.create(
     "v",
-    "<f5><f5>",
+    "<f5><f4>",
     function()
       require("fzf.grep.workspace")({
         initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
@@ -388,12 +389,12 @@ local setup = function(opts)
   )
   keymap_utils.create(
     "n",
-    "<f4><f4>",
+    "ls",
     function() require("fzf.lsp.document_symbols")():start() end
   )
   keymap_utils.create(
     "n",
-    "<f4><f5>",
+    "lS",
     function() require("fzf.lsp.workspace_symbols")():start() end
   )
   keymap_utils.create(
@@ -442,13 +443,16 @@ local setup = function(opts)
   )
 
   -- LSP
-  keymap_utils.create("n", "lu", "<cmd>lua vim.lsp.buf.hover()<CR>")
-  keymap_utils.create("n", "lj", "<cmd>lua vim.diagnostic.open_float()<CR>")
-  keymap_utils.create("n", "lI", "<cmd>lua vim.lsp.buf.definition()<CR>")
-  keymap_utils.create("i", "<C-p>", "<cmd>lua vim.lsp.buf.signature_help()<CR>")
-  keymap_utils.create("n", "le", "<cmd>lua vim.lsp.buf.rename()<CR>")
-  keymap_utils.create("n", "lR", "<cmd>LspRestart<CR>")
-  keymap_utils.create("n", "<space>l", "<cmd>LspInfo<CR>")
+  keymap_utils.create("n", "lu", function() vim.lsp.buf.hover() end)
+  keymap_utils.create("n", "lj", function() vim.diagnostic.open_float() end)
+  keymap_utils.create("n", "lI", function() vim.lsp.buf.definition() end)
+  keymap_utils.create("i", "<C-p>", function() vim.lsp.buf.signature_help() end)
+  keymap_utils.create("n", "le", function() vim.lsp.buf.rename() end)
+  keymap_utils.create("n", "lR", function()
+    vim.info("Restarting LSP")
+    vim.cmd("LspRestart")
+  end)
+  keymap_utils.create("n", "<space>l", function() vim.cmd("LspInfo") end)
 
   keymap_utils.create("n", "ll", function()
     if not conform then return vim.lsp.buf.format() end
@@ -463,9 +467,11 @@ local setup = function(opts)
   end)
 
   local lsp_pick_formatter = function()
-    local clients = vim.lsp.get_active_clients({
-      bufnr = 0, -- current buffer
-    })
+    ---@type vim.lsp.get_clients.Filter
+    local filter = {
+      bufnr = 0,
+    }
+    local clients = vim.lsp.get_clients(filter)
 
     local formatters = tbl_utils.filter(
       clients,
@@ -582,12 +588,18 @@ local setup = function(opts)
   end
 
   -- File managers
-  keymap_utils.create("n", "<f2><f2>", lf.lf)
-  keymap_utils.create("n", "<f2><f3>", function()
-    lf.lf({
-      path = vim.fn.expand("%:p"), -- Relative to ~ doesn't work
-    })
-  end)
+  ---@type YaziBasicInstance | nil
+  local yazi = nil
+  keymap_utils.create("n", "<f2>", function()
+    if not yazi then
+      yazi = YaziBasicInstance.new()
+      yazi.layout.main_popup:map("<f2>", "Hide", function() yazi:hide() end)
+      yazi:on_exited(function() yazi = nil end)
+      yazi:start()
+    else
+      yazi:show_and_focus()
+    end
+  end, {})
 
   -- Copy path
   keymap_utils.create("n", "<leader>g", function()

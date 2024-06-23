@@ -302,7 +302,6 @@ local yazi = {
   config = function()
     require("yazi").setup({
       keymaps = {
-        show_help = "<f12>",
         file_open = {
           new_tab = "<M-t>",
           new_window = "<M-w>",

@@ -22,11 +22,14 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
+local pub_event = function(payload) ps.pub("preview", payload) end
+
 local function entry(state)
-  if state.old then
-    Manager.layout, state.old = state.old, nil
+  if state.prev_layout then
+    Manager.layout, state.prev_layout = state.prev_layout, nil
+    pub_event({ visible = true })
   else
-    state.old = Manager.layout
+    state.prev_layout = Manager.layout
     Manager.layout = function(self, area)
       self.area = area
 
@@ -40,6 +43,7 @@ local function entry(state)
         })
         :split(area)
     end
+    pub_event({ visible = false })
   end
   ya.app_emit("resize", {})
 end

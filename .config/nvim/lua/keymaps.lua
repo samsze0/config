@@ -589,16 +589,44 @@ local setup = function(opts)
   end
 
   -- File managers
-  ---@type YaziBasicInstance | nil
+  ---@type YaziPowerInstance | nil
   local yazi = nil
   keymap_utils.create("n", "<f2>", function()
     if not yazi then
-      yazi = YaziBasicInstance.new()
+      yazi = YaziPowerInstance.new()
+
       yazi.layout.main_popup:map("<f2>", "Hide", function() yazi:hide() end)
+
       yazi.layout.main_popup:map("<f3>", "Reveal current file", function()
         local path = yazi:prev_filepath()
         yazi:reveal(path)
       end)
+
+      -- yazi.layout.main_popup:map(opts.new_window, "Open in new window", function()
+      --   if not yazi.focus then return end
+      --
+      --   local filepath = yazi.focus.url
+      --   yazi:hide()
+      --   vim.cmd(([[vsplit %s]]):format(filepath))
+      -- end)
+      --
+      -- yazi.layout.main_popup:map(opts.new_tab, "Open in new tab", function()
+      --   if not yazi.focus then return end
+      --
+      --   local filepath = yazi.focus.url
+      --   yazi:hide()
+      --   vim.cmd(([[tabnew %s]]):format(filepath))
+      -- end)
+      --
+      -- yazi.layout.main_popup:map(opts.current_window, "Open", function()
+      --   if not yazi.focus then return end
+      --
+      --   local filepath = yazi.focus.url
+      --   yazi:hide()
+      --   if jumplist then jumplist.save() end
+      --   vim.cmd(([[e %s]]):format(filepath))
+      -- end)
+
       yazi:on_quit(function() yazi:hide() end)
       yazi:on_exited(function() yazi = nil end)
       yazi:start()

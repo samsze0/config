@@ -6,6 +6,7 @@
 show_hidden = true
 show_symlink = true
 scrolloff = 3
+ratio = [1, 4, 3]
 
 [plugin]
 prepend_preloaders = [{ mime = "image/heic", run = "heic" }]

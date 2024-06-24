@@ -44,22 +44,13 @@ end
 return {
   entry = entry,
   setup = function(state)
-    state.preview_visible = true
-
     ps.sub_remote("nvim", function(payload)
       if type(payload.type) ~= "string" then
         ya.err("invalid payload. invalid event type")
       end
 
-      if payload.type == "preview-visibility" then
-        if type(payload.value) ~= "boolean" then
-          ya.err("invalid payload for preview-visibility event")
-        end
-        if state.preview_visible ~= payload.value then
-          state.preview_visible = payload.value
-          ya.manager_emit("plugin", { "hide-preview", sync = true })
-        end
-        return
+      if payload.type == "toggle-preview" then
+        ya.manager_emit("plugin", { "hide-preview", sync = true })
       elseif payload.type == "reveal" then
         if type(payload.path) ~= "string" then
           ya.err("invalid payload for reveal event")

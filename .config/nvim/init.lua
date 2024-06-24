@@ -191,6 +191,7 @@ local jdtls = {
 local workspace_diagnostics = {
   "artemave/workspace-diagnostics.nvim",
   config = function() require("workspace-diagnostics").setup({}) end,
+  enabled = false
 }
 
 local lspconfig = {

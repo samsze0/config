@@ -12,20 +12,11 @@ prepend_keymap = [
     "<C-/>",
   ], run = "help", desc = "Show help" },
   { on = [
-    "<F12>",
-  ], run = "tasks_show", desc = "Show task manager" },
-  { on = [
     "<C-t>",
   ], run = "tab_create", desc = "New tab" },
   { on = [
     "<C-w>",
   ], run = "tab_close", desc = "Close current tab" },
-  { on = [
-    "<C-j>",
-  ], run = "tab_switch -1 --relative", desc = "Prev tab" },
-  { on = [
-    "<C-l>",
-  ], run = "tab_switch +1 --relative", desc = "Next tab" },
   { on = [
     "t",
   ], run = "plugin --sync hide-preview", desc = "Show/hide preview" },
@@ -40,7 +31,7 @@ prepend_keymap = [
     "F",
   ], run = "plugin smart-filter", desc = "Smart filter" },
   { on = [
-    "<C-CR>",
+    "<C-Enter>",
   ], run = "open --interactive --hover", desc = "Show context menu for hovered file" },
 
   # Overriden by nvim.yazi 
@@ -48,7 +39,7 @@ prepend_keymap = [
     "q",
   ], run = "plugin --sync nvim --args=quit", desc = "Quit" },
   { on = [
-    "<CR>",
+    "<Enter>",
   ], run = "plugin --sync nvim --args=open", desc = "Open" },
   { on = [
     "<S-Up>",

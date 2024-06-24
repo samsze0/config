@@ -11,6 +11,7 @@ local jumplist = require("jumplist")
 local lf = require("lf")
 local persist = require("persist")
 local YaziBasicInstance = require("yazi.instance").BasicInstance
+local YaziPowerInstance = require("yazi.instance").PowerInstance
 
 ---@module 'conform'
 local conform = safe_require("conform")

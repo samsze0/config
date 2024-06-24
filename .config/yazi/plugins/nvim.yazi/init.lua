@@ -11,14 +11,14 @@ local function entry(state, args)
 
   if action == "quit" then
     if is_active then
-      pub_event({ kind = "quit" })
+      pub_event({ type = "quit" })
     else
       ya.manager_emit("quit", {})
     end
     return
   elseif action == "open" then
     if is_active then
-      pub_event({ kind = "open" })
+      pub_event({ type = "open" })
     else
       ya.manager_emit("open", {})
     end
@@ -31,7 +31,7 @@ local function entry(state, args)
     end
 
     if is_active then
-      pub_event({ kind = "scroll-preview", value = scroll_units })
+      pub_event({ type = "scroll-preview", value = scroll_units })
     else
       ya.manager_emit("seek", { scroll_units })
     end
@@ -59,6 +59,12 @@ return {
           state.preview_visible = payload.value
           ya.manager_emit("plugin", { "hide-preview", sync = true })
         end
+        return
+      elseif payload.type == "reveal" then
+        if type(payload.path) ~= "string" then
+          ya.err("invalid payload for reveal event")
+        end
+        ya.manager_emit("reveal", { payload.path })
         return
       end
 

@@ -594,6 +594,11 @@ local setup = function(opts)
     if not yazi then
       yazi = YaziBasicInstance.new()
       yazi.layout.main_popup:map("<f2>", "Hide", function() yazi:hide() end)
+      yazi.layout.main_popup:map("<f3>", "Reveal current file", function()
+        local path = yazi:prev_filepath()
+        yazi:reveal(path)
+      end)
+      yazi:on_quit(function() yazi:hide() end)
       yazi:on_exited(function() yazi = nil end)
       yazi:start()
     else

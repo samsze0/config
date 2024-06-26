@@ -602,6 +602,11 @@ local setup = function(opts)
         yazi:reveal(path)
       end)
 
+      yazi:on_open(function(payload)
+        yazi:hide()
+        vim.cmd(([[e %s]]):format(yazi.focus.url))
+      end)
+
       -- yazi.layout.main_popup:map(opts.new_window, "Open in new window", function()
       --   if not yazi.focus then return end
       --

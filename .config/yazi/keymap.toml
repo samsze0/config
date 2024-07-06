@@ -19,10 +19,7 @@ prepend_keymap = [
   ], run = "tab_close", desc = "Close current tab" },
   { on = [
     "t",
-  ], run = "plugin --sync hide-preview", desc = "Show/hide preview" },
-  { on = [
-    "T",
-  ], run = "plugin --sync max-preview", desc = "Maximize or restore preview" },
+  ], run = "plugin --sync preview-visibility --args=toggle", desc = "Show/hide preview" },
   { on = [
     "c",
     "m",

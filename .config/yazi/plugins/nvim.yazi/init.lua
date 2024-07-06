@@ -1,6 +1,6 @@
 local is_active = os.getenv("NVIM_YAZI")
 
-local pub_event = function(payload) ps.pub("nvim", payload) end
+local pub_event = function(payload) ps.pub("to-nvim", payload) end
 
 local function entry(state, args)
   local action = args[1]
@@ -44,17 +44,39 @@ end
 return {
   entry = entry,
   setup = function(state)
-    ps.sub_remote("nvim", function(payload)
+    ps.sub_remote("from-nvim", function(payload)
       if type(payload.type) ~= "string" then
         ya.err("invalid payload. invalid event type")
+        return
       end
 
-      if payload.type == "toggle-preview" then
-        ya.manager_emit("plugin", { "hide-preview", sync = true })
+      if payload.type == "preview-visibility" then
+        if
+          type(payload.value) ~= "string"
+          or (
+            payload.value ~= "show"
+            and payload.value ~= "hide"
+            and payload.value ~= "toggle"
+          )
+        then
+          ya.err(
+            ("invalid payload. invalid value for preview-visibility: '%s'"):format(
+              payload.value
+            )
+          )
+          return
+        end
+        ya.manager_emit(
+          "plugin",
+          { "preview-visibility", sync = true, args = payload.value }
+        )
+        return
       elseif payload.type == "reveal" then
         if type(payload.path) ~= "string" then
           ya.err("invalid payload for reveal event")
+          return
         end
+        -- TODO: validate path
         ya.manager_emit("reveal", { payload.path })
         return
       end

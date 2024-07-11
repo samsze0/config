@@ -91,12 +91,24 @@ local jumplist = {
   config = function() require("jumplist").setup({}) end,
 }
 
+---@type LazySpec
+local tui = {
+  "samsze0/tui.nvim",
+  dir = os.getenv("NVIM_TUI_NVIM_PATH"),
+  dependencies = {
+    nui,
+    utils_nvim
+  }
+}
+
+---@type LazySpec
 local terminal_filetype = {
   "samsze0/terminal-filetype.nvim",
   dir = os.getenv("NVIM_TERMINAL_FILETYPE_NVIM_PATH"),
   config = function() require("terminal-filetype").setup({}) end,
 }
 
+---@type LazySpec
 local notifier = {
   "samsze0/notifier.nvim",
   dir = os.getenv("NVIM_NOTIFIER_NVIM_PATH"),
@@ -106,6 +118,7 @@ local notifier = {
   },
 }
 
+---@type LazySpec
 local fzf = {
   "samsze0/fzf.nvim",
   dir = os.getenv("NVIM_FZF_NVIM_PATH"),
@@ -116,9 +129,11 @@ local fzf = {
     jumplist,
     terminal_filetype,
     notifier,
+    tui
   },
 }
 
+---@type LazySpec
 local websocket = {
   "samsze0/websocket.nvim",
   dir = os.getenv("NVIM_WEBSOCKET_NVIM_PATH"),
@@ -128,23 +143,27 @@ local websocket = {
   },
 }
 
+---@type LazySpec
 local treesitter = {
   "nvim-treesitter/nvim-treesitter",
   tag = "v0.9.1",
 }
 
+---@type LazySpec
 local copilot = {
   "zbirenbaum/copilot.lua",
   config = function() require("config.copilot") end,
   commit = "f7612f5af4a7d7615babf43ab1e67a2d790c13a6",
 }
 
+---@type LazySpec
 local colorizer = {
   "norcalli/nvim-colorizer.lua",
   config = function() require("config.colorizer") end,
   commit = "a065833f35a3a7cc3ef137ac88b5381da2ba302e",
 }
 
+---@type LazySpec
 local nvim_lint = {
   -- Linters interface that reports to vim.diagnostic
   "mfussenegger/nvim-lint",
@@ -152,6 +171,7 @@ local nvim_lint = {
   commit = "1a3a8d047bc01f1760ae4a0f5e80f111ea222e67",
 }
 
+---@type LazySpec
 local conform = {
   -- Formatters interface that calculates minimal diff
   "stevearc/conform.nvim",
@@ -159,6 +179,7 @@ local conform = {
   tag = "v5.8.0",
 }
 
+---@type LazySpec
 local scrollview = {
   "dstein64/nvim-scrollview",
   config = function()
@@ -169,31 +190,37 @@ local scrollview = {
   commit = "9257c3f3ebf7608a8711caf44f878d87cd40395d",
 }
 
+---@type LazySpec
 local fzf_lua = {
   "ibhagwan/fzf-lua",
   config = function() require("config.fzf-lua").setup() end,
   commit = "d368f76b37448d31918c81f020b0c725781c8354",
 }
 
+---@type LazySpec
 local cmp_nvim_lsp = {
   -- completion source for lsp
   "hrsh7th/cmp-nvim-lsp",
 }
 
+---@type LazySpec
 local schemastore = {
   "b0o/schemastore.nvim",
 }
 
+---@type LazySpec
 local jdtls = {
   "mfussenegger/nvim-jdtls",
 }
 
+---@type LazySpec
 local workspace_diagnostics = {
   "artemave/workspace-diagnostics.nvim",
   config = function() require("workspace-diagnostics").setup({}) end,
   enabled = false
 }
 
+---@type LazySpec
 local lspconfig = {
   "neovim/nvim-lspconfig",
   config = function() require("config.lspconfig") end,
@@ -206,6 +233,7 @@ local lspconfig = {
   },
 }
 
+---@type LazySpec
 local neodev = {
   -- Setup neovim plugin/script dev env by configuring lua-language-server with lsp-config
   -- Also add type annotations to vim/neovim built-in functions and APIs
@@ -213,6 +241,7 @@ local neodev = {
   tag = "v3.0.0",
 }
 
+---@type LazySpec
 local gitsigns = {
   -- Git status in sign column, git hunk preview/navigation, and line blame
   "lewis6991/gitsigns.nvim",
@@ -220,6 +249,7 @@ local gitsigns = {
   tag = "v0.8.1",
 }
 
+---@type LazySpec
 local comment = {
   "numToStr/Comment.nvim",
   config = function()
@@ -230,36 +260,43 @@ local comment = {
   tag = "v0.8.0",
 }
 
+---@type LazySpec
 local cmp_path = {
   -- completion source for filesystem paths
   "hrsh7th/cmp-path",
 }
 
+---@type LazySpec
 local cmp_cmdline = {
   -- completion source for vim command line
   "hrsh7th/cmp-cmdline",
 }
 
+---@type LazySpec
 local cmp_buffer = {
   -- completion source for buffer words
   "hrsh7th/cmp-buffer",
 }
 
+---@type LazySpec
 local cmp_git = {
   -- completion source for git
   "petertriho/cmp-git",
 }
 
+---@type LazySpec
 local lspkind = {
   -- add vscode-codicons to popup menu
   "onsails/lspkind.nvim",
 }
 
+---@type LazySpec
 local LuaSnip = {
   -- snippet
   "L3MON4D3/LuaSnip",
 }
 
+---@type LazySpec
 local nvim_cmp = {
   "hrsh7th/nvim-cmp",
   config = function() require("config.nvim-cmp") end,
@@ -275,6 +312,7 @@ local nvim_cmp = {
   commit = "5260e5e8ecadaf13e6b82cf867a909f54e15fd07",
 }
 
+---@type LazySpec
 local treesitter_textobjs = {
   "nvim-treesitter/nvim-treesitter-textobjects",
   dependencies = {
@@ -283,6 +321,7 @@ local treesitter_textobjs = {
   enabled = false,
 }
 
+---@type LazySpec
 local treesitter_playground = {
   "nvim-treesitter/playground",
   dependencies = {
@@ -291,29 +330,25 @@ local treesitter_playground = {
   enabled = false,
 }
 
+---@type LazySpec
 local dap = {
   "mfussenegger/nvim-dap",
   config = function() require("config.dap") end,
   enabled = false,
 }
 
+---@type LazySpec
 local yazi = {
   "samsze0/yazi.nvim",
   dir = os.getenv("NVIM_YAZI_NVIM_PATH"),
   config = function()
-    require("yazi").setup({
-      keymaps = {
-        file_open = {
-          new_tab = "<M-t>",
-          new_window = "<M-w>",
-        },
-      },
-    })
+    require("yazi").setup({})
   end,
   dependencies = {
     utils_nvim,
     nui,
     jumplist,
+    tui
   },
 }
 

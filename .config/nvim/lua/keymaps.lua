@@ -295,7 +295,7 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "<f3>",
-    function() require("fzf.files")():start() end
+    function() require("fzf.selector.files")():start() end
   )
 
   keymap_utils.create(

@@ -66,6 +66,12 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 ---@type LazySpec
+local pathlib = {
+  "pysan3/pathlib.nvim",
+  tag = "v2.2.2"
+}
+
+---@type LazySpec
 local utils_nvim = {
   "samsze0/utils.nvim",
   priority = 100,
@@ -76,6 +82,9 @@ local utils_nvim = {
     require("theme").setup({})
     require("keymaps").setup({})
   end,
+  dependencies = {
+    pathlib
+  }
 }
 
 ---@type LazySpec

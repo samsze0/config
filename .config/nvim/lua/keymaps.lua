@@ -360,7 +360,7 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "<f11><f3>",
-    function() require("fzf.git.status")():start() end
+    function() require("fzf.selector.git.status")():start() end
   )
   keymap_utils.create(
     "n",

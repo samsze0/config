@@ -483,11 +483,24 @@ function M.setup(opts)
   hl.TUIBorderActive = { guifg = colors.gray_600, guibg = colors.black }
   hl.TUIBorderInactive = { guifg = colors.gray_300, guibg = colors.black }
 
+  -- Fzf
+  hl.FzfSelectorBreadcrumbs = { guifg = colors.blue, guibg = nil, gui = "bold" }
+
   -- Fzf Git status
   hl.FzfGitStatusBorderAdded = { guifg = colors.blue, guibg = nil, gui = "bold" }
   hl.FzfGitStatusBorderChanged = { guifg = colors.yellow, guibg = nil, gui = "bold" }
   hl.FzfGitStatusBorderDeleted = { guifg = colors.red, guibg = nil, gui = "bold" }
   hl.FzfGitStatusBorderNormal = { guifg = colors.gray_800, guibg = nil, gui = "bold" }
+  hl.FzfGitStatusBorderDiffStat = { guifg = colors.gray_800, guibg = nil }
+
+  -- Fzf files
+  hl.FzfFilesBorderFiletype = { guifg = colors.gray_800, guibg = nil, gui = "bold" }
+
+  -- Fzf Git stash
+  hl.FzfGitStatusBorderDiffStat = "FzfGitStatusBorderDiffStat"
+
+  -- Fzf Git commit
+  hl.FzfGitCommitBorderDiffStat = "FzfGitStatusBorderDiffStat"
 
   -- stylua: ignore end
 end

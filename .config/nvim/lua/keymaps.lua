@@ -341,19 +341,27 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "<f11><f6>",
-    function() require("fzf.git.stash")():start() end
+    function() require("fzf.selector.git.stash")():start() end
   )
   keymap_utils.create(
     "n",
     "<f11><f5>",
-    function() require("fzf.git.commits")():start() end
+    function() require("fzf.selector.git.commits")():start() end
   )
   keymap_utils.create(
     "n",
     "<f11><f4>",
     function()
-      require("fzf.git.commits")({
-        filepaths = vim.fn.expand("%"),
+      local current_file = vim.fn.expand("%")
+      if not current_file or current_file == "" then
+        vim.warn("No current file")
+        return
+      end
+
+      require("fzf.selector.git.commits")({
+        filepaths = {
+          current_file
+        },
       }):start()
     end
   )

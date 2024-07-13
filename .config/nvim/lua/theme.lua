@@ -479,6 +479,16 @@ function M.setup(opts)
   hl.GitSignsChangeInline = { guifg = nil, guibg = colors.blue_300 } -- Current state of the hunk for preview_hunk
   hl.GitSignsDeleteVirtLn = { guifg = nil, guibg = colors.red_300 } -- Previous state of the hunk for preview_hunk
 
+  -- TUI
+  hl.TUIBorderActive = { guifg = colors.gray_600, guibg = colors.black }
+  hl.TUIBorderInactive = { guifg = colors.gray_300, guibg = colors.black }
+
+  -- Fzf Git status
+  hl.FzfGitStatusBorderAdded = { guifg = colors.blue, guibg = nil, gui = "bold" }
+  hl.FzfGitStatusBorderChanged = { guifg = colors.yellow, guibg = nil, gui = "bold" }
+  hl.FzfGitStatusBorderDeleted = { guifg = colors.red, guibg = nil, gui = "bold" }
+  hl.FzfGitStatusBorderNormal = { guifg = colors.gray_800, guibg = nil, gui = "bold" }
+
   -- stylua: ignore end
 end
 

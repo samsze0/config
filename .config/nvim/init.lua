@@ -357,7 +357,8 @@ local yazi = {
     utils_nvim,
     nui,
     jumplist,
-    tui
+    tui,
+    terminal_filetype
   },
 }
 

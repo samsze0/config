@@ -193,7 +193,7 @@ function M.setup(opts)
   -- Diff highlighting
   hl.DiffAdd = { bg = colors.blue_200 }
   hl.DiffChange = { bg = colors.yellow_200 }
-  hl.DiffDelete = { fg = colors.gray_200, bg = colors.red_200 }
+  hl.DiffDelete = { bg = colors.red_200 }
   hl.DiffText = { bg = colors.yellow_400 }
 
   -- GitGutter highlighting
@@ -476,7 +476,8 @@ function M.setup(opts)
   hl.TUIBorderInactive = { fg = colors.gray_300, bg = colors.black }
 
   -- Fzf
-  hl.FzfSelectorBreadcrumbs = { fg = colors.blue, bold = true }
+  hl.FzfBorderSelectorBreadcrumbs = { fg = colors.blue, bold = true }
+  hl.FzfBorderFiletype = { fg = colors.gray_800 }
 
   -- Fzf Git status
   hl.FzfGitStatusBorderAdded = { fg = colors.blue, bold = true }
@@ -484,9 +485,6 @@ function M.setup(opts)
   hl.FzfGitStatusBorderDeleted = { fg = colors.red, bold = true }
   hl.FzfGitStatusBorderNormal = { fg = colors.gray_800, bold = true }
   hl.FzfGitStatusBorderDiffStat = { fg = colors.gray_800 }
-
-  -- Fzf files
-  hl.FzfFilesBorderFiletype = { fg = colors.gray_800, bold = true }
 
   -- Fzf Git stash
   hl.FzfGitStatusBorderDiffStat = "FzfGitStatusBorderDiffStat"
@@ -500,6 +498,14 @@ function M.setup(opts)
   hl.FzfGitFileChangesBorderDeleted = "FzfGitStatusBorderDeleted"
   hl.FzfGitFileChangesBorderNormal = "FzfGitStatusBorderNormal"
   hl.FzfGitFileChangesBorderDiffStat = "FzfGitStatusBorderDiffStat"
+
+  -- Fzf Diff
+  hl.FzfDiffAdd = "DiffAdd"
+  hl.FzfDiffAddAsDelete = "DiffDelete"
+  hl.FzfDiffDelete = "DiffDelete"
+  hl.FzfDiffPadding = { fg = colors.gray_100, bg = colors.gray_100 }
+  hl.FzfDiffChange = "DiffChange"
+  hl.FzfDiffText = "DiffText"
 
   -- stylua: ignore end
 end

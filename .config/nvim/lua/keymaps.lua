@@ -270,8 +270,8 @@ local setup = function(opts)
   keymap_utils.create("n", "<f4><f2>", function() require("fzf.buffers")():start() end)
   keymap_utils.create("n", "<f4><f1>", function() require("fzf.tabs")():start() end)
 
-  keymap_utils.create("n", "<f5><f3>", function() require("fzf.grep.file")():start() end)
-  keymap_utils.create("n", "<f5><f4>", function() require("fzf.grep.workspace")():start() end)
+  keymap_utils.create("n", "<f5><f3>", function() require("fzf.selector.grep.file")():start() end)
+  keymap_utils.create("n", "<f5><f4>", function() require("fzf.selector.grep.workspace")():start() end)
   keymap_utils.create(
     "v",
     "<f5><f3>",
@@ -285,7 +285,7 @@ local setup = function(opts)
     "v",
     "<f5><f4>",
     function()
-      require("fzf.grep.workspace")({
+      require("fzf.selector.grep.workspace")({
         initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
       }):start()
     end

@@ -45,9 +45,7 @@ local function is_normal_buffer()
   return vim.bo.buftype == ""
 end
 
-local function get_diagnostic_count(id)
-  return #vim.diagnostic.get(0, { severity = id })
-end
+local function get_diagnostic_count(id) return #vim.diagnostic.get(0, { severity = id }) end
 
 M.setup = function()
   _G.Statusline = M
@@ -61,14 +59,10 @@ M.setup = function()
     )
   end
 
-  local set_active = function()
-    vim.wo.statusline = "%!v:lua.Statusline.active()"
-  end
+  local set_active = function() vim.wo.statusline = "%!v:lua.Statusline.active()" end
   au({ "WinEnter", "BufEnter" }, "*", set_active, "Set active statusline")
 
-  local set_inactive = function()
-    vim.wo.statusline = "%!v:lua.Statusline.inactive()"
-  end
+  local set_inactive = function() vim.wo.statusline = "%!v:lua.Statusline.inactive()" end
   au({ "WinLeave", "BufLeave" }, "*", set_inactive, "Set inactive statusline")
 
   -- :h statusline
@@ -105,14 +99,11 @@ end
 M.inactive = function()
   if has_error then return hl("StatusLineDiagnosticError", "X") end
 
-  return config.margin
-    .. pcall_section(M.section_filename, "filename")
-    .. config.margin
+  return config.margin .. pcall_section(M.section_filename, "filename") .. config.margin
 end
 
 M.is_truncated = function()
-  local cur_width = vim.o.laststatus == 3 and vim.o.columns
-    or vim.api.nvim_win_get_width(0)
+  local cur_width = vim.o.laststatus == 3 and vim.o.columns or vim.api.nvim_win_get_width(0)
   return cur_width > config.truncate_width
 end
 
@@ -133,41 +124,25 @@ M.section_git = function()
 
   local val = string.format("%s %s", icon, head_ref)
   if (gitsigns_status.added or 0) > 0 then
-    val = val
-      .. hl(
-        "StatusLineDiagnosticInfo",
-        string.format(" +%s", gitsigns_status.added)
-      )
+    val = val .. hl("StatusLineDiagnosticInfo", string.format(" +%s", gitsigns_status.added))
   end
   if (gitsigns_status.changed or 0) > 0 then
-    val = val
-      .. hl(
-        "StatusLineDiagnosticWarn",
-        string.format(" ~%s", gitsigns_status.changed)
-      )
+    val = val .. hl("StatusLineDiagnosticWarn", string.format(" ~%s", gitsigns_status.changed))
   end
   if (gitsigns_status.removed or 0) > 0 then
-    val = val
-      .. hl(
-        "StatusLineDiagnosticError",
-        string.format(" -%s", gitsigns_status.removed)
-      )
+    val = val .. hl("StatusLineDiagnosticError", string.format(" -%s", gitsigns_status.removed))
   end
   return val
 end
 
 M.section_diagnostics = function()
   local hasnt_attached_client = next(vim.lsp.get_active_clients()) == nil
-  if M.is_truncated() or not is_normal_buffer() or hasnt_attached_client then
-    return ""
-  end
+  if M.is_truncated() or not is_normal_buffer() or hasnt_attached_client then return "" end
 
   local t = {}
   for _, level in ipairs(config.diagnostic_levels) do
     local n = get_diagnostic_count(level.id)
-    if n > 0 then
-      table.insert(t, hl(level.hl, string.format("%s%s", level.sign, n)))
-    end
+    if n > 0 then table.insert(t, hl(level.hl, string.format("%s%s", level.sign, n))) end
   end
 
   local icon = ""
@@ -197,10 +172,7 @@ M.section_fileinfo = function()
   local encoding = vim.bo.fileencoding or vim.bo.encoding
   local format = vim.bo.fileformat
 
-  return hl(
-    "StatusLineMuted",
-    string.format("%s  %s  %s", filetype, encoding, format)
-  )
+  return hl("StatusLineMuted", string.format("%s  %s  %s", filetype, encoding, format))
 end
 
 M.section_copilot = function()
@@ -210,10 +182,7 @@ M.section_copilot = function()
   if next(copilot) == nil then return hl("StatusLineMuted", " ") end
 
   local ok, val = pcall(function()
-    if
-      copilot.is_disabled()
-      or not copilot.buf_is_attached(vim.api.nvim_get_current_buf())
-    then
+    if copilot.is_disabled() or not copilot.buf_is_attached(vim.api.nvim_get_current_buf()) then
       return hl("StatusLineMuted", " ")
     else
       return hl(config.default_hl, " ")

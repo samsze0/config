@@ -502,6 +502,13 @@ function M.setup(opts)
   -- Fzf Git commit
   hl.FzfGitCommitBorderDiffStat = "FzfGitStatusBorderDiffStat"
 
+  -- Fzf Git file changes
+  hl.FzfGitFileChangesBorderAdded = "FzfGitStatusBorderAdded"
+  hl.FzfGitFileChangesBorderChanged = "FzfGitStatusBorderChanged"
+  hl.FzfGitFileChangesBorderDeleted = "FzfGitStatusBorderDeleted"
+  hl.FzfGitFileChangesBorderNormal = "FzfGitStatusBorderNormal"
+  hl.FzfGitFileChangesBorderDiffStat = "FzfGitStatusBorderDiffStat"
+
   -- stylua: ignore end
 end
 

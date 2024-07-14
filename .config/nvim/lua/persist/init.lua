@@ -26,9 +26,7 @@ function M.get_last_session()
   local sessions = M.list_sessions()
   table.sort(
     sessions,
-    function(a, b)
-      return vim.loop.fs_stat(a).mtime.sec > vim.loop.fs_stat(b).mtime.sec
-    end
+    function(a, b) return vim.loop.fs_stat(a).mtime.sec > vim.loop.fs_stat(b).mtime.sec end
   )
   return sessions[1]
 end
@@ -81,18 +79,13 @@ function M.start()
     group = vim.api.nvim_create_augroup("persist-backup", { clear = true }),
     desc = "Add timestamp to backup extension",
     pattern = "*",
-    callback = function()
-      vim.opt.backupext = "-" .. vim.fn.strftime("%Y%m%d%H%M")
-    end,
+    callback = function() vim.opt.backupext = "-" .. vim.fn.strftime("%Y%m%d%H%M") end,
   })
 
   -- Autowrite
   if config.autowrite then
     vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged" }, {
-      group = vim.api.nvim_create_augroup(
-        "persist-autowrite",
-        { clear = true }
-      ),
+      group = vim.api.nvim_create_augroup("persist-autowrite", { clear = true }),
       desc = "Autowrite",
       pattern = "*",
       callback = function(ctx)
@@ -122,10 +115,7 @@ function M.start()
 
   -- Delete hidden buffer
   vim.api.nvim_create_autocmd("BufHidden", {
-    group = vim.api.nvim_create_augroup(
-      "persist-delete-hidden",
-      { clear = true }
-    ),
+    group = vim.api.nvim_create_augroup("persist-delete-hidden", { clear = true }),
     desc = "Delete hidden buffer",
     pattern = "*",
     callback = function(ctx)
@@ -145,9 +135,7 @@ function M.start()
             vim.api.nvim_buf_get_name(buf)
           ),
         }, function(val)
-          if val == "y" then
-            vim.api.nvim_buf_call(buf, function() vim.cmd("silent! write") end)
-          end
+          if val == "y" then vim.api.nvim_buf_call(buf, function() vim.cmd("silent! write") end) end
         end)
       end
 
@@ -156,11 +144,7 @@ function M.start()
           function() vim.api.nvim_buf_delete(buf, { force = true }) end,
           function(err)
             vim.notify(
-              string.format(
-                "Error deleting buffer %s: %s",
-                vim.api.nvim_buf_get_name(buf),
-                err
-              ),
+              string.format("Error deleting buffer %s: %s", vim.api.nvim_buf_get_name(buf), err),
               vim.log.levels.ERROR
             )
           end
@@ -207,17 +191,13 @@ function M.save_session()
   end
 
   vim.cmd("mks! " .. e(M.cwd_session or M.get_cwd_session()))
-  if debug then
-    vim.notify(string.format("Saved session @ %s", vim.fn.strftime("%H:%M:%S")))
-  end
+  if debug then vim.notify(string.format("Saved session @ %s", vim.fn.strftime("%H:%M:%S"))) end
 end
 
 function M.load_session(opt)
   opt = opt or {}
   local sfile = opt.last and M.get_last_session() or M.get_cwd_session()
-  if sfile and vim.fn.filereadable(sfile) ~= 0 then
-    vim.cmd("silent! source " .. e(sfile))
-  end
+  if sfile and vim.fn.filereadable(sfile) ~= 0 then vim.cmd("silent! source " .. e(sfile)) end
 end
 
 function M.list_sessions() return vim.fn.glob(config.sessions_dir .. "*.vim") end

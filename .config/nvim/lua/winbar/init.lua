@@ -28,11 +28,7 @@ local section_file = function()
   if not isempty(filename) then
     value = " "
     local file_path_list = {}
-    local _ = string.gsub(
-      file_path,
-      "[^/]+",
-      function(w) table.insert(file_path_list, w) end
-    )
+    local _ = string.gsub(file_path, "[^/]+", function(w) table.insert(file_path_list, w) end)
 
     for i = 1, #file_path_list do
       value = value
@@ -73,12 +69,8 @@ end
 M.show_winbar = function()
   if excludes() then return end
 
-  local ok, _ = pcall(
-    vim.api.nvim_set_option_value,
-    "winbar",
-    pcall_section(section_file),
-    { scope = "local" }
-  )
+  local ok, _ =
+    pcall(vim.api.nvim_set_option_value, "winbar", pcall_section(section_file), { scope = "local" })
   if not ok then
     vim.error("Failed to set winbar")
     return

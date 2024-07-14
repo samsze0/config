@@ -28,11 +28,10 @@ end
 
 local render_tab = function(index, tab)
   local current_tab = fn.tabpagenr() == index
-  return string.format(
-    "%%%sT%s",
-    index,
-    current_tab and "%#TabLineSel#" or "%#TabLine#"
-  ) .. config.padding .. tab.display .. config.padding
+  return string.format("%%%sT%s", index, current_tab and "%#TabLineSel#" or "%#TabLine#")
+    .. config.padding
+    .. tab.display
+    .. config.padding
 end
 
 local render_count = 1
@@ -79,12 +78,9 @@ M.section_tabs = function()
 
       _G.tabs[index] = {
         full = filename ~= "" and filename or "[No Name]",
-        display = filename ~= "" and string.format(
-          "%s %s %s",
-          fileicon,
-          filename,
-          table.concat(extras, " ")
-        ) or "  ",
+        display = filename ~= ""
+            and string.format("%s %s %s", fileicon, filename, table.concat(extras, " "))
+          or "  ",
       }
     else
       _G.tabs[index] = {
@@ -108,9 +104,7 @@ M.section_tabs = function()
 
   local tab_index_to_distance_map = {}
   for i = 1, #_G.tabs do
-    if i ~= current_tab then
-      tab_index_to_distance_map[i] = math.abs(current_tab - i)
-    end
+    if i ~= current_tab then tab_index_to_distance_map[i] = math.abs(current_tab - i) end
   end
   -- Sort in-place by ascending distance
   if config.debug then vim.info(tab_index_to_distance_map) end
@@ -132,11 +126,8 @@ M.section_tabs = function()
   local quota = max_width - current_tab_length
 
   for _, i in ipairs(sorted_keys) do
-    local tab_length = string.len(_G.tabs[i].display)
-      + string.len(config.padding) * 2
-    if config.debug then
-      vim.info("Tab:", i, "Length:", tab_length, "Quota:", quota)
-    end
+    local tab_length = string.len(_G.tabs[i].display) + string.len(config.padding) * 2
+    if config.debug then vim.info("Tab:", i, "Length:", tab_length, "Quota:", quota) end
     if tab_length < quota then
       tabs_to_render[i] = _G.tabs[i]
       quota = quota - tab_length
@@ -154,10 +145,8 @@ M.section_tabs = function()
     end
   end
 
-  return table.concat(
-    utils.map(tabs_to_render, render_tab, { is_array = false }),
-    ""
-  ) .. "%#TabLineFill#"
+  return table.concat(utils.map(tabs_to_render, render_tab, { is_array = false }), "")
+    .. "%#TabLineFill#"
 end
 
 function M.setup()

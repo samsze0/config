@@ -74,12 +74,8 @@ local setup = function(opts)
     end
 
     lang_utils.switch(vim.api.nvim_get_current_buf(), {
-      [diff_buffers[2]] = function()
-        vim.cmd(([[diffget %s]]):format(diff_buffers[1]))
-      end,
-      [diff_buffers[3]] = function()
-        vim.cmd(([[diffput %s]]):format(diff_buffers[2]))
-      end,
+      [diff_buffers[2]] = function() vim.cmd(([[diffget %s]]):format(diff_buffers[1])) end,
+      [diff_buffers[3]] = function() vim.cmd(([[diffput %s]]):format(diff_buffers[2])) end,
     })
   end)
   keymap_utils.create("n", "sl", function()
@@ -90,12 +86,8 @@ local setup = function(opts)
     end
 
     lang_utils.switch(vim.api.nvim_get_current_buf(), {
-      [diff_buffers[2]] = function()
-        vim.cmd(([[diffget %s]]):format(diff_buffers[3]))
-      end,
-      [diff_buffers[1]] = function()
-        vim.cmd(([[diffput %s]]):format(diff_buffers[2]))
-      end,
+      [diff_buffers[2]] = function() vim.cmd(([[diffget %s]]):format(diff_buffers[3])) end,
+      [diff_buffers[1]] = function() vim.cmd(([[diffput %s]]):format(diff_buffers[2])) end,
     })
   end)
 
@@ -110,26 +102,10 @@ local setup = function(opts)
 
   -- Move/swap line/selection up/down
   local auto_indent = false
-  keymap_utils.create(
-    "n",
-    "<C-up>",
-    "<cmd>m .-2<CR>" .. (auto_indent and "==" or "")
-  )
-  keymap_utils.create(
-    "n",
-    "<C-down>",
-    "<cmd>m .+1<CR>" .. (auto_indent and "==" or "")
-  )
-  keymap_utils.create(
-    "v",
-    "<C-up>",
-    ":m .-2<CR>gv" .. (auto_indent and "=gv" or "")
-  )
-  keymap_utils.create(
-    "v",
-    "<C-down>",
-    ":m '>+1<CR>gv" .. (auto_indent and "=gv" or "")
-  )
+  keymap_utils.create("n", "<C-up>", "<cmd>m .-2<CR>" .. (auto_indent and "==" or ""))
+  keymap_utils.create("n", "<C-down>", "<cmd>m .+1<CR>" .. (auto_indent and "==" or ""))
+  keymap_utils.create("v", "<C-up>", ":m .-2<CR>gv" .. (auto_indent and "=gv" or ""))
+  keymap_utils.create("v", "<C-down>", ":m '>+1<CR>gv" .. (auto_indent and "=gv" or ""))
 
   -- Delete line
   keymap_utils.create("n", "<M-y>", "dd", { noremap = false })
@@ -254,11 +230,8 @@ local setup = function(opts)
 
     vim.cmd([[tabclose]])
 
-    local is_last_tab = vim.fn.tabpagenr("$")
-      == vim.api.nvim_tabpage_get_number(0)
-    if not is_last_tab and vim.fn.tabpagenr() > 1 then
-      vim.cmd([[tabprevious]])
-    end
+    local is_last_tab = vim.fn.tabpagenr("$") == vim.api.nvim_tabpage_get_number(0)
+    if not is_last_tab and vim.fn.tabpagenr() > 1 then vim.cmd([[tabprevious]]) end
   end
   keymap_utils.create("n", "tw", close_tab)
   keymap_utils.create("n", "tq", "<cmd>tabonly<CR>")
@@ -292,33 +265,13 @@ local setup = function(opts)
 
   keymap_utils.create("n", "<f1>", nullish(fzf_lua).builtin)
 
-  keymap_utils.create(
-    "n",
-    "<f3>",
-    function() require("fzf.selector.files")():start() end
-  )
+  keymap_utils.create("n", "<f3>", function() require("fzf.selector.files")():start() end)
 
-  keymap_utils.create(
-    "n",
-    "<f4><f2>",
-    function() require("fzf.buffers")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f4><f1>",
-    function() require("fzf.tabs")():start() end
-  )
+  keymap_utils.create("n", "<f4><f2>", function() require("fzf.buffers")():start() end)
+  keymap_utils.create("n", "<f4><f1>", function() require("fzf.tabs")():start() end)
 
-  keymap_utils.create(
-    "n",
-    "<f5><f3>",
-    function() require("fzf.grep.file")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f5><f4>",
-    function() require("fzf.grep.workspace")():start() end
-  )
+  keymap_utils.create("n", "<f5><f3>", function() require("fzf.grep.file")():start() end)
+  keymap_utils.create("n", "<f5><f4>", function() require("fzf.grep.workspace")():start() end)
   keymap_utils.create(
     "v",
     "<f5><f3>",
@@ -338,74 +291,34 @@ local setup = function(opts)
     end
   )
 
-  keymap_utils.create(
-    "n",
-    "<f11><f6>",
-    function() require("fzf.selector.git.stash")():start() end
-  )
+  keymap_utils.create("n", "<f11><f6>", function() require("fzf.selector.git.stash")():start() end)
   keymap_utils.create(
     "n",
     "<f11><f5>",
     function() require("fzf.selector.git.commits")():start() end
   )
-  keymap_utils.create(
-    "n",
-    "<f11><f4>",
-    function()
-      local current_file = vim.fn.expand("%")
-      if not current_file or current_file == "" then
-        vim.warn("No current file")
-        return
-      end
-
-      require("fzf.selector.git.commits")({
-        filepaths = {
-          current_file
-        },
-      }):start()
+  keymap_utils.create("n", "<f11><f4>", function()
+    local current_file = vim.fn.expand("%")
+    if not current_file or current_file == "" then
+      vim.warn("No current file")
+      return
     end
-  )
-  keymap_utils.create(
-    "n",
-    "<f11><f3>",
-    function() require("fzf.selector.git.status")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f11><f2>",
-    function() require("fzf.git.branch")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f11><f1>",
-    function() require("fzf.git.submodules")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f11><f11>",
-    function() require("fzf.git.reflog")():start() end
-  )
 
-  keymap_utils.create(
-    "n",
-    "li",
-    function() require("fzf.lsp.definitions")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "lr",
-    function() require("fzf.lsp.references")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "ls",
-    function() require("fzf.lsp.document_symbols")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "lS",
-    function() require("fzf.lsp.workspace_symbols")():start() end
-  )
+    require("fzf.selector.git.commits")({
+      filepaths = {
+        current_file,
+      },
+    }):start()
+  end)
+  keymap_utils.create("n", "<f11><f3>", function() require("fzf.selector.git.status")():start() end)
+  keymap_utils.create("n", "<f11><f2>", function() require("fzf.git.branch")():start() end)
+  keymap_utils.create("n", "<f11><f1>", function() require("fzf.git.submodules")():start() end)
+  keymap_utils.create("n", "<f11><f11>", function() require("fzf.git.reflog")():start() end)
+
+  keymap_utils.create("n", "li", function() require("fzf.lsp.definitions")():start() end)
+  keymap_utils.create("n", "lr", function() require("fzf.lsp.references")():start() end)
+  keymap_utils.create("n", "ls", function() require("fzf.lsp.document_symbols")():start() end)
+  keymap_utils.create("n", "lS", function() require("fzf.lsp.workspace_symbols")():start() end)
   keymap_utils.create(
     "n",
     "ld",
@@ -418,38 +331,14 @@ local setup = function(opts)
       }):start()
     end
   )
-  keymap_utils.create(
-    "n",
-    "lD",
-    function() require("fzf.diagnostics")():start() end
-  )
+  keymap_utils.create("n", "lD", function() require("fzf.diagnostics")():start() end)
 
-  keymap_utils.create(
-    "n",
-    "<space>u",
-    function() require("fzf.undo")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<space>m",
-    function() require("fzf.notification")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<space>j",
-    function() require("fzf.jump")():start() end
-  )
+  keymap_utils.create("n", "<space>u", function() require("fzf.undo")():start() end)
+  keymap_utils.create("n", "<space>m", function() require("fzf.notification")():start() end)
+  keymap_utils.create("n", "<space>j", function() require("fzf.jump")():start() end)
 
-  keymap_utils.create(
-    "n",
-    "<f9><f1>",
-    function() require("fzf.docker.images")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f9><f2>",
-    function() require("fzf.docker.containers")():start() end
-  )
+  keymap_utils.create("n", "<f9><f1>", function() require("fzf.docker.images")():start() end)
+  keymap_utils.create("n", "<f9><f2>", function() require("fzf.docker.containers")():start() end)
 
   -- LSP
   keymap_utils.create("n", "lu", function() vim.lsp.buf.hover() end)
@@ -499,10 +388,7 @@ local setup = function(opts)
 
   local conform_pick_formatter = function()
     local formatters = conform.list_formatters()
-    formatters = tbl_utils.filter(
-      formatters,
-      function(_, formatter) return formatter.available end
-    )
+    formatters = tbl_utils.filter(formatters, function(_, formatter) return formatter.available end)
     vim.ui.select(formatters, {
       prompt = "[Conform] Select formatter:",
       format_item = function(formatter) return formatter.name end,
@@ -615,6 +501,12 @@ local setup = function(opts)
         vim.cmd(([[e %s]]):format(yazi.focus.url))
       end)
 
+      yazi.layout.main_popup:map(
+        "<C-z>",
+        "Maximise",
+        function() yazi.layout:maximise_popup("main") end
+      )
+
       -- yazi.layout.main_popup:map(opts.new_window, "Open in new window", function()
       --   if not yazi.focus then return end
       --
@@ -661,10 +553,7 @@ local setup = function(opts)
   end)
 
   -- Misc
-  command_utils.create(
-    "LogCurrentBuf",
-    function() vim.info(vim.api.nvim_get_current_buf()) end
-  )
+  command_utils.create("LogCurrentBuf", function() vim.info(vim.api.nvim_get_current_buf()) end)
 end
 
 return {

@@ -11,30 +11,56 @@ local fallback_if_cmp_has_no_active_entry = function(f)
 end
 
 local mapping = {
-  ["<Up>"] = cmp.mapping(fallback_if_cmp_has_no_active_entry(function() cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 1 }) end), { "i", "c", "s" }),
-  ["<Down>"] = cmp.mapping(fallback_if_cmp_has_no_active_entry(function() cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 }) end), { "i", "c", "s" }),
+  ["<Up>"] = cmp.mapping(
+    fallback_if_cmp_has_no_active_entry(
+      function() cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 1 }) end
+    ),
+    { "i", "c", "s" }
+  ),
+  ["<Down>"] = cmp.mapping(
+    fallback_if_cmp_has_no_active_entry(
+      function() cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 }) end
+    ),
+    { "i", "c", "s" }
+  ),
   ["<PageUp>"] = cmp.mapping(
-    fallback_if_cmp_has_no_active_entry(function()
-      cmp.select_prev_item({
-        behavior = cmp.SelectBehavior.Select,
-        count = 10,
-      })
-    end),
+    fallback_if_cmp_has_no_active_entry(
+      function()
+        cmp.select_prev_item({
+          behavior = cmp.SelectBehavior.Select,
+          count = 10,
+        })
+      end
+    ),
     { "i", "c", "s" }
   ),
   ["<PageDown>"] = cmp.mapping(
-    fallback_if_cmp_has_no_active_entry(function()
-      cmp.select_next_item({
-        behavior = cmp.SelectBehavior.Select,
-        count = 10,
-      })
-    end),
+    fallback_if_cmp_has_no_active_entry(
+      function()
+        cmp.select_next_item({
+          behavior = cmp.SelectBehavior.Select,
+          count = 10,
+        })
+      end
+    ),
     { "i", "c", "s" }
   ),
-  ["<S-Up>"] = cmp.mapping(fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(-5) end), { "i", "c", "s" }),
-  ["<S-Down>"] = cmp.mapping(fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(5) end), { "i", "c", "s" }),
-  ["<S-PageUp>"] = cmp.mapping(fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(-10) end), { "i", "c", "s" }),
-  ["<S-PageDown>"] = cmp.mapping(fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(10) end), { "i", "c", "s" }),
+  ["<S-Up>"] = cmp.mapping(
+    fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(-5) end),
+    { "i", "c", "s" }
+  ),
+  ["<S-Down>"] = cmp.mapping(
+    fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(5) end),
+    { "i", "c", "s" }
+  ),
+  ["<S-PageUp>"] = cmp.mapping(
+    fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(-10) end),
+    { "i", "c", "s" }
+  ),
+  ["<S-PageDown>"] = cmp.mapping(
+    fallback_if_cmp_has_no_active_entry(function() cmp.scroll_docs(10) end),
+    { "i", "c", "s" }
+  ),
   ["<C-Space>"] = cmp.mapping(function(fallback)
     local close_if_open = false
 

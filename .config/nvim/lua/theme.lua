@@ -83,24 +83,16 @@ local syntax_hl = {
   TSVariableBuiltin = colors.gray_blue,
 }
 
+---@type table<string, vim.api.keyset.highlight | string>
 local hl = setmetatable({}, {
-  __newindex = function(tbl, hlgroup, args)
+  __newindex = function(tbl, hlgroup, hl)
     -- If type is string, set a link
-    if type(args) == "string" then
-      vim.api.nvim_set_hl(0, hlgroup, { link = args })
+    if type(hl) == "string" then
+      vim.api.nvim_set_hl(0, hlgroup, { link = hl })
       return
     end
 
-    local val = {}
-    if args.guifg then val.fg = args.guifg end
-    if args.guibg then val.bg = args.guibg end
-    if args.guisp then val.sp = args.guisp end
-    if args.gui then
-      for x in args.gui:gmatch("([^,]+)") do
-        if x ~= "none" then val[x] = true end
-      end
-    end
-    vim.api.nvim_set_hl(0, hlgroup, val)
+    vim.api.nvim_set_hl(0, hlgroup, hl)
   end,
 })
 
@@ -112,129 +104,129 @@ function M.setup(opts)
   -- stylua: ignore start
 
   -- Vim editor colors
-  hl.Normal = { guifg = colors.gray_800, guibg = colors.black, gui = nil, guisp = nil }
-  hl.Bold = { guifg = nil, guibg = nil, gui = "bold", guisp = nil }
-  hl.Debug = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.Directory = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.Error = { guifg = colors.red, guibg = nil, gui = nil, guisp = nil }
-  hl.ErrorMsg = { guifg = colors.red, guibg = nil, gui = nil, guisp = nil }
-  hl.Exception = { guifg = colors.red, guibg = nil, gui = nil, guisp = nil }
-  hl.FoldColumn = { guifg = colors.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hl.Folded = { guifg = colors.gray_600, guibg = colors.gray_200, gui = nil, guisp = nil }
-  hl.IncSearch = { guifg = colors.true_white, guibg = colors.yellow_800, gui = "none", guisp = nil }
-  hl.Italic = { guifg = nil, guibg = nil, gui = "none", guisp = nil }
-  hl.Macro = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.MatchParen = { guifg = nil, guibg = colors.gray_400, gui = nil, guisp = nil }
-  hl.ModeMsg = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.MoreMsg = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.Question = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.Search = { guifg = nil, guibg = colors.yellow_300, gui = nil, guisp = nil }
-  hl.CurSearch = { guifg = nil, guibg = colors.yellow_300, gui = nil, guisp = nil }
-  hl.Substitute = { guifg = nil, guibg = colors.yellow_500, gui = "none", guisp = nil }
-  hl.SpecialKey = { guifg = colors.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hl.TooLong = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.Underlined = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.Visual = { guifg = nil, guibg = colors.gray_400, gui = nil, guisp = nil }
-  hl.VisualNOS = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.WarningMsg = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.WildMenu = { guifg = colors.yellow, guibg = colors.blue, gui = nil, guisp = nil }
-  hl.Title = { guifg = colors.blue, guibg = nil, gui = "none", guisp = nil }
-  hl.Conceal = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.Cursor = { guifg = colors.black, guibg = colors.gray_800, gui = nil, guisp = nil }
-  hl.NonText = { guifg = colors.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hl.LineNr = { guifg = colors.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hl.SignColumn = { guifg = colors.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hl.WinBar = { guifg = colors.gray_800, guibg = nil, gui = "none", guisp = nil }
-  hl.WinBarNC = { guifg = colors.gray_600, guibg = nil, gui = "none", guisp = nil }
-  hl.VertSplit = { guifg = colors.gray_300, guibg = nil, gui = "none", guisp = nil }
-  hl.ColorColumn = { guifg = nil, guibg = colors.gray_300, gui = "none", guisp = nil }
-  hl.CursorColumn = { guifg = nil, guibg = colors.gray_300, gui = "none", guisp = nil }
-  hl.CursorLine = { guifg = nil, guibg = colors.gray_300, gui = "none", guisp = nil }
-  hl.CursorLineNr = { guifg = colors.gray_600, guibg = colors.gray_300, gui = nil, guisp = nil }
-  hl.QuickFixLine = { guifg = nil, guibg = colors.gray_300, gui = "none", guisp = nil }
-  hl.PMenu = { guifg = colors.gray_600, guibg = colors.gray_100, gui = "none", guisp = nil }
-  hl.PMenuSel = { guifg = colors.gray_800, guibg = colors.gray_400, gui = nil, guisp = nil }
-  hl.PMenuSbar = { guifg = nil, guibg = colors.gray_300, gui = "none", guisp = nil }
-  hl.PMenuThumb = { guifg = nil, guibg = colors.gray_600, gui = nil, guisp = nil }
-  hl.StatusLine = { guifg = colors.gray_800, guibg = colors.gray_100, gui = "none", guisp = nil } -- Active status line
-  hl.StatusLineNC = { guifg = colors.gray_600, guibg = colors.gray_100, gui = "none", guisp = nil } -- Inactive status line
-  hl.TabLine = { guifg = colors.gray_600, guibg = colors.black, gui = "none", guisp = nil } -- Inactive tab
-  hl.TabLineFill = { guifg = nil, guibg = nil, gui = "none", guisp = nil }
-  hl.TabLineSel = { guifg = colors.gray_800, guibg = colors.gray_300, gui = "none", guisp = nil } -- Active tab
+  hl.Normal = { fg = colors.gray_800, bg = colors.black }
+  hl.Bold = { bold = true }
+  hl.Debug = { fg = colors.blue }
+  hl.Directory = { fg = colors.blue }
+  hl.Error = { fg = colors.red }
+  hl.ErrorMsg = { fg = colors.red }
+  hl.Exception = { fg = colors.red }
+  hl.FoldColumn = { fg = colors.gray_600 }
+  hl.Folded = { fg = colors.gray_600, bg = colors.gray_200 }
+  hl.IncSearch = { fg = colors.true_white, bg = colors.yellow_800 }
+  hl.Italic = { italic = true }
+  hl.Macro = { fg = colors.blue }
+  hl.MatchParen = { bg = colors.gray_400 }
+  hl.ModeMsg = { fg = colors.yellow }
+  hl.MoreMsg = { fg = colors.yellow }
+  hl.Question = { fg = colors.blue }
+  hl.Search = { bg = colors.yellow_300 }
+  hl.CurSearch = { bg = colors.yellow_300 }
+  hl.Substitute = { bg = colors.yellow_500 }
+  hl.SpecialKey = { fg = colors.gray_600 }
+  hl.TooLong = { fg = colors.blue }
+  hl.Underlined = { fg = colors.blue }
+  hl.Visual = { bg = colors.gray_400 }
+  hl.VisualNOS = { fg = colors.blue }
+  hl.WarningMsg = { fg = colors.yellow }
+  hl.WildMenu = { fg = colors.yellow, bg = colors.blue }
+  hl.Title = { fg = colors.blue }
+  hl.Conceal = { fg = colors.blue }
+  hl.Cursor = { fg = colors.black, bg = colors.gray_800 }
+  hl.NonText = { fg = colors.gray_600 }
+  hl.LineNr = { fg = colors.gray_600 }
+  hl.SignColumn = { fg = colors.gray_600 }
+  hl.WinBar = { fg = colors.gray_800 }
+  hl.WinBarNC = { fg = colors.gray_600 }
+  hl.VertSplit = { fg = colors.gray_300 }
+  hl.ColorColumn = { bg = colors.gray_300 }
+  hl.CursorColumn = { bg = colors.gray_300 }
+  hl.CursorLine = { bg = colors.gray_300 }
+  hl.CursorLineNr = { fg = colors.gray_600, bg = colors.gray_300 }
+  hl.QuickFixLine = { bg = colors.gray_300 }
+  hl.PMenu = { fg = colors.gray_600, bg = colors.gray_100 }
+  hl.PMenuSel = { fg = colors.gray_800, bg = colors.gray_400 }
+  hl.PMenuSbar = { bg = colors.gray_300 }
+  hl.PMenuThumb = { bg = colors.gray_600 }
+  hl.StatusLine = { fg = colors.gray_800, bg = colors.gray_100 }  -- Active status line
+  hl.StatusLineNC = { fg = colors.gray_600, bg = colors.gray_100 }  -- Inactive status line
+  hl.TabLine = { fg = colors.gray_600, bg = colors.black }  -- Inactive tab
+  hl.TabLineFill = {}
+  hl.TabLineSel = { fg = colors.gray_800, bg = colors.gray_300 }  -- Active tab
 
   -- Status line (custom)
-  hl.StatusLineDiagnosticError = { guifg = colors.red, guibg = colors.gray_100, gui = nil, guisp = nil }
-  hl.StatusLineDiagnosticWarn = { guifg = colors.yellow, guibg = colors.gray_100, gui = nil, guisp = nil }
-  hl.StatusLineDiagnosticInfo = { guifg = colors.blue, guibg = colors.gray_100, gui = nil, guisp = nil }
-  hl.StatusLineDiagnosticHint = { guifg = colors.blue, guibg = colors.gray_100, gui = nil, guisp = nil }
-  hl.StatusLineMuted = { guifg = colors.gray_600, guibg = colors.gray_100, gui = nil, guisp = nil }
+  hl.StatusLineDiagnosticError = { fg = colors.red, bg = colors.gray_100 }
+  hl.StatusLineDiagnosticWarn = { fg = colors.yellow, bg = colors.gray_100 }
+  hl.StatusLineDiagnosticInfo = { fg = colors.blue, bg = colors.gray_100 }
+  hl.StatusLineDiagnosticHint = { fg = colors.blue, bg = colors.gray_100 }
+  hl.StatusLineMuted = { fg = colors.gray_600, bg = colors.gray_100 }
 
   -- Standard syntax highlighting
-  hl.Comment = { guifg = syntax_hl.Comment, guibg = nil, gui = nil, guisp = nil }
-  hl.Boolean = { guifg = syntax_hl.Boolean, guibg = nil, gui = nil, guisp = nil }
-  hl.Character = { guifg = syntax_hl.Character, guibg = nil, gui = nil, guisp = nil }
-  hl.Conditional = { guifg = syntax_hl.Conditional, guibg = nil, gui = nil, guisp = nil }
-  hl.Constant = { guifg = syntax_hl.Constant, guibg = nil, gui = nil, guisp = nil }
-  hl.Define = { guifg = syntax_hl.Define, guibg = nil, gui = "none", guisp = nil }
-  hl.Delimiter = { guifg = syntax_hl.Delimiter, guibg = nil, gui = nil, guisp = nil }
-  hl.Float = { guifg = syntax_hl.Float, guibg = nil, gui = nil, guisp = nil }
-  hl.Function = { guifg = syntax_hl.Function, guibg = nil, gui = nil, guisp = nil }
-  hl.Identifier = { guifg = syntax_hl.Identifier, guibg = nil, gui = "none", guisp = nil }
-  hl.Include = { guifg = syntax_hl.Include, guibg = nil, gui = nil, guisp = nil }
-  hl.Keyword = { guifg = syntax_hl.Keyword, guibg = nil, gui = nil, guisp = nil }
-  hl.Label = { guifg = syntax_hl.Label, guibg = nil, gui = nil, guisp = nil }
-  hl.Number = { guifg = syntax_hl.Number, guibg = nil, gui = nil, guisp = nil }
-  hl.Operator = { guifg = syntax_hl.Operator, guibg = nil, gui = "none", guisp = nil }
-  hl.PreProc = { guifg = syntax_hl.PreProc, guibg = nil, gui = nil, guisp = nil }
-  hl.Repeat = { guifg = syntax_hl.Repeat, guibg = nil, gui = nil, guisp = nil }
-  hl.Special = { guifg = syntax_hl.Special, guibg = nil, gui = nil, guisp = nil }
-  hl.SpecialChar = { guifg = syntax_hl.SpecialChar, guibg = nil, gui = nil, guisp = nil }
-  hl.Statement = { guifg = syntax_hl.Statement, guibg = nil, gui = nil, guisp = nil }
-  hl.StorageClass = { guifg = syntax_hl.StorageClass, guibg = nil, gui = nil, guisp = nil }
-  hl.String = { guifg = syntax_hl.String, guibg = nil, gui = nil, guisp = nil }
-  hl.Structure = { guifg = syntax_hl.Structure, guibg = nil, gui = nil, guisp = nil }
-  hl.Tag = { guifg = syntax_hl.Tag, guibg = nil, gui = nil, guisp = nil }
-  hl.Type = { guifg = syntax_hl.Type, guibg = nil, gui = "none", guisp = nil }
-  hl.Typedef = { guifg = syntax_hl.Typedef, guibg = nil, gui = nil, guisp = nil }
-  hl.Todo = { guifg = nil, guibg = syntax_hl.blue_300, gui = nil, guisp = nil }
+  hl.Comment = { fg = syntax_hl.Comment }
+  hl.Boolean = { fg = syntax_hl.Boolean }
+  hl.Character = { fg = syntax_hl.Character }
+  hl.Conditional = { fg = syntax_hl.Conditional }
+  hl.Constant = { fg = syntax_hl.Constant }
+  hl.Define = { fg = syntax_hl.Define }
+  hl.Delimiter = { fg = syntax_hl.Delimiter }
+  hl.Float = { fg = syntax_hl.Float }
+  hl.Function = { fg = syntax_hl.Function }
+  hl.Identifier = { fg = syntax_hl.Identifier }
+  hl.Include = { fg = syntax_hl.Include }
+  hl.Keyword = { fg = syntax_hl.Keyword }
+  hl.Label = { fg = syntax_hl.Label }
+  hl.Number = { fg = syntax_hl.Number }
+  hl.Operator = { fg = syntax_hl.Operator }
+  hl.PreProc = { fg = syntax_hl.PreProc }
+  hl.Repeat = { fg = syntax_hl.Repeat }
+  hl.Special = { fg = syntax_hl.Special }
+  hl.SpecialChar = { fg = syntax_hl.SpecialChar }
+  hl.Statement = { fg = syntax_hl.Statement }
+  hl.StorageClass = { fg = syntax_hl.StorageClass }
+  hl.String = { fg = syntax_hl.String }
+  hl.Structure = { fg = syntax_hl.Structure }
+  hl.Tag = { fg = syntax_hl.Tag }
+  hl.Type = { fg = syntax_hl.Type }
+  hl.Typedef = { fg = syntax_hl.Typedef }
+  hl.Todo = { bg = syntax_hl.blue_300 }
 
   -- Diff highlighting
-  hl.DiffAdd = { guifg = nil, guibg = colors.blue_200, gui = nil, guisp = nil }
-  hl.DiffChange = { guifg = nil, guibg = colors.yellow_200, gui = nil, guisp = nil }
-  hl.DiffDelete = { guifg = colors.gray_200, guibg = colors.red_200, gui = nil, guisp = nil }
-  hl.DiffText = { guifg = nil, guibg = colors.yellow_400, gui = nil, guisp = nil }
+  hl.DiffAdd = { bg = colors.blue_200 }
+  hl.DiffChange = { bg = colors.yellow_200 }
+  hl.DiffDelete = { fg = colors.gray_200, bg = colors.red_200 }
+  hl.DiffText = { bg = colors.yellow_400 }
 
   -- GitGutter highlighting
-  hl.GitGutterAdd = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.GitGutterChange = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.GitGutterDelete = { guifg = colors.red, guibg = nil, gui = nil, guisp = nil }
-  hl.GitGutterChangeDelete = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
+  hl.GitGutterAdd = { fg = colors.blue }
+  hl.GitGutterChange = { fg = colors.yellow }
+  hl.GitGutterDelete = { fg = colors.red }
+  hl.GitGutterChangeDelete = { fg = colors.blue }
 
   -- Spelling highlighting
-  hl.SpellBad = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.yellow }
-  hl.SpellLocal = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.yellow }
-  hl.SpellCap = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.blue }
-  hl.SpellRare = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.blue }
+  hl.SpellBad = { undercurl = true, sp = colors.yellow }
+  hl.SpellLocal = { undercurl = true, sp = colors.yellow }
+  hl.SpellCap = { undercurl = true, sp = colors.blue }
+  hl.SpellRare = { undercurl = true, sp = colors.blue }
 
-  hl.DiagnosticError = { guifg = colors.red, guibg = nil, gui = "none", guisp = nil }
-  hl.DiagnosticWarn = { guifg = colors.yellow, guibg = nil, gui = "none", guisp = nil }
-  hl.DiagnosticOk = { guifg = colors.blue, guibg = nil, gui = "none", guisp = nil }
-  hl.DiagnosticInfo = { guifg = colors.blue, guibg = nil, gui = "none", guisp = nil }
-  hl.DiagnosticHint = { guifg = colors.blue, guibg = nil, gui = "none", guisp = nil }
-  hl.DiagnosticUnderlineError = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.red_700 }
-  hl.DiagnosticUnderlineWarning = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.yellow_700 }
-  hl.DiagnosticUnderlineWarn = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.yellow_700 }
-  hl.DiagnosticUnderlineInformation = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.blue_700 }
-  hl.DiagnosticUnderlineHint = { guifg = nil, guibg = nil, gui = "undercurl", guisp = colors.blue_700 }
+  hl.DiagnosticError = { fg = colors.red }
+  hl.DiagnosticWarn = { fg = colors.yellow }
+  hl.DiagnosticOk = { fg = colors.blue }
+  hl.DiagnosticInfo = { fg = colors.blue }
+  hl.DiagnosticHint = { fg = colors.blue }
+  hl.DiagnosticUnderlineError = { undercurl = true, sp = colors.red_700 }
+  hl.DiagnosticUnderlineWarning = { undercurl = true, sp = colors.yellow_700 }
+  hl.DiagnosticUnderlineWarn = { undercurl = true, sp = colors.yellow_700 }
+  hl.DiagnosticUnderlineInformation = { undercurl = true, sp = colors.blue_700 }
+  hl.DiagnosticUnderlineHint = { undercurl = true, sp = colors.blue_700 }
 
-  hl.DiagnosticVirtualTextError = { guifg = colors.red_700, guibg = colors.red_100 }
-  hl.DiagnosticVirtualTextWarn = { guifg = colors.yellow_700, guibg = colors.yellow_100 }
-  hl.DiagnosticVirtualTextInfo = { guifg = colors.blue_700, guibg = colors.blue_100 }
-  hl.DiagnosticVirtualTextHint = { guifg = colors.blue_700, guibg = colors.blue_100 }
+  hl.DiagnosticVirtualTextError = { fg = colors.red_700, bg = colors.red_100 }
+  hl.DiagnosticVirtualTextWarn = { fg = colors.yellow_700, bg = colors.yellow_100 }
+  hl.DiagnosticVirtualTextInfo = { fg = colors.blue_700, bg = colors.blue_100 }
+  hl.DiagnosticVirtualTextHint = { fg = colors.blue_700, bg = colors.blue_100 }
 
-  hl.LspReferenceText = { guifg = nil, guibg = nil, gui = "underline", guisp = colors.gray_600 }
-  hl.LspReferenceRead = { guifg = nil, guibg = nil, gui = "underline", guisp = colors.gray_600 }
-  hl.LspReferenceWrite = { guifg = nil, guibg = nil, gui = "underline", guisp = colors.gray_600 }
+  hl.LspReferenceText = { underline = true, sp = colors.gray_600 }
+  hl.LspReferenceRead = { underline = true, sp = colors.gray_600 }
+  hl.LspReferenceWrite = { underline = true, sp = colors.gray_600 }
   hl.LspDiagnosticsDefaultError = "DiagnosticError"
   hl.LspDiagnosticsDefaultWarning = "DiagnosticWarn"
   hl.LspDiagnosticsDefaultInformation = "DiagnosticInfo"
@@ -243,64 +235,64 @@ function M.setup(opts)
   hl.LspDiagnosticsUnderlineWarning = "DiagnosticUnderlineWarning"
   hl.LspDiagnosticsUnderlineInformation = "DiagnosticUnderlineInformation"
   hl.LspDiagnosticsUnderlineHint = "DiagnosticUnderlineHint"
-  hl.LspInlayHint = { guifg = colors.gray_600, guibg = nil, gui = "italic", guisp = nil }
+  hl.LspInlayHint = { fg = colors.gray_600, italic = true }
 
-  hl.TSAnnotation = { guifg = syntax_hl.TSAnnotation, guibg = nil, gui = "none", guisp = nil }
-  hl.TSAttribute = { guifg = syntax_hl.TSAttribute, guibg = nil, gui = "none", guisp = nil }
-  hl.TSBoolean = { guifg = syntax_hl.TSBoolean, guibg = nil, gui = "none", guisp = nil }
-  hl.TSCharacter = { guifg = syntax_hl.TSCharacter, guibg = nil, gui = "none", guisp = nil }
-  hl.TSComment = { guifg = syntax_hl.TSComment, guibg = nil, gui = "italic", guisp = nil }
-  hl.TSConstructor = { guifg = syntax_hl.TSConstructor, guibg = nil, gui = "none", guisp = nil }
-  hl.TSConditional = { guifg = syntax_hl.TSConditional, guibg = nil, gui = "none", guisp = nil }
-  hl.TSConstant = { guifg = syntax_hl.TSConstant, guibg = nil, gui = "none", guisp = nil }
-  hl.TSConstBuiltin = { guifg = syntax_hl.TSConstBuiltin, guibg = nil, gui = "italic", guisp = nil }
-  hl.TSConstMacro = { guifg = syntax_hl.TSConstMacro, guibg = nil, gui = "none", guisp = nil }
-  hl.TSError = { guifg = syntax_hl.TSError, guibg = nil, gui = "none", guisp = nil }
-  hl.TSException = { guifg = syntax_hl.TSException, guibg = nil, gui = "none", guisp = nil }
-  hl.TSField = { guifg = syntax_hl.TSField, guibg = nil, gui = "none", guisp = nil }
-  hl.TSFloat = { guifg = syntax_hl.TSFloat, guibg = nil, gui = "none", guisp = nil }
-  hl.TSFunction = { guifg = syntax_hl.TSFunction, guibg = nil, gui = "none", guisp = nil }
-  hl.TSFuncBuiltin = { guifg = syntax_hl.TSFuncBuiltin, guibg = nil, gui = "italic", guisp = nil }
-  hl.TSFuncMacro = { guifg = syntax_hl.TSFuncMacro, guibg = nil, gui = "none", guisp = nil }
-  hl.TSInclude = { guifg = syntax_hl.TSInclude, guibg = nil, gui = "none", guisp = nil }
-  hl.TSKeyword = { guifg = syntax_hl.TSKeyword, guibg = nil, gui = "none", guisp = nil }
-  hl.TSKeywordFunction = { guifg = syntax_hl.TSKeywordFunction, guibg = nil, gui = "none", guisp = nil }
-  hl.TSKeywordOperator = { guifg = syntax_hl.TSKeywordOperator, guibg = nil, gui = "none", guisp = nil }
-  hl.TSLabel = { guifg = syntax_hl.TSLabel, guibg = nil, gui = "none", guisp = nil }
-  hl.TSMethod = { guifg = syntax_hl.TSMethod, guibg = nil, gui = "none", guisp = nil }
-  hl.TSNamespace = { guifg = syntax_hl.TSNamespace, guibg = nil, gui = "none", guisp = nil }
-  hl.TSNone = { guifg = syntax_hl.TSNone, guibg = nil, gui = "none", guisp = nil }
-  hl.TSNumber = { guifg = syntax_hl.TSNumber, guibg = nil, gui = "none", guisp = nil }
-  hl.TSOperator = { guifg = syntax_hl.TSOperator, guibg = nil, gui = "none", guisp = nil }
-  hl.TSParameter = { guifg = syntax_hl.TSParameter, guibg = nil, gui = "none", guisp = nil }
-  hl.TSParameterReference = { guifg = syntax_hl.TSParameterReference, guibg = nil, gui = "none", guisp = nil }
-  hl.TSProperty = { guifg = syntax_hl.TSProperty, guibg = nil, gui = "none", guisp = nil }
-  hl.TSPunctDelimiter = { guifg = syntax_hl.TSPunctDelimiter, guibg = nil, gui = "none", guisp = nil }
-  hl.TSPunctBracket = { guifg = syntax_hl.TSPunctBracket, guibg = nil, gui = "none", guisp = nil }
-  hl.TSPunctSpecial = { guifg = syntax_hl.TSPunctSpecial, guibg = nil, gui = "none", guisp = nil }
-  hl.TSRepeat = { guifg = syntax_hl.TSRepeat, guibg = nil, gui = "none", guisp = nil }
-  hl.TSString = { guifg = syntax_hl.TSString, guibg = nil, gui = "none", guisp = nil }
-  hl.TSStringRegex = { guifg = syntax_hl.TSStringRegex, guibg = nil, gui = "none", guisp = nil }
-  hl.TSStringEscape = { guifg = syntax_hl.TSStringEscape, guibg = nil, gui = "none", guisp = nil }
-  hl.TSSymbol = { guifg = syntax_hl.TSSymbol, guibg = nil, gui = "none", guisp = nil }
-  hl.TSTag = { guifg = syntax_hl.TSTag, guibg = nil, gui = "none", guisp = nil }
-  hl.TSTagDelimiter = { guifg = syntax_hl.TSTagDelimiter, guibg = nil, gui = "none", guisp = nil }
-  hl.TSText = { guifg = syntax_hl.TSText, guibg = nil, gui = "none", guisp = nil }
-  hl.TSEmphasis = { guifg = syntax_hl.TSEmphasis, guibg = nil, gui = "italic", guisp = nil }
-  hl.TSUnderline = { guifg = syntax_hl.TSUnderline, guibg = nil, gui = "underline", guisp = nil }
-  hl.TSStrike = { guifg = syntax_hl.TSStrike, guibg = nil, gui = "strikethrough", guisp = nil }
-  hl.TSTitle = { guifg = syntax_hl.TSTitle, guibg = nil, gui = "none", guisp = nil }
-  hl.TSLiteral = { guifg = syntax_hl.TSLiteral, guibg = nil, gui = "none", guisp = nil }
-  hl.TSURI = { guifg = syntax_hl.TSURI, guibg = nil, gui = "underline", guisp = nil }
-  hl.TSType = { guifg = syntax_hl.TSType, guibg = nil, gui = "none", guisp = nil }
-  hl.TSTypeBuiltin = { guifg = syntax_hl.TSTypeBuiltin, guibg = nil, gui = "italic", guisp = nil }
-  hl.TSVariable = { guifg = syntax_hl.TSVariable, guibg = nil, gui = "none", guisp = nil }
-  hl.TSVariableBuiltin = { guifg = syntax_hl.TSVariableBuiltin, guibg = nil, gui = "italic", guisp = nil }
+  hl.TSAnnotation = { fg = syntax_hl.TSAnnotation }
+  hl.TSAttribute = { fg = syntax_hl.TSAttribute }
+  hl.TSBoolean = { fg = syntax_hl.TSBoolean }
+  hl.TSCharacter = { fg = syntax_hl.TSCharacter }
+  hl.TSComment = { fg = syntax_hl.TSComment, italic = true }
+  hl.TSConstructor = { fg = syntax_hl.TSConstructor }
+  hl.TSConditional = { fg = syntax_hl.TSConditional }
+  hl.TSConstant = { fg = syntax_hl.TSConstant }
+  hl.TSConstBuiltin = { fg = syntax_hl.TSConstBuiltin, italic = true }
+  hl.TSConstMacro = { fg = syntax_hl.TSConstMacro }
+  hl.TSError = { fg = syntax_hl.TSError }
+  hl.TSException = { fg = syntax_hl.TSException }
+  hl.TSField = { fg = syntax_hl.TSField }
+  hl.TSFloat = { fg = syntax_hl.TSFloat }
+  hl.TSFunction = { fg = syntax_hl.TSFunction }
+  hl.TSFuncBuiltin = { fg = syntax_hl.TSFuncBuiltin, italic = true }
+  hl.TSFuncMacro = { fg = syntax_hl.TSFuncMacro }
+  hl.TSInclude = { fg = syntax_hl.TSInclude }
+  hl.TSKeyword = { fg = syntax_hl.TSKeyword }
+  hl.TSKeywordFunction = { fg = syntax_hl.TSKeywordFunction }
+  hl.TSKeywordOperator = { fg = syntax_hl.TSKeywordOperator }
+  hl.TSLabel = { fg = syntax_hl.TSLabel }
+  hl.TSMethod = { fg = syntax_hl.TSMethod }
+  hl.TSNamespace = { fg = syntax_hl.TSNamespace }
+  hl.TSNone = { fg = syntax_hl.TSNone }
+  hl.TSNumber = { fg = syntax_hl.TSNumber }
+  hl.TSOperator = { fg = syntax_hl.TSOperator }
+  hl.TSParameter = { fg = syntax_hl.TSParameter }
+  hl.TSParameterReference = { fg = syntax_hl.TSParameterReference }
+  hl.TSProperty = { fg = syntax_hl.TSProperty }
+  hl.TSPunctDelimiter = { fg = syntax_hl.TSPunctDelimiter }
+  hl.TSPunctBracket = { fg = syntax_hl.TSPunctBracket }
+  hl.TSPunctSpecial = { fg = syntax_hl.TSPunctSpecial }
+  hl.TSRepeat = { fg = syntax_hl.TSRepeat }
+  hl.TSString = { fg = syntax_hl.TSString }
+  hl.TSStringRegex = { fg = syntax_hl.TSStringRegex }
+  hl.TSStringEscape = { fg = syntax_hl.TSStringEscape }
+  hl.TSSymbol = { fg = syntax_hl.TSSymbol }
+  hl.TSTag = { fg = syntax_hl.TSTag }
+  hl.TSTagDelimiter = { fg = syntax_hl.TSTagDelimiter }
+  hl.TSText = { fg = syntax_hl.TSText }
+  hl.TSEmphasis = { fg = syntax_hl.TSEmphasis, italic = true }
+  hl.TSUnderline = { fg = syntax_hl.TSUnderline, underline = true }
+  hl.TSStrike = { fg = syntax_hl.TSStrike, strikethrough = true }
+  hl.TSTitle = { fg = syntax_hl.TSTitle }
+  hl.TSLiteral = { fg = syntax_hl.TSLiteral }
+  hl.TSURI = { fg = syntax_hl.TSURI, underline = true }
+  hl.TSType = { fg = syntax_hl.TSType }
+  hl.TSTypeBuiltin = { fg = syntax_hl.TSTypeBuiltin, italic = true }
+  hl.TSVariable = { fg = syntax_hl.TSVariable }
+  hl.TSVariableBuiltin = { fg = syntax_hl.TSVariableBuiltin, italic = true }
 
-  hl.TSStrong = { guifg = nil, guibg = nil, gui = "bold", guisp = nil }
-  hl.TSDefinition = { guifg = nil, guibg = nil, gui = "underline", guisp = colors.gray_600 }
-  hl.TSDefinitionUsage = { guifg = nil, guibg = nil, gui = "underline", guisp = colors.gray_600 }
-  hl.TSCurrentScope = { guifg = nil, guibg = nil, gui = "bold", guisp = nil }
+  hl.TSStrong = { bold = true }
+  hl.TSDefinition = { underline = true, sp = colors.gray_600 }
+  hl.TSDefinitionUsage = { underline = true, sp = colors.gray_600 }
+  hl.TSCurrentScope = { bold = true }
 
   hl["@comment"] = "TSComment"
   hl["@error"] = "TSError"
@@ -375,42 +367,42 @@ function M.setup(opts)
   hl["@tag.attribute"] = "TSAttribute"
   hl["@tag.delimiter"] = "TSTagDelimiter"
 
-  hl.Added = { guifg = nil, guibg = colors.blue_200, gui = nil, guisp = nil }
-  hl.Changed = { guifg = nil, guibg = colors.yellow_200, gui = nil, guisp = nil }
-  hl.Removed = { guifg = colors.gray_200, guibg = colors.red_200, gui = nil, guisp = nil }
+  hl.Added = { bg = colors.blue_200 }
+  hl.Changed = { bg = colors.yellow_200 }
+  hl.Removed = { fg = colors.gray_200, bg = colors.red_200 }
   hl["@diff.plus"] = "Added"
   hl["@diff.delta"] = "Changed"
   hl["@diff.minus"] = "Removed"
 
-  hl.NvimInternalError = { guifg = colors.black, guibg = colors.blue, gui = "none", guisp = nil }
+  hl.NvimInternalError = { fg = colors.black, bg = colors.blue }
 
-  hl.NormalFloat = { guifg = colors.gray_800, guibg = colors.blue_200, gui = nil, guisp = nil }
-  hl.FloatBorder = { guifg = colors.gray_800, guibg = colors.black, gui = nil, guisp = nil }
-  hl.NormalNC = { guifg = colors.gray_800, guibg = nil, gui = nil, guisp = nil }
-  hl.TermCursor = { guifg = colors.black, guibg = colors.gray_800, gui = "none", guisp = nil }
-  hl.TermCursorNC = { guifg = colors.black, guibg = colors.gray_800, gui = nil, guisp = nil }
+  hl.NormalFloat = { fg = colors.gray_800, bg = colors.blue_200 }
+  hl.FloatBorder = { fg = colors.gray_800, bg = colors.black }
+  hl.NormalNC = { fg = colors.gray_800 }
+  hl.TermCursor = { fg = colors.black, bg = colors.gray_800 }
+  hl.TermCursorNC = { fg = colors.black, bg = colors.gray_800 }
 
-  hl.NotifierError = { guifg = colors.gray_700, guibg = colors.red_300, gui = nil, guisp = nil }
-  hl.NotifierWarn = { guifg = colors.gray_700, guibg = colors.yellow_300, gui = nil, guisp = nil }
-  hl.NotifierInfo = { guifg = colors.gray_700, guibg = colors.blue_300, gui = nil, guisp = nil }
-  hl.NotifierDebug = { guifg = colors.gray_700, guibg = colors.gray_300, gui = nil, guisp = nil }
-  hl.NotifierTrace = { guifg = colors.gray_700, guibg = colors.gray_300, gui = nil, guisp = nil }
-  hl.NotifierUnknown = { guifg = colors.gray_700, guibg = colors.gray_200, gui = nil, guisp = nil }
+  hl.NotifierError = { fg = colors.gray_700, bg = colors.red_300 }
+  hl.NotifierWarn = { fg = colors.gray_700, bg = colors.yellow_300 }
+  hl.NotifierInfo = { fg = colors.gray_700, bg = colors.blue_300 }
+  hl.NotifierDebug = { fg = colors.gray_700, bg = colors.gray_300 }
+  hl.NotifierTrace = { fg = colors.gray_700, bg = colors.gray_300 }
+  hl.NotifierUnknown = { fg = colors.gray_700, bg = colors.gray_200 }
 
-  hl.WinbarPath = { guifg = colors.gray_600, guibg = nil, gui = nil, guisp = nil }
-  hl.WinbarFile = { guifg = colors.gray_600, guibg = nil, gui = nil, guisp = nil }
+  hl.WinbarPath = { fg = colors.gray_600 }
+  hl.WinbarFile = { fg = colors.gray_600 }
 
-  hl.User1 = { guifg = colors.blue, guibg = colors.gray_400, gui = "none", guisp = nil }
-  hl.User2 = { guifg = colors.blue, guibg = colors.gray_400, gui = "none", guisp = nil }
-  hl.User3 = { guifg = colors.gray_800, guibg = colors.gray_400, gui = "none", guisp = nil }
-  hl.User4 = { guifg = colors.yellow, guibg = colors.gray_400, gui = "none", guisp = nil }
-  hl.User5 = { guifg = colors.gray_800, guibg = colors.gray_400, gui = "none", guisp = nil }
-  hl.User6 = { guifg = colors.gray_800, guibg = colors.gray_300, gui = "none", guisp = nil }
-  hl.User7 = { guifg = colors.gray_800, guibg = colors.gray_400, gui = "none", guisp = nil }
-  hl.User8 = { guifg = colors.black, guibg = colors.gray_400, gui = "none", guisp = nil }
-  hl.User9 = { guifg = colors.black, guibg = colors.gray_400, gui = "none", guisp = nil }
+  hl.User1 = { fg = colors.blue, bg = colors.gray_400 }
+  hl.User2 = { fg = colors.blue, bg = colors.gray_400 }
+  hl.User3 = { fg = colors.gray_800, bg = colors.gray_400 }
+  hl.User4 = { fg = colors.yellow, bg = colors.gray_400 }
+  hl.User5 = { fg = colors.gray_800, bg = colors.gray_400 }
+  hl.User6 = { fg = colors.gray_800, bg = colors.gray_300 }
+  hl.User7 = { fg = colors.gray_800, bg = colors.gray_400 }
+  hl.User8 = { fg = colors.black, bg = colors.gray_400 }
+  hl.User9 = { fg = colors.black, bg = colors.gray_400 }
 
-  hl.TreesitterContext = { guifg = nil, guibg = colors.gray_300, gui = "italic", guisp = nil }
+  hl.TreesitterContext = { bg = colors.gray_300, italic = true }
 
   local override_terminal_color = vim.g.neovide
 
@@ -434,67 +426,67 @@ function M.setup(opts)
   end
 
   -- FzfLua
-  hl.FzfLuaBufFlagCur = { guifg = colors.gray_600, guibg = nil }
-  hl.FzfLuaTabTitle = { guifg = colors.blue, guibg = nil }
-  hl.FzfLuaHeaderText = { guifg = colors.gray_600, guibg = nil }
-  hl.FzfLuaBufLineNr = { guifg = colors.blue, guibg = nil }
-  hl.FzfLuaBufNr = { guifg = colors.blue, guibg = nil }
-  hl.FzfLuaBufName = { guifg = colors.blue, guibg = nil }
-  hl.FzfLuaHeaderBind = { guifg = colors.blue, guibg = nil }
-  hl.FzfLuaTabMarker = { guifg = colors.blue, guibg = nil }
-  hl.FzfLuaBufFlagAlt = { guifg = colors.blue, guibg = nil }
+  hl.FzfLuaBufFlagCur = { fg = colors.gray_600 }
+  hl.FzfLuaTabTitle = { fg = colors.blue }
+  hl.FzfLuaHeaderText = { fg = colors.gray_600 }
+  hl.FzfLuaBufLineNr = { fg = colors.blue }
+  hl.FzfLuaBufNr = { fg = colors.blue }
+  hl.FzfLuaBufName = { fg = colors.blue }
+  hl.FzfLuaHeaderBind = { fg = colors.blue }
+  hl.FzfLuaTabMarker = { fg = colors.blue }
+  hl.FzfLuaBufFlagAlt = { fg = colors.blue }
 
   -- nvim-cmp
-  hl.CmpItemAbbr = { guifg = colors.gray_700, guibg = nil, gui = nil, guisp = nil } -- Completion items default
-  hl.CmpItemAbbrDeprecated = { guifg = colors.gray_600, guibg = nil, gui = "strikethrough", guisp = nil }
+  hl.CmpItemAbbr = { fg = colors.gray_700 } -- Completion items default
+  hl.CmpItemAbbrDeprecated = { fg = colors.gray_600, strikethrough = true }
   hl.CmpItemAbbrDeprecatedDefault = "CmpItemAbbrDeprecated"
-  hl.CmpItemAbbrMatch = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil } -- Matched portion of completion items
-  hl.CmpItemAbbrMatchFuzzy = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemMenu = { guifg = nil, guibg = nil, gui = nil, guisp = nil }
+  hl.CmpItemAbbrMatch = { fg = colors.blue } -- Matched portion of completion items
+  hl.CmpItemAbbrMatchFuzzy = { fg = colors.blue }
+  hl.CmpItemMenu = { }
   -- Color of "<icon> symbol" on the right
-  hl.CmpItemKindDefault = { guifg = colors.gray_700, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindKeyword = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindVariable = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindConstant = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindReference = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindValue = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindFunction = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindMethod = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindConstructor = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindClass = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindInterface = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindStruct = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindEvent = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindEnum = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindUnit = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindModule = { guifg = colors.yellow, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindProperty = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindField = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindTypeParameter = { guifg = colors.blue, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindEnumMember = { guifg = colors.white, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindOperator = { guifg = colors.white, guibg = nil, gui = nil, guisp = nil }
-  hl.CmpItemKindSnippet = { guifg = colors.white, guibg = nil, gui = nil, guisp = nil }
+  hl.CmpItemKindDefault = { fg = colors.gray_700 }
+  hl.CmpItemKindKeyword = { fg = colors.blue }
+  hl.CmpItemKindVariable = { fg = colors.blue }
+  hl.CmpItemKindConstant = { fg = colors.blue }
+  hl.CmpItemKindReference = { fg = colors.blue }
+  hl.CmpItemKindValue = { fg = colors.blue }
+  hl.CmpItemKindFunction = { fg = colors.blue }
+  hl.CmpItemKindMethod = { fg = colors.blue }
+  hl.CmpItemKindConstructor = { fg = colors.blue }
+  hl.CmpItemKindClass = { fg = colors.yellow }
+  hl.CmpItemKindInterface = { fg = colors.yellow }
+  hl.CmpItemKindStruct = { fg = colors.yellow }
+  hl.CmpItemKindEvent = { fg = colors.yellow }
+  hl.CmpItemKindEnum = { fg = colors.yellow }
+  hl.CmpItemKindUnit = { fg = colors.yellow }
+  hl.CmpItemKindModule = { fg = colors.yellow }
+  hl.CmpItemKindProperty = { fg = colors.blue }
+  hl.CmpItemKindField = { fg = colors.blue }
+  hl.CmpItemKindTypeParameter = { fg = colors.blue }
+  hl.CmpItemKindEnumMember = { fg = colors.white }
+  hl.CmpItemKindOperator = { fg = colors.white }
+  hl.CmpItemKindSnippet = { fg = colors.white }
 
   -- Git signs
-  hl.GitSignsChangeInline = { guifg = nil, guibg = colors.blue_300 } -- Current state of the hunk for preview_hunk
-  hl.GitSignsDeleteVirtLn = { guifg = nil, guibg = colors.red_300 } -- Previous state of the hunk for preview_hunk
+  hl.GitSignsChangeInline = { bg = colors.blue_300 } -- Current state of the hunk for preview_hunk
+  hl.GitSignsDeleteVirtLn = { bg = colors.red_300 } -- Previous state of the hunk for preview_hunk
 
   -- TUI
-  hl.TUIBorderActive = { guifg = colors.gray_600, guibg = colors.black }
-  hl.TUIBorderInactive = { guifg = colors.gray_300, guibg = colors.black }
+  hl.TUIBorderActive = { fg = colors.gray_600, bg = colors.black }
+  hl.TUIBorderInactive = { fg = colors.gray_300, bg = colors.black }
 
   -- Fzf
-  hl.FzfSelectorBreadcrumbs = { guifg = colors.blue, guibg = nil, gui = "bold" }
+  hl.FzfSelectorBreadcrumbs = { fg = colors.blue, bold = true }
 
   -- Fzf Git status
-  hl.FzfGitStatusBorderAdded = { guifg = colors.blue, guibg = nil, gui = "bold" }
-  hl.FzfGitStatusBorderChanged = { guifg = colors.yellow, guibg = nil, gui = "bold" }
-  hl.FzfGitStatusBorderDeleted = { guifg = colors.red, guibg = nil, gui = "bold" }
-  hl.FzfGitStatusBorderNormal = { guifg = colors.gray_800, guibg = nil, gui = "bold" }
-  hl.FzfGitStatusBorderDiffStat = { guifg = colors.gray_800, guibg = nil }
+  hl.FzfGitStatusBorderAdded = { fg = colors.blue, bold = true }
+  hl.FzfGitStatusBorderChanged = { fg = colors.yellow, bold = true }
+  hl.FzfGitStatusBorderDeleted = { fg = colors.red, bold = true }
+  hl.FzfGitStatusBorderNormal = { fg = colors.gray_800, bold = true }
+  hl.FzfGitStatusBorderDiffStat = { fg = colors.gray_800 }
 
   -- Fzf files
-  hl.FzfFilesBorderFiletype = { guifg = colors.gray_800, guibg = nil, gui = "bold" }
+  hl.FzfFilesBorderFiletype = { fg = colors.gray_800, bold = true }
 
   -- Fzf Git stash
   hl.FzfGitStatusBorderDiffStat = "FzfGitStatusBorderDiffStat"

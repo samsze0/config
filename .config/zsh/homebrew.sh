@@ -58,8 +58,12 @@ brew_check() {
 	brew bundle check --global
 }
 
-brew_cleanup() {
+brew_cleanup_check() {
 	brew bundle cleanup --global
+}
+
+brew_cleanup() {
+	brew bundle cleanup --global --force
 }
 
 brew_install() {

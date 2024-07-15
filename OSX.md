@@ -61,3 +61,14 @@ Change default shell to brew's installation of zsh:
 echo /opt/homebrew/bin/zsh | sudo tee -a /etc/shells
 chsh -s /opt/homebrew/bin/zsh
 ```
+
+Install custom builds of fzf and yazi:
+```bash
+# Inside fzf project
+FZF_VERSION=0 make install
+cp <binary> ~/bin
+
+# Inside yazi project
+cargo build --release
+cp <binary> ~/bin
+```

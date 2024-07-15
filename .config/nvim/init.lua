@@ -9,7 +9,7 @@ vim.opt.number = true
 vim.opt.cursorline = false
 vim.opt.signcolumn = "auto"
 vim.opt.signcolumn = "yes:1"
-vim.opt.wrap = true
+vim.opt.wrap = false
 
 vim.opt.splitright = true
 vim.opt.splitbelow = true

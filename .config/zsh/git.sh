@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 
+git_current_branch() {
+  git rev-parse --abbrev-ref HEAD
+}
+
+git_publish_branch() {
+  git push --set-upstream origin "$(git_current_branch)"
+}
+
 git_remote_list() {
 	git remote -v
 }

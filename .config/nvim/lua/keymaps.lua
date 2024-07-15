@@ -321,7 +321,11 @@ local setup = function(opts)
 
   keymap_utils.create("n", "li", function() require("fzf.lsp.definitions")():start() end)
   keymap_utils.create("n", "lr", function() require("fzf.lsp.references")():start() end)
-  keymap_utils.create("n", "ls", function() require("fzf.lsp.document_symbols")():start() end)
+  keymap_utils.create(
+    "n",
+    "ls",
+    function() require("fzf.selector.lsp.document_symbols")():start() end
+  )
   keymap_utils.create("n", "lS", function() require("fzf.lsp.workspace_symbols")():start() end)
   keymap_utils.create(
     "n",

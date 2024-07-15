@@ -178,5 +178,6 @@ export EDITOR="nvim"
 export MANPAGER="nvim +Man\!" # https://neovim.io/doc/user/filetype.html#ft-man-plugin
 
 # Prevent "repeating characters" issue when inside a ssh session that also uses zsh
-export LANG=C.UTF-8
-export LC_CTYPE=C.UTF-8
+export LANG="C.UTF-8"
+export LC_CTYPE="$LANG"
+export LC_ALL="$LANG"

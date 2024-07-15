@@ -131,7 +131,11 @@ local notifier = {
 local fzf = {
   "samsze0/fzf.nvim",
   dir = os.getenv("NVIM_FZF_NVIM_PATH"),
-  config = function() require("fzf").setup({}) end,
+  config = function() require("fzf").setup({
+    default_extra_args = {
+      ["--scroll-off"] = "2",
+    }
+  }) end,
   dependencies = {
     nui,
     utils_nvim,

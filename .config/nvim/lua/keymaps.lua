@@ -271,7 +271,11 @@ local setup = function(opts)
   keymap_utils.create("n", "<f4><f1>", function() require("fzf.tabs")():start() end)
 
   keymap_utils.create("n", "<f5><f3>", function() require("fzf.selector.grep.file")():start() end)
-  keymap_utils.create("n", "<f5><f4>", function() require("fzf.selector.grep.workspace")():start() end)
+  keymap_utils.create(
+    "n",
+    "<f5><f4>",
+    function() require("fzf.selector.grep.workspace")():start() end
+  )
   keymap_utils.create(
     "v",
     "<f5><f3>",

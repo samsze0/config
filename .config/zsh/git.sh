@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
+git_wip() {
+	git stash push -m "WIP" --all --include-untracked
+}
+
 git_current_branch() {
-  git rev-parse --abbrev-ref HEAD
+	git rev-parse --abbrev-ref HEAD
 }
 
 git_publish_branch() {
-  git push --set-upstream origin "$(git_current_branch)"
+	git push --set-upstream origin "$(git_current_branch)"
 }
 
 git_remote_list() {
@@ -22,12 +26,6 @@ git_fetch_prune() {
 
 git_remote_prune() {
 	git remote update origin --prune
-}
-
-git_stash_push_and_pull() {
-    git stash push -m "WIP" --all --include-untracked
-    git pull --rebase
-    git stash pop
 }
 
 # Git branch helper

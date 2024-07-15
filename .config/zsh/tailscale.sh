@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+tailscale_peers() {
+  tailscale status --peers
+}
+
 # Copy file to the tailscale inbox of targeted peer
 tailscale_send() {
 	DATA=$(tailscale status --json | gojq '.Peer | .[] | { HostName, TailscaleIPs, Online, Active }')

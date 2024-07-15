@@ -478,6 +478,8 @@ function M.setup(opts)
   -- Fzf
   hl.FzfBorderSelectorBreadcrumbs = { fg = colors.blue, bold = true }
   hl.FzfBorderFiletype = { fg = colors.gray_800 }
+  hl.FzfBorderLoadingIndicator = { fg = colors.yellow }
+  hl.FzfBorderStaleIndicator = { fg = colors.yellow }
 
   -- Fzf Git status
   hl.FzfGitStatusBorderAdded = { fg = colors.blue, bold = true }

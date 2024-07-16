@@ -319,8 +319,8 @@ local setup = function(opts)
   keymap_utils.create("n", "<f11><f1>", function() require("fzf.git.submodules")():start() end)
   keymap_utils.create("n", "<f11><f11>", function() require("fzf.git.reflog")():start() end)
 
-  keymap_utils.create("n", "li", function() require("fzf.lsp.definitions")():start() end)
-  keymap_utils.create("n", "lr", function() require("fzf.lsp.references")():start() end)
+  keymap_utils.create("n", "li", function() require("fzf.selector.lsp.definitions")():start() end)
+  keymap_utils.create("n", "lr", function() require("fzf.selector.lsp.references")():start() end)
   keymap_utils.create(
     "n",
     "ls",
@@ -331,15 +331,12 @@ local setup = function(opts)
     "n",
     "ld",
     function()
-      require("fzf.diagnostics")({
+      require("fzf.selector.diagnostics")({
         current_buffer_only = true,
-        severity = {
-          min = vim.diagnostic.severity.HINT,
-        },
       }):start()
     end
   )
-  keymap_utils.create("n", "lD", function() require("fzf.diagnostics")():start() end)
+  keymap_utils.create("n", "lD", function() require("fzf.selector.diagnostics")():start() end)
 
   keymap_utils.create("n", "<space>u", function() require("fzf.undo")():start() end)
   keymap_utils.create("n", "<space>m", function() require("fzf.notification")():start() end)

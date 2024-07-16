@@ -18,6 +18,7 @@ source ~/.config/zsh/lemminx.sh
 source ~/.config/zsh/azure.sh
 source ~/.config/zsh/openssh.sh
 source ~/.config/zsh/android.sh
+source ~/.config/zsh/other-deps.sh
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions

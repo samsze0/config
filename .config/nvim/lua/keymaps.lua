@@ -506,12 +506,6 @@ local setup = function(opts)
         vim.cmd(([[e %s]]):format(yazi.focus.url))
       end)
 
-      yazi.layout.main_popup:map(
-        "<C-z>",
-        "Maximise",
-        function() yazi.layout:maximise_popup("main") end
-      )
-
       -- yazi.layout.main_popup:map(opts.new_window, "Open in new window", function()
       --   if not yazi.focus then return end
       --

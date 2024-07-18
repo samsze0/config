@@ -1,5 +1,8 @@
 import { promises } from "fs";
 
+// TODO: migrate to use this https://github.com/evan-liu/karabiner.ts
+// For now, just use https://genesy.github.io/karabiner-complex-rules-generator/
+
 const rules = [
   {
     description: "Capslock -> Hyper",
@@ -181,7 +184,8 @@ const rules = [
         to: [{ key_code: "page_down" }],
         type: "basic",
       },
-      {  // Use Home/End for terminal
+      {
+        // Use Home/End for terminal
         conditions: [
           { name: "rcommand", type: "variable_if", value: 1 },
           {
@@ -193,7 +197,8 @@ const rules = [
         to: { key_code: "home" },
         type: "basic",
       },
-      {  // Use Ctrl + left/right for other apps
+      {
+        // Use Ctrl + left/right for other apps
         conditions: [
           { name: "rcommand", type: "variable_if", value: 1 },
           {
@@ -232,7 +237,8 @@ const rules = [
       },
     ],
   },
-  {  // TODO
+  {
+    // Move cursor by word
     description: "Command Left/Right -> Option Left/Right",
     manipulators: [
       {
@@ -267,11 +273,13 @@ const rules = [
           modifiers: { optional: ["any"] },
         },
         to: { key_code: "left_control" },
-        type: "basic"
-      }
-    ]
+        type: "basic",
+      },
+    ],
   },
-  {  // Cannot be mapped in system preferences
+  {
+    // Firefox prev/next tab
+    // Cannot be mapped in system preferences
     description: "Commnd J/L -> Cmd + Opt + Left/Right (Firefox)",
     manipulators: [
       {
@@ -293,6 +301,40 @@ const rules = [
         to: {
           key_code: "right_arrow",
           modifiers: ["left_command", "left_option"],
+        },
+        type: "basic",
+      },
+    ],
+  },
+  {
+    // Google chrome prev/next tab
+    description: "Commnd J/L -> Ctrl (+ Shift) + Tab (Firefox)",
+    manipulators: [
+      {
+        conditions: [
+          {
+            type: "frontmost_application_if",
+            bundle_identifiers: ["com.google.Chrome"],
+          },
+        ],
+        from: { key_code: "j", modifiers: { mandatory: ["left_command"] } },
+        to: {
+          key_code: "tab",
+          modifiers: ["left_control"],
+        },
+        type: "basic",
+      },
+      {
+        conditions: [
+          {
+            type: "frontmost_application_if",
+            bundle_identifiers: ["com.google.Chrome"],
+          },
+        ],
+        from: { key_code: "l", modifiers: { mandatory: ["left_command"] } },
+        to: {
+          key_code: "tab",
+          modifiers: ["left_control", "left_shift"],
         },
         type: "basic",
       },
@@ -353,7 +395,7 @@ async function updateConfig() {
     {
       from: { key_code: "right_option" },
       to: [{ key_code: "right_option", modifiers: ["left_command"] }],
-    }
+    },
   ];
   config.profiles[0].complex_modifications.rules = rules;
 

@@ -42,12 +42,7 @@
 !.config/yazi/**
 
 !.config/karabiner/
-!.config/karabiner/config.ts
-!.config/karabiner/default_config.json
-!.config/karabiner/tsconfig.json
-!.config/karabiner/flake.nix
-!.config/karabiner/flake.lock
-!.config/karabiner/README.md
+!.config/karabiner/**
 
 !.config/skhd/
 !.config/skhd/**

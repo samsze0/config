@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Alias for `git stash push --all -u`
 git_wip() {
 	git stash push -m "WIP" --all --include-untracked
 }
@@ -8,6 +9,7 @@ git_current_branch() {
 	git rev-parse --abbrev-ref HEAD
 }
 
+# Alias for `git push --set-upstream origin`
 git_publish_branch() {
 	git push --set-upstream origin "$(git_current_branch)"
 }
@@ -28,16 +30,20 @@ git_remote_prune() {
 	git remote update origin --prune
 }
 
-# Git branch helper
-# By default show tracking info (relationship between local and remote branches)
-# man git branch
+# Alias for `git rebase -i HEAD~n`
+git_rebase_from() {
+	git rebase -i "HEAD~$1"
+}
+
+# `git branch` helper
+# Show tracking info (relationship between local and remote branches)
 git_branch() (
 	set_flags
 
 	git branch -vv --all --format="%(refname:short) -> %(upstream:short)"
 )
 
-git_branch_select() (
+git_branch_fzf() (
 	set_flags
 
 	choice=$(git_branch)
@@ -45,7 +51,7 @@ git_branch_select() (
 	echo "$ref"
 )
 
-git_commit_select() (
+git_commit_fzf() (
 	set_flags
 
 	branch="${1:-}"
@@ -57,7 +63,7 @@ git_commit_select() (
 	echo "$commit"
 )
 
-# Git worktree_remove helper
+# `git worktree_remove` helper
 git_worktree_remove() (
 	set_flags
 

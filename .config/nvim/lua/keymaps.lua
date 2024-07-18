@@ -503,7 +503,7 @@ local setup = function(opts)
 
       yazi:on_open(function(payload)
         yazi:hide()
-        vim.cmd(([[e %s]]):format(yazi.focus.url))
+        vim.cmd(([[edit %s]]):format(yazi.focus.url))
       end)
 
       -- yazi.layout.main_popup:map(opts.new_window, "Open in new window", function()
@@ -522,14 +522,6 @@ local setup = function(opts)
       --   vim.cmd(([[tabnew %s]]):format(filepath))
       -- end)
       --
-      -- yazi.layout.main_popup:map(opts.current_window, "Open", function()
-      --   if not yazi.focus then return end
-      --
-      --   local filepath = yazi.focus.url
-      --   yazi:hide()
-      --   if jumplist then jumplist.save() end
-      --   vim.cmd(([[e %s]]):format(filepath))
-      -- end)
 
       yazi:on_quit(function() yazi:hide() end)
       yazi:on_exited(function() yazi = nil end)

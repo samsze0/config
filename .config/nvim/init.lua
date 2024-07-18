@@ -1,7 +1,5 @@
 local version = vim.version()
-if version.major ~= 0 or version.minor ~= 10 then
-  error("Neovim version 0.10 is required")
-end
+if version.major ~= 0 or version.minor ~= 10 then error("Neovim version 0.10 is required") end
 
 vim.cmd([[set clipboard+=unnamedplus]])
 
@@ -68,7 +66,7 @@ vim.opt.rtp:prepend(lazypath)
 ---@type LazySpec
 local pathlib = {
   "pysan3/pathlib.nvim",
-  tag = "v2.2.2"
+  tag = "v2.2.2",
 }
 
 ---@type LazySpec
@@ -83,14 +81,14 @@ local utils_nvim = {
     require("keymaps").setup({})
   end,
   dependencies = {
-    pathlib
-  }
+    pathlib,
+  },
 }
 
 ---@type LazySpec
 local nui = { -- Required by fzf & lf
   "MunifTanjim/nui.nvim",
-  tag = "0.3.0",
+  commit = "61574ce6e60c815b0a0c4b5655b8486ba58089a1",
 }
 
 ---@type LazySpec
@@ -106,8 +104,8 @@ local tui = {
   dir = os.getenv("NVIM_TUI_NVIM_PATH"),
   dependencies = {
     nui,
-    utils_nvim
-  }
+    utils_nvim,
+  },
 }
 
 ---@type LazySpec
@@ -131,18 +129,20 @@ local notifier = {
 local fzf = {
   "samsze0/fzf.nvim",
   dir = os.getenv("NVIM_FZF_NVIM_PATH"),
-  config = function() require("fzf").setup({
-    default_extra_args = {
-      ["--scroll-off"] = "2",
-    }
-  }) end,
+  config = function()
+    require("fzf").setup({
+      default_extra_args = {
+        ["--scroll-off"] = "2",
+      },
+    })
+  end,
   dependencies = {
     nui,
     utils_nvim,
     jumplist,
     terminal_filetype,
     notifier,
-    tui
+    tui,
   },
 }
 
@@ -230,7 +230,7 @@ local jdtls = {
 local workspace_diagnostics = {
   "artemave/workspace-diagnostics.nvim",
   config = function() require("workspace-diagnostics").setup({}) end,
-  enabled = false
+  enabled = false,
 }
 
 ---@type LazySpec
@@ -354,15 +354,13 @@ local dap = {
 local yazi = {
   "samsze0/yazi.nvim",
   dir = os.getenv("NVIM_YAZI_NVIM_PATH"),
-  config = function()
-    require("yazi").setup({})
-  end,
+  config = function() require("yazi").setup({}) end,
   dependencies = {
     utils_nvim,
     nui,
     jumplist,
     tui,
-    terminal_filetype
+    terminal_filetype,
   },
 }
 

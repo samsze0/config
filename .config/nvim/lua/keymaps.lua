@@ -51,12 +51,7 @@ local setup = function(opts)
     return function()
       local content = vim.fn.getreg("r")
       local length = #content
-      return (
-        (whole_file and ":%s" or ":s")
-        .. [[//<C-r>r/gc<left><left><left>]]
-        .. ("<left>"):rep(length)
-        .. "<left>"
-      )
+      return ((whole_file and ":%s" or ":s") .. [[//<C-r>r/gc<left><left><left>]] .. ("<left>"):rep(length) .. "<left>")
     end
   end
   keymap_utils.create("n", "rp", rp_rhs(true), { expr = true })
@@ -271,11 +266,7 @@ local setup = function(opts)
   keymap_utils.create("n", "<f4><f1>", function() require("fzf.tabs")():start() end)
 
   keymap_utils.create("n", "<f5><f3>", function() require("fzf.selector.grep.file")():start() end)
-  keymap_utils.create(
-    "n",
-    "<f5><f4>",
-    function() require("fzf.selector.grep.workspace")():start() end
-  )
+  keymap_utils.create("n", "<f5><f4>", function() require("fzf.selector.grep.workspace")():start() end)
   keymap_utils.create(
     "v",
     "<f5><f3>",
@@ -296,11 +287,7 @@ local setup = function(opts)
   )
 
   keymap_utils.create("n", "<f11><f6>", function() require("fzf.selector.git.stash")():start() end)
-  keymap_utils.create(
-    "n",
-    "<f11><f5>",
-    function() require("fzf.selector.git.commits")():start() end
-  )
+  keymap_utils.create("n", "<f11><f5>", function() require("fzf.selector.git.commits")():start() end)
   keymap_utils.create("n", "<f11><f4>", function()
     local current_file = vim.fn.expand("%")
     if not current_file or current_file == "" then
@@ -321,11 +308,7 @@ local setup = function(opts)
 
   keymap_utils.create("n", "li", function() require("fzf.selector.lsp.definitions")():start() end)
   keymap_utils.create("n", "lr", function() require("fzf.selector.lsp.references")():start() end)
-  keymap_utils.create(
-    "n",
-    "ls",
-    function() require("fzf.selector.lsp.document_symbols")():start() end
-  )
+  keymap_utils.create("n", "ls", function() require("fzf.selector.lsp.document_symbols")():start() end)
   keymap_utils.create("n", "lS", function() require("fzf.lsp.workspace_symbols")():start() end)
   keymap_utils.create(
     "n",
@@ -342,8 +325,8 @@ local setup = function(opts)
   keymap_utils.create("n", "<space>m", function() require("fzf.notification")():start() end)
   keymap_utils.create("n", "<space>j", function() require("fzf.jump")():start() end)
 
-  keymap_utils.create("n", "<f9><f1>", function() require("fzf.docker.images")():start() end)
-  keymap_utils.create("n", "<f9><f2>", function() require("fzf.docker.containers")():start() end)
+  keymap_utils.create("n", "<f9><f1>", function() require("fzf.selector.docker.images")():start() end)
+  keymap_utils.create("n", "<f9><f2>", function() require("fzf.selector.docker.containers")():start() end)
 
   -- LSP
   keymap_utils.create("n", "lu", function() vim.lsp.buf.hover() end)
@@ -412,9 +395,7 @@ local setup = function(opts)
   keymap_utils.create("n", "<C-/>", "<Plug>(comment_toggle_linewise_current)")
   keymap_utils.create("v", "<C-/>", "<Plug>(comment_toggle_linewise_visual)gv") -- Re-select the last block
   local comment_api = require("Comment.api")
-  if not vim.tbl_isempty(comment_api) then
-    keymap_utils.create("i", "<C-/>", comment_api.toggle.linewise.current)
-  end
+  if not vim.tbl_isempty(comment_api) then keymap_utils.create("i", "<C-/>", comment_api.toggle.linewise.current) end
 
   -- GitSigns
   keymap_utils.create("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>")

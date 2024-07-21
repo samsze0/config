@@ -101,6 +101,22 @@ local jumplist = {
   config = function() require("jumplist").setup({}) end,
 }
 
+local ui_nvim = {
+  "samsze0/ui.nvim",
+  dir = os.getenv("NVIM_UI_NVIM_PATH"),
+  config = function()
+    -- :h statusline
+    vim.g.qf_disable_statusline = 1 -- Disable built-in statusline in Quickfix window
+    vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
+
+    require("ui").setup({})
+    require("ui.statusline").register(require("ui.statusline.presets"))
+  end,
+  dependencies = {
+    utils_nvim,
+  },
+}
+
 ---@type LazySpec
 local tui = {
   "samsze0/tui.nvim",
@@ -392,6 +408,7 @@ require("lazy").setup({
   fzf,
   websocket,
   yazi,
+  ui_nvim,
 })
 
 if vim.g.neovide then require("config.neovide") end

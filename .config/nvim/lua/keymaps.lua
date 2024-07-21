@@ -424,7 +424,7 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "<space>m",
-    function() require("fzf.notification")():start() end
+    function() require("fzf.selector.notification")():start() end
   )
   keymap_utils.create(
     "n",

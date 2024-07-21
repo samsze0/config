@@ -155,11 +155,21 @@ function M.setup(opts)
   hl.TabLineSel = { fg = colors.gray_800, bg = colors.gray_300 }  -- Active tab
 
   -- Status line (custom)
+  --
+  hl.StatusLineCopilotInactive = { fg = colors.gray_600, bg = colors.gray_100 }
+  hl.StatusLineCopilotActive = { fg = colors.gray_800, bg = colors.gray_100 }
+
+  hl.StatusLineFileInfo = { fg = colors.gray_600, bg = colors.gray_100 }
+
+  hl.StatusLineGitSignsAdded = { fg = colors.blue, bg = colors.gray_100 }
+  hl.StatusLineGitSignsChanged = { fg = colors.yellow, bg = colors.gray_100 }
+  hl.StatusLineGitSignsRemoved = { fg = colors.red, bg = colors.gray_100 }
+  hl.StatusLineGitSignsHead = { fg = colors.gray_800, bg = colors.gray_100 }
+
   hl.StatusLineDiagnosticError = { fg = colors.red, bg = colors.gray_100 }
   hl.StatusLineDiagnosticWarn = { fg = colors.yellow, bg = colors.gray_100 }
   hl.StatusLineDiagnosticInfo = { fg = colors.blue, bg = colors.gray_100 }
   hl.StatusLineDiagnosticHint = { fg = colors.blue, bg = colors.gray_100 }
-  hl.StatusLineMuted = { fg = colors.gray_600, bg = colors.gray_100 }
 
   -- Standard syntax highlighting
   hl.Comment = { fg = syntax_hl.Comment }

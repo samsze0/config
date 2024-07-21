@@ -5,9 +5,26 @@ local terminal_utils = require("utils.terminal")
 local M = {}
 
 function M.generate_luarc_workspace_library_config_for_nvim_plugins()
+  local plugins_to_skip = {
+    "yazi.nvim",
+    "fzf.nvim",
+    "jumplist.nvim",
+    "notifier.nvim",
+    "utils.nvim",
+    "terminal_filetype.nvim",
+    "tui.nvim",
+    "ui.nvim",
+    "test.nvim",
+    "websocket.nvim",
+  }
+
   local plugins = terminal_utils.systemlist_unsafe(
     "eza --oneline ~/.local/share/nvim/lazy",
     { trim_endline = true, keepempty = false }
+  )
+  plugins = tbl_utils.filter(
+    plugins,
+    function(_, p) return not tbl_utils.contains(plugins_to_skip, p) end
   )
   if not vim.fn.filereadable(".luarc.json") then
     vim.warn("No .luarc.json file found")

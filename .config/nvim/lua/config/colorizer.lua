@@ -12,5 +12,11 @@ local options = {
 
 require("colorizer").setup({
   "*", -- Highlight all files, but customize some others.
-  css = { rgb_fn = true, hsl_fn = true, css = true, css_fn = true, names = true },
+  css = {
+    rgb_fn = true,
+    hsl_fn = true,
+    css = true,
+    css_fn = true,
+    names = true,
+  },
 }, options)

@@ -1,5 +1,7 @@
 local version = vim.version()
-if version.major ~= 0 or version.minor ~= 10 then error("Neovim version 0.10 is required") end
+if version.major ~= 0 or version.minor ~= 10 then
+  error("Neovim version 0.10 is required")
+end
 
 vim.cmd([[set clipboard+=unnamedplus]])
 
@@ -79,6 +81,7 @@ local utils_nvim = {
     require("utils").setup({})
     require("theme").setup({})
     require("keymaps").setup({})
+    require("nvim-dev").setup({})
   end,
   dependencies = {
     pathlib,
@@ -247,14 +250,6 @@ local lspconfig = {
 }
 
 ---@type LazySpec
-local neodev = {
-  -- Setup neovim plugin/script dev env by configuring lua-language-server with lsp-config
-  -- Also add type annotations to vim/neovim built-in functions and APIs
-  "folke/neodev.nvim",
-  tag = "v3.0.0",
-}
-
----@type LazySpec
 local gitsigns = {
   -- Git status in sign column, git hunk preview/navigation, and line blame
   "lewis6991/gitsigns.nvim",
@@ -367,7 +362,6 @@ local yazi = {
 require("lazy").setup({
   fzf_lua,
   lspconfig,
-  neodev,
   gitsigns,
   comment,
   nvim_cmp,

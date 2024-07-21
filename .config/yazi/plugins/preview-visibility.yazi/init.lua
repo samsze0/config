@@ -28,7 +28,7 @@ local show = function(state)
     ya.err("preview is already shown")
     return
   end
-  Manager.layout, state.prev_layout = state.prev_layout, nil
+  Tab.layout, state.prev_layout = state.prev_layout, nil
   ya.app_emit("resize", {})
   pub_event({ visible = true })
 end
@@ -37,19 +37,19 @@ local hide = function(state)
     ya.err("preview is already hidden")
     return
   end
-  state.prev_layout = Manager.layout
-  Manager.layout = function(self, area)
+  state.prev_layout = Tab.layout
+  Tab.layout = function(self, area)
     self.area = area
 
     local all = MANAGER.ratio.parent + MANAGER.ratio.current
-    return ui.Layout()
+    self._chunks = ui.Layout()
       :direction(ui.Layout.HORIZONTAL)
       :constraints({
         ui.Constraint.Ratio(MANAGER.ratio.parent, all),
         ui.Constraint.Ratio(MANAGER.ratio.current, all),
         ui.Constraint.Length(0),
       })
-      :split(area)
+      :split(self._area)
   end
   ya.app_emit("resize", {})
   pub_event({ visible = false })

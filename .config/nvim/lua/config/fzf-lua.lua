@@ -117,7 +117,9 @@ M.setup = function()
     },
   }
 
-  require("fzf-lua").setup(vim.tbl_deep_extend("force", config, providers_config))
+  require("fzf-lua").setup(
+    vim.tbl_deep_extend("force", config, providers_config)
+  )
 
   -- vim.ui.select
   require("fzf-lua").register_ui_select()

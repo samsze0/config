@@ -13,13 +13,17 @@ end
 local mapping = {
   ["<Up>"] = cmp.mapping(
     fallback_if_cmp_has_no_active_entry(
-      function() cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 1 }) end
+      function()
+        cmp.select_prev_item({ behavior = cmp.SelectBehavior.Select, count = 1 })
+      end
     ),
     { "i", "c", "s" }
   ),
   ["<Down>"] = cmp.mapping(
     fallback_if_cmp_has_no_active_entry(
-      function() cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 }) end
+      function()
+        cmp.select_next_item({ behavior = cmp.SelectBehavior.Select, count = 1 })
+      end
     ),
     { "i", "c", "s" }
   ),

@@ -349,7 +349,17 @@ local dap = {
 local yazi = {
   "samsze0/yazi.nvim",
   dir = os.getenv("NVIM_YAZI_NVIM_PATH"),
-  config = function() require("yazi").setup({}) end,
+  config = function()
+    require("yazi").setup({
+      keymaps = {
+        open = "<f2>",
+        hide = "<f2>",
+        open_in_new_window = "<C-w>",
+        open_in_new_tab = "<C-t>",
+        reveal_current_file = "<f3>",
+      },
+    })
+  end,
   dependencies = {
     utils_nvim,
     nui,

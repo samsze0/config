@@ -10,8 +10,7 @@ local nullish = lang_utils.nullish
 local jumplist = require("jumplist")
 local lf = require("lf")
 local persist = require("persist")
-local YaziBasicInstance = require("yazi.instance").BasicInstance
-local YaziPowerInstance = require("yazi.instance").PowerInstance
+local Yazi = require("yazi")
 
 ---@module 'conform'
 local conform = safe_require("conform")
@@ -588,50 +587,6 @@ local setup = function(opts)
     keymap_utils.create("n", "<M-d>", nullish(copilot_panel).jump_next)
     keymap_utils.create("n", "<M-a>", nullish(copilot_panel).accept)
   end
-
-  -- File managers
-  ---@type YaziPowerInstance | nil
-  local yazi = nil
-  keymap_utils.create("n", "<f2>", function()
-    if not yazi then
-      yazi = YaziPowerInstance.new()
-
-      yazi.layout.main_popup:map("<f2>", "Hide", function() yazi:hide() end)
-
-      yazi.layout.main_popup:map("<f3>", "Reveal current file", function()
-        local path = yazi:prev_filepath()
-        yazi:reveal(path)
-      end)
-
-      yazi:on_open(function(payload)
-        yazi:hide()
-        vim.cmd(([[edit %s]]):format(yazi.focus.url))
-      end)
-
-      -- yazi.layout.main_popup:map(opts.new_window, "Open in new window", function()
-      --   if not yazi.focus then return end
-      --
-      --   local filepath = yazi.focus.url
-      --   yazi:hide()
-      --   vim.cmd(([[vsplit %s]]):format(filepath))
-      -- end)
-      --
-      -- yazi.layout.main_popup:map(opts.new_tab, "Open in new tab", function()
-      --   if not yazi.focus then return end
-      --
-      --   local filepath = yazi.focus.url
-      --   yazi:hide()
-      --   vim.cmd(([[tabnew %s]]):format(filepath))
-      -- end)
-      --
-
-      yazi:on_quit(function() yazi:hide() end)
-      yazi:on_exited(function() yazi = nil end)
-      yazi:start()
-    else
-      yazi:show_and_focus()
-    end
-  end, {})
 
   -- Copy path
   keymap_utils.create("n", "<leader>g", function()

@@ -19,6 +19,8 @@ source ~/.config/zsh/azure.sh
 source ~/.config/zsh/openssh.sh
 source ~/.config/zsh/android.sh
 source ~/.config/zsh/other-deps.sh
+source ~/.config/zsh/network.sh
+source ~/.config/zsh/redis.sh
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions

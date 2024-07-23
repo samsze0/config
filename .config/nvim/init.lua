@@ -109,8 +109,13 @@ local ui_nvim = {
     vim.g.qf_disable_statusline = 1 -- Disable built-in statusline in Quickfix window
     vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
 
+    -- :h tabbline
+    vim.opt.showtabline = 2 -- 2 = always ; 1 = at least 2 tabs ; 0 = never
+
     require("ui").setup({})
     require("ui.statusline").register(require("ui.statusline.presets"))
+    -- TODO
+    -- require("ui.tabline").register(require("ui.tabline.presets"))
   end,
   dependencies = {
     utils_nvim,

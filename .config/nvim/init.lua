@@ -114,8 +114,7 @@ local ui_nvim = {
 
     require("ui").setup({})
     require("ui.statusline").register(require("ui.statusline.presets"))
-    -- TODO
-    -- require("ui.tabline").register(require("ui.tabline.presets"))
+    require("ui.tabline").register(require("ui.tabline.presets"))
   end,
   dependencies = {
     utils_nvim,

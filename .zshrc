@@ -21,6 +21,7 @@ source ~/.config/zsh/android.sh
 source ~/.config/zsh/other-deps.sh
 source ~/.config/zsh/network.sh
 source ~/.config/zsh/redis.sh
+source ~/.config/zsh/nvim.sh
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions

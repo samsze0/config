@@ -20,3 +20,17 @@ get_video_thumbnail_as_image() {
 convert_m3u8_to_mkv() {
 	ffmpeg -i $1 -c copy $2
 }
+
+# Convert mkv to mp4
+convert_mkv_to_mp4() {
+	# https://askubuntu.com/questions/396883/how-to-simply-convert-video-files-i-e-mkv-to-mp4
+	# If you only want to convert MKV to MP4 then you will save quality and a lot of time by just changing the containers.
+	# Both of these are just wrappers over the same content so the CPU only needs to do a little work.
+	# Don't re encode as you will definitely lose quality.
+	ffmpeg -i $1 -c copy $2
+}
+
+# Convert webm to mp3
+convert_webm_to_mp3() {
+	ffmpeg -i $1 -vn -ar 44100 -ac 2 -b:a 192k $2
+}

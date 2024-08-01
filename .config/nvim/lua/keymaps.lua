@@ -8,7 +8,6 @@ local safe_require = lang_utils.safe_require
 local nullish = lang_utils.nullish
 
 local jumplist = require("jumplist")
-local lf = require("lf")
 local persist = require("persist")
 local Yazi = require("yazi")
 
@@ -41,6 +40,7 @@ local setup = function(opts)
   keymap_utils.create("i", "<PageDown>", "<C-o><C-d><C-o><C-d>")
 
   -- Find and replace (local)
+  -- TODO: better find and replace?
   keymap_utils.create("n", "rw", "*N:%s///g<left><left>") -- Select next occurrence of word under cursor then go back to current instance
   keymap_utils.create("n", "rr", ":%s//g<left><left>")
   keymap_utils.create("v", "rr", ":s//g<left><left>")
@@ -65,6 +65,7 @@ local setup = function(opts)
   keymap_utils.create("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]]) -- "ra" but forward direction only
 
   -- Diff
+  -- TODO: test diff mode
   keymap_utils.create("n", "sj", function()
     local diff_buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
     if not diff_buffers then
@@ -99,12 +100,14 @@ local setup = function(opts)
   end)
 
   -- Move by word
+  -- FIX: sometimes not moving by word
   keymap_utils.create("n", "<C-Left>", "b")
   keymap_utils.create("n", "<C-S-Left>", "B")
   keymap_utils.create("n", "<C-Right>", "w")
   keymap_utils.create("n", "<C-S-Right>", "W")
 
   -- Delete word
+  -- FIX: sometimes not deleting whole word
   keymap_utils.create("i", "<C-BS>", "<C-W>")
 
   -- Move/swap line/selection up/down
@@ -204,6 +207,7 @@ local setup = function(opts)
   keymap_utils.create("n", "<S-Down>", "5<C-E>")
   keymap_utils.create("v", "<S-Down>", "5<C-E>")
   keymap_utils.create("i", "<S-Down>", "<C-o>5<C-E>")
+  -- TODO: not working
   keymap_utils.create("n", "<S-Left>", "2<ScrollWheelLeft>")
   keymap_utils.create("v", "<S-Left>", "2<ScrollWheelLeft>")
   keymap_utils.create("i", "<S-Left>", "<C-o>2<ScrollWheelLeft>")
@@ -300,12 +304,12 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "<f4><f2>",
-    function() require("fzf.buffers")():start() end
+    function() require("fzf.selector.buffers")():start() end
   )
   keymap_utils.create(
     "n",
     "<f4><f1>",
-    function() require("fzf.tabs")():start() end
+    function() require("fzf.selector.tabs")():start() end
   )
 
   keymap_utils.create(
@@ -368,17 +372,12 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "<f11><f2>",
-    function() require("fzf.git.branch")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f11><f1>",
-    function() require("fzf.git.submodules")():start() end
+    function() require("fzf.selector.git.branch")():start() end
   )
   keymap_utils.create(
     "n",
     "<f11><f11>",
-    function() require("fzf.git.reflog")():start() end
+    function() require("fzf.selector.git.reflog")():start() end
   )
 
   keymap_utils.create(
@@ -394,12 +393,12 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "ls",
-    function() require("fzf.selector.lsp.document_symbols")():start() end
+    function() require("fzf.selector.lsp.document-symbols")():start() end
   )
   keymap_utils.create(
     "n",
     "lS",
-    function() require("fzf.lsp.workspace_symbols")():start() end
+    function() require("fzf.lsp.workspace-symbols")():start() end
   )
   keymap_utils.create(
     "n",
@@ -419,7 +418,7 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "<space>u",
-    function() require("fzf.undo")():start() end
+    function() require("fzf.selector.undo")():start() end
   )
   keymap_utils.create(
     "n",
@@ -429,7 +428,7 @@ local setup = function(opts)
   keymap_utils.create(
     "n",
     "<space>j",
-    function() require("fzf.jump")():start() end
+    function() require("fzf.selector.jump")():start() end
   )
 
   keymap_utils.create(
@@ -551,6 +550,7 @@ local setup = function(opts)
   keymap_utils.create("n", "<space>;", "q:")
 
   -- Session restore
+  -- TODO: fix plugin
   keymap_utils.create("n", "<Space>r", function()
     persist.load_session()
     vim.info("Reloaded session")

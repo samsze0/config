@@ -89,7 +89,7 @@ local utils_nvim = {
 }
 
 ---@type LazySpec
-local nui = { -- Required by fzf & lf
+local nui = { -- Required by fzf
   "MunifTanjim/nui.nvim",
   commit = "61574ce6e60c815b0a0c4b5655b8486ba58089a1",
 }
@@ -414,5 +414,3 @@ require("lazy").setup({
   yazi,
   ui_nvim,
 })
-
-if vim.g.neovide then require("config.neovide") end

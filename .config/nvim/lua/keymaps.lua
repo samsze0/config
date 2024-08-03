@@ -301,45 +301,45 @@ local setup = function(opts)
     function() require("fzf.selector.files")():start() end
   )
 
-  keymap_utils.create(
-    "n",
-    "<f4><f2>",
-    function() require("fzf.selector.buffers")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f4><f1>",
-    function() require("fzf.selector.tabs")():start() end
-  )
+  -- keymap_utils.create(
+  --   "n",
+  --   "<f4><f2>",
+  --   function() require("fzf.selector.buffers")():start() end
+  -- )
+  -- keymap_utils.create(
+  --   "n",
+  --   "<f4><f1>",
+  --   function() require("fzf.selector.tabs")():start() end
+  -- )
 
-  keymap_utils.create(
-    "n",
-    "<f5><f3>",
-    function() require("fzf.selector.grep.file")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f5><f4>",
-    function() require("fzf.selector.grep.workspace")():start() end
-  )
-  keymap_utils.create(
-    "v",
-    "<f5><f3>",
-    function()
-      require("fzf.grep.file")({
-        initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
-      }):start()
-    end
-  )
-  keymap_utils.create(
-    "v",
-    "<f5><f4>",
-    function()
-      require("fzf.selector.grep.workspace")({
-        initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
-      }):start()
-    end
-  )
+  -- keymap_utils.create(
+  --   "n",
+  --   "<f5><f3>",
+  --   function() require("fzf.selector.grep.file")():start() end
+  -- )
+  -- keymap_utils.create(
+  --   "n",
+  --   "<f5><f4>",
+  --   function() require("fzf.selector.grep.workspace")():start() end
+  -- )
+  -- keymap_utils.create(
+  --   "v",
+  --   "<f5><f3>",
+  --   function()
+  --     require("fzf.grep.file")({
+  --       initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
+  --     }):start()
+  --   end
+  -- )
+  -- keymap_utils.create(
+  --   "v",
+  --   "<f5><f4>",
+  --   function()
+  --     require("fzf.selector.grep.workspace")({
+  --       initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
+  --     }):start()
+  --   end
+  -- )
 
   keymap_utils.create(
     "n",
@@ -369,16 +369,16 @@ local setup = function(opts)
     "<f11><f3>",
     function() require("fzf.selector.git.status")():start() end
   )
-  keymap_utils.create(
-    "n",
-    "<f11><f2>",
-    function() require("fzf.selector.git.branch")():start() end
-  )
-  keymap_utils.create(
-    "n",
-    "<f11><f11>",
-    function() require("fzf.selector.git.reflog")():start() end
-  )
+  -- keymap_utils.create(
+  --   "n",
+  --   "<f11><f2>",
+  --   function() require("fzf.selector.git.branch")():start() end
+  -- )
+  -- keymap_utils.create(
+  --   "n",
+  --   "<f11><f11>",
+  --   function() require("fzf.selector.git.reflog")():start() end
+  -- )
 
   keymap_utils.create(
     "n",
@@ -415,21 +415,21 @@ local setup = function(opts)
     function() require("fzf.selector.diagnostics")():start() end
   )
 
-  keymap_utils.create(
-    "n",
-    "<space>u",
-    function() require("fzf.selector.undo")():start() end
-  )
+  -- keymap_utils.create(
+  --   "n",
+  --   "<space>u",
+  --   function() require("fzf.selector.undo")():start() end
+  -- )
   keymap_utils.create(
     "n",
     "<space>m",
     function() require("fzf.selector.notification")():start() end
   )
-  keymap_utils.create(
-    "n",
-    "<space>j",
-    function() require("fzf.selector.jump")():start() end
-  )
+  -- keymap_utils.create(
+  --   "n",
+  --   "<space>j",
+  --   function() require("fzf.selector.jump")():start() end
+  -- )
 
   keymap_utils.create(
     "n",

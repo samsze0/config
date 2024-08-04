@@ -389,6 +389,18 @@ local yazi = {
   },
 }
 
+---@type LazySpec
+local peek = { -- Markdown preview
+  "toppair/peek.nvim",
+  event = { "VeryLazy" },
+  build = "deno task --quiet build:fast",
+  config = function()
+    require("peek").setup()
+    vim.api.nvim_create_user_command("PeekOpen", require("peek").open, {})
+    vim.api.nvim_create_user_command("PeekClose", require("peek").close, {})
+  end,
+}
+
 require("lazy").setup({
   fzf_lua,
   lspconfig,
@@ -413,4 +425,5 @@ require("lazy").setup({
   websocket,
   yazi,
   ui_nvim,
+  peek,
 })

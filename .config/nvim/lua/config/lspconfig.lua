@@ -174,3 +174,9 @@ if not os.getenv("NVIM_USE_JDTLS") then
     on_attach = on_attach,
   })
 end
+
+-- Markdown
+lspconfig.marksman.setup({
+  capabilities = capabilities,
+  on_attach = on_attach,
+})

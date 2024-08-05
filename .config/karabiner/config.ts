@@ -308,7 +308,7 @@ const rules = [
   },
   {
     // Google chrome prev/next tab
-    description: "Commnd J/L -> Ctrl (+ Shift) + Tab (Firefox)",
+    description: "Commnd J/L -> Ctrl (+ Shift) + Tab (Chrome)",
     manipulators: [
       {
         conditions: [
@@ -317,7 +317,7 @@ const rules = [
             bundle_identifiers: ["com.google.Chrome"],
           },
         ],
-        from: { key_code: "j", modifiers: { mandatory: ["left_command"] } },
+        from: { key_code: "l", modifiers: { mandatory: ["left_command"] } },
         to: {
           key_code: "tab",
           modifiers: ["left_control"],
@@ -331,7 +331,7 @@ const rules = [
             bundle_identifiers: ["com.google.Chrome"],
           },
         ],
-        from: { key_code: "l", modifiers: { mandatory: ["left_command"] } },
+        from: { key_code: "j", modifiers: { mandatory: ["left_command"] } },
         to: {
           key_code: "tab",
           modifiers: ["left_control", "left_shift"],

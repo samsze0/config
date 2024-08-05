@@ -399,6 +399,21 @@ local peek = { -- Markdown preview
     vim.api.nvim_create_user_command("PeekOpen", require("peek").open, {})
     vim.api.nvim_create_user_command("PeekClose", require("peek").close, {})
   end,
+  commit = "5820d937d5414baea5f586dc2a3d912a74636e5b",
+}
+
+---@type LazySpec
+local ssr = {
+  "cshuaimin/ssr.nvim",
+  config = function() require("config.ssr") end,
+  commit = "bb323ba621ac647b4ac5638b47666e3ef3c279e1",
+}
+
+---@type LazySpec
+local git_conflict = {
+  "akinsho/git-conflict.nvim",
+  config = function() require("config.git-conflict") end,
+  tag = "v2.0.0",
 }
 
 require("lazy").setup({
@@ -426,4 +441,6 @@ require("lazy").setup({
   yazi,
   ui_nvim,
   peek,
+  ssr,
+  git_conflict,
 })

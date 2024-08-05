@@ -9,7 +9,6 @@ local nullish = lang_utils.nullish
 
 local jumplist = require("jumplist")
 local persist = require("persist")
-local Yazi = require("yazi")
 
 ---@module 'conform'
 local conform = safe_require("conform")
@@ -28,6 +27,12 @@ local cmp = safe_require("cmp")
 
 ---@module 'fzf-lua'
 local fzf_lua = safe_require("fzf-lua")
+
+---@module 'ssr'
+local ssr = safe_require("ssr")
+
+---@module 'git-conflict'
+local git_conflict = safe_require("git-conflict")
 
 ---@param opts? {  }
 local setup = function(opts)
@@ -64,8 +69,7 @@ local setup = function(opts)
   keymap_utils.create("v", "ri", [["rygv*N:s/<C-r>r//g<left><left>]]) -- "ra" but backward direction only. Because ":s///c" doesn't support backward direction, rely on user pressing "N" and "r."
   keymap_utils.create("v", "rk", [["ry:.,$s/<C-r>r//gc<left><left><left>]]) -- "ra" but forward direction only
 
-  -- Diff
-  -- TODO: test diff mode
+  -- Diff / Git conflicts / Git signs
   keymap_utils.create("n", "sj", function()
     local diff_buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
     if not diff_buffers then
@@ -97,6 +101,54 @@ local setup = function(opts)
         vim.cmd(([[diffput %s]]):format(diff_buffers[2]))
       end,
     })
+  end)
+  keymap_utils.create("n", "su", function()
+    local has_conflicts = git_conflict.conflict_count() > 0
+    if has_conflicts then
+      vim.cmd([[GitConflictChooseOurs]])
+    else
+      vim.cmd([[Gitsigns preview_hunk_inline]])
+    end
+  end)
+  keymap_utils.create("n", "si", function()
+    local diff_buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
+    if not diff_buffers then
+      local has_conflicts = git_conflict.conflict_count() > 0
+      if has_conflicts then
+        vim.cmd([[GitConflictPrevConflict]])
+      else
+        vim.cmd([[Gitsigns prev_hunk]])
+      end
+    else
+      vim.cmd("normal! [c") -- Goto previous diff
+    end
+  end)
+  keymap_utils.create("n", "sk", function()
+    local diff_buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
+    if not diff_buffers then
+      local has_conflicts = git_conflict.conflict_count() > 0
+      if has_conflicts then
+        vim.cmd([[GitConflictNextConflict]])
+      else
+        vim.cmd([[Gitsigns next_hunk]])
+      end
+    else
+      vim.cmd("normal! ]c") -- Goto next diff
+    end
+  end)
+  keymap_utils.create("n", "sb", "<cmd>Gitsigns blame_line<CR>")
+  keymap_utils.create("n", "s;", "<cmd>Gitsigns reset_hunk<CR>")
+  keymap_utils.create("n", "so", function()
+    local has_conflicts = git_conflict.conflict_count() > 0
+    if has_conflicts then vim.cmd([[GitConflictChooseTheirs]]) end
+  end)
+  keymap_utils.create("n", "sp", function()
+    local has_conflicts = git_conflict.conflict_count() > 0
+    if has_conflicts then vim.cmd([[GitConflictChooseBoth]]) end
+  end)
+  keymap_utils.create("n", "sy", function()
+    local has_conflicts = git_conflict.conflict_count() > 0
+    if has_conflicts then vim.cmd([[GitConflictChooseNone]]) end
   end)
 
   -- Move by word
@@ -207,13 +259,6 @@ local setup = function(opts)
   keymap_utils.create("n", "<S-Down>", "5<C-E>")
   keymap_utils.create("v", "<S-Down>", "5<C-E>")
   keymap_utils.create("i", "<S-Down>", "<C-o>5<C-E>")
-  -- TODO: not working
-  keymap_utils.create("n", "<S-Left>", "2<ScrollWheelLeft>")
-  keymap_utils.create("v", "<S-Left>", "2<ScrollWheelLeft>")
-  keymap_utils.create("i", "<S-Left>", "<C-o>2<ScrollWheelLeft>")
-  keymap_utils.create("n", "<S-Right>", "2<ScrollWheelRight>")
-  keymap_utils.create("v", "<S-Right>", "2<ScrollWheelRight>")
-  keymap_utils.create("i", "<S-Right>", "<C-o>2<ScrollWheelRight>")
 
   -- Window (pane)
   keymap_utils.create("n", "wi", "<cmd>wincmd k<CR>")
@@ -239,10 +284,6 @@ local setup = function(opts)
   keymap_utils.create("n", "ws", "<cmd>vsplit<CR>")
 
   keymap_utils.create("n", "wt", "<cmd>wincmd T<CR>") -- Move to new tab
-
-  -- TODO: remove
-  keymap_utils.create("n", "wz", "<C-W>_<C-W>|") -- Maximise both horizontally and vertically
-  keymap_utils.create("n", "wx", "<C-W>=")
 
   -- Tab
   keymap_utils.create("n", "tj", "<cmd>tabp<CR>")
@@ -516,27 +557,6 @@ local setup = function(opts)
     keymap_utils.create("i", "<C-/>", comment_api.toggle.linewise.current)
   end
 
-  -- GitSigns
-  keymap_utils.create("n", "su", "<cmd>Gitsigns preview_hunk_inline<CR>")
-  keymap_utils.create("n", "si", function()
-    local buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
-    if not buffers then
-      vim.cmd([[Gitsigns prev_hunk]])
-    else
-      vim.cmd("normal! [c") -- Goto previous diff
-    end
-  end)
-  keymap_utils.create("n", "sk", function()
-    local buffers = vim.t.diff_buffers ---@diagnostic disable-line: undefined-field
-    if not buffers then
-      vim.cmd([[Gitsigns next_hunk]])
-    else
-      vim.cmd("normal! ]c") -- Goto next diff
-    end
-  end)
-  keymap_utils.create("n", "sb", "<cmd>Gitsigns blame_line<CR>")
-  keymap_utils.create("n", "s;", "<cmd>Gitsigns reset_hunk<CR>")
-
   -- :qa, :q!, :wq
   keymap_utils.create("n", "<space>q", ":q<cr>")
   keymap_utils.create("n", "<space>w", ":w<cr>")
@@ -599,6 +619,9 @@ local setup = function(opts)
     vim.fn.setreg("+", path)
     vim.info("Copied", path)
   end)
+
+  -- SSR
+  keymap_utils.create("n", "<leader>r", function() ssr.open() end)
 
   -- Misc
   command_utils.create(

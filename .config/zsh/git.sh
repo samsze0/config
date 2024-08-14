@@ -35,6 +35,10 @@ git_rebase_from() {
 	git rebase -i "HEAD~$1"
 }
 
+git_branch_change_tracking() {
+	git branch --set-upstream-to="$1"
+}
+
 # `git branch` helper
 # Show tracking info (relationship between local and remote branches)
 git_branch() (

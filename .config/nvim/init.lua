@@ -395,9 +395,7 @@ local peek = { -- Markdown preview
   event = { "VeryLazy" },
   build = "deno task --quiet build:fast",
   config = function()
-    require("peek").setup()
-    vim.api.nvim_create_user_command("PeekOpen", require("peek").open, {})
-    vim.api.nvim_create_user_command("PeekClose", require("peek").close, {})
+    require("config.peek")
   end,
   commit = "5820d937d5414baea5f586dc2a3d912a74636e5b",
 }

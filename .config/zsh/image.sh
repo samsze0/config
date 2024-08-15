@@ -34,3 +34,11 @@ convert_mkv_to_mp4() {
 convert_webm_to_mp3() {
 	ffmpeg -i $1 -vn -ar 44100 -ac 2 -b:a 192k $2
 }
+
+convert_pdf_to_image() {
+	magick -density 300 "$1" -quality 100 "$2"
+}
+
+convert_pdf_to_single_image() {
+	magick -density 300 "$1" -append -quality 100 "$2"
+}

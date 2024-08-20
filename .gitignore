@@ -79,3 +79,6 @@
 
 !.config/pandoc/
 !.config/pandoc/**
+
+!.config/vscode/
+!.config/vscode/**

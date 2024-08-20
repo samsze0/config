@@ -72,3 +72,9 @@ cp <binary> ~/bin
 cargo build --release
 cp <binary> ~/bin
 ```
+
+Create symlink to vscode config:
+```bash
+cd "/Users/mingsumsze/Library/Application Support/Cursor"
+ln -s ~/.config/vscode/User User
+```

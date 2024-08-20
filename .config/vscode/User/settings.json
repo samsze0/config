@@ -1,0 +1,102 @@
+{
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "cmake.configureOnOpen": true,
+    "color-highlight.markerType": "outline",
+    "color-highlight.matchRgbWithNoFunction": true,
+    "color-highlight.rgbWithNoFunctionLanguages": [
+        "*"
+    ],
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    "editor.fontSize": 13,
+    "editor.guides.bracketPairs": "active",
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "editor.inlineSuggest.enabled": true,
+    "editor.minimap.enabled": false,
+    "editor.minimap.scale": 2,
+    "editor.minimap.showSlider": "always",
+    "editor.minimap.size": "fill",
+    "editor.smoothScrolling": true,
+    "editor.stickyScroll.enabled": true,
+    "editor.suggest.showSnippets": false,
+    "errorLens.enabledDiagnosticLevels": [
+        "warning",
+        "info"
+    ],
+    "files.associations": {
+        "*.pch": "cpp"
+    },
+    "genieai.personalizedName": "Not AI",
+    "git.confirmSync": false,
+    "git.enableSmartCommit": true,
+    "gitlens.codeLens.enabled": false,
+    "haskell.manageHLS": "PATH",
+    "javascript.inlayHints.enumMemberValues.enabled": true,
+    "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
+    "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "jupyter.runStartupCommands": [
+        "%reload_ext",
+        "autoreload %autoreload 2"
+    ],
+    "markdown-preview-enhanced.previewTheme": "atom-dark.css",
+    "notebook.output.textLineLimit": 160,
+    "pasteImage.filePathConfirmInputBoxMode": "onlyName",
+    "pasteImage.path": "${projectRoot}/assets",
+    "pasteImage.showFilePathConfirmInputBox": true,
+    "python.languageServer": "Pylance",
+    "rewrap.wrappingColumn": 80,
+    "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+    "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "always",
+    "rust-analyzer.inlayHints.lifetimeElisionHints.enable": "always",
+    "rust-analyzer.inlayHints.lifetimeElisionHints.useParameterNames": true,
+    "rust-analyzer.inlayHints.reborrowHints.enable": "always",
+    "security.workspace.trust.enabled": false,
+    "security.workspace.trust.untrustedFiles": "open",
+    "settingsSync.keybindingsPerPlatform": false,
+    "terminal.integrated.allowChords": true,
+    "terminal.integrated.fontFamily": "'DroidSansM Nerd Font', 'Menlo', 'monospace', monospace",
+    "todo-tree.general.tags": [
+        "TODO",
+        "REFACTOR",
+        "FIX",
+        "WHY"
+    ],
+    "typescript.inlayHints.enumMemberValues.enabled": true,
+    "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+    "typescript.inlayHints.parameterNames.enabled": "all",
+    "typescript.inlayHints.parameterTypes.enabled": true,
+    "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+    "typescript.inlayHints.variableTypes.enabled": true,
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "vscode-color-picker.languages": [
+        "css",
+        "markdown",
+        "svg",
+        "yaml",
+        "qml",
+        "typescriptreact",
+        "python",
+        "javascript",
+        "typescript",
+        "xml",
+        "json",
+        "properties",
+        "lua"
+    ],
+    "window.titleBarStyle": "custom",
+    "workbench.colorTheme": "Artizon Dark Theme",
+    "workbench.iconTheme": "helium-icon-theme",
+    "workbench.list.smoothScrolling": true,
+    "workbench.startupEditor": "none",
+    "editor.fontFamily": "'Liga SFMono Nerd Font', Arial, Meno, monospace",
+    "files.autoSave": "afterDelay",
+    "pasteImage.basePath": "${projectRoot}",
+    "cursor.cpp.disabledLanguages": [
+        "plaintext",
+        "scminput",
+        "yaml"
+    ]
+}

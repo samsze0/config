@@ -47,6 +47,12 @@ git_branch() (
 	git branch -vv --all --format="%(refname:short) -> %(upstream:short)"
 )
 
+git_branch_list_with_last_revision_date() {
+	for k in $(git branch | sed s/^..//); do
+		echo -e $(git log --color=always -1 --pretty=format:"%Cgreen%ci %Cblue%cr%Creset" $k --)\\t"$k"
+	done | sort
+}
+
 git_branch_fzf() (
 	set_flags
 

@@ -87,6 +87,16 @@
   //   "when": "!isMac && editorFocus"
   // },
   {
+    "key": "cmd+shift+g",
+    "command": "workbench.view.scm",
+    "when": "isMac"
+  },
+  {
+    "key": "ctrl+shift+g",
+    "command": "workbench.view.scm",
+    "when": "!isMac"
+  },
+  {
     "key": "cmd+k cmd+p",
     "command": "workbench.action.pinEditor",
     "when": "isMac && editorFocus && !activeEditorIsPinned"
@@ -279,6 +289,17 @@
     "when": "focusedView == 'workbench.panel.repl.view'"
   },
   {
+    "key": "f12 delete",
+    "command": "workbench.panel.output.focus",
+    "when": "focusedView != 'workbench.panel.output.active'"
+  },
+  // TODO
+  // {
+  //   "key": "f12 delete",
+  //   "command": "workbench.action.focusActiveEditorGroup",
+  //   "when": "outputview"
+  // },
+  {
     "key": "cmd+f2",
     "command": "workbench.action.closeSidebar",
     "when": "isMac"
@@ -297,6 +318,16 @@
     "key": "f2",
     "command": "workbench.action.focusActiveEditorGroup",
     "when": "filesExplorerFocus"
+  },
+  {
+    "key": "cmd+shift+g",
+    "command": "workbench.view.scm",
+    "when": "isMac && focusedView != 'workbench.scm'"
+  },
+  {
+    "key": "ctrl+shift+g",
+    "command": "workbench.view.scm",
+    "when": "!isMac && focusedView != 'workbench.scm'"
   },
   {
     "key": "f3",
@@ -349,16 +380,6 @@
   {
     "key": "f11 pageup",
     "command": "workbench.action.toggleDevTools"
-  },
-  {
-    "key": "f11 c",
-    "command": "workbench.panel.chat.view.copilot.focus",
-    "when": "!sideBarFocus || !inChatInput"
-  },
-  {
-    "key": "f11 c",
-    "command": "workbench.action.focusActiveEditorGroup",
-    "when": "sideBarFocus && inChatInput"
   },
   // File Explorer
   {
@@ -657,5 +678,5 @@
     "key": "ctrl+p",
     "command": "-workbench.action.quickOpen",
     "when": "!isMac"
-  },
+  }
 ]

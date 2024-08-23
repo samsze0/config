@@ -75,6 +75,7 @@ cp <binary> ~/bin
 
 Create symlink to vscode config:
 ```bash
-cd "/Users/mingsumsze/Library/Application Support/Cursor"
+rm -rf ~/Library/Application\ Support/Cursor/User
+cd ~/Library/Application\ Support/Cursor
 ln -s ~/.config/vscode/User User
 ```

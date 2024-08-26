@@ -165,8 +165,8 @@ alias ts-get='tailscale_get'
 alias ts-send='tailscale_send'
 alias jq='gojq'
 alias v='nvim'
-alias vv='neovide'
 alias lf='PAGER="nvim -RM" lf'
+alias y='yazi'
 
 export FZF_DEFAULT_OPTS=$(fzf_default_opts)
 

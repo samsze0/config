@@ -36,7 +36,8 @@ fzf_default_opts() {
       marker:#687184,
       fg+:#95a1b3,
       prompt:#549eff,
-      hl+:#549eff
+      hl+:#549eff,
+      gutter:-1
 EOT
 	)
 
@@ -45,12 +46,14 @@ EOT
   $colors
   
   --layout=reverse
-  --info=inline
+  --info=inline-right
   --border
   --margin=1
   --padding=1
-  --pointer=''
-  --marker=''
+  --marker='▏'
+  --pointer='▌'
+  --prompt=' '
+  --highlight-line
   
   --bind 'ctrl-a:toggle-all'
   --bind 'ctrl-i:toggle'

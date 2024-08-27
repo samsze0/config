@@ -61,6 +61,13 @@ git_branch_fzf() (
 	echo "$ref"
 )
 
+git_checkout() {
+	branch=$(git branch | fzf)
+	if [[ -n "$branch" ]]; then
+		git checkout "$branch"
+	fi
+}
+
 git_commit_fzf() (
 	set_flags
 

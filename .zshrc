@@ -167,6 +167,7 @@ alias jq='gojq'
 alias v='nvim'
 alias lf='PAGER="nvim -RM" lf'
 alias y='yazi'
+alias c='code'
 
 export FZF_DEFAULT_OPTS=$(fzf_default_opts)
 

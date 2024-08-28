@@ -394,9 +394,7 @@ local peek = { -- Markdown preview
   "toppair/peek.nvim",
   event = { "VeryLazy" },
   build = "deno task --quiet build:fast",
-  config = function()
-    require("config.peek")
-  end,
+  config = function() require("config.peek") end,
   commit = "5820d937d5414baea5f586dc2a3d912a74636e5b",
 }
 
@@ -412,6 +410,13 @@ local git_conflict = {
   "akinsho/git-conflict.nvim",
   config = function() require("config.git-conflict") end,
   tag = "v2.0.0",
+}
+
+---@type LazySpec
+local fidget = {
+  "j-hui/fidget.nvim",
+  config = function() require("config.fidget") end,
+  tag = "v1.4.5",
 }
 
 require("lazy").setup({
@@ -441,4 +446,5 @@ require("lazy").setup({
   peek,
   ssr,
   git_conflict,
+  fidget,
 })

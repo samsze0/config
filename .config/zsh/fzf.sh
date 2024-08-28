@@ -46,7 +46,7 @@ EOT
   $colors
   
   --layout=reverse
-  --info=inline-right
+  --info=inline
   --border
   --margin=1
   --padding=1

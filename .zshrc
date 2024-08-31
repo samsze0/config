@@ -22,6 +22,7 @@ source ~/.config/zsh/other-deps.sh
 source ~/.config/zsh/network.sh
 source ~/.config/zsh/redis.sh
 source ~/.config/zsh/nvim.sh
+source ~/.config/zsh/yazi.sh
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions
@@ -168,6 +169,9 @@ alias v='nvim'
 alias lf='PAGER="nvim -RM" lf'
 alias y='yazi'
 alias c='code'
+
+# https://github.com/kovidgoyal/kitty/discussions/3873
+alias sshs='TERM=xterm-256color sshs'
 
 export FZF_DEFAULT_OPTS=$(fzf_default_opts)
 

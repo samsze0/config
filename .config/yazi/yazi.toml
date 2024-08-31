@@ -13,3 +13,20 @@ prepend_previewers = [
   # HEIC previewer
   { mime = "image/heic", run = "heic" },
 ]
+
+[preview]
+max_width = 2000
+max_height = 2000
+
+[opener]
+# https://yazi-rs.github.io/docs/configuration/yazi/#opener
+video = [{ run = 'iina "$@"', orphan = false, for = "macos", desc = "IINA" }]
+open = [
+  { run = 'open "$@"', for = "macos", desc = "open" },
+  { run = 'xdg-open "$@"', desc = "xdg-open" },
+]
+fallback = [{ run = 'xdg-open "$@"', desc = "xdg-Open" }]
+
+[open]
+prepend_rules = [{ name = "*.mp4", use = "video" }]
+append_rules = [{ name = "*", use = "fallback" }]

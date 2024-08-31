@@ -407,16 +407,6 @@
     "command": "explorer.newFolder",
     "when": "!isMac && explorerViewletFocus"
   },
-  {
-    "key": "right",
-    "command": "filesExplorer.openFilePreserveFocus",
-    "when": "filesExplorerFocus && !treeElementCanExpand && !treeElementHasChild"
-  },
-  {
-    "key": "right",
-    "command": "list.expand",
-    "when": "filesExplorerFocus && (treeElementCanExpand || treeElementHasChild)"
-  },
   // LSP
   {
     "key": "cmd+u",

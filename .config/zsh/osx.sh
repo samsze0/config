@@ -37,6 +37,9 @@ osx_init() {
 	# Auto hide the menubar
 	defaults write -g _HIHideMenuBar -bool true
 
+  # Decrease spacing of the menu bar icons (to avoid them being hidden by top notch)
+  defaults write -g NSStatusItemSpacing -int 10
+
 	# HIToolbox: Set function key usage to "Show Emoji & Symbols"
 	defaults write com.apple.HIToolbox AppleFnUsageType -int "2"
 

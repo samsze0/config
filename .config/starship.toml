@@ -73,14 +73,17 @@ $time\
 $status\
 $os\
 $shell\
-$character"""
+$hostname\
+$localip\
+$character
+"""
+
 
 # right_format = """
 # $sudo\
 # $memory_usage\
-# $username\
-# $hostname\
-# $localip"""
+# $username
+# """
 
 [battery]
 disabled = true

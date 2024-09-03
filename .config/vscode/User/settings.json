@@ -74,12 +74,14 @@
     "lua"
   ],
   "window.titleBarStyle": "custom",
-  "workbench.colorTheme": "Artizon Dark Theme",
   "workbench.iconTheme": "helium-icon-theme",
   "workbench.list.smoothScrolling": true,
   "workbench.startupEditor": "none",
   "editor.fontFamily": "'Liga SFMono Nerd Font', Arial, Meno, monospace",
   "files.autoSave": "afterDelay",
   "pasteImage.basePath": "${projectRoot}",
-  "cursor.cpp.disabledLanguages": ["plaintext", "scminput", "yaml"]
+  "cursor.cpp.disabledLanguages": ["plaintext", "scminput", "yaml"],
+  "workbench.activityBar.location": "top",
+  "editor.inlineSuggest.suppressSuggestions": true,
+  "workbench.colorTheme": "Artizon Dark Theme"
 }

@@ -83,5 +83,6 @@
   "cursor.cpp.disabledLanguages": ["plaintext", "scminput", "yaml"],
   "workbench.activityBar.location": "top",
   "editor.inlineSuggest.suppressSuggestions": true,
-  "workbench.colorTheme": "Artizon Dark Theme"
+  "workbench.colorTheme": "Artizon Dark Theme",
+  "cursor.cmdk.useThemedDiffBackground": true
 }

@@ -90,6 +90,7 @@ brew "syncthing"
 brew "tailscale", restart_service: true
 brew "tailwindcss-language-server"
 brew "taplo"
+brew "termshark"
 brew "terraform"
 brew "terraform-ls"
 brew "tflint"
@@ -97,6 +98,7 @@ brew "tldr"
 brew "trash"
 brew "typescript-language-server"
 brew "vscode-langservers-extracted"
+brew "wakeonlan"
 brew "watch"
 brew "watchman"
 brew "wget"
@@ -157,7 +159,6 @@ mas "Motion", id: 434290957
 mas "Outline", id: 1356178125
 mas "WireGuard", id: 1451685025
 mas "Xcode", id: 497799835
-vscode "farosystemappender constructor"
 vscode "42crunch.vscode-openapi"
 vscode "adam-bender.commit-message-editor"
 vscode "adpyke.codesnap"

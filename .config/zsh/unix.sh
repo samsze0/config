@@ -85,3 +85,11 @@ iommu() {
 		done
 	done
 }
+
+list_disk_name_id_mappings() {
+	ls -l /dev/disk/by-id/* | grep -v part | awk '{print $9, $10, $11}' | sed 's/\.\.\/\.\.\//\/dev\//'
+}
+
+list_kernel_supported_filesystems() {
+	ls /lib/modules/$(uname -r)/kernel/fs
+}

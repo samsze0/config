@@ -97,3 +97,7 @@ list_kernel_supported_filesystems() {
 md5_dir() {
   find "$1" -type f -exec md5sum {} + | md5sum
 }
+
+dir_size() {
+  du -sh "$1"
+}

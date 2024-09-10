@@ -93,3 +93,7 @@ list_disk_name_id_mappings() {
 list_kernel_supported_filesystems() {
 	ls /lib/modules/$(uname -r)/kernel/fs
 }
+
+md5_dir() {
+  find "$1" -type f -exec md5sum {} + | md5sum
+}

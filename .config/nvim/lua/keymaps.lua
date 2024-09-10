@@ -466,11 +466,11 @@ local setup = function(opts)
     "<space>m",
     function() require("fzf.selector.notification")():start() end
   )
-  -- keymap_utils.create(
-  --   "n",
-  --   "<space>j",
-  --   function() require("fzf.selector.jump")():start() end
-  -- )
+  keymap_utils.create(
+    "n",
+    "<space>j",
+    function() require("fzf.selector.jump")():start() end
+  )
 
   keymap_utils.create(
     "n",

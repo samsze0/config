@@ -65,6 +65,8 @@ $direnv\
 $env_var\
 $custom\
 $cmd_duration\
+$hostname\
+$localip\
 
 $line_break\
 
@@ -73,8 +75,6 @@ $time\
 $status\
 $os\
 $shell\
-$hostname\
-$localip\
 $character
 """
 
@@ -110,13 +110,13 @@ ssh_only = true
 ssh_symbol = '⋅ '
 trim_at = '.'
 format = '[$ssh_symbol$hostname]($style) '
-style = 'bright-black '
+style = 'bright-yellow '
 disabled = false
 
 [localip]
 ssh_only = true
 format = '[$localipv4]($style) '
-style = 'bright-black '
+style = 'bright-yellow '
 disabled = false
 
 [character]

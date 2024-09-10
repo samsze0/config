@@ -115,7 +115,7 @@ disabled = false
 
 [localip]
 ssh_only = true
-format = '[$localipv4]($style) '
+format = '⋅ [$localipv4]($style) '
 style = 'bright-yellow '
 disabled = false
 

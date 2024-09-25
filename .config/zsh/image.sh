@@ -42,3 +42,8 @@ convert_pdf_to_image() {
 convert_pdf_to_single_image() {
 	magick -density 300 "$1" -append -quality 100 "$2"
 }
+
+convert_to_h265() {
+	# Anywhere between 24-30 CNF is reasonable, lower = higher bitrates
+	ffmpeg -i $1 -vcodec libx265 -crf 24 $2
+}

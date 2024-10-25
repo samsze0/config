@@ -65,17 +65,17 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
----@type LazySpec
+---@type LazyPluginSpec
 local pathlib = {
   "pysan3/pathlib.nvim",
   tag = "v2.2.2",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local utils_nvim = {
   "samsze0/utils.nvim",
   priority = 100,
-  dir = os.getenv("NVIM_UTILS_NVIM_PATH"), ---@diagnostic disable-line: assign-type-mismatch
+  dir = os.getenv("NVIM_UTILS_NVIM_PATH"),
   config = function()
     -- Load theme once before loading other plugins (to prevent theme flickering)
     require("utils").setup({})
@@ -88,17 +88,18 @@ local utils_nvim = {
   },
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local nui = { -- Required by fzf
   "MunifTanjim/nui.nvim",
   commit = "61574ce6e60c815b0a0c4b5655b8486ba58089a1",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local jumplist = {
   "samsze0/jumplist.nvim",
   dir = os.getenv("NVIM_JUMPLIST_NVIM_PATH"),
   config = function() require("jumplist").setup({}) end,
+  enabled = true,
 }
 
 local ui_nvim = {
@@ -121,7 +122,7 @@ local ui_nvim = {
   },
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local tui = {
   "samsze0/tui.nvim",
   dir = os.getenv("NVIM_TUI_NVIM_PATH"),
@@ -131,14 +132,15 @@ local tui = {
   },
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local terminal_filetype = {
   "samsze0/terminal-filetype.nvim",
   dir = os.getenv("NVIM_TERMINAL_FILETYPE_NVIM_PATH"),
   config = function() require("terminal-filetype").setup({}) end,
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local notifier = {
   "samsze0/notifier.nvim",
   dir = os.getenv("NVIM_NOTIFIER_NVIM_PATH"),
@@ -146,9 +148,10 @@ local notifier = {
   dependencies = {
     utils_nvim,
   },
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local fzf = {
   "samsze0/fzf.nvim",
   dir = os.getenv("NVIM_FZF_NVIM_PATH"),
@@ -157,6 +160,8 @@ local fzf = {
       default_extra_args = {
         ["--scroll-off"] = "2",
       },
+      ipc_client_type = 1,
+      fzf_bin = "~/dev/fzf/bin/fzf",
     })
   end,
   dependencies = {
@@ -167,9 +172,10 @@ local fzf = {
     notifier,
     tui,
   },
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local websocket = {
   "samsze0/websocket.nvim",
   dir = os.getenv("NVIM_WEBSOCKET_NVIM_PATH"),
@@ -179,43 +185,47 @@ local websocket = {
   },
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local treesitter = {
   "nvim-treesitter/nvim-treesitter",
   tag = "v0.9.1",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local copilot = {
   "zbirenbaum/copilot.lua",
   config = function() require("config.copilot") end,
   commit = "f7612f5af4a7d7615babf43ab1e67a2d790c13a6",
+  enabled = false,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local colorizer = {
   "norcalli/nvim-colorizer.lua",
   config = function() require("config.colorizer") end,
   commit = "a065833f35a3a7cc3ef137ac88b5381da2ba302e",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local nvim_lint = {
   -- Linters interface that reports to vim.diagnostic
   "mfussenegger/nvim-lint",
   config = function() require("config.nvim-lint") end,
   commit = "1a3a8d047bc01f1760ae4a0f5e80f111ea222e67",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local conform = {
   -- Formatters interface that calculates minimal diff
   "stevearc/conform.nvim",
   config = function() require("config.conform") end,
   tag = "v5.8.0",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local scrollview = {
   "dstein64/nvim-scrollview",
   config = function()
@@ -224,39 +234,41 @@ local scrollview = {
     })
   end,
   commit = "9257c3f3ebf7608a8711caf44f878d87cd40395d",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local fzf_lua = {
   "ibhagwan/fzf-lua",
   config = function() require("config.fzf-lua").setup() end,
   commit = "d368f76b37448d31918c81f020b0c725781c8354",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local cmp_nvim_lsp = {
   -- completion source for lsp
   "hrsh7th/cmp-nvim-lsp",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local schemastore = {
   "b0o/schemastore.nvim",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local jdtls = {
   "mfussenegger/nvim-jdtls",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local workspace_diagnostics = {
   "artemave/workspace-diagnostics.nvim",
   config = function() require("workspace-diagnostics").setup({}) end,
   enabled = false,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local lspconfig = {
   "neovim/nvim-lspconfig",
   config = function() require("config.lspconfig") end,
@@ -267,17 +279,19 @@ local lspconfig = {
     jdtls,
     workspace_diagnostics,
   },
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local gitsigns = {
   -- Git status in sign column, git hunk preview/navigation, and line blame
   "lewis6991/gitsigns.nvim",
   config = function() require("config.gitsigns") end,
   tag = "v0.8.1",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local comment = {
   "numToStr/Comment.nvim",
   config = function()
@@ -286,45 +300,46 @@ local comment = {
     })
   end,
   tag = "v0.8.0",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local cmp_path = {
   -- completion source for filesystem paths
   "hrsh7th/cmp-path",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local cmp_cmdline = {
   -- completion source for vim command line
   "hrsh7th/cmp-cmdline",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local cmp_buffer = {
   -- completion source for buffer words
   "hrsh7th/cmp-buffer",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local cmp_git = {
   -- completion source for git
   "petertriho/cmp-git",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local lspkind = {
   -- add vscode-codicons to popup menu
   "onsails/lspkind.nvim",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local LuaSnip = {
   -- snippet
   "L3MON4D3/LuaSnip",
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local nvim_cmp = {
   "hrsh7th/nvim-cmp",
   config = function() require("config.nvim-cmp") end,
@@ -338,9 +353,10 @@ local nvim_cmp = {
     LuaSnip,
   },
   commit = "5260e5e8ecadaf13e6b82cf867a909f54e15fd07",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local treesitter_textobjs = {
   "nvim-treesitter/nvim-treesitter-textobjects",
   dependencies = {
@@ -349,7 +365,7 @@ local treesitter_textobjs = {
   enabled = false,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local treesitter_playground = {
   "nvim-treesitter/playground",
   dependencies = {
@@ -358,14 +374,14 @@ local treesitter_playground = {
   enabled = false,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local dap = {
   "mfussenegger/nvim-dap",
   config = function() require("config.dap") end,
   enabled = false,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local yazi = {
   "samsze0/yazi.nvim",
   dir = os.getenv("NVIM_YAZI_NVIM_PATH"),
@@ -387,36 +403,41 @@ local yazi = {
     tui,
     terminal_filetype,
   },
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local peek = { -- Markdown preview
   "toppair/peek.nvim",
   event = { "VeryLazy" },
   build = "deno task --quiet build:fast",
   config = function() require("config.peek") end,
   commit = "5820d937d5414baea5f586dc2a3d912a74636e5b",
+  enabled = false,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local ssr = {
   "cshuaimin/ssr.nvim",
   config = function() require("config.ssr") end,
   commit = "bb323ba621ac647b4ac5638b47666e3ef3c279e1",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local git_conflict = {
   "akinsho/git-conflict.nvim",
   config = function() require("config.git-conflict") end,
   tag = "v2.0.0",
+  enabled = true,
 }
 
----@type LazySpec
+---@type LazyPluginSpec
 local fidget = {
   "j-hui/fidget.nvim",
   config = function() require("config.fidget") end,
   tag = "v1.4.5",
+  enabled = false,
 }
 
 require("lazy").setup({

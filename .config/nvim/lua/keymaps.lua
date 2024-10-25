@@ -5,7 +5,6 @@ local command_utils = require("utils.command")
 local editor_utils = require("utils.editor")
 
 local safe_require = lang_utils.safe_require
-local nullish = lang_utils.nullish
 
 local jumplist = require("jumplist")
 local persist = require("persist")
@@ -334,7 +333,7 @@ local setup = function(opts)
 
   -- Fzf/FzfLua
 
-  keymap_utils.create("n", "<f1>", nullish(fzf_lua).builtin)
+  if fzf_lua then keymap_utils.create("n", "<f1>", fzf_lua.builtin) end
 
   keymap_utils.create(
     "n",
@@ -594,18 +593,18 @@ local setup = function(opts)
   end)
 
   -- Copilot
-  if not vim.g.vi_mode then
+  if not vim.g.vi_mode and copilot_suggestion and copilot_panel then
     keymap_utils.create("n", "<leader>a", function()
       if copilot then vim.cmd("Copilot enable") end
     end)
-    keymap_utils.create("i", "<M-a>", nullish(copilot_suggestion).accept)
-    keymap_utils.create("i", "<M-w>", nullish(copilot_suggestion).accept_line)
-    keymap_utils.create("i", "<M-d>", nullish(copilot_suggestion).next)
-    keymap_utils.create("i", "<M-e>", nullish(copilot_suggestion).prev)
-    keymap_utils.create("i", "<M-q>", nullish(copilot_panel).open)
-    keymap_utils.create("n", "<M-e>", nullish(copilot_panel).jump_prev)
-    keymap_utils.create("n", "<M-d>", nullish(copilot_panel).jump_next)
-    keymap_utils.create("n", "<M-a>", nullish(copilot_panel).accept)
+    keymap_utils.create("i", "<M-a>", copilot_suggestion.accept)
+    keymap_utils.create("i", "<M-w>", copilot_suggestion.accept_line)
+    keymap_utils.create("i", "<M-d>", copilot_suggestion.next)
+    keymap_utils.create("i", "<M-e>", copilot_suggestion.prev)
+    keymap_utils.create("i", "<M-q>", copilot_panel.open)
+    keymap_utils.create("n", "<M-e>", copilot_panel.jump_prev)
+    keymap_utils.create("n", "<M-d>", copilot_panel.jump_next)
+    keymap_utils.create("n", "<M-a>", copilot_panel.accept)
   end
 
   -- Copy path

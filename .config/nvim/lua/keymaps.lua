@@ -27,9 +27,6 @@ local cmp = safe_require("cmp")
 ---@module 'fzf-lua'
 local fzf_lua = safe_require("fzf-lua")
 
----@module 'ssr'
-local ssr = safe_require("ssr")
-
 ---@module 'git-conflict'
 local git_conflict = safe_require("git-conflict")
 
@@ -618,9 +615,6 @@ local setup = function(opts)
     vim.fn.setreg("+", path)
     vim.info("Copied", path)
   end)
-
-  -- SSR
-  keymap_utils.create("n", "<leader>r", function() ssr.open() end)
 
   -- Misc
   command_utils.create(

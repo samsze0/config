@@ -413,14 +413,6 @@ local peek = { -- Markdown preview
   build = "deno task --quiet build:fast",
   config = function() require("config.peek") end,
   commit = "5820d937d5414baea5f586dc2a3d912a74636e5b",
-  enabled = false,
-}
-
----@type LazyPluginSpec
-local ssr = {
-  "cshuaimin/ssr.nvim",
-  config = function() require("config.ssr") end,
-  commit = "bb323ba621ac647b4ac5638b47666e3ef3c279e1",
   enabled = true,
 }
 
@@ -457,6 +449,5 @@ require("lazy").setup({
   yazi,
   ui_nvim,
   peek,
-  ssr,
   git_conflict,
 })

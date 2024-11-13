@@ -432,14 +432,6 @@ local git_conflict = {
   enabled = true,
 }
 
----@type LazyPluginSpec
-local fidget = {
-  "j-hui/fidget.nvim",
-  config = function() require("config.fidget") end,
-  tag = "v1.4.5",
-  enabled = false,
-}
-
 require("lazy").setup({
   fzf_lua,
   lspconfig,
@@ -467,5 +459,4 @@ require("lazy").setup({
   peek,
   ssr,
   git_conflict,
-  fidget,
 })

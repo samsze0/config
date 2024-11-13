@@ -192,14 +192,6 @@ local treesitter = {
 }
 
 ---@type LazyPluginSpec
-local copilot = {
-  "zbirenbaum/copilot.lua",
-  config = function() require("config.copilot") end,
-  commit = "f7612f5af4a7d7615babf43ab1e67a2d790c13a6",
-  enabled = false,
-}
-
----@type LazyPluginSpec
 local colorizer = {
   "norcalli/nvim-colorizer.lua",
   config = function() require("config.colorizer") end,
@@ -437,7 +429,6 @@ require("lazy").setup({
   conform,
   scrollview,
   colorizer,
-  copilot,
   treesitter,
   nui,
   utils_nvim,

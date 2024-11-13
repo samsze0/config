@@ -12,15 +12,6 @@ local persist = require("persist")
 ---@module 'conform'
 local conform = safe_require("conform")
 
----@module 'copilot.suggestion'
-local copilot_suggestion = safe_require("copilot.suggestion")
-
----@module 'copilot.panel'
-local copilot_panel = safe_require("copilot.panel")
-
----@module 'copilot'
-local copilot = safe_require("copilot")
-
 ---@module 'cmp'
 local cmp = safe_require("cmp")
 
@@ -588,21 +579,6 @@ local setup = function(opts)
 
     if cmp.visible() then cmp.confirm({ select = true }) end
   end)
-
-  -- Copilot
-  if not vim.g.vi_mode and copilot_suggestion and copilot_panel then
-    keymap_utils.create("n", "<leader>a", function()
-      if copilot then vim.cmd("Copilot enable") end
-    end)
-    keymap_utils.create("i", "<M-a>", copilot_suggestion.accept)
-    keymap_utils.create("i", "<M-w>", copilot_suggestion.accept_line)
-    keymap_utils.create("i", "<M-d>", copilot_suggestion.next)
-    keymap_utils.create("i", "<M-e>", copilot_suggestion.prev)
-    keymap_utils.create("i", "<M-q>", copilot_panel.open)
-    keymap_utils.create("n", "<M-e>", copilot_panel.jump_prev)
-    keymap_utils.create("n", "<M-d>", copilot_panel.jump_next)
-    keymap_utils.create("n", "<M-a>", copilot_panel.accept)
-  end
 
   -- Copy path
   keymap_utils.create("n", "<leader>g", function()

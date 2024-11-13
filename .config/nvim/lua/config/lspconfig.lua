@@ -15,10 +15,6 @@ local workspace_diagnostics = safe_require("workspace-diagnostics")
 ---@module 'schemastore'
 local schemastore = safe_require("schemastore")
 
----@module 'neodev'
-local neodev = safe_require("neodev")
-nullish(neodev).setup({})
-
 local on_attach = function(client, bufnr)
   nullish(workspace_diagnostics).populate_workspace_diagnostics(client, bufnr)
 end

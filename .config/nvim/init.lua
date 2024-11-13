@@ -218,18 +218,6 @@ local conform = {
 }
 
 ---@type LazyPluginSpec
-local scrollview = {
-  "dstein64/nvim-scrollview",
-  config = function()
-    require("scrollview").setup({
-      floating_windows = true,
-    })
-  end,
-  commit = "9257c3f3ebf7608a8711caf44f878d87cd40395d",
-  enabled = true,
-}
-
----@type LazyPluginSpec
 local fzf_lua = {
   "ibhagwan/fzf-lua",
   config = function() require("config.fzf-lua").setup() end,
@@ -427,7 +415,6 @@ require("lazy").setup({
   dap,
   nvim_lint,
   conform,
-  scrollview,
   colorizer,
   treesitter,
   nui,

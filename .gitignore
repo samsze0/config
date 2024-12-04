@@ -10,6 +10,8 @@
 !README.md
 !OSX.md
 
+!.aerospace.toml
+
 !.config/
 .config/*
 

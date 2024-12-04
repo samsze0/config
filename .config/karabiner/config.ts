@@ -339,48 +339,7 @@ const rules = [
         type: "basic",
       },
     ],
-  },
-  {
-    description: "Hyper + -/= -> Hyper + Shift + -/= (skhd)",
-    manipulators: [
-      {
-        from: {
-          key_code: "hyphen",
-          modifiers: {
-            mandatory: ["left_command", "left_option", "left_control"],
-          },
-        },
-        to: {
-          key_code: "9",
-          modifiers: [
-            "left_shift",
-            "left_command",
-            "left_option",
-            "left_control",
-          ],
-        },
-        type: "basic",
-      },
-      {
-        from: {
-          key_code: "equal_sign",
-          modifiers: {
-            mandatory: ["left_command", "left_option", "left_control"],
-          },
-        },
-        to: {
-          key_code: "0",
-          modifiers: [
-            "left_shift",
-            "left_command",
-            "left_option",
-            "left_control",
-          ],
-        },
-        type: "basic",
-      },
-    ],
-  },
+  }
 ];
 
 async function updateConfig() {

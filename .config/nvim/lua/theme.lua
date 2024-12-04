@@ -160,6 +160,7 @@ function M.setup(opts)
   hl.StatusLineCopilotActive = { fg = colors.gray_800, bg = colors.gray_100 }
 
   hl.StatusLineFileInfo = { fg = colors.gray_600, bg = colors.gray_100 }
+  hl.StatusLineFileProgress = { fg = colors.gray_600, bg = colors.gray_100 }
 
   hl.StatusLineGitSignsAdded = { fg = colors.blue, bg = colors.gray_100 }
   hl.StatusLineGitSignsChanged = { fg = colors.yellow, bg = colors.gray_100 }

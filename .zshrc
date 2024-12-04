@@ -35,11 +35,6 @@ source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
 
-# zsh completion
-autoload -U compinit
-compinit
-compaudit || (compaudit | xargs chmod go-w) # Remove group & other write permission for all insecure directories if there are any
-
 function init_pyenv() {
 	if check_command_exists pyenv; then
 		export PYENV_ROOT="$HOME/.pyenv"
@@ -138,6 +133,11 @@ else # OSX
 	export PATH="$ANDROID_HOME/emulator:$PATH"
 	export PATH="$ANDROID_HOME/tools:$PATH"
 fi
+
+# zsh completion (need to be after brew shellenv)
+autoload -U compinit
+compinit
+compaudit || (compaudit | xargs chmod go-w) # Remove group & other write permission for all insecure directories if there are any
 
 init_starship
 init_zoxide

@@ -147,10 +147,10 @@ ctrl-alt-cmd-l = 'focus-monitor right'
 
 # Home, end, pageup/down are not yet supported
 # https://github.com/nikitabobko/AeroSpace/issues/748
-# ctrl-alt-cmd-home = 'focus-monitor left'
-# ctrl-alt-cmd-pageup = 'focus-monitor up'
-# ctrl-alt-cmd-pagedown = 'focus-monitor down'
-# ctrl-alt-cmd-end = 'focus-monitor right'
+# ctrl-alt-cmd-home = 'move-node-to-monitor left'
+# ctrl-alt-cmd-pageup = 'move-node-to-monitor up'
+# ctrl-alt-cmd-pagedown = 'move-node-to-monitor down'
+# ctrl-alt-cmd-end = 'move-node-to-monitor right'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
 # alt-tab = 'workspace-back-and-forth'
@@ -162,19 +162,23 @@ ctrl-alt-cmd-semicolon = 'mode misc'
 
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 [mode.misc.binding]
-esc = ['reload-config', 'mode main']
-r = ['flatten-workspace-tree', 'mode main'] # reset layout
-f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
-backspace = ['close-all-windows-but-current', 'mode main']
+esc = 'mode main'
+r = ['reload-config', 'mode main']
+
+j = ['move-node-to-monitor left', 'mode main']
+i = ['move-node-to-monitor up', 'mode main']
+k = ['move-node-to-monitor down', 'mode main']
+l = ['move-node-to-monitor right', 'mode main']
+
+# s = ['join-with left', 'mode main']
+# d = ['join-with down', 'mode main']
+# e = ['join-with up', 'mode main']
+# f = ['join-with right', 'mode main']
+
+# f = ['flatten-workspace-tree', 'mode main'] # reset layout
+# f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
+
+# backspace = ['close-all-windows-but-current', 'mode main']
 
 # sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
-#s = ['layout sticky tiling', 'mode main']
-
-alt-shift-h = ['join-with left', 'mode main']
-alt-shift-j = ['join-with down', 'mode main']
-alt-shift-k = ['join-with up', 'mode main']
-alt-shift-l = ['join-with right', 'mode main']
-
-down = 'volume down'
-up = 'volume up'
-shift-down = ['volume set 0', 'mode main']
+# s = ['layout sticky tiling', 'mode main']

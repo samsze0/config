@@ -101,3 +101,7 @@ md5_dir() {
 dir_size() {
   du -sh "$1"
 }
+
+diff_dir_with_progress() {
+  diff -rqs "$1" "$2" | pv -l -s "$(find "$1" -type f | wc -l)" > /dev/null
+}

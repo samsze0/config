@@ -64,9 +64,9 @@ $azure\
 $direnv\
 $env_var\
 $custom\
-$cmd_duration\
 $hostname\
 $localip\
+$cmd_duration\
 
 $line_break\
 

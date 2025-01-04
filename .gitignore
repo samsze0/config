@@ -12,6 +12,8 @@
 
 !.aerospace.toml
 
+!.tmux.conf
+
 !.config/
 .config/*
 
@@ -75,9 +77,6 @@
 
 !.config/nvim/
 !.config/nvim/**
-
-!.config/tmux/
-!.config/tmux/**
 
 !.config/pandoc/
 !.config/pandoc/**

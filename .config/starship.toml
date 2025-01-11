@@ -328,6 +328,15 @@ detect_extensions = ["gradle", "gradle.kts"]
 detect_files = []
 detect_folders = ["gradle"]
 
+[typst]
+disabled = false
+format = '⋅ [$symbol($version )]($style)'
+version_format = 'v${raw}'
+symbol = 'Typst '
+style = ' blue'
+detect_extensions = ['typ']
+detect_files = []
+detect_folders = []
 
 [c]
 disabled = false

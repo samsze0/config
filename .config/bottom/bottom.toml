@@ -4,3 +4,7 @@
 # https://clementtsang.github.io/bottom/stable/configuration/config-file/flags/
 enable_gpu = true
 temperature_type = "c"
+
+[processes]
+# Pick which columns you want to use in any order.
+columns = ["cpu%", "mem%", "pid", "name", "read", "write", "tread", "twrite", "state", "user", "time", "gmem%", "gpu%"]

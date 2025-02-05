@@ -6,17 +6,13 @@ local editor_utils = require("utils.editor")
 
 local safe_require = lang_utils.safe_require
 
-local jumplist = require("jumplist")
-local persist = require("persist")
+local jumplist = safe_require("jumplist")
 
 ---@module 'conform'
 local conform = safe_require("conform")
 
 ---@module 'cmp'
 local cmp = safe_require("cmp")
-
----@module 'fzf-lua'
-local fzf_lua = safe_require("fzf-lua")
 
 ---@module 'git-conflict'
 local git_conflict = safe_require("git-conflict")
@@ -316,12 +312,12 @@ local setup = function(opts)
   keymap_utils.create("v", "C", '"dC')
 
   -- Jump (jumplist)
-  keymap_utils.create("n", "<C-u>", jumplist.jump_back)
-  keymap_utils.create("n", "<C-o>", jumplist.jump_forward)
+  if jumplist then
+    keymap_utils.create("n", "<C-u>", jumplist.jump_back)
+    keymap_utils.create("n", "<C-o>", jumplist.jump_forward)
+  end
 
-  -- Fzf/FzfLua
-
-  if fzf_lua then keymap_utils.create("n", "<f1>", fzf_lua.builtin) end
+  -- Fzf
 
   keymap_utils.create(
     "n",
@@ -329,45 +325,35 @@ local setup = function(opts)
     function() require("fzf.selector.files")():start() end
   )
 
-  -- keymap_utils.create(
-  --   "n",
-  --   "<f4><f2>",
-  --   function() require("fzf.selector.buffers")():start() end
-  -- )
-  -- keymap_utils.create(
-  --   "n",
-  --   "<f4><f1>",
-  --   function() require("fzf.selector.tabs")():start() end
-  -- )
+  keymap_utils.create("n", "<f4><f2>", function()
+    -- require("fzf.selector.buffers")():start()
+    vim.warn("Not implemented")
+  end)
+  keymap_utils.create("n", "<f4><f1>", function()
+    -- require("fzf.selector.tabs")():start()
+    vim.warn("Not implemented")
+  end)
 
-  -- keymap_utils.create(
-  --   "n",
-  --   "<f5><f3>",
-  --   function() require("fzf.selector.grep.file")():start() end
-  -- )
-  -- keymap_utils.create(
-  --   "n",
-  --   "<f5><f4>",
-  --   function() require("fzf.selector.grep.workspace")():start() end
-  -- )
-  -- keymap_utils.create(
-  --   "v",
-  --   "<f5><f3>",
-  --   function()
-  --     require("fzf.grep.file")({
-  --       initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
-  --     }):start()
-  --   end
-  -- )
-  -- keymap_utils.create(
-  --   "v",
-  --   "<f5><f4>",
-  --   function()
-  --     require("fzf.selector.grep.workspace")({
-  --       initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
-  --     }):start()
-  --   end
-  -- )
+  keymap_utils.create("n", "<f5><f3>", function()
+    -- require("fzf.selector.grep.file")():start()
+    vim.warn("Not implemented")
+  end)
+  keymap_utils.create("n", "<f5><f4>", function()
+    -- require("fzf.selector.grep.workspace")():start()
+    vim.warn("Not implemented")
+  end)
+  keymap_utils.create("v", "<f5><f3>", function()
+    -- require("fzf.grep.file")({
+    --   initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
+    -- }):start()
+    vim.warn("Not implemented")
+  end)
+  keymap_utils.create("v", "<f5><f4>", function()
+    -- require("fzf.selector.grep.workspace")({
+    --   initial_query = table.concat(editor_utils.get_visual_selection(), "\n"),
+    -- }):start()
+    vim.warn("Not implemented")
+  end)
 
   keymap_utils.create(
     "n",
@@ -397,16 +383,14 @@ local setup = function(opts)
     "<f11><f3>",
     function() require("fzf.selector.git.status")():start() end
   )
-  -- keymap_utils.create(
-  --   "n",
-  --   "<f11><f2>",
-  --   function() require("fzf.selector.git.branch")():start() end
-  -- )
-  -- keymap_utils.create(
-  --   "n",
-  --   "<f11><f11>",
-  --   function() require("fzf.selector.git.reflog")():start() end
-  -- )
+  keymap_utils.create("n", "<f11><f2>", function()
+    -- require("fzf.selector.git.branch")():start()
+    vim.warn("Not implemented")
+  end)
+  keymap_utils.create("n", "<f11><f11>", function()
+    -- require("fzf.selector.git.reflog")():start()
+    vim.warn("Not implemented")
+  end)
 
   keymap_utils.create(
     "n",
@@ -443,11 +427,10 @@ local setup = function(opts)
     function() require("fzf.selector.diagnostics")():start() end
   )
 
-  -- keymap_utils.create(
-  --   "n",
-  --   "<space>u",
-  --   function() require("fzf.selector.undo")():start() end
-  -- )
+  keymap_utils.create("n", "<space>u", function()
+    -- require("fzf.selector.undo")():start()
+    vim.warn("Not implemented")
+  end)
   keymap_utils.create(
     "n",
     "<space>m",
@@ -546,9 +529,9 @@ local setup = function(opts)
 
   -- :qa, :q!, :wq
   keymap_utils.create("n", "<space>q", ":q<cr>")
-  keymap_utils.create("n", "<space>w", ":w<cr>")
+  keymap_utils.create("n", "<space>w", ":wq<cr>")
   keymap_utils.create("n", "<space><BS>", ":q!<cr>")
-  keymap_utils.create("n", "<space>s", ":w!<cr>")
+  keymap_utils.create("n", "<space>s", ":w<cr>")
   keymap_utils.create("n", "<space>a", ":qa<cr>")
   keymap_utils.create("n", "<space>e", ":e<cr>")
   keymap_utils.create("n", "<space><delete>", ":qa!<cr>")
@@ -557,10 +540,11 @@ local setup = function(opts)
   keymap_utils.create("n", "<space>;", "q:")
 
   -- Session restore
-  -- TODO: fix plugin
+  -- TODO
   keymap_utils.create("n", "<Space>r", function()
-    persist.load_session()
-    vim.info("Reloaded session")
+    -- persist.load_session()
+    -- vim.info("Reloaded session")
+    vim.warn("Not implemented")
   end)
 
   -- Colorizer

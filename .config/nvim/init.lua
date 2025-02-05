@@ -1,8 +1,3 @@
-local version = vim.version()
-if version.major ~= 0 or version.minor ~= 10 then
-  error("Neovim version 0.10 is required")
-end
-
 vim.cmd([[set clipboard+=unnamedplus]])
 
 vim.opt.number = true
@@ -99,7 +94,6 @@ local jumplist = {
   "samsze0/jumplist.nvim",
   dir = os.getenv("NVIM_JUMPLIST_NVIM_PATH"),
   config = function() require("jumplist").setup({}) end,
-  enabled = true,
 }
 
 local ui_nvim = {
@@ -111,7 +105,7 @@ local ui_nvim = {
     vim.opt.laststatus = 2 -- 3 = global; 2 = always ; 1 = at least 2 windows ; 0 = never
 
     -- :h tabbline
-    vim.opt.showtabline = 2 -- 2 = always ; 1 = at least 2 tabs ; 0 = never
+    vim.opt.showtabline = 1 -- 2 = always ; 1 = at least 2 tabs ; 0 = never
 
     require("ui").setup({})
     require("ui.statusline").register(require("ui.statusline.presets"))
@@ -137,7 +131,6 @@ local terminal_filetype = {
   "samsze0/terminal-filetype.nvim",
   dir = os.getenv("NVIM_TERMINAL_FILETYPE_NVIM_PATH"),
   config = function() require("terminal-filetype").setup({}) end,
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -148,7 +141,6 @@ local notifier = {
   dependencies = {
     utils_nvim,
   },
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -172,7 +164,6 @@ local fzf = {
     notifier,
     tui,
   },
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -196,7 +187,6 @@ local colorizer = {
   "norcalli/nvim-colorizer.lua",
   config = function() require("config.colorizer") end,
   commit = "a065833f35a3a7cc3ef137ac88b5381da2ba302e",
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -205,7 +195,6 @@ local nvim_lint = {
   "mfussenegger/nvim-lint",
   config = function() require("config.nvim-lint") end,
   commit = "1a3a8d047bc01f1760ae4a0f5e80f111ea222e67",
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -214,15 +203,6 @@ local conform = {
   "stevearc/conform.nvim",
   config = function() require("config.conform") end,
   tag = "v5.8.0",
-  enabled = true,
-}
-
----@type LazyPluginSpec
-local fzf_lua = {
-  "ibhagwan/fzf-lua",
-  config = function() require("config.fzf-lua").setup() end,
-  commit = "d368f76b37448d31918c81f020b0c725781c8354",
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -245,7 +225,6 @@ local jdtls = {
 local workspace_diagnostics = {
   "artemave/workspace-diagnostics.nvim",
   config = function() require("workspace-diagnostics").setup({}) end,
-  enabled = false,
 }
 
 ---@type LazyPluginSpec
@@ -259,7 +238,6 @@ local lspconfig = {
     jdtls,
     workspace_diagnostics,
   },
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -268,7 +246,6 @@ local gitsigns = {
   "lewis6991/gitsigns.nvim",
   config = function() require("config.gitsigns") end,
   tag = "v0.8.1",
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -280,7 +257,6 @@ local comment = {
     })
   end,
   tag = "v0.8.0",
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -333,7 +309,6 @@ local nvim_cmp = {
     LuaSnip,
   },
   commit = "5260e5e8ecadaf13e6b82cf867a909f54e15fd07",
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -342,7 +317,6 @@ local treesitter_textobjs = {
   dependencies = {
     treesitter,
   },
-  enabled = false,
 }
 
 ---@type LazyPluginSpec
@@ -351,14 +325,12 @@ local treesitter_playground = {
   dependencies = {
     treesitter,
   },
-  enabled = false,
 }
 
 ---@type LazyPluginSpec
 local dap = {
   "mfussenegger/nvim-dap",
   config = function() require("config.dap") end,
-  enabled = false,
 }
 
 ---@type LazyPluginSpec
@@ -383,7 +355,6 @@ local yazi = {
     tui,
     terminal_filetype,
   },
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -393,7 +364,6 @@ local peek = { -- Markdown preview
   build = "deno task --quiet build:fast",
   config = function() require("config.peek") end,
   commit = "5820d937d5414baea5f586dc2a3d912a74636e5b",
-  enabled = true,
 }
 
 ---@type LazyPluginSpec
@@ -401,31 +371,29 @@ local git_conflict = {
   "akinsho/git-conflict.nvim",
   config = function() require("config.git-conflict") end,
   tag = "v2.0.0",
-  enabled = true,
 }
 
 require("lazy").setup({
-  fzf_lua,
   lspconfig,
   gitsigns,
   comment,
   nvim_cmp,
-  treesitter_textobjs,
-  treesitter_playground,
-  dap,
   nvim_lint,
   conform,
   colorizer,
   treesitter,
-  nui,
   utils_nvim,
   jumplist,
-  terminal_filetype,
-  notifier,
-  fzf,
-  websocket,
-  yazi,
   ui_nvim,
-  peek,
-  git_conflict,
+  notifier,
+  nui,
+  -- treesitter_textobjs,
+  -- treesitter_playground,
+  -- dap,
+  -- terminal_filetype,
+  -- fzf,
+  -- websocket,
+  -- yazi,
+  -- peek,
+  -- git_conflict,
 })

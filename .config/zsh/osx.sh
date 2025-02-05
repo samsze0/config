@@ -177,6 +177,10 @@ osx_init() {
 	defaults write com.apple.AdLib allowApplePersonalizedAdvertising -bool false
 	defaults write com.apple.AdLib allowIdentifierForAdvertising -bool false
 
+  # AeroSpace: Workaround for the small window size in mission control issue
+  # https://nikitabobko.github.io/AeroSpace/guide#a-note-on-mission-control
+  defaults write com.apple.dock expose-group-apps -bool true
+
 	# Reload Dock
 	killall Dock
 

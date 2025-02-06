@@ -70,10 +70,10 @@ function init_rbenv() {
 
 function init_nvm() {
 	if [ $(arch) = "x86_64" ]; then # Linux / NixOS
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-	else                            # OSX
+		export NVM_DIR="$HOME/.nvm"
+		[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+		[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+	else                                                                # OSX
 		export NVM_DIR="$HOME/.nvm"
 		if [[ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ]]; then
 			. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"

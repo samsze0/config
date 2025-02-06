@@ -170,7 +170,7 @@ alias ts-send='tailscale_send'
 alias jq='gojq'
 alias v='nvim'
 alias lf='PAGER="nvim -RM" lf'
-alias y='yazi'
+alias f='yazi'
 alias c='code'
 
 # https://github.com/kovidgoyal/kitty/discussions/3873

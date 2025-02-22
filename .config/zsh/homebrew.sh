@@ -51,21 +51,21 @@ brew_taps_cask_token_list() {
 }
 
 brew_dump() {
-	brew bundle dump --global --force
+	brew bundle dump --force --file="$HOME/.Brewfile.full"
 }
 
 brew_check() {
-	brew bundle check --global
+	brew bundle check --file="$HOME/.Brewfile.full"
 }
 
 brew_cleanup_check() {
-	brew bundle cleanup --global
+	brew bundle cleanup --file="$HOME/.Brewfile.full"
 }
 
 brew_cleanup() {
-	brew bundle cleanup --global --force
+	brew bundle cleanup --force --file="$HOME/.Brewfile.full"
 }
 
 brew_install() {
-	brew bundle install --global --no-upgrade
+	brew bundle install --no-upgrade --file="$HOME/.Brewfile.full"
 }

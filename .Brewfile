@@ -44,6 +44,7 @@ brew "tldr"
 brew "tmux"
 brew "trash", link: true
 brew "typescript-language-server"
+brew "uv"
 brew "watch"
 brew "watchman"
 brew "wget"

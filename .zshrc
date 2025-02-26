@@ -1,37 +1,37 @@
 # Custom lib
-source ~/.config/zsh/tailscale.sh
-source ~/.config/zsh/utils.sh
-source ~/.config/zsh/pandoc.sh
-source ~/.config/zsh/image.sh
-source ~/.config/zsh/browser.sh
-source ~/.config/zsh/kitty.sh
-source ~/.config/zsh/nix.sh
-source ~/.config/zsh/fzf.sh
-source ~/.config/zsh/socket.sh
-source ~/.config/zsh/unix.sh
-source ~/.config/zsh/git.sh
-source ~/.config/zsh/homebrew.sh
-source ~/.config/zsh/syncthing.sh
-source ~/.config/zsh/osx.sh
-source ~/.config/zsh/bat.sh
-source ~/.config/zsh/lemminx.sh
-source ~/.config/zsh/azure.sh
-source ~/.config/zsh/openssh.sh
-source ~/.config/zsh/android.sh
-source ~/.config/zsh/other-deps.sh
-source ~/.config/zsh/network.sh
-source ~/.config/zsh/redis.sh
-source ~/.config/zsh/nvim.sh
-source ~/.config/zsh/yazi.sh
+. ~/.config/zsh/tailscale.sh
+. ~/.config/zsh/utils.sh
+. ~/.config/zsh/pandoc.sh
+. ~/.config/zsh/image.sh
+. ~/.config/zsh/browser.sh
+. ~/.config/zsh/kitty.sh
+. ~/.config/zsh/nix.sh
+. ~/.config/zsh/fzf.sh
+. ~/.config/zsh/socket.sh
+. ~/.config/zsh/unix.sh
+. ~/.config/zsh/git.sh
+. ~/.config/zsh/homebrew.sh
+. ~/.config/zsh/syncthing.sh
+. ~/.config/zsh/osx.sh
+. ~/.config/zsh/bat.sh
+. ~/.config/zsh/lemminx.sh
+. ~/.config/zsh/azure.sh
+. ~/.config/zsh/openssh.sh
+. ~/.config/zsh/android.sh
+. ~/.config/zsh/other-deps.sh
+. ~/.config/zsh/network.sh
+. ~/.config/zsh/redis.sh
+. ~/.config/zsh/nvim.sh
+. ~/.config/zsh/yazi.sh
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions
-source ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
+. ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 
 # zsh-syntax-highlighting
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
-source ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+. ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
 
@@ -82,6 +82,16 @@ function init_nvm() {
 			. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
 		fi
 	fi
+}
+
+function init_azure_cli() {
+  # Requires system package python-argcomplete
+  if check_command_exists az && check_command_exists register-python-argcomplete; then
+    if [[ -s "$HOMEBREW_PREFIX/etc/bash_completion.d/az" ]]; then
+      . "$HOMEBREW_PREFIX/etc/bash_completion.d/az"
+      eval "$(register-python-argcomplete az)"
+    fi
+  fi
 }
 
 if [ $(arch) = "x86_64" ]; then # Linux / NixOS
@@ -137,9 +147,12 @@ else # OSX
 	export PATH="$ANDROID_HOME/tools:$PATH"
 fi
 
-# zsh completion (need to be after brew shellenv)
+# zsh completion (& bash completion) (need to be after brew shellenv)
+FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
 autoload -U compinit
 compinit
+autoload -U bashcompinit
+bashcompinit
 compaudit || (compaudit | xargs chmod go-w) # Remove group & other write permission for all insecure directories if there are any
 
 init_starship
@@ -148,6 +161,7 @@ init_pyenv
 init_pip
 init_rbenv
 init_nvm
+init_azure_cli
 
 mkdir -p "$HOME/bin"
 export PATH=$HOME/bin:${PATH}
@@ -189,7 +203,6 @@ export PAGER="less"
 export EDITOR="nvim"
 export MANPAGER="nvim +Man\!" # https://neovim.io/doc/user/filetype.html#ft-man-plugin
 
-# Prevent "repeating characters" issue when inside a ssh session that also uses zsh
 # man locale
 # locale -a to list all available locales
 # export LANG="en_US.UTF-8"

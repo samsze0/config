@@ -1,7 +1,7 @@
 import { promises } from "fs";
 
 // TODO: migrate to use this https://github.com/evan-liu/karabiner.ts
-// For now, just use https://genesy.github.io/karabiner-complex-rules-generator/
+// https://genesy.github.io/karabiner-complex-rules-generator/
 
 const rules = [
   {
@@ -184,8 +184,8 @@ const rules = [
         to: [{ key_code: "page_down" }],
         type: "basic",
       },
+      // Use Home/End for terminal
       {
-        // Use Home/End for terminal
         conditions: [
           { name: "rcommand", type: "variable_if", value: 1 },
           {
@@ -198,7 +198,6 @@ const rules = [
         type: "basic",
       },
       {
-        // Use Ctrl + left/right for other apps
         conditions: [
           { name: "rcommand", type: "variable_if", value: 1 },
           {
@@ -210,6 +209,7 @@ const rules = [
         to: { key_code: "end" },
         type: "basic",
       },
+      // Use Ctrl + left/right for other apps
       {
         conditions: [{ name: "rcommand", type: "variable_if", value: 1 }],
         from: { key_code: "j", modifiers: { optional: ["any"] } },

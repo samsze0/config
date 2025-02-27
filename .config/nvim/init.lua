@@ -177,9 +177,18 @@ local websocket = {
 }
 
 ---@type LazyPluginSpec
+local treesitter_nu = {
+  "nushell/tree-sitter-nu",
+  enabled = true
+}
+
+---@type LazyPluginSpec
 local treesitter = {
   "nvim-treesitter/nvim-treesitter",
-  tag = "v0.9.1",
+  tag = "v0.9.3",
+  dependencies = {
+    treesitter_nu
+  }
 }
 
 ---@type LazyPluginSpec
@@ -219,6 +228,7 @@ local schemastore = {
 ---@type LazyPluginSpec
 local jdtls = {
   "mfussenegger/nvim-jdtls",
+  enabled = false,
 }
 
 ---@type LazyPluginSpec

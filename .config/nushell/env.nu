@@ -5,6 +5,93 @@ use std "path add"
 path add /usr/local/bin
 path add ~/.cargo/bin
 
+let os = uname | get kernel-name
+
+if $os == "Darwin" {
+    let homebrew_prefix = (match (arch) {
+        "arm64" => "/opt/homebrew",
+        "x86_64" => "/opt/homebrew-x86",
+    })
+    path add ($homebrew_prefix | path join "bin")
+    $env.HOMEBREW_PREFIX = $homebrew_prefix
+    $env.HOMEBREW_CELLAR = ($homebrew_prefix | path join "Cellar")
+}
+
+if (command-exists starship) {
+    mkdir ($nu.data-dir | path join "vendor/autoload")
+    starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
+}
+
+if (command-exists zoxide) {
+    source ~/.zoxide.nu
+}
+
+if (command-exists fzf) {
+    let fzf_colors = {
+        "bg+": "#23283c",
+        "preview-bg": "#0f1118",
+        "bg": "#0f1118",
+        "border": "#535d6c",
+        "spinner": "#549eff",
+        "hl": "#549eff",
+        "fg": "#687184",
+        "header": "#7E8E91",
+        "info": "#549eff",
+        "pointer": "#549eff",
+        "marker": "#687184",
+        "fg+": "#95a1b3",
+        "prompt": "#549eff",
+        "hl+": "#549eff",
+        "gutter": "-1"
+    }
+
+    let fzf_colors_str = $fzf_colors | transpose key val | each {|kv| $kv.key + ":" + $kv.val} | str join ','
+
+    let fzf_default_opts = [
+        "--layout=reverse",
+        "--info=inline",
+        "--border",
+        "--margin=1",
+        "--padding=1",
+        "--marker='▏'",
+        "--pointer='▌'",
+        "--prompt=' '",
+        "--highlight-line",
+
+        # Join the colors as `key:val,key:val`
+        $"--color=($fzf_colors_str)",
+
+        "--bind 'ctrl-a:toggle-all'",
+        "--bind 'ctrl-i:toggle'",
+    ]
+
+    $env.FZF_DEFAULT_OPTS = $fzf_default_opts | str join ' '
+}
+
+let carapace_completer = {|spans|
+    carapace $spans.0 nushell ...$spans | from json
+}
+
+let default_completer = match (command-exists carapace) {
+    true => $carapace_completer
+    false => ({|spans|
+        error make {
+            msg: "Default completer not configured"
+        }
+    })
+}
+
+let zoxide_completer = {|spans|
+    $spans | skip 1 | zoxide query -l ...$in | lines | where {|x| $x != $env.PWD}
+}
+
+let completer = {|spans|
+    match $spans.0 {
+        z => $zoxide_completer
+        _ => $default_completer
+    } | do $in $spans
+}
+
 $env.config = {
     show_banner: false
     edit_mode: 'emacs'
@@ -55,6 +142,7 @@ $env.config = {
         external: {
             enable: true
             max_results: 100
+            completer: $default_completer
         }
         use_ls_colors: false
     }
@@ -64,11 +152,50 @@ $env.config = {
     use_ansi_coloring: true
 
     # Run `keybindings list`
+    # Run `keybindings listen`
+    # Run `keybindings default`
     keybindings: [
+        {
+            name: fuzzy_file
+            modifier: control
+            keycode: char_t
+            mode: emacs
+            event: {
+                send: ExecuteHostCommand
+                cmd: "commandline edit --insert (fzf --layout=reverse)"
+            }
+        }
+        # https://github.com/nushell/nushell/issues/1616
+        {
+            name: fuzzy_history
+            modifier: control
+            keycode: char_r
+            mode: [emacs, vi_normal, vi_insert]
+            event: [
+                {
+                    send: ExecuteHostCommand
+                    cmd: "commandline edit --insert (
+                    history
+                        | get command
+                        | reverse
+                        | uniq
+                        | str join (char -i 0)
+                        | fzf
+                            --read0
+                            --layout reverse
+                            --scheme=history
+                            --query (commandline)
+                        | decode utf-8
+                        | str trim
+                    )"
+                }
+            ]
+        }
         {
             name: delete_one_word_backward
             modifier: control
-            keycode: backspace
+            # keycode: backspace
+            keycode: char_h
             mode: emacs
             event: { edit: backspaceword }
         }
@@ -86,28 +213,21 @@ $env.config = {
             mode: emacs
             event: { edit: undo }
         }
+        {
+            name: menu_page_previous
+            modifier: none
+            keycode: pageup
+            mode: emacs
+            event: { send: MenuPagePrevious }
+        }
+        {
+            name: menu_page_next
+            modifier: none
+            keycode: pagedown
+            mode: emacs
+            event: { send: MenuPageNext }
+        }
     ]
-}
-
-if (command-exists starship) {
-    mkdir ($nu.data-dir | path join "vendor/autoload")
-    starship init nu | save -f ($nu.data-dir | path join "vendor/autoload/starship.nu")
-}
-
-if (command-exists zoxide) {
-    source ~/.zoxide.nu
-}
-
-let os = uname | get kernel-name
-
-if $os == "Darwin" {
-    let homebrew_prefix = (match (arch) {
-        "arm64" => "/opt/homebrew",
-        "x86_64" => "/opt/homebrew-x86",
-    })
-    path add ($homebrew_prefix | path join "bin")
-    $env.HOMEBREW_PREFIX = $homebrew_prefix
-    $env.HOMEBREW_CELLAR = ($homebrew_prefix | path join "Cellar")
 }
 
 alias w = w-columns

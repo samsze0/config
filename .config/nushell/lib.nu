@@ -4,7 +4,7 @@ export def w-columns [] {
 
 export def command-exists [c] {
     try {
-        command -v $c
+        command -v $c out> /dev/null
         true
     } catch {
         false

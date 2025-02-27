@@ -455,6 +455,7 @@ when = "w -h | awk '{print $6}' | grep 'sshd' | wc -l | xargs -I{} -- test {} -g
 symbol = "SSH "
 format = '⋅ [$symbol($output )]($style)'
 style = " grey"
+disabled = true
 
 [shell]
 bash_indicator = 'bash'

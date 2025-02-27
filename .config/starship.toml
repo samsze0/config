@@ -63,6 +63,7 @@ $gcloud\
 $azure\
 $direnv\
 $env_var\
+$shell\
 $custom\
 $hostname\
 $localip\
@@ -74,7 +75,6 @@ $jobs\
 $time\
 $status\
 $os\
-$shell\
 $character
 """
 
@@ -456,3 +456,13 @@ symbol = "SSH "
 format = '⋅ [$symbol($output )]($style)'
 style = " grey"
 
+[shell]
+bash_indicator = 'bash'
+zsh_indicator = 'zsh'
+nu_indicator = 'nu'
+fish_indicator = '󰈺'
+format = '⋅ [$indicator ]($style)'
+powershell_indicator = '_'
+unknown_indicator = '?'
+style = ' bright-black'
+disabled = false

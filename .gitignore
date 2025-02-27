@@ -65,6 +65,9 @@
 !.config/kitty/
 !.config/kitty/**
 
+!.config/nushell/
+!.config/nushell/**
+
 !.config/lf/
 !.config/lf/**
 

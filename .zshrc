@@ -202,6 +202,7 @@ export SHELL="$(which zsh)"
 export PAGER="less"
 export EDITOR="nvim"
 export MANPAGER="nvim +Man\!" # https://neovim.io/doc/user/filetype.html#ft-man-plugin
+export XDG_CONFIG_HOME="$HOME/.config"
 
 # man locale
 # locale -a to list all available locales

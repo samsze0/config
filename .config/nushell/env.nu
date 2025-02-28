@@ -231,5 +231,6 @@ $env.config = {
 }
 
 alias w = w-columns
+alias v = nvim
 alias f = yazi
 alias c = code

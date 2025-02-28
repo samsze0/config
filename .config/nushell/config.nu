@@ -2,9 +2,6 @@ use lib.nu *
 use std log
 use std "path add"
 
-path add /usr/local/bin
-path add ~/.cargo/bin
-
 let os = uname | get kernel-name
 
 if $os == "Darwin" {
@@ -16,6 +13,10 @@ if $os == "Darwin" {
     $env.HOMEBREW_PREFIX = $homebrew_prefix
     $env.HOMEBREW_CELLAR = ($homebrew_prefix | path join "Cellar")
 }
+
+# Higher precedence than brew
+path add /usr/local/bin
+path add ~/.cargo/bin
 
 if (command-exists fzf) {
     let fzf_colors = {

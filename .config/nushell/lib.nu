@@ -3,10 +3,5 @@ export def w-columns [] {
 }
 
 export def command-exists [c] {
-    try {
-        command -v $c out> /dev/null
-        true
-    } catch {
-        false
-    }
+    (which $c | length) > 0
 }

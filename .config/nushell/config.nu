@@ -238,3 +238,5 @@ alias c = code
 alias v = nvim
 
 alias git-wip = git stash push -m "WIP" --all --include-untracked
+
+alias sshs = env TERM="xterm-256color" sshs

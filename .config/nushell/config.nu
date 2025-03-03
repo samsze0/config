@@ -238,5 +238,9 @@ alias c = code
 alias v = nvim
 
 alias git-wip = git stash push -m "WIP" --all --include-untracked
+def git-branch-publish [] {
+    let branch = git branch --show-current
+    git push --set-upstream origin $branch
+}
 
 alias sshs = env TERM="xterm-256color" sshs

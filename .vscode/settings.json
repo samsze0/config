@@ -3,6 +3,7 @@
         "**/lf/lfrc": "properties",
         "**/lf/colors": "properties",
         "**/lf/icons": "properties",
+        "**/brew-bundles/*": "properties"
     },
     "explorer.excludeGitIgnore": false,
     "search.exclude": {

@@ -259,5 +259,8 @@ $env.git.profiles = {
 }
 
 alias brew-bundle-install = brew bundle install --no-upgrade --file=(brew-bundle-path-interactive-select)
-alias brew-bundle-dump = brew bundle dump --force --file=($env.brew.bundle.dir | path join full)
+alias brew-bundle-dump = brew bundle dump --describe --force --no-vscode --file=($env.brew.bundle.dir | path join full)
 alias brew-bundle-check = brew bundle check --file=(brew-bundle-path-interactive-select)
+alias brew-bundle-cleanup = brew bundle cleanup --force --file=(brew-bundle-path-interactive-select)
+alias brew-bundle-formula-list = brew bundle list --formula --file=(brew-bundle-path-interactive-select)
+alias brew-bundle-cask-list = brew bundle list --casks --file=(brew-bundle-path-interactive-select)

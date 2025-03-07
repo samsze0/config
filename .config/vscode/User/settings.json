@@ -80,7 +80,7 @@
   "editor.fontFamily": "'Liga SFMono Nerd Font', Arial, Meno, monospace",
   "files.autoSave": "afterDelay",
   "pasteImage.basePath": "${projectRoot}",
-  "cursor.cpp.disabledLanguages": ["plaintext", "scminput", "yaml"],
+  "cursor.cpp.disabledLanguages": [],
   "workbench.activityBar.location": "top",
   "editor.inlineSuggest.suppressSuggestions": true,
   "workbench.colorTheme": "Artizon Dark Theme",

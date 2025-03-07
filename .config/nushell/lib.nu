@@ -82,3 +82,43 @@ export def brew-bundle-path-interactive-select [] {
 
     [$bundle_dir, (ls --short-names $bundle_dir | get name | input list)] | path join
 }
+
+export def which-all [command] {
+    for $dir in ($env.PATH) {
+        fd --maxdepth 1 --type executable --type symlink --glob $command $dir
+    }
+}
+
+export def git-profile-set [] {
+    let profile_dir = $env.git.profiles.dir
+    mkdir $profile_dir
+
+    let profile_name = ls --short-names $profile_dir | get name | input list
+    let profile = ([$profile_dir, $profile_name] | path join) | open | from yaml
+
+    git config --local user.name $profile.name
+    git config --local user.email $profile.email
+}
+
+export def git-profile-list [] {
+    let profile_dir = $env.git.profiles.dir
+    ls --short-names $profile_dir | get name
+}
+
+export def git-profile-create [profile_name] {
+    let profile_dir = $env.git.profiles.dir
+    mkdir $profile_dir
+
+    mut profile = {}
+
+    $profile.name = (input "Name: ") | str trim
+    $profile.email = (input "Email: ") | str trim
+
+    $profile | to yaml | save --force ([$profile_dir, $profile_name] | path join)
+}
+
+export def git-profile-show [] {
+    let profile_dir = $env.git.profiles.dir
+    let profile_name = git-profile-list | input list
+    ([$profile_dir, $profile_name] | path join) | open | from yaml
+}

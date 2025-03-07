@@ -35,7 +35,8 @@ export def kitty-session-save [] {
     for $tab in $tabs {
         $session_str = $session_str | append ""
         $session_str = $session_str | append $"new_tab ($tab.title)"
-        $session_str = $session_str | append $"layout ($tab.layout)"
+        # $session_str = $session_str | append $"layout ($tab.layout)"
+        $session_str = $session_str | append $"layout fat"
 
         let windows = $tab.windows
         if ($windows | length) > 0 {

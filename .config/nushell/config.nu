@@ -238,9 +238,14 @@ alias c = code
 alias v = nvim
 
 alias git-wip = git stash push -m "WIP" --all --include-untracked
-def git-branch-publish [] {
+alias git-branch-publish = do {
     let branch = git branch --show-current
     git push --set-upstream origin $branch
 }
 
 alias sshs = env TERM="xterm-256color" sshs
+
+$env.kitty.session = {
+    dir: $"($env.XDG_DATA_HOME)/kitty/sessions"
+    date_format: "%Y-%m-%d-%H-%M"
+}

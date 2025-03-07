@@ -21,11 +21,15 @@ export def install-plugins [] {
 }
 
 export def kitty-session-save [] {
-    let current_os_window = kitten @ls | from json | where is_focused | first
-    mkdir $"($env.XDG_DATA_HOME)/kitty/sessions/"
-    let path = $"($env.XDG_DATA_HOME)/kitty/sessions/(date now | format date "%Y-%m-%d-%H-%M")"
+    let session_dir = $env.kitty.session.dir
+    mkdir $session_dir
+    let date_format = $env.kitty.session.date_format
 
-    mut session_str = ["new_os_window"]
+    let current_os_window = kitten @ls | from json | where is_focused | first
+    let path = [$session_dir, (date now | format date $date_format)] | path join
+    let path_last_session = [$session_dir, "last-session"] | path join
+
+    mut session_str = []
 
     let tabs = $current_os_window.tabs
     for $tab in $tabs {
@@ -45,17 +49,28 @@ export def kitty-session-save [] {
     }
 
     $session_str | str join "\n" | save --force $path
+    $session_str | str join "\n" | save --force $path_last_session
 
     open $path
 }
 
-export def kitty-session-load [] {
-    let session_dir = $"($env.XDG_DATA_HOME)/kitty/sessions"
-    let date_format = "%Y-%m-%d-%H-%M"
+export def kitty-session-load [--interactive(-i)] {
+    let session_dir = $env.kitty.session.dir
+    let date_format = $env.kitty.session.date_format
 
-    let all_sessions = ls --short-names $session_dir | get name | into datetime --format $date_format | sort --reverse | format date $date_format
-    let latest_session = $all_sessions | first
+    let all_sessions = ls --short-names $session_dir | where name != "last-session" | get name | into datetime --format $date_format | sort --reverse | format date $date_format
+    let session = match $interactive {
+        true => { if ($all_sessions | length) > 0 { $all_sessions | input list } else { error make { msg: "No sessions found" } } }
+        false => { $all_sessions | first }
+    }
 
-    let path = [$session_dir, $latest_session] | path join
+    let path = [$session_dir, $session] | path join
     kitty --session $path
+}
+
+export def kitty-session-path [] {
+    let session_dir = $env.kitty.session.dir
+    let path_last_session = [$session_dir, "last-session"] | path join
+
+    $path_last_session
 }

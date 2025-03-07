@@ -1,0 +1,371 @@
+tap "azure/functions"
+tap "homebrew/bundle"
+tap "homebrew/services"
+tap "koekeishiya/formulae"
+tap "localsend/localsend"
+tap "nikitabobko/tap"
+tap "shaunsingh/sfmono-nerd-font-ligaturized"
+tap "spring-io/tap"
+# Run your GitHub Actions locally
+brew "act"
+# Simple, modern, secure file encryption
+brew "age"
+# Official Amazon AWS command-line interface
+brew "awscli"
+# Microsoft Azure CLI 2.0
+brew "azure-cli"
+# Bourne-Again SHell, a UNIX command interpreter
+brew "bash"
+# Platform built on V8 to build network applications
+brew "node"
+# Language Server for Bash
+brew "bash-language-server"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Secure and free password manager for all of your devices
+brew "bitwarden-cli"
+# Version manager for neovim
+brew "bob"
+# Yet another cross-platform graphical process/system monitor
+brew "bottom"
+# Multi-shell multi-command argument completer
+brew "carapace"
+# Library to render SVG files using Cairo
+brew "librsvg"
+# Versatile and fast Unicode/ASCII/ANSI graphics renderer
+brew "chafa"
+# Cross-platform make
+brew "cmake"
+# Command-line tool to manage cert-manager
+brew "cmctl"
+# Dependency manager for Cocoa projects
+brew "cocoapods"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
+# Securely send things from one computer to another
+brew "croc"
+# Get a file from an HTTP, HTTPS or FTP server
+brew "curl"
+# Modern diagram scripting language that turns text to diagrams
+brew "d2"
+# Secure runtime for JavaScript and TypeScript
+brew "deno"
+# Pack, ship and run any application as a lightweight container
+brew "docker"
+# Tool for managing dock items
+brew "dockutil"
+# Disk Usage/Free Utility - a better 'df' alternative
+brew "duf"
+# Command-line DNS Client for Humans
+brew "doggo"
+# Collection of reusable C++ library artifacts developed at Facebook
+brew "folly"
+# C++14 implementation of the TLS-1.3 standard
+brew "fizz"
+# Modular, composable client/server abstractions framework
+brew "wangle"
+# Facebook's branch of Apache Thrift, including a new C++ server
+brew "fbthrift"
+# Thrift functions for querying information from a service
+brew "fb303"
+# AST-based pattern checker for JavaScript
+brew "eslint"
+# Perl lib for reading and writing EXIF metadata
+brew "exiftool"
+# Modern, maintained replacement for ls
+brew "eza"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
+# Play, record, convert, and stream audio and video
+brew "ffmpeg"
+# Create thumbnails for your video files
+brew "ffmpegthumbnailer"
+# I/O benchmark and stress test
+brew "fio"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# GitHub command-line tool
+brew "gh"
+# Distributed revision control system
+brew "git"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
+# GNU implementation of the famous stream editor
+brew "gnu-sed"
+# Pure Go implementation of jq
+brew "gojq"
+# Fast linters runner for Go
+brew "golangci-lint"
+# Language server for the Go language
+brew "gopls"
+# Deliver Go binaries as fast and easily as possible
+brew "goreleaser"
+# Gorgeous metric visualizations and dashboards for timeseries databases
+brew "grafana"
+# Kubernetes package manager
+brew "helm"
+# Tools and libraries to manipulate images in many formats
+brew "imagemagick"
+# CLI wrapper for basic network utilities on macOS - ip command
+brew "iproute2mac"
+# Java language specific implementation of the Language Server Protocol
+brew "jdtls"
+# Run local Kubernetes cluster in Docker
+brew "kind"
+# Kubernetes command-line interface
+brew "kubernetes-cli"
+# TUI tool for monitoring and exploration of Kubernetes resources
+brew "kubetui"
+# Lazier way to manage everything docker
+brew "lazydocker"
+# Pager program similar to more
+brew "less"
+# Count lines of code quickly
+brew "loc"
+# Horizontally-scalable, highly-available log aggregation system
+brew "loki"
+# Powerful, lightweight programming language
+brew "lua"
+# Language Server for the Lua language
+brew "lua-language-server"
+# Just-In-Time Compiler (JIT) for the Lua programming language
+brew "luajit"
+# Utility for directing compilation
+brew "make"
+# Language Server Protocol for Markdown
+brew "marksman"
+# Mac App Store command-line interface
+brew "mas"
+# High Performance, Kubernetes Native Object Storage
+brew "minio"
+# Replacement for ls, cp and other commands for object storage
+brew "minio-mc"
+# Experimental optional static type checker for Python
+brew "mypy"
+# Open source relational database management system
+brew "mysql"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
+# Port scanning utility for large networks
+brew "nmap"
+# Modern shell for the GitHub era
+brew "nushell"
+# Manage multiple Node.js versions
+brew "nvm"
+# OpenShift command-line interface tools
+brew "openshift-cli"
+# Fast, disk space efficient package manager
+brew "pnpm"
+# Quick and easy command-line file transfer utility from any computer to another
+brew "portal"
+# Object-relational database system
+brew "postgresql", restart_service: :changed
+# Code formatter for JavaScript, CSS, JSON, GraphQL, Markdown, YAML
+brew "prettier"
+# Service monitoring system and time series database
+brew "prometheus"
+# Log agent for Loki
+brew "promtail"
+# Cloud native development platform
+brew "pulumi"
+# Monitor data's progress through a pipe
+brew "pv"
+# Python version management
+brew "pyenv"
+# Static type checker for Python
+brew "pyright"
+# Tools for and transforming and inspecting PDF files
+brew "qpdf"
+# Ruby version manager
+brew "rbenv"
+# Persistent key-value database, with built-in net interface
+brew "redis", restart_service: :changed
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
+# Utility that provides fast incremental file transfer
+brew "rsync"
+# Language Server Protocol implementation for Ruff
+brew "ruff-lsp"
+# Experimental Rust compiler front-end for IDEs
+brew "rust-analyzer"
+# Rust toolchain installer
+brew "rustup"
+# Libev port of shadowsocks
+brew "shadowsocks-libev"
+# Static analysis and lint tool, for (ba)sh scripts
+brew "shellcheck"
+# Autoformat shell script source code
+brew "shfmt"
+# SMART hard drive monitoring
+brew "smartmontools"
+# Modern alternative network traffic sniffer
+brew "sniffer"
+# Cross-platform application to monitor your network traffic
+brew "sniffnet"
+# Command-line interface for https://speedtest.net bandwidth tests
+brew "speedtest-cli"
+# Graphical command-line client for SSH
+brew "sshs"
+# Cross-shell prompt for astronauts
+brew "starship"
+# Opinionated Lua code formatter
+brew "stylua"
+# Open source continuous file synchronization application
+brew "syncthing"
+# LSP for TailwindCSS
+brew "tailwindcss-language-server"
+# TOML toolkit written in Rust
+brew "taplo"
+# User interface to the TELNET protocol
+brew "telnet"
+# Display images in a terminal using block graphic characters
+brew "terminalimageviewer"
+# Network analyzer and capture tool - without graphical user interface
+brew "wireshark", link: false
+# Terminal UI for tshark, inspired by Wireshark
+brew "termshark"
+# Tool to build, change, and version infrastructure
+brew "terraform"
+# Terraform Language Server
+brew "terraform-ls"
+# Linter for Terraform files
+brew "tflint"
+# Simplified and community-driven man pages
+brew "tldr"
+# Terminal multiplexer
+brew "tmux"
+# CLI tool that moves files or folder to the trash
+brew "trash", link: true
+# Language Server Protocol implementation for TypeScript wrapping tsserver
+brew "typescript-language-server"
+# Markup-based typesetting system
+brew "typst"
+# Extremely fast Python package installer and resolver, written in Rust
+brew "uv"
+# Language servers for HTML, CSS, JavaScript, and JSON extracted from vscode
+brew "vscode-langservers-extracted"
+# Sends magic packets to wake up network-devices
+brew "wakeonlan"
+# Executes a program periodically, showing output fullscreen
+brew "watch"
+# Watch files and take action when they change
+brew "watchman"
+# Internet file retriever
+brew "wget"
+# Userspace Go implementation of WireGuard
+brew "wireguard-go"
+# Language Server for Yaml Files
+brew "yaml-language-server"
+# Blazing fast terminal file manager written in Rust, based on async I/O
+brew "yazi"
+# Process YAML, JSON, XML, CSV and properties documents from the CLI
+brew "yq"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+# UNIX shell (command interpreter)
+brew "zsh"
+# Azure Functions Core Tools 4.0
+brew "azure/functions/azure-functions-core-tools@4"
+# Password manager that keeps all passwords secure behind one password
+cask "1password"
+# Command-line interface for 1Password
+cask "1password-cli"
+# AeroSpace is an i3-like tiling window manager for macOS
+cask "aerospace"
+# iOS App Store alternative
+cask "altserver"
+# 3D creation suite
+cask "blender"
+# Web browser focusing on privacy
+cask "brave-browser"
+# Screen capturing tool
+cask "cleanshot"
+# Write, edit, and chat about your code with AI
+cask "cursor"
+# Teamwork app by Alibaba Group
+cask "dingtalk"
+# Voice and text chat software
+cask "discord"
+# App to build and share containerised applications and microservices
+cask "docker"
+# Web browser
+cask "firefox@developer-edition"
+cask "font-sf-mono-nerd-font-ligaturized"
+# Convert RAW images captured with Fujifilm cameras
+cask "fujifilm-x-raw-studio"
+# Web browser
+cask "google-chrome"
+# Free and open-source media player
+cask "iina"
+# Tool for multi-language users
+cask "input-source-pro"
+# Keyboard customiser
+cask "karabiner-elements"
+# Open-source keystroke visualiser
+cask "keycastr"
+# GPU-based terminal emulator
+cask "kitty"
+# An open source cross-platform alternative to AirDrop
+cask "localsend"
+# Cable-free audio router
+cask "loopback"
+# Clipboard manager
+cask "maccy"
+# Open-source software for live streaming and screen recording
+cask "obs"
+# Client program for the OpenVPN Access Server
+cask "openvpn-connect"
+# Tool to create and manage Outline servers, powered by Shadowsocks
+cask "outline-manager"
+# Monitors computer mic and webcam
+cask "oversight"
+# VPN client focusing on security
+cask "protonvpn"
+# HTTP debugging proxy
+cask "proxyman"
+# Peer to peer Bitorrent client
+cask "qbittorrent"
+# Imaging utility to install operating systems to a microSD card
+cask "raspberry-pi-imager"
+# GUI for streamlined Redis application development
+cask "redis-insight"
+# Screen recorder and editor
+cask "screen-studio"
+# Instant messaging application focusing on security
+cask "signal"
+# Open source cross-platform file explorer
+cask "spacedrive"
+# Music streaming service
+cask "spotify"
+# Network toolbox
+cask "surge"
+# Mesh VPN based on WireGuard
+cask "tailscale"
+# Messaging app with a focus on speed and security
+cask "telegram"
+# Open-source code editor
+cask "visual-studio-code"
+# Rust-based terminal
+cask "warp"
+# Terminal emulator
+cask "wave"
+# Free messaging and calling application
+cask "wechat"
+# Connect to Windows
+cask "windows-app"
+# Network protocol analyzer
+cask "wireshark"
+mas "Adobe Lightroom", id: 1451544217
+mas "ColorSlurp", id: 1287239339
+mas "Compressor", id: 424390742
+mas "Dark Noise", id: 1465439395
+mas "Final Cut Pro", id: 424389933
+mas "Keynote", id: 409183694
+mas "Klack", id: 6446206067
+mas "Logic Pro", id: 634148309
+mas "MainStage", id: 634159523
+mas "Microsoft Excel", id: 462058435
+mas "Microsoft Word", id: 462054704
+mas "Motion", id: 434290957
+mas "Outline", id: 1356178125
+mas "WireGuard", id: 1451685025

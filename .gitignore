@@ -1,8 +1,5 @@
 *
 
-!.Brewfile
-!.Brewfile.dev
-!.Brewfile.full
 !.Brewfile.lock.json
 
 !.gitignore
@@ -88,3 +85,6 @@
 
 !.config/vscode/
 !.config/vscode/**
+
+!.config/brew-bundles/
+!.config/brew-bundles/**

@@ -75,3 +75,10 @@ export def kitty-session-path [] {
 
     $path_last_session
 }
+
+export def brew-bundle-path-interactive-select [] {
+    let bundle_dir = $env.brew.bundle.dir
+    mkdir $bundle_dir
+
+    [$bundle_dir, (ls --short-names $bundle_dir | get name | input list)] | path join
+}

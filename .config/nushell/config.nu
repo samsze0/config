@@ -249,3 +249,11 @@ $env.kitty.session = {
     dir: $"($env.XDG_DATA_HOME)/kitty/sessions"
     date_format: "%Y-%m-%d-%H-%M"
 }
+
+$env.brew.bundle = {
+    dir: $"($env.XDG_CONFIG_HOME)/brew-bundles"
+}
+
+alias brew-bundle-install = brew bundle install --no-upgrade --file=(brew-bundle-path-interactive-select)
+alias brew-bundle-dump = brew bundle dump --force --file=($env.brew.bundle.dir | path join full)
+alias brew-bundle-check = brew bundle check --file=(brew-bundle-path-interactive-select)

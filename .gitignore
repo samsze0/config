@@ -86,5 +86,8 @@
 !.config/vscode/
 !.config/vscode/**
 
+!.config/zed/
+!.config/zed/**
+
 !.config/brew-bundles/
 !.config/brew-bundles/**

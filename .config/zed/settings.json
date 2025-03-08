@@ -1,0 +1,20 @@
+// https://zed.dev/docs/configuring-zed
+{
+  "icon_theme": "Material Icon Theme",
+  "telemetry": {
+    "diagnostics": true,
+    "metrics": false
+  },
+  "ui_font_size": 14,
+  "buffer_font_size": 13,
+  "terminal": {
+    "font_family": "Liga SFMono Nerd Font",
+    "cursor_shape": "bar"
+  },
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Github Dark Tritanopia"
+  },
+  "vim_mode": false
+}

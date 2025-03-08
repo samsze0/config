@@ -234,7 +234,8 @@ if (command-exists zoxide) {
 
 alias w = w-columns
 alias f = yazi
-alias c = code
+# alias c = code
+alias c = zed
 alias v = nvim
 
 alias git-wip = git stash push -m "WIP" --all --include-untracked

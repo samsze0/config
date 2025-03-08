@@ -1,0 +1,57 @@
+// https://zed.dev/docs/key-bindings
+[
+  {
+    "context": "Workspace",
+    "bindings": {}
+  },
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "cmd-shift-c": "workspace::CopyRelativePath",
+      "cmd-r": "project_panel::RevealInFileManager",
+      "cmd-n": "project_panel::NewFile",
+      "cmd-shift-n": "project_panel::NewDirectory",
+      "cmd-d": "project_panel::Duplicate"
+    }
+  },
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "escape": "project_panel::ToggleFocus"
+    }
+  },
+  {
+    "context": "Editor",
+    "bindings": {
+      // Workspace stuff
+      "f1": "command_palette::Toggle",
+      "f2": "project_panel::ToggleFocus",
+      "f3": "file_finder::Toggle",
+      "f4": "outline_panel::ToggleFocus",
+      "f12": "git_panel::ToggleFocus",
+      "cmd-shift-f": "pane::DeploySearch",
+      "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
+      // Pane stuff
+      "cmd-j": "pane::ActivatePreviousItem",
+      "cmd-l": "pane::ActivateNextItem",
+      "cmd-k cmd-p": "pane::TogglePinTab",
+      "cmd-k cmd-w": ["pane::CloseAllItems", { "close_pinned": false }],
+      // Editor stuff
+      "shift-space": "editor::ShowCompletions",
+      "cmd-u": "editor::Hover",
+      "cmd-alt-y": "editor::DeleteLine",
+      "cmd-alt-g": "editor::DuplicateLineDown",
+      "cmd-alt-j": "editor::JoinLines",
+      "cmd-up": "editor::MoveLineUp",
+      "cmd-down": "editor::MoveLineDown",
+      "cmd-shift-up": "editor::AddSelectionAbove",
+      "cmd-shift-down": "editor::AddSelectionBelow",
+      "cmd-i up": "editor::Rename", // cmd-i cmd-e
+      "cmd-i cmd-i": "editor::GoToDefinition" // cmd-i cmd-i
+    }
+  },
+  {
+    "context": "Pane",
+    "bindings": {}
+  }
+]

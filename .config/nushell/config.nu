@@ -235,7 +235,7 @@ if (command-exists zoxide) {
 alias w = w-columns
 alias f = yazi
 # alias c = code
-alias c = zed
+alias c = zed-preview
 alias v = nvim
 
 alias git-wip = git stash push -m "WIP" --all --include-untracked
@@ -258,6 +258,10 @@ $env.brew.bundle = {
 $env.git.profiles = {
     dir: $"($env.XDG_DATA_HOME)/git-profiles"
 }
+
+# Zed: enable jupyter notebook feature
+# https://github.com/zed-industries/zed/pull/19756
+$env.LOCAL_NOTEBOOK_DEV = 1
 
 alias brew-bundle-install = brew bundle install --no-upgrade --file=(brew-bundle-path-interactive-select)
 alias brew-bundle-dump = brew bundle dump --describe --force --no-vscode --file=($env.brew.bundle.dir | path join full)

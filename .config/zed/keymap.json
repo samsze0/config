@@ -1,4 +1,6 @@
 // https://zed.dev/docs/key-bindings
+// Zed's contexts make up a tree, with the root being Workspace. Workspaces contain Panes and Panels, and Panes contain Editors.
+// Check context with: `debug: Open Key Context View`
 [
   {
     "context": "Workspace",
@@ -7,6 +9,19 @@
   {
     "context": "ProjectPanel",
     "bindings": {
+      // Workspace stuff
+      "f1": "command_palette::Toggle",
+      "f2": "project_panel::ToggleFocus",
+      "f3": "file_finder::Toggle",
+      "f4": "outline_panel::ToggleFocus",
+      "f5": "project_symbols::Toggle",
+      "f12": "git_panel::ToggleFocus",
+      "cmd-shift-f": "pane::DeploySearch",
+      "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
+      // Pane stuff
+      "cmd-shift-j": "workspace::ActivatePaneLeft",
+      "cmd-shift-l": "workspace::ActivatePaneRight",
+      // Project panel stuff
       "cmd-shift-c": "workspace::CopyRelativePath",
       "cmd-r": "project_panel::RevealInFileManager",
       "cmd-n": "project_panel::NewFile",
@@ -15,9 +30,20 @@
     }
   },
   {
-    "context": "ProjectPanel && not_editing",
+    "context": "GitPanel",
     "bindings": {
-      "escape": "project_panel::ToggleFocus"
+      // Workspace stuff
+      "f1": "command_palette::Toggle",
+      "f2": "project_panel::ToggleFocus",
+      "f3": "file_finder::Toggle",
+      "f4": "outline_panel::ToggleFocus",
+      "f5": "project_symbols::Toggle",
+      "f12": "git_panel::ToggleFocus",
+      "cmd-shift-f": "pane::DeploySearch",
+      "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
+      // Pane stuff
+      "cmd-shift-j": "workspace::ActivatePaneLeft",
+      "cmd-shift-l": "workspace::ActivatePaneRight"
     }
   },
   {
@@ -28,17 +54,19 @@
       "f2": "project_panel::ToggleFocus",
       "f3": "file_finder::Toggle",
       "f4": "outline_panel::ToggleFocus",
+      "f5": "project_symbols::Toggle",
       "f12": "git_panel::ToggleFocus",
       "cmd-shift-f": "pane::DeploySearch",
       "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
       // Pane stuff
+      "cmd-shift-j": "workspace::ActivatePaneLeft",
+      "cmd-shift-l": "workspace::ActivatePaneRight",
+      // Pane item/tab stuff
       "cmd-j": "pane::ActivatePreviousItem",
       "cmd-l": "pane::ActivateNextItem",
       "cmd-k cmd-p": "pane::TogglePinTab",
       "cmd-k cmd-w": ["pane::CloseAllItems", { "close_pinned": false }],
       // Editor stuff
-      "shift-space": "editor::ShowCompletions",
-      "cmd-u": "editor::Hover",
       "cmd-alt-y": "editor::DeleteLine",
       "cmd-alt-g": "editor::DuplicateLineDown",
       "cmd-alt-j": "editor::JoinLines",
@@ -46,12 +74,48 @@
       "cmd-down": "editor::MoveLineDown",
       "cmd-shift-up": "editor::AddSelectionAbove",
       "cmd-shift-down": "editor::AddSelectionBelow",
+      "cmd-alt-l": ["editor::SelectNext", { "replace_newest": false }],
+      "cmd-shift-alt-l": [
+        "editor::SelectPrevious",
+        { "replace_newest": false }
+      ],
+      "cmd-k cmd-r": "editor::ToggleSoftWrap",
+      // Editor stuff - LSP
+      "cmd-u": "editor::Hover",
+      "shift-space": "editor::ShowCompletions",
       "cmd-i up": "editor::Rename", // cmd-i cmd-e
-      "cmd-i cmd-i": "editor::GoToDefinition" // cmd-i cmd-i
+      "cmd-i cmd-i": "editor::GoToDefinition", // cmd-i cmd-i
+      "cmd-i cmd-r": "editor::FindAllReferences",
+      // Editor stuff - Git / hunk
+      "cmd-e": "editor::GoToPreviousHunk",
+      "cmd-d": "editor::GoToHunk",
+      "cmd-k cmd-u": "editor::ToggleSelectedDiffHunks",
+      // "cmd-d cmd-y": "git::StageAndNext",
+      // "cmd-d cmd-n": "git::UnstageAndNext",
+      "cmd-p": "git::ToggleStaged",
+      // Other
+      "cmd-k cmd-m": "markdown::OpenPreviewToTheSide"
     }
   },
   {
     "context": "Pane",
     "bindings": {}
+  },
+  {
+    "context": "MarkdownPreview",
+    "bindings": {
+      // Workspace stuff
+      "f1": "command_palette::Toggle",
+      "f2": "project_panel::ToggleFocus",
+      "f3": "file_finder::Toggle",
+      "f4": "outline_panel::ToggleFocus",
+      "f5": "project_symbols::Toggle",
+      "f12": "git_panel::ToggleFocus",
+      "cmd-shift-f": "pane::DeploySearch",
+      "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
+      // Pane stuff
+      "cmd-shift-j": "workspace::ActivatePaneLeft",
+      "cmd-shift-l": "workspace::ActivatePaneRight"
+    }
   }
 ]

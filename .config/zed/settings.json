@@ -16,5 +16,27 @@
     "light": "One Light",
     "dark": "Github Dark Tritanopia"
   },
-  "vim_mode": false
+  "vim_mode": false,
+  "active_pane_modifiers": {
+    "inactive_opacity": 1,
+    "border_size": 1
+  },
+  "experimental.theme_overrides": {
+    "panel.focused_border": "#cccccc"
+    // "version_control.added_background": "#ffffff",
+    // "version_control.modified_background": "#ffffff",
+    // "version_control.deleted_background": "#ffffff",
+    // "version_control.conflict_background": "#ffffff"
+  },
+  "hover_popover_delay": 200,
+  "multi_cursor_modifier": "alt",
+  "restore_on_startup": "none",
+  "show_completions_on_input": true,
+  "show_completion_documentation": true,
+  "auto_signature_help": true,
+  "show_edit_predictions": true,
+  "soft_wrap": "editor_width",
+  "features": {
+    "edit_prediction_provider": "zed"
+  }
 }

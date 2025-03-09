@@ -22,11 +22,13 @@
     "border_size": 1
   },
   "experimental.theme_overrides": {
-    "panel.focused_border": "#cccccc"
+    "panel.focused_border": "#cccccc",
     // "version_control.added_background": "#ffffff",
     // "version_control.modified_background": "#ffffff",
     // "version_control.deleted_background": "#ffffff",
-    // "version_control.conflict_background": "#ffffff"
+    // "version_control.conflict_background": "#ffffff",
+    "tab.active_background": "#293547",
+    "tab.inactive_background": "#000000"
   },
   "hover_popover_delay": 200,
   "multi_cursor_modifier": "alt",

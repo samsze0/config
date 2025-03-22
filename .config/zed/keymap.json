@@ -83,8 +83,8 @@
       // Editor stuff - LSP
       "cmd-u": "editor::Hover",
       "shift-space": "editor::ShowCompletions",
-      "cmd-i up": "editor::Rename", // cmd-i cmd-e
-      "cmd-i cmd-i": "editor::GoToDefinition", // cmd-i cmd-i
+      "cmd-i cmd-e": "editor::Rename",
+      "cmd-i cmd-i": "editor::GoToDefinition",
       "cmd-i cmd-r": "editor::FindAllReferences",
       // Editor stuff - Git / hunk
       "cmd-e": "editor::GoToPreviousHunk",

@@ -38,6 +38,8 @@
   "auto_signature_help": true,
   "show_edit_predictions": true,
   "soft_wrap": "editor_width",
+  "format_on_save": "off",
+  "extend_comment_on_newline": false,
   "features": {
     "edit_prediction_provider": "zed"
   }

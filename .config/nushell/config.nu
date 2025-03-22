@@ -1,6 +1,9 @@
-use lib.nu *
+use mine *
 use std log
 use std "path add"
+
+# https://www.nushell.sh/book/configuration.html#nu-lib-dirs-constant
+# $env.NU_LIB_DIRS = $env.NU_LIB_DIRS | append ($nu.config-path | path dirname)
 
 let os = uname | get kernel-name
 

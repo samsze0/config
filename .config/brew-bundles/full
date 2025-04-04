@@ -106,6 +106,8 @@ brew "gitlab-runner"
 brew "gnu-sed"
 # GNU Pretty Good Privacy (PGP) package
 brew "gnupg"
+# Task is a task runner/build tool that aims to be simpler and easier to use
+brew "go-task"
 # Pure Go implementation of jq
 brew "gojq"
 # Fast linters runner for Go
@@ -186,6 +188,8 @@ brew "nvm"
 brew "openshift-cli"
 # Draw UML diagrams
 brew "plantuml"
+# Paste PNG into files
+brew "pngpaste"
 # Fast, disk space efficient package manager
 brew "pnpm"
 # Object-relational database system
@@ -321,6 +325,8 @@ cask "datagrip"
 cask "discord"
 # App to build and share containerised applications and microservices
 cask "docker"
+# Dictionary and translator app
+cask "easydict"
 # Web browser
 cask "firefox"
 # Web browser
@@ -394,6 +400,8 @@ cask "surge"
 cask "ubiquiti-unifi-controller"
 # Open-source code editor
 cask "visual-studio-code"
+# Utility for extracting text from images, videos, QR codes and barcodes
+cask "viz"
 # Rust-based terminal
 cask "warp"
 # Terminal emulator
@@ -406,6 +414,8 @@ cask "wezterm"
 cask "wireshark"
 # Multiplayer code editor
 cask "zed"
+# Multiplayer code editor
+cask "zed@preview"
 mas "ClashX", id: 6738605442
 mas "ColorSlurp", id: 1287239339
 mas "Dark Noise", id: 1465439395

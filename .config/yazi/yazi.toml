@@ -11,21 +11,23 @@ ratio = [1, 4, 3]
 [plugin]
 prepend_previewers = [
   # HEIC previewer
-  { mime = "image/heic", run = "heic" },
+  { mime = "image/{heic,jxl,svg+xml}", run = "magick" },
 ]
 
 [preview]
 max_width = 2000
 max_height = 2000
+image_quality = 50
 
 [opener]
 # https://yazi-rs.github.io/docs/configuration/yazi/#opener
-video = [{ run = 'iina "$@"', orphan = false, for = "macos", desc = "IINA" }]
+# Using open instead of something like iina
+video = [{ run = 'open "$@"', orphan = false, for = "macos", desc = "IINA" }]
 open = [
   { run = 'open "$@"', for = "macos", desc = "open" },
   { run = 'xdg-open "$@"', desc = "xdg-open" },
 ]
-fallback = [{ run = 'xdg-open "$@"', desc = "xdg-Open" }]
+fallback = [{ run = 'xdg-open "$@"', desc = "xdg-open" }]
 
 [open]
 prepend_rules = [{ name = "*.mp4", use = "video" }]

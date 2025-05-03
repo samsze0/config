@@ -78,13 +78,6 @@ $os\
 $character
 """
 
-
-# right_format = """
-# $sudo\
-# $memory_usage\
-# $username
-# """
-
 [battery]
 disabled = true
 
@@ -429,10 +422,19 @@ detect_extensions = ['zig']
 detect_files = []
 detect_folders = []
 
+[shell]
+bash_indicator = 'bash'
+zsh_indicator = 'zsh'
+nu_indicator = 'nu'
+fish_indicator = '󰈺'
+format = '⋅ [$indicator ]($style)'
+powershell_indicator = '_'
+unknown_indicator = '?'
+style = ' bright-black'
+disabled = false
+
 # https://starship.rs/config/#custom-commands
 # https://github.com/starship/starship/discussions/1252
-
-# [custom.os] over the built-in os module
 
 [custom.osx]
 command = 'arch'
@@ -447,23 +449,3 @@ symbol = ' '
 format = '⋅ [$symbol($output )]($style)'
 style = ' bright-black'
 when = '[[ "$(uname)" == "Linux" ]]'
-
-[custom.ssh_remote_conn]
-description = "show number of remote ssh connections"
-command = "w -h | awk '{print $6}' | grep 'sshd' | wc -l"
-when = "w -h | awk '{print $6}' | grep 'sshd' | wc -l | xargs -I{} -- test {} -gt 0"
-symbol = "SSH "
-format = '⋅ [$symbol($output )]($style)'
-style = " grey"
-disabled = true
-
-[shell]
-bash_indicator = 'bash'
-zsh_indicator = 'zsh'
-nu_indicator = 'nu'
-fish_indicator = '󰈺'
-format = '⋅ [$indicator ]($style)'
-powershell_indicator = '_'
-unknown_indicator = '?'
-style = ' bright-black'
-disabled = false

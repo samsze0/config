@@ -84,5 +84,8 @@
   "workbench.activityBar.location": "top",
   "editor.inlineSuggest.suppressSuggestions": true,
   "workbench.colorTheme": "Artizon Dark Theme",
-  "cursor.cmdk.useThemedDiffBackground": true
+  "cursor.cmdk.useThemedDiffBackground": true,
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  }
 }

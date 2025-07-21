@@ -391,6 +391,19 @@ detect_extensions = ['js', 'mjs', 'cjs', 'ts', 'mts', 'cts']
 detect_files = ['package.json', '.node-version', '.nvmrc']
 detect_folders = ['node_modules']
 
+[deno]
+disabled = false
+format = '⋅ [$symbol($version )]($style)'
+version_format = 'v${raw}'
+symbol = 'Deno '
+style = 'blue'
+detect_extensions = []
+detect_files = [
+    'deno.json',
+    'deno.jsonc'
+]
+detect_folders = []
+
 [swift]
 disabled = false
 format = '⋅ [$symbol($version )]($style)'

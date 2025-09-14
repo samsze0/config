@@ -307,14 +307,14 @@ const rules = [
     ],
   },
   {
-    // Google chrome prev/next tab
-    description: "Commnd J/L -> Ctrl (+ Shift) + Tab (Chrome)",
+    // Google chrome and Brave (nightly) prev/next tab
+    description: "Commnd J/L -> Ctrl (+ Shift) + Tab (Chrome and Brave nightly)",
     manipulators: [
       {
         conditions: [
           {
             type: "frontmost_application_if",
-            bundle_identifiers: ["com.google.Chrome"],
+            bundle_identifiers: ["com.google.Chrome", "com.brave.Browser.nightly"],
           },
         ],
         from: { key_code: "l", modifiers: { mandatory: ["left_command"] } },
@@ -328,7 +328,7 @@ const rules = [
         conditions: [
           {
             type: "frontmost_application_if",
-            bundle_identifiers: ["com.google.Chrome"],
+            bundle_identifiers: ["com.google.Chrome", "com.brave.Browser.nightly"],
           },
         ],
         from: { key_code: "j", modifiers: { mandatory: ["left_command"] } },

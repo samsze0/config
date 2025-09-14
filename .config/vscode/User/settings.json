@@ -87,5 +87,6 @@
   "cursor.cmdk.useThemedDiffBackground": true,
   "[markdown]": {
     "editor.wordWrap": "on"
-  }
+  },
+  "database-client.autoSync": true
 }

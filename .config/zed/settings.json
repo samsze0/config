@@ -1,5 +1,88 @@
 // https://zed.dev/docs/configuring-zed
 {
+  "assistant": {
+    "default_model": {
+      "provider": "zed.dev",
+      "model": "claude-3-5-sonnet-latest"
+    },
+    "version": "2"
+  },
+  "language_models": {
+    "anthropic": {
+      "version": "1",
+      "api_url": "http://192.168.1.226:8080/anthropic"
+    },
+    "openai": {
+      "version": "1",
+      "api_url": "http://192.168.1.226:8080/openai"
+    },
+    "ollama": {
+      "api_url": "http://192.168.1.211:11434",
+      "available_models": [
+        {
+          "name": "qwen2.5-coder",
+          "display_name": "qwen 2.5 coder 32K",
+          "max_tokens": 32768
+        }
+      ]
+    }
+  },
+  "ssh_connections": [
+    {
+      "host": "192.168.1.212",
+      "username": "root",
+      "projects": [
+        {
+          "paths": ["/etc/nixos"]
+        },
+        {
+          "paths": ["~/scrutiny"]
+        }
+      ]
+    },
+    {
+      "host": "192.168.1.2",
+      "username": "root",
+      "projects": [
+        {
+          "paths": ["/etc"]
+        },
+        {
+          "paths": ["/etc/pve"]
+        },
+        {
+          "paths": ["/mnt/pve"]
+        },
+        {
+          "paths": ["~/bin"]
+        }
+      ]
+    },
+    {
+      "host": "192.168.1.223",
+      "username": "root",
+      "projects": [
+        {
+          "paths": ["~/home-lab"]
+        },
+        {
+          "paths": ["~/homeassistant"]
+        }
+      ]
+    },
+    {
+      "host": "192.168.1.211",
+      "username": "root",
+      "projects": [
+        {
+          "paths": ["/etc/nixos"]
+        },
+        {
+          "paths": ["~/.ssh"]
+        }
+      ]
+    }
+  ],
   "icon_theme": "Material Icon Theme",
   "telemetry": {
     "diagnostics": true,

@@ -1,3 +1,9 @@
+# Config version for compatibility and deprecations
+config-version = 2
+
+# Start AeroSpace at login
+start-at-login = true
+
 # You can use it to add commands that run after login to macOS user session.
 # 'start-at-login' needs to be 'true' for 'after-login-command' to work
 # Available commands: https://nikitabobko.github.io/AeroSpace/commands
@@ -7,9 +13,6 @@ after-login-command = []
 # 'after-startup-command' is run after 'after-login-command'
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = []
-
-# Start AeroSpace at login
-start-at-login = true
 
 # Normalizations. See: https://nikitabobko.github.io/AeroSpace/guide#normalization
 enable-normalization-flatten-containers = true
@@ -21,24 +24,52 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 accordion-padding = 30
 
 # Possible values: tiles|accordion
-default-root-container-layout = 'tiles'
+# https://nikitabobko.github.io/AeroSpace/guide#layouts
+default-root-container-layout = 'accordion'
 
 # Possible values: horizontal|vertical|auto
 # 'auto' means: wide monitor (anything wider than high) gets horizontal orientation,
 #               tall monitor (anything higher than wide) gets vertical orientation
-default-root-container-orientation = 'auto'
+default-root-container-orientation = 'vertical'
 
 # Mouse follows focus when focused monitor changes
 # Drop it from your config, if you don't like this behavior
 # See https://nikitabobko.github.io/AeroSpace/guide#on-focus-changed-callbacks
 # See https://nikitabobko.github.io/AeroSpace/commands#move-mouse
-# Fallback value (if you omit the key): on-focused-monitor-changed = []
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
-automatically-unhide-macos-hidden-apps = false
+automatically-unhide-macos-hidden-apps = true
+
+# A callback that runs every time binding mode changes
+# See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
+# See: https://nikitabobko.github.io/AeroSpace/commands#mode
+on-mode-changed = []
+
+# List of workspaces that should stay alive even when they contain no windows,
+# even when they are invisible.
+# This config version is only available since 'config-version = 2'
+# Fallback value (if you omit the key): persistent-workspaces = []
+persistent-workspaces = [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+]
+
+# In TOML, single square brackets [] define a table (like a dictionary or map) 
+# Nested Tables: Use dot notation within single brackets to create nested structures.
+# E.g. [mode.main.binding]
 
 # Possible values: (qwerty|dvorak)
 # See https://nikitabobko.github.io/AeroSpace/guide#key-mapping
@@ -54,18 +85,15 @@ preset = 'qwerty'
 #                 See: https://nikitabobko.github.io/AeroSpace/guide#assign-workspaces-to-monitors
 [gaps]
 inner.horizontal = 4
-inner.vertical =   4
-outer.left =       8
-outer.bottom =     8
-outer.top =        8
-outer.right =      8
+inner.vertical = 4
+outer.left = 8
+outer.bottom = 8
+outer.top = 8
+outer.right = 8
 
-# 'main' binding mode declaration
-# See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
-# 'main' binding mode must be always presented
-# Fallback value (if you omit the key): mode.main.binding = {}
-[mode.main.binding]
-
+# Key bindings
+# All possible modifiers: cmd, alt, ctrl, shift
+# All possible commands: https://nikitabobko.github.io/AeroSpace/commands
 # All possible keys:
 # - Letters.        a, b, c, ..., z
 # - Numbers.        0, 1, 2, ..., 9
@@ -77,23 +105,17 @@ outer.right =      8
 #                   keypadMinus, keypadMultiply, keypadPlus
 # - Arrows.         left, down, up, right
 
-# All possible modifiers: cmd, alt, ctrl, shift
-
-# All possible commands: https://nikitabobko.github.io/AeroSpace/commands
-
-# See: https://nikitabobko.github.io/AeroSpace/commands#exec-and-forget
-# You can uncomment the following lines to open up terminal with alt + enter shortcut (like in i3)
-# alt-enter = '''exec-and-forget osascript -e '
-# tell application "Terminal"
-#     do script
-#     activate
-# end tell'
-# '''
-
+# 'main' binding mode declaration
+# See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
+[mode.main.binding]
 # See: https://nikitabobko.github.io/AeroSpace/commands#layout
-# ctrl-alt-cmd-slash = 'layout tiles horizontal vertical'
-ctrl-alt-cmd-slash = 'layout floating tiling'
-# ctrl-alt-cmd-comma = 'layout accordion horizontal vertical'
+# Switch to tiles layout. Toggle the layout orientation if already in tiles layout:
+ctrl-alt-cmd-slash = 'layout tiles horizontal vertical'
+# Switch to accordion layout. Toggle the layout orientation if already in accordion layout:
+ctrl-alt-cmd-period = 'layout accordion horizontal vertical'
+# Switch between floating and accordion layout
+# FIX: somehow cannot swtich back to accordion or tiling layout once the window has become floating
+# ctrl-alt-cmd-comma = 'layout floating accordion'
 
 # See: https://nikitabobko.github.io/AeroSpace/commands#focus
 ctrl-alt-cmd-s = 'focus left'
@@ -153,11 +175,6 @@ ctrl-alt-cmd-l = 'focus-monitor right'
 # ctrl-alt-cmd-pagedown = 'move-node-to-monitor down'
 # ctrl-alt-cmd-end = 'move-node-to-monitor right'
 
-# See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
-# alt-tab = 'workspace-back-and-forth'
-# See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
-# alt-shift-tab = 'move-workspace-to-monitor --wrap-around next'
-
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
 ctrl-alt-cmd-semicolon = 'mode misc'
 
@@ -176,15 +193,62 @@ l = ['move-node-to-monitor right', 'mode main']
 # e = ['join-with up', 'mode main']
 # f = ['join-with right', 'mode main']
 
-# f = ['flatten-workspace-tree', 'mode main'] # reset layout
-# f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
+semicolon = ['flatten-workspace-tree', 'mode main'] # reset layout
 
-# backspace = ['close-all-windows-but-current', 'mode main']
+# Callbacks
+# https://nikitabobko.github.io/AeroSpace/guide#callbacks
+# https://nikitabobko.github.io/AeroSpace/goodies#popular-apps-ids
+# Or use `aerospace list-apps` to find the app-id
 
-# sticky is not yet supported https://github.com/nikitabobko/AeroSpace/issues/2
-# s = ['layout sticky tiling', 'mode main']
+# Arrays of Tables: [[fruit]] creates a table named "fruit," and repeating it
+# adds new entries to an array, each becoming a distinct table element.
 
 # Make all windows floats by default
+# [[on-window-detected]]
+# check-further-callbacks = true
+# run = ['layout floating']
+
 [[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+if.during-aerospace-startup = true
 check-further-callbacks = true
-run = 'layout floating'
+run = ['layout floating']
+
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+if.during-aerospace-startup = true
+check-further-callbacks = true
+run = ['layout floating']
+
+[[on-window-detected]]
+if.window-title-regex-substring = 'obsidian'
+if.during-aerospace-startup = true
+check-further-callbacks = true
+run = 'move-node-to-workspace 9'
+
+[[on-window-detected]]
+if.app-id = 'net.kovidgoyal.kitty'
+if.during-aerospace-startup = true
+check-further-callbacks = true
+run = 'move-node-to-workspace 12'
+
+[[on-window-detected]]
+if.window-title-regex-substring = 'spotify'
+if.during-aerospace-startup = true
+check-further-callbacks = true
+run = 'move-node-to-workspace 5'
+
+[[on-window-detected]]
+if.window-title-regex-substring = 'protonvpn'
+if.during-aerospace-startup = true
+check-further-callbacks = true
+run = 'move-node-to-workspace 5'
+
+[[on-window-detected]]
+if.window-title-regex-substring = 'discord'
+if.during-aerospace-startup = true
+check-further-callbacks = true
+run = 'move-node-to-workspace 5'
+
+# [[on-window-detected]]
+# if.window-title-regex-substring = 'cursor'

@@ -208,46 +208,46 @@ semicolon = ['flatten-workspace-tree', 'mode main'] # reset layout
 # check-further-callbacks = true
 # run = ['layout floating']
 
+# Option to specific an array of app-ids, PR still open
+# https://github.com/nikitabobko/AeroSpace/pull/1665
+
+# if.during-aerospace-startup = 
+# If true then run the callback only during AeroSpace startup.
+# If false then run callback only NOT during AeroSpace startup.
+# If not specified then the condition isn’t checked
+
+# check-further-callbacks = 
+# Several callbacks can be declared in the config. The callbacks are processed
+# in the order they are declared. By default, the first callback that matches
+# the criteria is run, and further callbacks are not considered. (The behavior
+# can be overridden with check-further-callbacks option)
+
 [[on-window-detected]]
 if.app-id = 'com.apple.systempreferences'
-if.during-aerospace-startup = true
-check-further-callbacks = true
 run = ['layout floating']
 
 [[on-window-detected]]
 if.app-id = 'com.apple.finder'
-if.during-aerospace-startup = true
-check-further-callbacks = true
 run = ['layout floating']
 
 [[on-window-detected]]
 if.window-title-regex-substring = 'obsidian'
-if.during-aerospace-startup = true
-check-further-callbacks = true
 run = 'move-node-to-workspace 9'
 
 [[on-window-detected]]
 if.app-id = 'net.kovidgoyal.kitty'
-if.during-aerospace-startup = true
-check-further-callbacks = true
 run = 'move-node-to-workspace 12'
 
 [[on-window-detected]]
 if.window-title-regex-substring = 'spotify'
-if.during-aerospace-startup = true
-check-further-callbacks = true
 run = 'move-node-to-workspace 5'
 
 [[on-window-detected]]
 if.window-title-regex-substring = 'protonvpn'
-if.during-aerospace-startup = true
-check-further-callbacks = true
 run = 'move-node-to-workspace 5'
 
 [[on-window-detected]]
 if.window-title-regex-substring = 'discord'
-if.during-aerospace-startup = true
-check-further-callbacks = true
 run = 'move-node-to-workspace 5'
 
 # [[on-window-detected]]

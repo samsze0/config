@@ -9,6 +9,9 @@
 !README.md
 !OSX.md
 
+!readme_assets/
+!readme_assets/**
+
 !.aerospace.toml
 
 !.tmux.conf

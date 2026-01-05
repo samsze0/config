@@ -68,6 +68,7 @@ ln -s ~/.config/vscode/User User
 ```
 
 Configure Finder settings:
+
 ![](./readme_assets/finder-settings-1.png)
 ![](./readme_assets/finder-settings-2.png)
 ![](./readme_assets/finder-settings-3.png)

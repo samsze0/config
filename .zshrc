@@ -1,28 +1,10 @@
 # Custom lib
-. ~/.config/zsh/tailscale.sh
 . ~/.config/zsh/utils.sh
-. ~/.config/zsh/pandoc.sh
-. ~/.config/zsh/image.sh
-. ~/.config/zsh/browser.sh
-. ~/.config/zsh/kitty.sh
-. ~/.config/zsh/nix.sh
 . ~/.config/zsh/fzf.sh
-. ~/.config/zsh/socket.sh
-. ~/.config/zsh/unix.sh
-. ~/.config/zsh/git.sh
-. ~/.config/zsh/homebrew.sh
-. ~/.config/zsh/syncthing.sh
 . ~/.config/zsh/osx.sh
-. ~/.config/zsh/bat.sh
-. ~/.config/zsh/lemminx.sh
-. ~/.config/zsh/azure.sh
-. ~/.config/zsh/openssh.sh
-. ~/.config/zsh/android.sh
-. ~/.config/zsh/other-deps.sh
-. ~/.config/zsh/network.sh
-. ~/.config/zsh/redis.sh
-. ~/.config/zsh/nvim.sh
-. ~/.config/zsh/yazi.sh
+. ~/.config/zsh/git.sh
+. ~/.config/zsh/browser.sh
+. ~/.config/zsh/image.sh
 
 # zsh-autosuggestions
 # https://github.com/zsh-users/zsh-autosuggestions
@@ -179,11 +161,8 @@ alias fzf-man='man $(echo $(man -k . | fzf) | cut -d " " -f 1)'
 alias duf='duf -theme ansi'
 alias ll='eza -l'
 alias delta-diff='delta --raw'
-alias ts-get='tailscale_get'
-alias ts-send='tailscale_send'
 alias jq='gojq'
 alias v='nvim'
-alias lf='PAGER="nvim -RM" lf'
 alias f='yazi'
 alias c='code'
 

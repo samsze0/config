@@ -23,12 +23,10 @@
   "files.associations": {
     "*.pch": "cpp"
   },
-  "genieai.personalizedName": "Not AI",
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
   "gitlens.codeLens.enabled": false,
   "haskell.manageHLS": "PATH",
-  "javascript.inlayHints.enumMemberValues.enabled": true,
   "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
   "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
   "javascript.updateImportsOnFileMove.enabled": "always",
@@ -38,7 +36,7 @@
   "pasteImage.filePathConfirmInputBoxMode": "onlyName",
   "pasteImage.path": "${projectRoot}/assets",
   "pasteImage.showFilePathConfirmInputBox": true,
-  "python.languageServer": "Pylance",
+  "python.languageServer": "None",
   "rewrap.wrappingColumn": 80,
   "rust-analyzer.inlayHints.bindingModeHints.enable": true,
   "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "always",
@@ -58,21 +56,6 @@
   "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
   "typescript.inlayHints.variableTypes.enabled": true,
   "typescript.updateImportsOnFileMove.enabled": "always",
-  "vscode-color-picker.languages": [
-    "css",
-    "markdown",
-    "svg",
-    "yaml",
-    "qml",
-    "typescriptreact",
-    "python",
-    "javascript",
-    "typescript",
-    "xml",
-    "json",
-    "properties",
-    "lua"
-  ],
   "window.titleBarStyle": "custom",
   "workbench.iconTheme": "helium-icon-theme",
   "workbench.list.smoothScrolling": true,
@@ -80,13 +63,20 @@
   "editor.fontFamily": "'Liga SFMono Nerd Font', Arial, Meno, monospace",
   "files.autoSave": "afterDelay",
   "pasteImage.basePath": "${projectRoot}",
-  "cursor.cpp.disabledLanguages": [],
   "workbench.activityBar.location": "top",
   "editor.inlineSuggest.suppressSuggestions": true,
   "workbench.colorTheme": "Artizon Dark Theme",
-  "cursor.cmdk.useThemedDiffBackground": true,
   "[markdown]": {
     "editor.wordWrap": "on"
   },
-  "database-client.autoSync": true
+  "database-client.autoSync": true,
+  "[dockercompose]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  }
 }

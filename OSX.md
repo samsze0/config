@@ -1,4 +1,4 @@
-# macOS Setup Guide
+# Personal MacOS Setup Walkthrough
 
 ## Prerequisites
 

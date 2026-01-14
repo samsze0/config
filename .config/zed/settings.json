@@ -1,95 +1,15 @@
 // https://zed.dev/docs/configuring-zed
 {
-  "assistant": {
-    "default_model": {
-      "provider": "zed.dev",
-      "model": "claude-3-5-sonnet-latest"
-    },
-    "version": "2"
+  "git_panel": {
+    "tree_view": true
   },
-  "language_models": {
-    "anthropic": {
-      "version": "1",
-      "api_url": "http://192.168.1.226:8080/anthropic"
-    },
-    "openai": {
-      "version": "1",
-      "api_url": "http://192.168.1.226:8080/openai"
-    },
-    "ollama": {
-      "api_url": "http://192.168.1.211:11434",
-      "available_models": [
-        {
-          "name": "qwen2.5-coder",
-          "display_name": "qwen 2.5 coder 32K",
-          "max_tokens": 32768
-        }
-      ]
-    }
-  },
-  "ssh_connections": [
-    {
-      "host": "192.168.1.212",
-      "username": "root",
-      "projects": [
-        {
-          "paths": ["/etc/nixos"]
-        },
-        {
-          "paths": ["~/scrutiny"]
-        }
-      ]
-    },
-    {
-      "host": "192.168.1.2",
-      "username": "root",
-      "projects": [
-        {
-          "paths": ["/etc"]
-        },
-        {
-          "paths": ["/etc/pve"]
-        },
-        {
-          "paths": ["/mnt/pve"]
-        },
-        {
-          "paths": ["~/bin"]
-        }
-      ]
-    },
-    {
-      "host": "192.168.1.223",
-      "username": "root",
-      "projects": [
-        {
-          "paths": ["~/home-lab"]
-        },
-        {
-          "paths": ["~/homeassistant"]
-        }
-      ]
-    },
-    {
-      "host": "192.168.1.211",
-      "username": "root",
-      "projects": [
-        {
-          "paths": ["/etc/nixos"]
-        },
-        {
-          "paths": ["~/.ssh"]
-        }
-      ]
-    }
-  ],
   "icon_theme": "Material Icon Theme",
   "telemetry": {
-    "diagnostics": true,
-    "metrics": false
+    "diagnostics": false,
+    "metrics": false,
   },
-  "ui_font_size": 14,
-  "buffer_font_size": 13,
+  "ui_font_size": 15,
+  "buffer_font_size": 14,
   "terminal": {
     "font_family": "Liga SFMono Nerd Font",
     "cursor_shape": "bar"
@@ -106,16 +26,11 @@
   },
   "experimental.theme_overrides": {
     "panel.focused_border": "#cccccc",
-    // "version_control.added_background": "#ffffff",
-    // "version_control.modified_background": "#ffffff",
-    // "version_control.deleted_background": "#ffffff",
-    // "version_control.conflict_background": "#ffffff",
     "tab.active_background": "#293547",
-    "tab.inactive_background": "#000000"
+    "tab.inactive_background": "#000000",
   },
   "hover_popover_delay": 200,
   "multi_cursor_modifier": "alt",
-  "restore_on_startup": "none",
   "show_completions_on_input": true,
   "show_completion_documentation": true,
   "auto_signature_help": true,
@@ -124,6 +39,6 @@
   "format_on_save": "off",
   "extend_comment_on_newline": false,
   "features": {
-    "edit_prediction_provider": "zed"
+    "edit_prediction_provider": "copilot"
   }
 }

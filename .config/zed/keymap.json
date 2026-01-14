@@ -3,25 +3,21 @@
 // Check context with: `debug: Open Key Context View`
 [
   {
-    "context": "Workspace",
-    "bindings": {}
-  },
-  {
-    "context": "ProjectPanel",
     "bindings": {
-      // Workspace stuff
       "f1": "command_palette::Toggle",
       "f2": "project_panel::ToggleFocus",
+      "cmd-shift-e": "project_panel::ToggleFocus",
       "f3": "file_finder::Toggle",
-      "f4": "outline_panel::ToggleFocus",
+      "cmd-shift-o": "outline_panel::ToggleFocus",
       "f5": "project_symbols::Toggle",
       "f12": "git_panel::ToggleFocus",
       "cmd-shift-f": "pane::DeploySearch",
       "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
-      // Pane stuff
-      "cmd-shift-j": "workspace::ActivatePaneLeft",
-      "cmd-shift-l": "workspace::ActivatePaneRight",
-      // Project panel stuff
+    }
+  },
+  {
+    "context": "ProjectPanel",
+    "bindings": {
       "cmd-shift-c": "workspace::CopyRelativePath",
       "cmd-r": "project_panel::RevealInFileManager",
       "cmd-n": "project_panel::NewFile",
@@ -32,38 +28,16 @@
   {
     "context": "GitPanel",
     "bindings": {
-      // Workspace stuff
-      "f1": "command_palette::Toggle",
-      "f2": "project_panel::ToggleFocus",
-      "f3": "file_finder::Toggle",
-      "f4": "outline_panel::ToggleFocus",
-      "f5": "project_symbols::Toggle",
-      "f12": "git_panel::ToggleFocus",
-      "cmd-shift-f": "pane::DeploySearch",
-      "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
-      // Pane stuff
-      "cmd-shift-j": "workspace::ActivatePaneLeft",
-      "cmd-shift-l": "workspace::ActivatePaneRight"
     }
   },
   {
     "context": "Editor",
     "bindings": {
-      // Workspace stuff
-      "f1": "command_palette::Toggle",
-      "f2": "project_panel::ToggleFocus",
-      "f3": "file_finder::Toggle",
-      "f4": "outline_panel::ToggleFocus",
-      "f5": "project_symbols::Toggle",
-      "f12": "git_panel::ToggleFocus",
-      "cmd-shift-f": "pane::DeploySearch",
-      "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
-      // Pane stuff
-      "cmd-shift-j": "workspace::ActivatePaneLeft",
-      "cmd-shift-l": "workspace::ActivatePaneRight",
       // Pane item/tab stuff
       "cmd-j": "pane::ActivatePreviousItem",
       "cmd-l": "pane::ActivateNextItem",
+      "cmd-shift-j": "workspace::ActivatePaneLeft",
+      "cmd-shift-l": "workspace::ActivatePaneRight",
       "cmd-k cmd-p": "pane::TogglePinTab",
       "cmd-k cmd-w": ["pane::CloseAllItems", { "close_pinned": false }],
       // Editor stuff
@@ -90,8 +64,6 @@
       "cmd-e": "editor::GoToPreviousHunk",
       "cmd-d": "editor::GoToHunk",
       "cmd-k cmd-u": "editor::ToggleSelectedDiffHunks",
-      // "cmd-d cmd-y": "git::StageAndNext",
-      // "cmd-d cmd-n": "git::UnstageAndNext",
       "cmd-p": "git::ToggleStaged",
       // Other
       "cmd-k cmd-m": "markdown::OpenPreviewToTheSide"
@@ -100,22 +72,5 @@
   {
     "context": "Pane",
     "bindings": {}
-  },
-  {
-    "context": "MarkdownPreview",
-    "bindings": {
-      // Workspace stuff
-      "f1": "command_palette::Toggle",
-      "f2": "project_panel::ToggleFocus",
-      "f3": "file_finder::Toggle",
-      "f4": "outline_panel::ToggleFocus",
-      "f5": "project_symbols::Toggle",
-      "f12": "git_panel::ToggleFocus",
-      "cmd-shift-f": "pane::DeploySearch",
-      "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
-      // Pane stuff
-      "cmd-shift-j": "workspace::ActivatePaneLeft",
-      "cmd-shift-l": "workspace::ActivatePaneRight"
-    }
   }
 ]

@@ -361,6 +361,8 @@ cask "iina"
 cask "imageoptim"
 # Tool for multi-language users
 cask "input-source-pro"
+# Menu bar manager
+cask "jordanbaird-ice"
 # Keyboard customiser
 cask "karabiner-elements"
 # Open-source keystroke visualiser

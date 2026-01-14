@@ -1,5 +1,6 @@
 // https://zed.dev/docs/configuring-zed
 {
+  "lsp_document_colors": "background",
   "git_panel": {
     "tree_view": true
   },

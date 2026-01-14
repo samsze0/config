@@ -1,74 +1,104 @@
-# MacOS
+# macOS Setup Guide
 
-```bash
-# If were to install in custom dir. But this can cause issues
-# In zsh / bash
-mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
-```
+## Prerequisites
 
-Install command line developer tools
+### Install Command Line Developer Tools
+
 ```bash
 sudo xcode-select --install
 ```
 
-Setup system settings
+### Install Homebrew (Optional: Custom Directory)
+
+```bash
+# Standard installation (recommended)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Alternative: Custom directory installation (may cause issues)
+# mkdir homebrew && curl -L https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C homebrew && export PATH="$HOME/homebrew/bin:$PATH"
+```
+
+## System Configuration
+
+### Initialize System Settings
+
 ```bash
 osx_init
 ```
 
-Create symlink to iCloud:
+### Create iCloud Symlink
+
 ```bash
 ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud
 ```
 
-Install brew "packages"
+### Install Homebrew Packages
+
 ```bash
 # In nushell
 brew-bundle-install
 ```
 
-Karabiner:
+### Configure Karabiner-Elements
+
 ```bash
 cd ~/.config/karabiner && npx tsx config.ts
 ```
 
-Change default shell to nushell or brew's installation of zsh:
-https://www.nushell.sh/book/default_shell.html#setting-nu-as-default-shell-on-your-terminal
-```bash
-# To either
-# /opt/homebrew/bin/zsh
-# /opt/homebrew/bin/nu
-```
+## Optional: Custom Tool Builds
 
-Optional: Install custom builds of fzf and yazi:
+### fzf (Custom Build)
+
 ```bash
-# Inside fzf project
+# Inside fzf project directory
 FZF_VERSION=0 make install
 cp <binary> ~/bin
+```
 
-# Inside yazi project
+### Yazi (Custom Build)
+
+```bash
+# Build from source
 cargo build --release
-cp <binary> ~/bin
+cp target/release/yazi ~/bin
 
 # Or install from cargo
-# https://yazi-rs.github.io/docs/installation/#crates
 cargo install --force yazi-build
-# Or
+
+# Or install latest from git
 cargo install --force --git https://github.com/sxyazi/yazi.git yazi-build
 ```
 
-Create symlink to VSCode/Cursor config:
-```bash
-rm -rf ~/Library/Application\ Support/Code/User
-# Or if using cursor
-# rm -rf ~/Library/Application\ Support/Cursor/User
-cd ~/Library/Application\ Support/Code
-# cd ~/Library/Application\ Support/Cursor
-ln -s ~/.config/vscode/User User
-```
+Reference: [Yazi Installation Guide](https://yazi-rs.github.io/docs/installation/#crates)
 
 Configure Finder settings:
 
-![](./readme_assets/finder-settings-1.png)
-![](./readme_assets/finder-settings-2.png)
-![](./readme_assets/finder-settings-3.png)
+**Advanced Tab:**
+- [x] Show all filename extensions
+- [x] Show warning before changing an extension
+- [x] Show warning before removing from iCloud Drive
+- [x] Show warning before emptying the Trash
+- [ ] Remove items from the Trash after 30 days
+- When performing a search: Search the Current Folder
+
+**General Tab:**
+- [ ] Sync Desktop & Documents folders
+- [ ] Open folders in tabs instead of new windows
+
+**Sidebar Tab:**
+Show these items in the sidebar:
+- [ ] Recents
+- [x] AirDrop
+- [x] Applications
+- [x] Desktop
+- [x] Documents
+- [x] Downloads
+- [x] Movies
+- [x] Music
+- [x] Pictures
+- [x] [your username]
+- [x] iCloud Drive
+- [x] Shared
+- [x] [your username]'s MacBook Pro
+- [x] Hard disks
+- [x] External disks

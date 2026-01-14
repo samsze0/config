@@ -243,11 +243,15 @@ if.window-title-regex-substring = 'spotify'
 run = 'move-node-to-workspace 5'
 
 [[on-window-detected]]
-if.window-title-regex-substring = 'protonvpn'
+if.window-title-regex-substring = 'discord'
 run = 'move-node-to-workspace 5'
 
 [[on-window-detected]]
-if.window-title-regex-substring = 'discord'
+if.window-title-regex-substring = 'clash verge'
+run = 'move-node-to-workspace 5'
+
+[[on-window-detected]]
+if.window-title-regex-substring = 'surge'
 run = 'move-node-to-workspace 5'
 
 # [[on-window-detected]]

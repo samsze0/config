@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "**/brew-bundles/*": "properties"
-    },
-    "explorer.excludeGitIgnore": false,
-    "search.exclude": {
-        "**/zsh/plugins/**": true,
-    }
-}

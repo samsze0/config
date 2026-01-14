@@ -1,5 +1,10 @@
 // https://zed.dev/docs/configuring-zed
 {
+  "autosave": {
+    "after_delay": {
+      "milliseconds": 1000
+    }
+  },
   "lsp_document_colors": "background",
   "git_panel": {
     "tree_view": true

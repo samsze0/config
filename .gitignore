@@ -41,9 +41,6 @@
 !.config/nushell/
 !.config/nushell/**
 
-!.config/lf/
-!.config/lf/**
-
 !.config/nvim/
 !.config/nvim/**
 

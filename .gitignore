@@ -49,8 +49,6 @@
 
 !.config/zed/
 !.config/zed/**
-.config/zed/prompts/
-.config/zed/conversations/
 
 !.config/brew-bundles/
 !.config/brew-bundles/**

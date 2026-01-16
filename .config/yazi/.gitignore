@@ -1,0 +1,3 @@
+# Ignore all plugins except nvim.yazi
+plugins/*
+!plugins/nvim.yazi/

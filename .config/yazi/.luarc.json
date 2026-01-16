@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
   "runtime.version": "LuaJIT",
   "workspace": {
-    "library": ["types.lua"],
+    "library": ["plugins/types.yazi"],
     "checkThirdParty": false
   }
 }

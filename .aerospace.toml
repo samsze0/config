@@ -67,7 +67,7 @@ persistent-workspaces = [
     "12",
 ]
 
-# In TOML, single square brackets [] define a table (like a dictionary or map) 
+# In TOML, single square brackets [] define a table (like a dictionary or map)
 # Nested Tables: Use dot notation within single brackets to create nested structures.
 # E.g. [mode.main.binding]
 
@@ -211,12 +211,12 @@ semicolon = ['flatten-workspace-tree', 'mode main'] # reset layout
 # Option to specific an array of app-ids, PR still open
 # https://github.com/nikitabobko/AeroSpace/pull/1665
 
-# if.during-aerospace-startup = 
+# if.during-aerospace-startup =
 # If true then run the callback only during AeroSpace startup.
 # If false then run callback only NOT during AeroSpace startup.
 # If not specified then the condition isn’t checked
 
-# check-further-callbacks = 
+# check-further-callbacks =
 # Several callbacks can be declared in the config. The callbacks are processed
 # in the order they are declared. By default, the first callback that matches
 # the criteria is run, and further callbacks are not considered. (The behavior
@@ -239,6 +239,18 @@ if.app-id = 'net.kovidgoyal.kitty'
 run = 'move-node-to-workspace 12'
 
 [[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = 'move-node-to-workspace 12'
+
+[[on-window-detected]]
+if.app-id = 'com.anthropic.claudefordesktop'
+run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
+if.app-id = 'com.openai.chat'
+run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
 if.window-title-regex-substring = 'spotify'
 run = 'move-node-to-workspace 5'
 
@@ -253,6 +265,3 @@ run = 'move-node-to-workspace 5'
 [[on-window-detected]]
 if.window-title-regex-substring = 'surge'
 run = 'move-node-to-workspace 5'
-
-# [[on-window-detected]]
-# if.window-title-regex-substring = 'cursor'

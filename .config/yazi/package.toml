@@ -8,5 +8,10 @@ use = "Rolv-Apneseth/starship"
 rev = "a63550b"
 hash = "c2021386289a0cbb3e152a052f67c177"
 
+[[plugin.deps]]
+use = "yazi-rs/plugins:types"
+rev = "56971d0"
+hash = "daf9e3d12688cf855fce665839efcd6d"
+
 [flavor]
 deps = []

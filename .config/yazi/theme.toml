@@ -1,7 +1,7 @@
 "$schema" = "https://yazi-rs.github.io/schemas/theme.json"
 
 [flavor]
-use = "samsze0"
+use = "x"
 
 [icon]
 files = [
@@ -560,4 +560,3 @@ exts = [
 	{ name = "zst", text = "", fg_dark = "#c87e46", fg_light = "#ed9a57" },
 	{ name = "🔥", text = "", fg_dark = "#b54949", fg_light = "#e66666" },
 ]
-

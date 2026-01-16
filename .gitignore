@@ -44,9 +44,6 @@
 !.config/nushell/
 !.config/nushell/**
 
-!.config/nvim/
-!.config/nvim/**
-
 !.config/zed/
 !.config/zed/**
 

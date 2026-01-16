@@ -2,22 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
     <dict>
-        <!--
-        Slight tweak of the base16 theme to make line highlighting more visible.
-
-        This theme is meant for users who configure their terminal with a base16
-        color theme. If you use a 256-color variant along with base16-shell, use
-        the bat theme base16-256 instead.
-
-        base16: https://github.com/chriskempson/base16
-        base16-shell: https://github.com/chriskempson/base16-shell
-
-        The colors in this theme are encoded as #RRGGBBAA where RR is an ANSI
-        palette number from 00 to 0f (the 8 colors and their bright versions),
-        and AA is the special value 00 to indicate this encoding is being used.
-        -->
         <key>author</key>
-        <string>Template: Chris Kempson, Scheme: Sam Sze</string>
+        <string>X</string>
         <key>name</key>
         <string>Base16</string>
         <key>colorSpaceName</key>

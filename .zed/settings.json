@@ -1,0 +1,12 @@
+{
+  "format_on_save": "on",
+  "formatter": "auto",
+  "languages": {
+    "JSON": {
+      "formatter": "prettier",
+    },
+    "TypeScript": {
+      "formatter": "prettier",
+    },
+  },
+}

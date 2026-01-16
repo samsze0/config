@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "generate": "tsx generate.ts"
+  },
+  "dependencies": {
+    "@types/node": "^25.0.9",
+    "smol-toml": "^1.6.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

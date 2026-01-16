@@ -2,6 +2,11 @@
 
 !AGENTS.md
 !.mcp.json
+!.geminiignore
+!.codexignore
+
+!.zed/
+!.zed/**
 
 !.gitignore
 !.gitmodules
@@ -9,19 +14,21 @@
 !README.md
 !OSX.md
 
-!.aerospace.toml
-
 !.tmux.conf
+
+!.zshrc
 
 !.config/
 .config/*
 
-!.zshrc
 !.config/zsh/
 !.config/zsh/**
 
-!.config/starship.toml
-!.config/starship_default.toml
+!.config/aerospace/
+!.config/aerospace/**
+
+!.config/starship/
+!.config/starship/**
 
 !.config/bat/
 !.config/bat/**

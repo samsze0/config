@@ -1,0 +1,267 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = "$directory$git_branch$git_commit$git_state$git_metrics$git_status$all$line_break$character"
+
+[battery]
+disabled = true
+
+[memory_usage]
+disabled = true
+
+[username]
+disabled = false
+style_root = "bright-black"
+style_user = "bright-black"
+show_always = false
+format = "⋅ [$user]($style) "
+
+[hostname]
+disabled = false
+ssh_only = true
+style = "bright-yellow"
+format = "⋅ [$hostname]($style) "
+
+[localip]
+disabled = false
+ssh_only = true
+style = "bright-yellow"
+format = "⋅ [$localipv4]($style) "
+
+[character]
+disabled = false
+success_symbol = "[❯](bold blue)"
+error_symbol = "[❯](bold red)"
+vimcmd_symbol = "[❮](bold blue)"
+vimcmd_visual_symbol = "[❮](bold yellow)"
+vimcmd_replace_symbol = "[❮](bold red)"
+vimcmd_replace_one_symbol = "[❮](bold red)"
+format = "[$symbol]($style) "
+
+[jobs]
+disabled = false
+threshold = 1
+symbol_threshold = 1
+number_threshold = 1
+symbol = "✦"
+style = "blue"
+format = "⋅ [$symbol$number]($style) "
+
+[aws]
+disabled = true
+
+[azure]
+disabled = true
+
+[cmd_duration]
+disabled = false
+min_time = 0
+style = "bright-black"
+show_milliseconds = false
+show_notifications = false
+min_time_to_notify = 45000
+format = "⋅ [$duration]($style) "
+
+[nix_shell]
+disabled = false
+symbol = "Nix"
+style = "blue"
+impure_msg = "impure"
+pure_msg = "pure"
+
+[package]
+disabled = true
+
+[docker_context]
+disabled = false
+symbol = "󰡨 "
+style = "blue"
+only_with_files = true
+format = "⋅ [$symbol$context]($style) "
+
+[container]
+disabled = true
+
+[directory]
+disabled = false
+style = "bright-black"
+
+[git_status]
+disabled = false
+style = " bright-black"
+ahead = "⇡"
+behind = "⇣"
+stashed = ""
+up_to_date = ""
+diverged = "ʏ"
+conflicted = "C"
+deleted = "D"
+renamed = "R"
+modified = "!"
+staged = "+"
+untracked = "?"
+ignore_submodules = true
+format = "⋅ [$all_status$ahead_behind]($style) "
+
+[git_state]
+disabled = false
+rebase = "REBASING"
+merge = "MERGING"
+revert = "REVERTING"
+cherry_pick = "CHERRY-PICKING"
+bisect = "BISECTING"
+style = " bright-black"
+format = "⋅ [$state ($progress_current/$progress_total)]($style) "
+
+[git_branch]
+disabled = false
+symbol = " "
+style = " blue"
+format = "⋅ [$symbol$branch(:$remote_branch)]($style) "
+
+[git_metrics]
+disabled = true
+added_style = "blue"
+deleted_style = "red"
+only_nonzero_diffs = true
+format = "[+$added]($added_style) [-$deleted]($deleted_style)"
+
+[kubernetes]
+disabled = false
+symbol = "󱃾 "
+style = "blue"
+format = "⋅ [$symbol$context$namespace]($style) "
+
+[shell]
+disabled = false
+bash_indicator = "bash"
+zsh_indicator = "zsh"
+nu_indicator = "nu"
+fish_indicator = "󰈺"
+powershell_indicator = "_"
+unknown_indicator = "?"
+style = "bright-black"
+format = "⋅ [$indicator]($style) "
+
+[c]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[cmake]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[golang]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[java]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[kotlin]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[gradle]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[lua]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[nodejs]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[python]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[rust]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[ruby]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[swift]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[typst]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[zig]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[deno]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[helm]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[terraform]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[pulumi]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+format = "⋅ [$symbol($version)]($style) "
+
+[custom.osx]
+disabled = false
+style = "bright-black"
+command = "arch"
+symbol = " "
+when = "[[ \"$(uname)\" == \"Darwin\" ]]"
+format = "⋅ [$symbol($output)]($style) "
+
+[custom.linux]
+disabled = false
+style = "bright-black"
+command = "arch"
+symbol = " "
+when = "[[ \"$(uname)\" == \"Linux\" ]]"
+format = "⋅ [$symbol($output)]($style) "

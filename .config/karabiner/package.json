@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "generate": "tsx generate.ts"
+  },
 	"dependencies": {
 		"@types/node": "^20.14.11"
 	}

@@ -9,7 +9,7 @@ Personal dotfiles repository for macOS. Uses an inverted gitignore pattern (igno
 ## Tracked Configurations
 
 - **Shell:** Nushell (`.config/nushell/`), Zsh (`.zshrc`, `.config/zsh/`)
-- **Editors:** Zed (`.config/zed/`)
+- **Editors:** Neovim (`.config/nvim/`), Zed (`.config/zed/`)
 - **Terminal:** Kitty (`.config/kitty/`), tmux (`.tmux.conf`)
 - **Window manager:** AeroSpace (`.aerospace.toml`)
 - **Tools:** Yazi (`.config/yazi/`), Karabiner (`.config/karabiner/`), starship (`.config/starship.toml`)

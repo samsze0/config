@@ -47,5 +47,8 @@
 !.config/zed/
 !.config/zed/**
 
+!.config/nvim/
+!.config/nvim/**
+
 !.config/brew-bundles/
 !.config/brew-bundles/**

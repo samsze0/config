@@ -1,0 +1,186 @@
+# Ghostty Configuration
+
+# =============================================================================
+# Cursor
+# =============================================================================
+cursor-style = bar
+cursor-style-blink = false
+
+# =============================================================================
+# Scrollback
+# =============================================================================
+# Kitty: scrollback_lines 10000
+# Ghostty uses bytes instead of lines (~1MB for 10000 lines)
+scrollback-limit = 10000000
+
+# =============================================================================
+# Mouse
+# =============================================================================
+mouse-hide-while-typing = true
+
+# =============================================================================
+# URLs
+# =============================================================================
+# Kitty: detect_urls no
+link-url = false
+
+# =============================================================================
+# Copy & Paste
+# =============================================================================
+copy-on-select = false
+clipboard-trim-trailing-spaces = true
+clipboard-paste-protection = true
+
+# =============================================================================
+# Colors
+# =============================================================================
+background-opacity = 1
+
+foreground = #CBD1DA
+background = #0f1118
+
+selection-foreground = #CBD1DA
+selection-background = #273335
+
+# Color palette (0-15)
+# black
+palette = 0=#0f1118
+# red
+palette = 1=#f36868
+# green
+palette = 2=#9dd39b
+# yellow
+palette = 3=#fea968
+# blue
+palette = 4=#62a6ff
+# magenta
+palette = 5=#e0a0e0
+# cyan
+palette = 6=#6cc6c6
+# white
+palette = 7=#CBD1DA
+
+# bright variants
+# bright black
+palette = 8=#547d9c
+# bright red
+palette = 9=#f36868
+# bright green
+palette = 10=#9dd39b
+# bright yellow
+palette = 11=#fea968
+# bright blue
+palette = 12=#62a6ff
+# bright magenta
+palette = 13=#e0a0e0
+# bright cyan
+palette = 14=#6cc6c6
+# bright white
+palette = 15=#CBD1DA
+
+# =============================================================================
+# Font
+# =============================================================================
+font-family = Liga SFMono Nerd Font
+font-family-bold = Liga SFMono Nerd Font
+font-size = 12
+
+# Kitty: adjust_line_height 10
+adjust-cell-height = 10
+
+# Kitty: disable_ligatures always
+font-feature = -calt
+font-feature = -liga
+
+# Kitty: modify_font underline_position 2
+adjust-underline-position = 2
+
+# Kitty: modify_font underline_thickness 50%
+adjust-underline-thickness = 50%
+
+# =============================================================================
+# Window
+# =============================================================================
+window-padding-x = 0
+window-padding-y = 0
+
+# Kitty: confirm_os_window_close 0
+confirm-close-surface = false
+
+# =============================================================================
+# Shell
+# =============================================================================
+# Kitty: shell_integration disabled
+shell-integration = none
+
+# =============================================================================
+# macOS Specific
+# =============================================================================
+macos-option-as-alt = true
+
+# =============================================================================
+# Keybindings
+# =============================================================================
+# Clear default keybindings (like Kitty's clear_all_shortcuts yes)
+keybind = clear
+
+# Copy & Paste
+keybind = alt+c=copy_to_clipboard
+keybind = alt+v=paste_from_clipboard
+
+# Windows (OS-level windows in Ghostty)
+keybind = alt+n=new_window
+
+# Tabs
+keybind = alt+t=new_tab
+keybind = alt+l=next_tab
+keybind = alt+j=previous_tab
+keybind = alt+shift+l=move_tab:1
+keybind = alt+shift+j=move_tab:-1
+
+# Config reload
+keybind = alt+comma=reload_config
+keybind = alt+r=reload_config
+
+# Font size
+keybind = alt+shift+equal=increase_font_size:2
+keybind = alt+shift+minus=decrease_font_size:2
+
+# Splits (Ghostty equivalent of Kitty's windows/panes)
+keybind = alt+down=new_split:down
+keybind = alt+right=new_split:right
+keybind = alt+left=new_split:left
+keybind = alt+up=new_split:up
+keybind = alt+w=close_surface
+keybind = alt+d=goto_split:down
+keybind = alt+e=goto_split:up
+keybind = alt+s=goto_split:left
+keybind = alt+f=goto_split:right
+
+# Toggle zoom (like Kitty's toggle_layout stack)
+keybind = alt+z=toggle_split_zoom
+
+# Scrollback
+keybind = alt+h=scroll_to_top
+keybind = alt+semicolon=clear_screen
+
+# Tab navigation by number
+keybind = alt+one=goto_tab:1
+keybind = alt+two=goto_tab:2
+keybind = alt+three=goto_tab:3
+keybind = alt+four=goto_tab:4
+keybind = alt+five=goto_tab:5
+keybind = alt+six=goto_tab:6
+keybind = alt+seven=goto_tab:7
+keybind = alt+eight=goto_tab:8
+keybind = alt+nine=goto_tab:9
+keybind = alt+zero=goto_tab:10
+
+# Tab renaming
+# https://github.com/ghostty-org/ghostty/issues/9880
+keybind = alt+shift+comma=prompt_surface_title
+
+# =============================================================================
+# Device-specific overrides (env, command, etc.)
+# =============================================================================
+config-file = /Users/x/.config/ghostty/env.config

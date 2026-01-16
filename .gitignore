@@ -1,5 +1,8 @@
 *
 
+!AGENTS.md
+!.mcp.json
+
 !.gitignore
 !.gitmodules
 
@@ -34,6 +37,9 @@
 
 !.config/kitty/
 !.config/kitty/**
+
+!.config/ghostty/
+!.config/ghostty/**
 
 !.config/nushell/
 !.config/nushell/**

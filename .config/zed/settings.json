@@ -45,6 +45,9 @@
   "format_on_save": "off",
   "extend_comment_on_newline": false,
   "features": {
-    "edit_prediction_provider": "copilot"
-  }
+    "edit_prediction_provider": "zed"
+  },
+  "edit_predictions": {
+    "mode": "eager" // or "subtle"
+  },
 }

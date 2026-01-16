@@ -19,6 +19,7 @@ if $os == "Darwin" {
     # Higher precedence than brew
     path add /usr/local/bin
     path add ~/.cargo/bin
+    path add ~/.local/bin
     path add ~/bin
     path add ~/miktex/bin
 

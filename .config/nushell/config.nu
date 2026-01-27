@@ -39,6 +39,9 @@ if $os == "Darwin" {
     # Zed: enable jupyter notebook feature
     # https://github.com/zed-industries/zed/pull/19756
     $env.LOCAL_NOTEBOOK_DEV = 1
+
+    # https://code.claude.com/docs/en/data-usage
+    $env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1
 }
 
 

@@ -1,4 +1,4 @@
-import { promises } from "fs";
+import { promises } from "node:fs";
 
 // TODO: migrate to use this https://github.com/evan-liu/karabiner.ts
 // https://genesy.github.io/karabiner-complex-rules-generator/
@@ -190,7 +190,7 @@ const rules = [
           { name: "rcommand", type: "variable_if", value: 1 },
           {
             type: "frontmost_application_if",
-            bundle_identifiers: ["kitty$"],
+            bundle_identifiers: ["kitty$", "ghostty$"],
           },
         ],
         from: { key_code: "j", modifiers: { optional: ["any"] } },
@@ -202,7 +202,7 @@ const rules = [
           { name: "rcommand", type: "variable_if", value: 1 },
           {
             type: "frontmost_application_if",
-            bundle_identifiers: ["kitty$"],
+            bundle_identifiers: ["kitty$", "ghostty$"],
           },
         ],
         from: { key_code: "l", modifiers: { optional: ["any"] } },
@@ -266,7 +266,10 @@ const rules = [
     manipulators: [
       {
         conditions: [
-          { type: "frontmost_application_if", bundle_identifiers: ["kitty$"] },
+          {
+            type: "frontmost_application_if",
+            bundle_identifiers: ["kitty$", "ghostty$"],
+          },
         ],
         from: {
           key_code: "left_command",
@@ -307,14 +310,14 @@ const rules = [
     ],
   },
   {
-    // Google chrome and Brave (nightly) prev/next tab
-    description: "Commnd J/L -> Ctrl (+ Shift) + Tab (Chrome and Brave nightly)",
+    // Chromium-based browsers prev/next tab
+    description: "Commnd J/L -> Ctrl (+ Shift) + Tab (Chromium-based browsers)",
     manipulators: [
       {
         conditions: [
           {
             type: "frontmost_application_if",
-            bundle_identifiers: ["com.google.Chrome", "com.brave.Browser.nightly"],
+            bundle_identifiers: ["com.google.Chrome", "com.brave.Browser"],
           },
         ],
         from: { key_code: "l", modifiers: { mandatory: ["left_command"] } },
@@ -328,7 +331,7 @@ const rules = [
         conditions: [
           {
             type: "frontmost_application_if",
-            bundle_identifiers: ["com.google.Chrome", "com.brave.Browser.nightly"],
+            bundle_identifiers: ["com.google.Chrome", "com.brave.Browser"],
           },
         ],
         from: { key_code: "j", modifiers: { mandatory: ["left_command"] } },
@@ -339,12 +342,12 @@ const rules = [
         type: "basic",
       },
     ],
-  }
+  },
 ];
 
 async function updateConfig() {
-  let data = await promises.readFile("default_config.json");
-  let config = JSON.parse(data.toString());
+  const data = await promises.readFile("default_config.json");
+  const config = JSON.parse(data.toString());
 
   config.profiles[0].name = "IM";
   config.profiles[0].selected = true;

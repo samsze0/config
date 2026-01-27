@@ -1,5 +1,28 @@
 // https://zed.dev/docs/configuring-zed
 {
+  "base_keymap": "VSCode",
+  "middle_click_paste": false,
+  "inlay_hints": {
+    "enabled": true
+  },
+  "completion_menu_scrollbar": "always",
+  
+  "show_signature_help_after_edits": true,
+  "which_key": {
+    "delay_ms": 300,
+    "enabled": true
+  },
+  "diagnostics": {
+    "inline": {
+      "enabled": true
+    }
+  },
+  "tabs": {
+    "file_icons": true
+  },
+  "outline_panel": {
+    "dock": "left"
+  },
   "autosave": {
     "after_delay": {
       "milliseconds": 1000
@@ -23,7 +46,7 @@
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "Github Dark Tritanopia"
+    "dark": "GitHub Dark Tritanopia"
   },
   "vim_mode": false,
   "active_pane_modifiers": {

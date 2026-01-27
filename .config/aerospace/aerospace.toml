@@ -259,7 +259,7 @@ if.window-title-regex-substring = 'discord'
 run = 'move-node-to-workspace 5'
 
 [[on-window-detected]]
-if.window-title-regex-substring = 'clash verge'
+if.window-title-regex-substring = 'clash party'
 run = 'move-node-to-workspace 5'
 
 [[on-window-detected]]

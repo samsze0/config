@@ -34,9 +34,7 @@ export def which-all [command] {
 
 export def "from env" []: string -> record {
 lines
-    | split column '#'
-    | get column1
-    | where {($in | str length) > 0}
+    | where { |line| ($line | str trim) != "" and not ($line | str starts-with "#") }
     | parse "{key}={value}"
     | update value {str trim -c '"'}
     | transpose -r -d

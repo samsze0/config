@@ -20,7 +20,7 @@ ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
 # Homebrew Configuration (macOS only)
 # =============================================================================
 
-if [ $(uname) == "Darwin" ]; then # macOS
+if [ $(uname) = "Darwin" ]; then # macOS
 	# Define Homebrew installation paths for different architectures
 	HOMEBREW_PREFIX="/opt/homebrew"         # Apple Silicon (M1/M2) location
 	HOMEBREW_X86_PREFIX="/opt/homebrew-x86" # Intel/Rosetta location

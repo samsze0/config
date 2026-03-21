@@ -260,6 +260,11 @@ if (command-exists zoxide) {
     zoxide init nushell | save -f ($nu.data-dir | path join "vendor/autoload/zoxide.nu")
 }
 
+if (command-exists pnpm) {
+    $env.PNPM_HOME = $"($env.HOME)/.local/share/pnpm"
+    path add $env.PNPM_HOME
+}
+
 alias w = w-columns
 alias f = yazi
 alias v = nvim

@@ -36,8 +36,18 @@ export def "from env" []: string -> record {
 lines
     | where { |line| ($line | str trim) != "" and not ($line | str starts-with "#") }
     | parse "{key}={value}"
-    | update value {str trim -c '"'}
-    | transpose -r -d
+    | each {|row|
+        let k = ($row.key | str trim)
+
+        let v = (
+            $row.value
+            | str trim
+            | str trim -c '"'
+        )
+
+        { $k: (if $v == "" { null } else { $v }) }
+    }
+    | reduce --fold {} {|it, acc| $acc | merge $it }
 }
 
 export alias du-ranked-by-largest = do {

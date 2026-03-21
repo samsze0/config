@@ -3,7 +3,10 @@
   "base_keymap": "VSCode",
   "middle_click_paste": false,
   "inlay_hints": {
-    "enabled": true
+    "enabled": false,
+    "toggle_on_modifiers_press": {
+      "alt": true
+    }
   },
   "completion_menu_scrollbar": "always",
   
@@ -37,8 +40,11 @@
     "diagnostics": false,
     "metrics": false,
   },
-  "ui_font_size": 15,
-  "buffer_font_size": 14,
+  "ui_font_size": 14,
+  "ui_font_family": ".SystemUIFont",
+  "ui_font_weight": 400,
+  "buffer_font_size": 13,
+  "buffer_font_family": "Liga SFMono Nerd Font",
   "terminal": {
     "font_family": "Liga SFMono Nerd Font",
     "cursor_shape": "bar"
@@ -46,7 +52,7 @@
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "GitHub Dark Tritanopia"
+    "dark": "GitHub Dark"
   },
   "vim_mode": false,
   "active_pane_modifiers": {

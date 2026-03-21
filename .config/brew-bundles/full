@@ -8,14 +8,16 @@ tap "shaunsingh/sfmono-nerd-font-ligaturized"
 tap "spring-io/tap"
 # Simple, modern, secure file encryption
 brew "age"
+# Open-source, cross-platform JavaScript runtime environment
+brew "node"
+# Browser automation CLI for AI agents
+brew "agent-browser"
 # Official Amazon AWS command-line interface
 brew "awscli"
 # Microsoft Azure CLI 2.0
 brew "azure-cli"
 # Bourne-Again SHell, a UNIX command interpreter
 brew "bash"
-# Open-source, cross-platform JavaScript runtime environment
-brew "node"
 # Language Server for Bash
 brew "bash-language-server"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -78,7 +80,7 @@ brew "exiftool"
 brew "eza"
 # Simple, fast and user-friendly alternative to find
 brew "fd"
-# Play, record, convert, and stream audio and video
+# Play, record, convert, and stream select audio and video codecs
 brew "ffmpeg"
 # Create thumbnails for your video files
 brew "ffmpegthumbnailer"
@@ -112,11 +114,13 @@ brew "gopls"
 brew "goreleaser"
 # Gorgeous metric visualizations and dashboards for timeseries databases
 brew "grafana"
+# Development framework for multimedia applications
+brew "gstreamer"
 # Kubernetes package manager
 brew "helm"
 # LLVM's OpenMP runtime library
 brew "libomp"
-# Tools and libraries to manipulate images in many formats
+# Tools and libraries to manipulate images in select formats
 brew "imagemagick"
 # CLI for ImageOptim, ImageAlpha and JPEGmini
 brew "imageoptim-cli"
@@ -158,6 +162,8 @@ brew "make"
 brew "marksman"
 # Mac App Store command-line interface
 brew "mas"
+# Another rule-based tunnel in Go, formerly known as ClashMeta
+brew "mihomo"
 # High Performance, Kubernetes Native Object Storage
 brew "minio"
 # Replacement for ls, cp and other commands for object storage
@@ -186,6 +192,8 @@ brew "ripgrep"
 brew "opencode"
 # OpenShift command-line interface tools
 brew "openshift-cli"
+# Execute binaries from Python packages in isolated environments
+brew "pipx"
 # Paste PNG into files
 brew "pngpaste"
 # Fast, disk space efficient package manager
@@ -274,6 +282,8 @@ brew "tldr"
 brew "tmux"
 # CLI tool that moves files or folder to the trash
 brew "trash", link: true
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
 # Language Server Protocol implementation for TypeScript wrapping tsserver
 brew "typescript-language-server"
 # Markup-based typesetting system
@@ -309,25 +319,23 @@ cask "1password"
 # Command-line interface for 1Password
 cask "1password-cli"
 # AeroSpace is an i3-like tiling window manager for macOS
-cask "aerospace"
+cask "nikitabobko/tap/aerospace"
 # iOS App Store alternative
 cask "altserver"
 # AI Coding Agent IDE
 cask "antigravity"
-# Cloud storage service
-cask "baidunetdisk"
+# Private desktop AI chat application
+cask "anythingllm"
 # 3D creation suite
 cask "blender"
-# Open source, extensible AI agent that goes beyond code suggestions
-cask "block-goose"
 # Web browser focusing on privacy
 cask "brave-browser"
 # Web browser focusing on privacy
 cask "brave-browser@nightly"
 # OpenAI's official ChatGPT desktop app
 cask "chatgpt"
-# Continuation of Clash Verge - A Clash Meta GUI based on Tauri
-cask "clash-verge-rev"
+# Another Mihomo GUI
+cask "clash-party"
 # Anthropic's official Claude AI desktop app
 cask "claude"
 # Terminal-based AI coding assistant
@@ -336,10 +344,10 @@ cask "claude-code"
 cask "cleanshot"
 # OpenAI's coding agent that runs in your terminal
 cask "codex"
+# OpenAI's Codex desktop app for managing coding agents
+cask "codex-app"
 # Write, edit, and chat about your code with AI
 cask "cursor"
-# Teamwork app by Alibaba Group
-cask "dingtalk"
 # Voice and text chat software
 cask "discord"
 # App to build and share containerised applications and microservices
@@ -349,12 +357,14 @@ cask "firefox@developer-edition"
 cask "font-sf-mono-nerd-font-ligaturized"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
-# Game development engine
+# 2D and 3D game engine
 cask "godot"
 # Web browser
 cask "google-chrome"
 # Video stabilization using gyroscope data
 cask "gyroflow"
+# Chromium-based web browser
+cask "helium-browser"
 # Free and open-source media player
 cask "iina"
 # Tool to optimise images to a smaller size
@@ -370,41 +380,33 @@ cask "keycastr"
 # GPU-based terminal emulator
 cask "kitty"
 # An open source cross-platform alternative to AirDrop
-cask "localsend"
+cask "localsend/localsend/localsend"
 # Cable-free audio router
 cask "loopback"
 # 2D game framework for Lua
 cask "love"
 # Clipboard manager
 cask "maccy"
-# Markdown editor
-cask "mark-text"
+# Speech recognition tool
+cask "macwhisper"
 # TeX distribution
 cask "miktex-console"
 # Open-source software for live streaming and screen recording
 cask "obs"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# Cross-platform GUI for youtube-dl made in Electron and node.js
-cask "open-video-downloader"
-# Client program for the OpenVPN Access Server
-cask "openvpn-connect"
 # Tool to create and manage Outline servers, powered by Shadowsocks
 cask "outline-manager"
 # Monitors computer mic and webcam
 cask "oversight"
 # Client for PikPak cloud storage service
 cask "pikpak"
+# 3D modeling software for concept artists and designers
+cask "plasticity"
 # VPN client focusing on security
 cask "protonvpn"
-# HTTP debugging proxy
-cask "proxyman"
-# Peer to peer Bitorrent client
-cask "qbittorrent"
 # Imaging utility to install operating systems to a microSD card
 cask "raspberry-pi-imager"
-# Control your tools with a few keystrokes
-cask "raycast"
 # Move and resize windows using keyboard shortcuts or snap areas
 cask "rectangle"
 # GUI for streamlined Redis application development
@@ -425,12 +427,8 @@ cask "steam"
 cask "superwhisper"
 # Network toolbox
 cask "surge"
-# Mesh VPN based on WireGuard
-cask "tailscale-app"
 # Messaging app with a focus on speed and security
 cask "telegram"
-# Configurable document editor that supports Markdown
-cask "typora"
 # AI image upscaler
 cask "upscayl"
 # Open-source code editor
@@ -439,16 +437,10 @@ cask "visual-studio-code"
 cask "viz"
 # Rust-based terminal
 cask "warp"
-# Terminal emulator
-cask "wave"
 # Free messaging and calling application
 cask "wechat"
 # Connect to Windows
 cask "windows-app"
-# Network protocol analyzer
-cask "wireshark-app"
-# BYOK (Bring Your Own Keys) AI assistant
-cask "witsy"
 # Multiplayer code editor
 cask "zed"
 # Multiplayer code editor
@@ -458,3 +450,6 @@ cask "zen"
 # Video communication and virtual meeting platform
 cask "zoom"
 go "honnef.co/go/tools/cmd/staticcheck"
+cargo "wasm-pack"
+uv "mcp-launchpad"
+uv "ruff"

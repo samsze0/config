@@ -53,24 +53,60 @@ const starshipSpec: {
     content: "$symbol($version)",
   },
   extensionModules: {
-    c: {},
-    cmake: {},
-    golang: {},
-    java: {},
-    kotlin: {},
-    gradle: {},
-    lua: {},
-    nodejs: {},
-    python: {},
-    rust: {},
-    ruby: {},
-    swift: {},
-    typst: {},
-    zig: {},
-    deno: {},
-    helm: {},
-    terraform: {},
-    pulumi: {},
+    c: {
+      symbol: "C ",
+    },
+    cmake: {
+      symbol: "CMake ",
+    },
+    golang: {
+      symbol: "Go ",
+    },
+    java: {
+      symbol: "Java ",
+    },
+    kotlin: {
+      symbol: "Kotlin ",
+    },
+    gradle: {
+      symbol: "Gradle ",
+    },
+    lua: {
+      symbol: "Lua ",
+    },
+    nodejs: {
+      symbol: "Node.js ",
+    },
+    python: {
+      symbol: "Python ",
+    },
+    rust: {
+      symbol: "Rust ",
+    },
+    ruby: {
+      symbol: "Ruby ",
+    },
+    swift: {
+      symbol: "Swift ",
+    },
+    typst: {
+      symbol: "Typst ",
+    },
+    zig: {
+      symbol: "Zig ",
+    },
+    deno: {
+      symbol: "Deno ",
+    },
+    helm: {
+      symbol: "Helm ",
+    },
+    terraform: {
+      symbol: "Terraform ",
+    },
+    pulumi: {
+      symbol: "Pulumi ",
+    },
   },
   coreModuleBaseConfig: {},
   coreModules: {

@@ -1,39 +1,56 @@
 // https://zed.dev/docs/configuring-zed
 {
+  "agent_servers": {
+    "codex-acp": {
+      "type": "registry",
+    },
+    "opencode": {
+      "type": "registry",
+    },
+  },
+  "project_panel": {
+    "dock": "left",
+  },
+  "agent": {
+    "dock": "left",
+    "favorite_models": [],
+    "model_parameters": [],
+  },
   "base_keymap": "VSCode",
   "middle_click_paste": false,
   "inlay_hints": {
     "enabled": false,
     "toggle_on_modifiers_press": {
-      "alt": true
-    }
+      "alt": true,
+    },
   },
   "completion_menu_scrollbar": "always",
-  
+
   "show_signature_help_after_edits": true,
   "which_key": {
     "delay_ms": 300,
-    "enabled": true
+    "enabled": true,
   },
   "diagnostics": {
     "inline": {
-      "enabled": true
-    }
+      "enabled": true,
+    },
   },
   "tabs": {
-    "file_icons": true
+    "file_icons": true,
   },
   "outline_panel": {
-    "dock": "left"
+    "dock": "left",
   },
   "autosave": {
     "after_delay": {
-      "milliseconds": 1000
-    }
+      "milliseconds": 1000,
+    },
   },
   "lsp_document_colors": "background",
   "git_panel": {
-    "tree_view": true
+    "dock": "left",
+    "tree_view": true,
   },
   "icon_theme": "Material Icon Theme",
   "telemetry": {
@@ -47,17 +64,17 @@
   "buffer_font_family": "Liga SFMono Nerd Font",
   "terminal": {
     "font_family": "Liga SFMono Nerd Font",
-    "cursor_shape": "bar"
+    "cursor_shape": "bar",
   },
   "theme": {
     "mode": "system",
     "light": "One Light",
-    "dark": "GitHub Dark"
+    "dark": "GitHub Dark Tritanopia",
   },
   "vim_mode": false,
   "active_pane_modifiers": {
     "inactive_opacity": 1,
-    "border_size": 1
+    "border_size": 1,
   },
   "experimental.theme_overrides": {
     "panel.focused_border": "#cccccc",
@@ -73,10 +90,8 @@
   "soft_wrap": "editor_width",
   "format_on_save": "off",
   "extend_comment_on_newline": false,
-  "features": {
-    "edit_prediction_provider": "zed"
-  },
   "edit_predictions": {
-    "mode": "eager" // or "subtle"
+    "provider": "zed",
+    "mode": "eager", // or "subtle"
   },
 }

@@ -10,10 +10,12 @@
       "f3": "file_finder::Toggle",
       "cmd-shift-o": "outline_panel::ToggleFocus",
       "f5": "project_symbols::Toggle",
+      "f9": "agent::ToggleFocus",
+      "f10": "multi_workspace::FocusWorkspaceSidebar",
       "f12": "git_panel::ToggleFocus",
       "cmd-shift-f": "pane::DeploySearch",
       "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],
-    }
+    },
   },
   {
     "context": "ProjectPanel",
@@ -22,13 +24,12 @@
       "cmd-r": "project_panel::RevealInFileManager",
       "cmd-n": "project_panel::NewFile",
       "cmd-shift-n": "project_panel::NewDirectory",
-      "cmd-d": "project_panel::Duplicate"
-    }
+      "cmd-d": "project_panel::Duplicate",
+    },
   },
   {
     "context": "GitPanel",
-    "bindings": {
-    }
+    "bindings": {},
   },
   {
     "context": "Editor",
@@ -51,7 +52,7 @@
       "cmd-alt-l": ["editor::SelectNext", { "replace_newest": false }],
       "cmd-shift-alt-l": [
         "editor::SelectPrevious",
-        { "replace_newest": false }
+        { "replace_newest": false },
       ],
       "cmd-k cmd-r": "editor::ToggleSoftWrap",
       // Editor stuff - LSP
@@ -66,11 +67,11 @@
       "cmd-k cmd-u": "editor::ToggleSelectedDiffHunks",
       "cmd-p": "git::ToggleStaged",
       // Other
-      "cmd-k cmd-m": "markdown::OpenPreviewToTheSide"
-    }
+      "cmd-k cmd-m": "markdown::OpenPreviewToTheSide",
+    },
   },
   {
     "context": "Pane",
-    "bindings": {}
-  }
+    "bindings": {},
+  },
 ]

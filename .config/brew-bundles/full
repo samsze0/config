@@ -375,6 +375,8 @@ cask "input-source-pro"
 cask "jordanbaird-ice"
 # Keyboard customiser
 cask "karabiner-elements"
+# Tool to prevent the system from going into sleep mode
+cask "keepingyouawake"
 # Open-source keystroke visualiser
 cask "keycastr"
 # GPU-based terminal emulator

@@ -42,6 +42,9 @@ if $os == "Darwin" {
 
     # https://code.claude.com/docs/en/data-usage
     $env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1
+} else if $os == "Linux" {
+    $env.XDG_DATA_HOME = ($env.HOME | path join ".local" "share")
+    $env.XDG_CONFIG_HOME = ($env.HOME | path join ".config")
 }
 
 

@@ -12,6 +12,7 @@
       "f5": "project_symbols::Toggle",
       "f9": "agent::ToggleFocus",
       "f10": "multi_workspace::FocusWorkspaceSidebar",
+      "f11": "git::Worktree",
       "f12": "git_panel::ToggleFocus",
       "cmd-shift-f": "pane::DeploySearch",
       "cmd-shift-h": ["pane::DeploySearch", { "replace_enabled": true }],

@@ -36,6 +36,9 @@
 !.config/bottom/
 !.config/bottom/**
 
+!.config/topiary/
+!.config/topiary/**
+
 !.config/yazi/
 !.config/yazi/**
 

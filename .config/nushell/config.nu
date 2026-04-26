@@ -268,6 +268,15 @@ if (command-exists pnpm) {
     path add $env.PNPM_HOME
 }
 
+if (command-exists topiary) {
+    $env.TOPIARY_CONFIG_FILE = ($env.XDG_CONFIG_HOME | path join topiary languages.ncl)
+    $env.TOPIARY_LANGUAGE_DIR = ($env.XDG_CONFIG_HOME | path join topiary queries)
+}
+
+if (command-exists bun) {
+    path add $"($env.HOME)/.bun/bin"
+}
+
 alias w = w-columns
 alias f = yazi
 alias v = nvim

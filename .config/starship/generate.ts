@@ -53,6 +53,9 @@ const starshipSpec: {
     content: "$symbol($version)",
   },
   extensionModules: {
+    bun: {
+      symbol: "Bun ",
+    },
     c: {
       symbol: "C ",
     },

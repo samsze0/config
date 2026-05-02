@@ -142,6 +142,13 @@ unknown_indicator = "?"
 style = "bright-black"
 format = "⋅ [$indicator]($style) "
 
+[bun]
+disabled = false
+style = "blue"
+version_format = "v${raw}"
+symbol = "Bun "
+format = "⋅ [$symbol($version)]($style) "
+
 [c]
 disabled = false
 style = "blue"

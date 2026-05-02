@@ -1,21 +1,15 @@
 name: linux-rtx
 root: ~/dev/image-gen
 
-shell: nix develop -c nu
-
 windows:
   - graphos-codex:
       panes:
-        - codex
-        - codex
-        - codex
-        - codex
-        - codex
-        - codex
+        - nix develop -c nu -c codex
+        - nix develop -c nu -c codex
   - graphos-server:
       panes:
-        - uv run cli.py server
+        - nix develop -c nu -c "uv run cli.py server"
   - comfyui:
       root: ~/dev/ComfyUI
       panes:
-        - uv run uv run main.py --listen 0.0.0.0 --enable-manager
+        - nix develop -c nu -c "uv run main.py --listen 0.0.0.0 --enable-manager"

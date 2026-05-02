@@ -62,3 +62,9 @@
 
 !.config/brew-bundles/
 !.config/brew-bundles/**
+
+!.config/pulse/
+!.config/pulse/**
+
+!.config/tmuxinator/
+!.config/tmuxinator/**

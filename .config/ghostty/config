@@ -111,7 +111,7 @@ confirm-close-surface = false
 # Shell
 # =============================================================================
 # Kitty: shell_integration disabled
-shell-integration = none
+shell-integration = detect
 
 # =============================================================================
 # macOS Specific
@@ -157,6 +157,17 @@ keybind = alt+e=goto_split:up
 keybind = alt+s=goto_split:left
 keybind = alt+f=goto_split:right
 
+# Scroll pageup/pagedown
+keybind = alt+page_up=scroll_page_up
+keybind = alt+page_down=scroll_page_down
+
+# Jump to next/previous prompt
+keybind = alt+home=jump_to_prompt:-1
+keybind = alt+end=jump_to_prompt:1
+
+# Search
+keybind = alt+shift+f=start_search
+
 # Toggle zoom (like Kitty's toggle_layout stack)
 keybind = alt+z=toggle_split_zoom
 
@@ -177,8 +188,13 @@ keybind = alt+nine=goto_tab:9
 keybind = alt+zero=goto_tab:10
 
 # Tab renaming
-# https://github.com/ghostty-org/ghostty/issues/9880
-keybind = alt+shift+comma=prompt_surface_title
+keybind = alt+shift+comma=prompt_tab_title
+
+# Command palette
+keybind = f1=toggle_command_palette
+
+# Quick / throwaway terminal
+keybind = f12=toggle_quick_terminal
 
 # =============================================================================
 # Device-specific overrides (env, command, etc.)

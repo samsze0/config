@@ -138,6 +138,13 @@ keybind = alt+j=previous_tab
 keybind = alt+shift+l=move_tab:1
 keybind = alt+shift+j=move_tab:-1
 
+# Undo
+# Not every action in Ghostty can be undone or redone. The list of actions support undo/redo is currently limited to:
+# - New window, close window
+# - New tab, close tab
+# - New split, close split
+keybind = alt+shift+t=undo
+
 # Config reload
 keybind = alt+comma=reload_config
 keybind = alt+r=reload_config
@@ -151,7 +158,8 @@ keybind = alt+down=new_split:down
 keybind = alt+right=new_split:right
 keybind = alt+left=new_split:left
 keybind = alt+up=new_split:up
-keybind = alt+w=close_surface
+keybind = alt+w=close_tab
+keybind = alt+x=close_surface
 keybind = alt+d=goto_split:down
 keybind = alt+e=goto_split:up
 keybind = alt+s=goto_split:left

@@ -5,3 +5,6 @@
 	path = .config/zsh/plugins/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting
 
+[submodule "harness-system"]
+	path = harness-system
+	url = https://gitea.bluebell.home/sam/harness-system.git

@@ -1,24 +1,70 @@
-# Personal Configuration
+# Personal Dotfiles
 
-This repository contains my personal dotfiles and system configuration.
+Personal dotfiles and system configuration. This repo is macOS-first, with best-effort Linux support for shared shell, terminal, editor, and tool configs.
+
+The repository uses an inverted `.gitignore`: everything is ignored by default, then specific configs are allowlisted. Use `git ls-files` to see what is actually version controlled.
 
 ## Quick Setup
 
-Clone and install configuration files:
+Clone the repo and copy the tracked configuration into `$HOME`:
 
 ```shell
-git clone https://github.com/samsze0/config --recursive config && cp -R config/{.,}* ~
+git clone https://github.com/samsze0/config --recursive config
+cp -R config/{.,}* ~
 ```
 
-## Platform-Specific Setup
+Review the worktree after copying, especially if the machine already has local dotfiles:
 
-- **[NixOS](https://github.com/samsze0/nixos-config)** - Complete NixOS system configuration
-- **[macOS](./OSX.md)** - macOS-specific setup instructions and configurations
+```shell
+git status --short
+git ls-files
+```
 
 ## What's Included
 
-This configuration includes dotfiles for:
-- Shell configurations (zsh, nushell)
-- Terminal utilities (fzf, yazi)
-- Development tools and editors
-- System preferences and settings
+- **Shell:** Nushell, Zsh entrypoint
+- **Terminals:** Kitty, Ghostty, tmux
+- **Editors:** Zed settings, keymap, and tasks
+- **Window management:** AeroSpace
+- **CLI tools:** Yazi, Starship, bat, bottom, Topiary, tmuxinator
+- **Keyboard:** Karabiner-Elements generated config source
+- **Audio:** PulseAudio macOS override
+- **Packages:** Homebrew bundles for lite, dev, full, and personal installs
+
+## macOS
+
+macOS is the primary target for this repo. See [OSX.md](./OSX.md) for the setup walkthrough.
+
+Common setup commands:
+
+```shell
+# Install packages from an interactive Homebrew bundle selector
+brew-bundle-install
+
+# Generate Karabiner configuration
+cd ~/.config/karabiner && bun run generate
+
+# Generate Starship configuration
+cd ~/.config/starship && bun run generate
+```
+
+The shell configs handle Apple Silicon and Rosetta/Homebrew prefix differences.
+
+## Linux
+
+Linux support is best effort for shared tracked configs. Current tracked Linux-aware pieces include:
+
+- Nushell environment setup for Linux
+- Starship prompt metadata for Linux
+- A tmuxinator profile for a Linux workstation
+
+## Maintenance
+
+Before editing, check what is tracked:
+
+```shell
+git ls-files
+git status --short
+```
+
+Avoid adding machine-local state, app histories, caches, secrets, or generated private config. If a config should become part of the repo, add it intentionally and update the allowlist in `.gitignore`.

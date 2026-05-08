@@ -29,5 +29,5 @@ open = [
 fallback = [{ run = 'xdg-open "$@"', desc = "xdg-open" }]
 
 [open]
-prepend_rules = [{ name = "*.mp4", use = "video" }]
-append_rules = [{ name = "*", use = "fallback" }]
+prepend_rules = [{ url = "*.mp4", use = "video" }]
+append_rules = [{ url = "*", use = "fallback" }]

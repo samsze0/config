@@ -1,5 +1,6 @@
 // https://zed.dev/docs/configuring-zed
 {
+  "cli_default_open_behavior": "existing_window",
   "agent_servers": {
     "codex-acp": {
       "type": "registry",
@@ -94,4 +95,14 @@
     "provider": "zed",
     "mode": "eager", // or "subtle"
   },
+  "languages": {
+    "Nu": {
+      "formatter": {
+        "external": {
+          "command": "topiary",
+          "arguments": ["format", "--language", "nu"]
+        }
+      }
+    }
+  }
 }

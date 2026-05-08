@@ -18,7 +18,7 @@ Always use `git ls-files` as the source of truth for what is part of version con
 
 ## Tracked Configuration Areas
 
-- **Shell:** Nushell in `.config/nushell/`, Zsh entrypoint in `.zshrc`
+- **Shell:** Nushell in `.config/nushell/`, Zsh entrypoint and plugin submodules under `.config/zsh/`
 - **Terminal:** Kitty, Ghostty, tmux
 - **Editors:** Zed project and user settings
 - **Window management:** AeroSpace
@@ -26,7 +26,7 @@ Always use `git ls-files` as the source of truth for what is part of version con
 - **Package management:** Homebrew bundles in `.config/brew-bundles/`
 - **Docs:** `README.md`, `OSX.md`, `AGENTS.md`
 
-Do not assume untracked directories, such as local Neovim or Zsh plugin directories, are part of the repo unless they appear in `git ls-files`.
+Do not assume untracked directories, such as local Neovim config, are part of the repo unless they appear in `git ls-files`.
 
 ## Platform Notes
 
@@ -52,5 +52,7 @@ cd ~/.config/karabiner && bun run generate
 # Regenerate Starship config from the tracked TypeScript source
 cd ~/.config/starship && bun run generate
 ```
+
+Machine-local overrides should stay ignored, including terminal env files and `.config/nushell/local.env.nu`.
 
 When changing generated configuration, update the source generator and the generated tracked output together when both are tracked.

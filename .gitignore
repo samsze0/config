@@ -59,9 +59,7 @@
 
 !.config/zed/
 !.config/zed/**
-
-!.config/nvim/
-!.config/nvim/**
+.config/zed/settings_backup.json
 
 !.config/brew-bundles/
 !.config/brew-bundles/**

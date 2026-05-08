@@ -4,17 +4,21 @@
 
 # zsh-autosuggestions: Suggests commands as you type based on history/completions
 # https://github.com/zsh-users/zsh-autosuggestions
-. ~/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh
-# Use both command history and shell completions for suggestions
-ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+if [ -f "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh" ]; then
+	. "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
+	# Use both command history and shell completions for suggestions
+	ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+fi
 
 # zsh-syntax-highlighting: Colors commands as you type them
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
-. ~/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# Configure syntax highlighting styles
-typeset -A ZSH_HIGHLIGHT_STYLES
-# Make valid commands appear in bold blue
-ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
+if [ -f "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+	. "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+	# Configure syntax highlighting styles
+	typeset -A ZSH_HIGHLIGHT_STYLES
+	# Make valid commands appear in bold blue
+	ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
+fi
 
 # =============================================================================
 # Homebrew Configuration (macOS only)

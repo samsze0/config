@@ -207,4 +207,4 @@ keybind = f12=toggle_quick_terminal
 # =============================================================================
 # Device-specific overrides (env, command, etc.)
 # =============================================================================
-config-file = /Users/x/.config/ghostty/env.config
+config-file = ?env.config

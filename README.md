@@ -22,7 +22,7 @@ git ls-files
 
 ## What's Included
 
-- **Shell:** Nushell, Zsh entrypoint
+- **Shell:** Nushell, Zsh entrypoint, and Zsh plugin submodules
 - **Terminals:** Kitty, Ghostty, tmux
 - **Editors:** Zed settings, keymap, and tasks
 - **Window management:** AeroSpace
@@ -68,3 +68,5 @@ git status --short
 ```
 
 Avoid adding machine-local state, app histories, caches, secrets, or generated private config. If a config should become part of the repo, add it intentionally and update the allowlist in `.gitignore`.
+
+Machine-local overrides belong in ignored files such as terminal env overrides and `.config/nushell/local.env.nu`.

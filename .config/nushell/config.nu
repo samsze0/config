@@ -283,3 +283,4 @@ alias v = nvim
 alias c = zed-preview
 
 alias sshs = env TERM="xterm-256color" sshs
+alias ssh = env TERM="xterm-256color" ssh

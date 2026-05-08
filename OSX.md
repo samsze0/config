@@ -42,7 +42,7 @@ brew-bundle-install
 ### Configure Karabiner-Elements
 
 ```bash
-cd ~/.config/karabiner && npx tsx config.ts
+cd ~/.config/karabiner && bun run generate
 ```
 
 ## Optional: Custom Tool Builds

@@ -14,8 +14,8 @@
 !README.md
 !OSX.md
 
-!harness-system
 !harness-system/
+!harness-system/**
 
 !.tmux.conf
 

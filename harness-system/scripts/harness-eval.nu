@@ -95,6 +95,18 @@ def check-agents [failures: list] {
   if ($manager | str contains '^ln -s $agents_link "AGENTS.md"') {
     $out = (add-failure $out "manager.nu must not symlink downstream AGENTS.md")
   }
+  if not ($manager | str contains 'def skills-runner') {
+    $out = (add-failure $out "manager.nu must select a skills runner")
+  }
+  if not ($manager | str contains '^bunx skills add $skill_dir --skill $skill_name --yes') {
+    $out = (add-failure $out "manager.nu must prefer bunx for skills install")
+  }
+  if not ($manager | str contains '^deno run -A npm:skills add $skill_dir --skill $skill_name --yes') {
+    $out = (add-failure $out "manager.nu must support deno for skills install")
+  }
+  if not ($manager | str contains '^npx --yes skills add $skill_dir --skill $skill_name --yes') {
+    $out = (add-failure $out "manager.nu must install skills non-interactively")
+  }
   if not ($manager | str contains 'def "main pull"') {
     $out = (add-failure $out "manager.nu must expose a pull subcommand")
   }

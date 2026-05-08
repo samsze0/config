@@ -251,7 +251,11 @@ nu harness-system/manager.nu setup
 
 In a clean downstream repo, setup creates a regular `AGENTS.md` containing a
 marked harness-managed block generated from `harness-system/templates/AGENTS.md`,
-symlinks `.mcp.json`, and installs the local skills with Vercel's skills tool.
+symlinks `.mcp.json`, and installs the local skills with Vercel's skills tool
+using non-interactive project-scope symlink defaults. Skill installation uses
+the first available runner in this order: `bunx`, `deno`, then `npx`; each runner
+is invoked in a form that can fetch the `skills` package if it is not already
+installed.
 
 If the downstream repo already has an `AGENTS.md`, setup leaves project-owned
 instructions in place and inserts or updates only a marked harness-managed block

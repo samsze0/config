@@ -120,6 +120,40 @@ def ensure-prefix-clean [prefix: string] {
   }
 }
 
+def skills-runner [] {
+  if not (which bunx | is-empty) {
+    return "bunx"
+  }
+
+  if not (which deno | is-empty) {
+    return "deno"
+  }
+
+  if not (which npx | is-empty) {
+    return "npx"
+  }
+
+  print "Error: setup requires bunx, deno, or npx to install skills."
+  print "Install one of those tools and rerun setup."
+  exit 1
+}
+
+def add-skill [runner: string, skill_dir: string, skill_name: string] {
+  match $runner {
+    "bunx" => { ^bunx skills add $skill_dir --skill $skill_name --yes }
+    "deno" => { ^deno run -A npm:skills add $skill_dir --skill $skill_name --yes }
+    "npx" => { ^npx --yes skills add $skill_dir --skill $skill_name --yes }
+    _ => {
+      print $"Error: unsupported skills runner ($runner)"
+      exit 1
+    }
+  }
+
+  if $env.LAST_EXIT_CODE != 0 {
+    exit $env.LAST_EXIT_CODE
+  }
+}
+
 def preflight-agents [subtree: string] {
   let agents_link = $"($subtree)/templates/AGENTS.md"
 
@@ -275,11 +309,6 @@ def run-setup [subtree: string] {
     exit 1
   }
 
-  if (which npx | is-empty) {
-    print "Error: npx is required to install skills with Vercel's skills tool."
-    exit 1
-  }
-
   preflight-agents $subtree
   preflight-mcp $subtree
 
@@ -287,12 +316,14 @@ def run-setup [subtree: string] {
   setup-agents $subtree
   setup-mcp $subtree
 
+  let runner = (skills-runner)
   print "Installing harness skills with Vercel's skills tool:"
+  print $"  runner: ($runner)"
   for skill in (glob ($SCRIPT_DIR | path join "skills/*/SKILL.md")) {
     let skill_dir = ($skill | path dirname)
     let skill_name = ($skill_dir | path basename)
     print $"  ($skill_name) <- ($skill_dir)"
-    ^npx skills add $skill_dir --skill $skill_name
+    add-skill $runner $skill_dir $skill_name
   }
 
   print $"Optional: run 'nu ($subtree)/scripts/harness-eval.nu static' from this repository to validate the harness package."

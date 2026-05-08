@@ -1,0 +1,7 @@
+{
+  "defaultAgent": "codex",
+  "defaultPermissions": "approve-reads",
+  "nonInteractivePermissions": "fail",
+  "format": "text",
+  "timeout": 1800
+}

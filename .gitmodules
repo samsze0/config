@@ -8,3 +8,6 @@
 [submodule "harness-system"]
 	path = harness-system
 	url = https://gitea.bluebell.home/sam/harness-system.git
+[submodule ".config/brew-bundles"]
+	path = .config/brew-bundles
+	url = https://gitea.bluebell.home/sam/brew-bundles.git

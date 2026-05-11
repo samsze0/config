@@ -23,7 +23,7 @@ Always use `git ls-files` as the source of truth for what is part of version con
 - **Editors:** Zed project and user settings
 - **Window management:** AeroSpace
 - **Tools:** Yazi, Karabiner-Elements, Starship, bat, bottom, Topiary, PulseAudio, tmuxinator
-- **Package management:** Homebrew bundles in `.config/brew-bundles/`
+- **Package management:** private Homebrew bundle submodule at `.config/brew-bundles/`
 - **Docs:** `README.md`, `OSX.md`, `AGENTS.md`
 
 Do not assume untracked directories, such as local Neovim config, are part of the repo unless they appear in `git ls-files`.
@@ -56,6 +56,8 @@ cd ~/.config/starship && bun run generate
 Machine-local overrides should stay ignored, including terminal env files and `.config/nushell/local.env.nu`.
 
 When changing generated configuration, update the source generator and the generated tracked output together when both are tracked.
+
+Do not add files inside `.config/brew-bundles/` to the parent repo. That path is a private submodule; the public parent should only track its gitlink.
 
 <!-- BEGIN harness-system managed block: source=harness-system/templates/AGENTS.md -->
 

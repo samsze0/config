@@ -13,6 +13,13 @@ git clone https://github.com/samsze0/config --recursive config
 cp -R config/{.,}* ~
 ```
 
+Private submodules, such as Homebrew bundle profiles, require access to their
+Gitea repositories:
+
+```shell
+git submodule update --init --recursive
+```
+
 Review the worktree after copying, especially if the machine already has local dotfiles:
 
 ```shell
@@ -29,7 +36,7 @@ git ls-files
 - **CLI tools:** Yazi, Starship, bat, bottom, Topiary, tmuxinator
 - **Keyboard:** Karabiner-Elements generated config source
 - **Audio:** PulseAudio macOS override
-- **Packages:** Homebrew bundles for lite, dev, full, and personal installs
+- **Packages:** Homebrew bundle profiles in a private submodule
 
 ## macOS
 

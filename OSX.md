@@ -35,6 +35,9 @@ ln -s ~/Library/Mobile\ Documents/com\~apple\~CloudDocs ~/cloud
 ### Install Homebrew Packages
 
 ```bash
+# Requires the private .config/brew-bundles submodule.
+git submodule update --init --recursive
+
 # In nushell
 brew-bundle-install
 ```

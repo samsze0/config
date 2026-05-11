@@ -6,10 +6,18 @@ windows:
       panes:
         - nix develop -c nu -c codex
         - nix develop -c nu -c codex
+        - nix develop -c nu -c codex
+        - nix develop -c nu -c codex
+        - nix develop -c nu -c codex
+        - nix develop -c nu -c codex
   - graphos-server:
       panes:
-        - nix develop -c nu -c "uv run cli.py server"
+        - nix develop -c nu
+        - nix develop -c nu
+        - nix develop -c nu
+        - nix develop -c nu
   - comfyui:
       root: ~/dev/ComfyUI
       panes:
         - nix develop -c nu -c "uv run main.py --listen 0.0.0.0 --enable-manager"
+        - nix develop -c nu

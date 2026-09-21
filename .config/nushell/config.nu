@@ -42,9 +42,16 @@ if $os == "Darwin" {
 
     # https://code.claude.com/docs/en/data-usage
     $env.CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1
+
+    # Added by MiniMax Code
+    path add ~/.minimax/bin
+
 } else if $os == "Linux" {
     $env.XDG_DATA_HOME = ($env.HOME | path join ".local" "share")
     $env.XDG_CONFIG_HOME = ($env.HOME | path join ".config")
+
+    path add ~/.local/bin
+    path add ~/bin
 }
 
 
@@ -275,6 +282,11 @@ if (command-exists topiary) {
 
 if (command-exists bun) {
     path add $"($env.HOME)/.bun/bin"
+}
+
+let bitwarden_ssh_agent_sock = $"($env.HOME)/.bitwarden-ssh-agent.sock"
+if ($bitwarden_ssh_agent_sock | path exists) {
+    $env.SSH_AUTH_SOCK = $bitwarden_ssh_agent_sock
 }
 
 alias w = w-columns

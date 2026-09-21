@@ -5,19 +5,19 @@
 # zsh-autosuggestions: Suggests commands as you type based on history/completions
 # https://github.com/zsh-users/zsh-autosuggestions
 if [ -f "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh" ]; then
-	. "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
-	# Use both command history and shell completions for suggestions
-	ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+    . "$HOME/.config/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.plugin.zsh"
+    # Use both command history and shell completions for suggestions
+    ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 fi
 
 # zsh-syntax-highlighting: Colors commands as you type them
 # https://github.com/zsh-users/zsh-syntax-highlighting/blob/master/docs/highlighters.md
 if [ -f "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
-	. "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
-	# Configure syntax highlighting styles
-	typeset -A ZSH_HIGHLIGHT_STYLES
-	# Make valid commands appear in bold blue
-	ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
+    . "$HOME/.config/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    # Configure syntax highlighting styles
+    typeset -A ZSH_HIGHLIGHT_STYLES
+    # Make valid commands appear in bold blue
+    ZSH_HIGHLIGHT_STYLES[command]='fg=blue,bold'
 fi
 
 # =============================================================================
@@ -25,16 +25,16 @@ fi
 # =============================================================================
 
 if [ $(uname) = "Darwin" ]; then # macOS
-	# Define Homebrew installation paths for different architectures
-	HOMEBREW_PREFIX="/opt/homebrew"         # Apple Silicon (M1/M2) location
-	HOMEBREW_X86_PREFIX="/opt/homebrew-x86" # Intel/Rosetta location
+    # Define Homebrew installation paths for different architectures
+    HOMEBREW_PREFIX="/opt/homebrew"         # Apple Silicon (M1/M2) location
+    HOMEBREW_X86_PREFIX="/opt/homebrew-x86" # Intel/Rosetta location
 
-	# Configure shell environment based on current architecture
-	if [ $(arch) = "i386" ]; then # Running under Rosetta (Intel compatibility)
-		eval "$($HOMEBREW_X86_PREFIX/bin/brew shellenv)"
-	else # Running natively on Apple Silicon
-		eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
-	fi
+    # Configure shell environment based on current architecture
+    if [ $(arch) = "i386" ]; then # Running under Rosetta (Intel compatibility)
+        eval "$($HOMEBREW_X86_PREFIX/bin/brew shellenv)"
+    else # Running natively on Apple Silicon
+        eval "$($HOMEBREW_PREFIX/bin/brew shellenv)"
+    fi
 fi
 
 # =============================================================================
@@ -62,3 +62,9 @@ bindkey "^H" backward-kill-word
 bindkey "^[[1;5D" backward-word
 # Ctrl+Right Arrow: Move cursor one word forwards
 bindkey "^[[1;5C" forward-word
+
+# Added by Paseo
+export PATH="$HOME/.local/bin:$PATH"
+
+# Added by MiniMax Code
+export PATH="$HOME/.minimax/bin:$PATH"

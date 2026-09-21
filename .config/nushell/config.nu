@@ -284,6 +284,10 @@ if (command-exists bun) {
     path add $"($env.HOME)/.bun/bin"
 }
 
+if (command-exists npm) {
+    path add $"(npm config get prefix)/bin"
+}
+
 let bitwarden_ssh_agent_sock = $"($env.HOME)/.bitwarden-ssh-agent.sock"
 if ($bitwarden_ssh_agent_sock | path exists) {
     $env.SSH_AUTH_SOCK = $bitwarden_ssh_agent_sock
